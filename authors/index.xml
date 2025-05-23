@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Authors on ASG LAB</title>
+    <link>https://asglab.github.io/asglab-web/authors/</link>
+    <description>Recent content in Authors on ASG LAB</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>info@asglab.it (ASG LAB)</managingEditor>
+    <webMaster>info@asglab.it (ASG LAB)</webMaster>
+    <copyright>© 2025 ASG LAB</copyright>
+    <atom:link href="https://asglab.github.io/asglab-web/authors/index.xml" rel="self" type="application/rss+xml" />
+    
+  </channel>
+</rss>
