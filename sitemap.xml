@@ -2,12 +2,52 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <sitemap>
-    <loc>http://localhost:1313/asglab-web/en/sitemap.xml</loc>
+    <loc>https://asglab.github.io/asglab-web/it/sitemap.xml</loc>
     
   </sitemap>
   
   <sitemap>
-    <loc>http://localhost:1313/asglab-web/it/sitemap.xml</loc>
+    <loc>https://asglab.github.io/asglab-web/de/sitemap.xml</loc>
+    
+  </sitemap>
+  
+  <sitemap>
+    <loc>https://asglab.github.io/asglab-web/en/sitemap.xml</loc>
+    
+  </sitemap>
+  
+  <sitemap>
+    <loc>https://asglab.github.io/asglab-web/es/sitemap.xml</loc>
+    
+  </sitemap>
+  
+  <sitemap>
+    <loc>https://asglab.github.io/asglab-web/fr/sitemap.xml</loc>
+    
+  </sitemap>
+  
+  <sitemap>
+    <loc>https://asglab.github.io/asglab-web/pt/sitemap.xml</loc>
+    
+  </sitemap>
+  
+  <sitemap>
+    <loc>https://asglab.github.io/asglab-web/ru/sitemap.xml</loc>
+    
+  </sitemap>
+  
+  <sitemap>
+    <loc>https://asglab.github.io/asglab-web/ar/sitemap.xml</loc>
+    
+  </sitemap>
+  
+  <sitemap>
+    <loc>https://asglab.github.io/asglab-web/zh-cn/sitemap.xml</loc>
+    
+  </sitemap>
+  
+  <sitemap>
+    <loc>https://asglab.github.io/asglab-web/hi/sitemap.xml</loc>
     
   </sitemap>
   

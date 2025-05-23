@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>欢迎访问 ASG LAB 网站！ on ASG LAB</title>
+    <link>https://asglab.github.io/asglab-web/zh-cn/</link>
+    <description>Recent content in 欢迎访问 ASG LAB 网站！ on ASG LAB</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <managingEditor>info@asglab.it (ASG LAB)</managingEditor>
+    <webMaster>info@asglab.it (ASG LAB)</webMaster>
+    <copyright>© 2025 ASG LAB</copyright>
+    <atom:link href="https://asglab.github.io/asglab-web/zh-cn/index.xml" rel="self" type="application/rss+xml" />
+    
+  </channel>
+</rss>
