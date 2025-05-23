@@ -3,63 +3,63 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
   <url>
-    <loc>https://asglab.github.io/asglab-web/contacts/</loc>
+    <loc>http://localhost:1313/asglab-web/contacts/</loc>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
     <xhtml:link
       rel="alternate"
       hreflang="it"
-      href="https://asglab.github.io/asglab-web/it/contacts/"
+      href="http://localhost:1313/asglab-web/it/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="https://asglab.github.io/asglab-web/contacts/"
+      href="http://localhost:1313/asglab-web/contacts/"
     />
   </url>
   <url>
-    <loc>https://asglab.github.io/asglab-web/privacy/</loc>
+    <loc>http://localhost:1313/asglab-web/privacy/</loc>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
     <xhtml:link
       rel="alternate"
       hreflang="it"
-      href="https://asglab.github.io/asglab-web/it/privacy/"
+      href="http://localhost:1313/asglab-web/it/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="https://asglab.github.io/asglab-web/privacy/"
+      href="http://localhost:1313/asglab-web/privacy/"
     />
   </url>
   <url>
-    <loc>https://asglab.github.io/asglab-web/terms/</loc>
+    <loc>http://localhost:1313/asglab-web/terms/</loc>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
     <xhtml:link
       rel="alternate"
       hreflang="it"
-      href="https://asglab.github.io/asglab-web/it/terms/"
+      href="http://localhost:1313/asglab-web/it/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="https://asglab.github.io/asglab-web/terms/"
+      href="http://localhost:1313/asglab-web/terms/"
     />
   </url>
   <url>
-    <loc>https://asglab.github.io/asglab-web/</loc>
+    <loc>http://localhost:1313/asglab-web/</loc>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
     <xhtml:link
       rel="alternate"
       hreflang="it"
-      href="https://asglab.github.io/asglab-web/it/"
+      href="http://localhost:1313/asglab-web/it/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="https://asglab.github.io/asglab-web/"
+      href="http://localhost:1313/asglab-web/"
     />
   </url>
 </urlset>

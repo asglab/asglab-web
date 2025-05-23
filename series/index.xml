@@ -2,14 +2,14 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Series on ASG LAB</title>
-    <link>https://asglab.github.io/asglab-web/series/</link>
+    <link>http://localhost:1313/asglab-web/series/</link>
     <description>Recent content in Series on ASG LAB</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <managingEditor>info@asglab.it (ASG LAB)</managingEditor>
     <webMaster>info@asglab.it (ASG LAB)</webMaster>
     <copyright>© 2025 ASG LAB</copyright>
-    <atom:link href="https://asglab.github.io/asglab-web/series/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/asglab-web/series/index.xml" rel="self" type="application/rss+xml" />
     
   </channel>
 </rss>
