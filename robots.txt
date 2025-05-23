@@ -1,3 +1,3 @@
 User-agent: *
-Allow: /
-Sitemap: https://asglab.github.io/asglab-web/sitemap.xml
+Disallow: /
+Sitemap: http://localhost:1313/sitemap.xml

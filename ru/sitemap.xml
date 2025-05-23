@@ -3,223 +3,223 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
   <url>
-    <loc>https://asglab.github.io/asglab-web/ru/privacy/</loc>
+    <loc>http://localhost:1313/ru/privacy/</loc>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="https://asglab.github.io/asglab-web/de/privacy/"
+      href="http://localhost:1313/de/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="it"
-      href="https://asglab.github.io/asglab-web/privacy/"
+      href="http://localhost:1313/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="https://asglab.github.io/asglab-web/en/privacy/"
+      href="http://localhost:1313/en/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="es"
-      href="https://asglab.github.io/asglab-web/es/privacy/"
+      href="http://localhost:1313/es/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="fr"
-      href="https://asglab.github.io/asglab-web/fr/privacy/"
+      href="http://localhost:1313/fr/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="pt"
-      href="https://asglab.github.io/asglab-web/pt/privacy/"
+      href="http://localhost:1313/pt/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ar"
-      href="https://asglab.github.io/asglab-web/ar/privacy/"
+      href="http://localhost:1313/ar/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="zh-cn"
-      href="https://asglab.github.io/asglab-web/zh-cn/privacy/"
+      href="http://localhost:1313/zh-cn/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="hi"
-      href="https://asglab.github.io/asglab-web/hi/privacy/"
+      href="http://localhost:1313/hi/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ru"
-      href="https://asglab.github.io/asglab-web/ru/privacy/"
+      href="http://localhost:1313/ru/privacy/"
     />
   </url>
   <url>
-    <loc>https://asglab.github.io/asglab-web/ru/terms/</loc>
+    <loc>http://localhost:1313/ru/terms/</loc>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="https://asglab.github.io/asglab-web/de/terms/"
+      href="http://localhost:1313/de/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="it"
-      href="https://asglab.github.io/asglab-web/terms/"
+      href="http://localhost:1313/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="https://asglab.github.io/asglab-web/en/terms/"
+      href="http://localhost:1313/en/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="es"
-      href="https://asglab.github.io/asglab-web/es/terms/"
+      href="http://localhost:1313/es/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="fr"
-      href="https://asglab.github.io/asglab-web/fr/terms/"
+      href="http://localhost:1313/fr/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="pt"
-      href="https://asglab.github.io/asglab-web/pt/terms/"
+      href="http://localhost:1313/pt/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ar"
-      href="https://asglab.github.io/asglab-web/ar/terms/"
+      href="http://localhost:1313/ar/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="zh-cn"
-      href="https://asglab.github.io/asglab-web/zh-cn/terms/"
+      href="http://localhost:1313/zh-cn/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="hi"
-      href="https://asglab.github.io/asglab-web/hi/terms/"
+      href="http://localhost:1313/hi/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ru"
-      href="https://asglab.github.io/asglab-web/ru/terms/"
+      href="http://localhost:1313/ru/terms/"
     />
   </url>
   <url>
-    <loc>https://asglab.github.io/asglab-web/ru/</loc>
+    <loc>http://localhost:1313/ru/</loc>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
     <xhtml:link
       rel="alternate"
       hreflang="it"
-      href="https://asglab.github.io/asglab-web/"
+      href="http://localhost:1313/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="https://asglab.github.io/asglab-web/de/"
+      href="http://localhost:1313/de/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="https://asglab.github.io/asglab-web/en/"
+      href="http://localhost:1313/en/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="es"
-      href="https://asglab.github.io/asglab-web/es/"
+      href="http://localhost:1313/es/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="fr"
-      href="https://asglab.github.io/asglab-web/fr/"
+      href="http://localhost:1313/fr/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="pt"
-      href="https://asglab.github.io/asglab-web/pt/"
+      href="http://localhost:1313/pt/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ar"
-      href="https://asglab.github.io/asglab-web/ar/"
+      href="http://localhost:1313/ar/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="zh-cn"
-      href="https://asglab.github.io/asglab-web/zh-cn/"
+      href="http://localhost:1313/zh-cn/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="hi"
-      href="https://asglab.github.io/asglab-web/hi/"
+      href="http://localhost:1313/hi/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ru"
-      href="https://asglab.github.io/asglab-web/ru/"
+      href="http://localhost:1313/ru/"
     />
   </url>
   <url>
-    <loc>https://asglab.github.io/asglab-web/ru/contacts/</loc>
+    <loc>http://localhost:1313/ru/contacts/</loc>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
     <xhtml:link
       rel="alternate"
       hreflang="it"
-      href="https://asglab.github.io/asglab-web/contacts/"
+      href="http://localhost:1313/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="https://asglab.github.io/asglab-web/de/contacts/"
+      href="http://localhost:1313/de/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="https://asglab.github.io/asglab-web/en/contacts/"
+      href="http://localhost:1313/en/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="es"
-      href="https://asglab.github.io/asglab-web/es/contacts/"
+      href="http://localhost:1313/es/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="fr"
-      href="https://asglab.github.io/asglab-web/fr/contacts/"
+      href="http://localhost:1313/fr/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="pt"
-      href="https://asglab.github.io/asglab-web/pt/contacts/"
+      href="http://localhost:1313/pt/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ar"
-      href="https://asglab.github.io/asglab-web/ar/contacts/"
+      href="http://localhost:1313/ar/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="zh-cn"
-      href="https://asglab.github.io/asglab-web/zh-cn/contacts/"
+      href="http://localhost:1313/zh-cn/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="hi"
-      href="https://asglab.github.io/asglab-web/hi/contacts/"
+      href="http://localhost:1313/hi/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ru"
-      href="https://asglab.github.io/asglab-web/ru/contacts/"
+      href="http://localhost:1313/ru/contacts/"
     />
   </url>
 </urlset>
