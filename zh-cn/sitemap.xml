@@ -3,223 +3,223 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
   <url>
-    <loc>http://localhost:1313/zh-cn/privacy/</loc>
+    <loc>https://asglab.it/zh-cn/terms/</loc>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="http://localhost:1313/de/privacy/"
+      href="https://asglab.it/de/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="it"
-      href="http://localhost:1313/privacy/"
+      href="https://asglab.it/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="http://localhost:1313/en/privacy/"
+      href="https://asglab.it/en/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="es"
-      href="http://localhost:1313/es/privacy/"
+      href="https://asglab.it/es/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="fr"
-      href="http://localhost:1313/fr/privacy/"
+      href="https://asglab.it/fr/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="pt"
-      href="http://localhost:1313/pt/privacy/"
+      href="https://asglab.it/pt/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ru"
-      href="http://localhost:1313/ru/privacy/"
+      href="https://asglab.it/ru/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ar"
-      href="http://localhost:1313/ar/privacy/"
+      href="https://asglab.it/ar/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="hi"
-      href="http://localhost:1313/hi/privacy/"
+      href="https://asglab.it/hi/terms/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="zh-cn"
-      href="http://localhost:1313/zh-cn/privacy/"
+      href="https://asglab.it/zh-cn/terms/"
     />
   </url>
   <url>
-    <loc>http://localhost:1313/zh-cn/terms/</loc>
+    <loc>https://asglab.it/zh-cn/</loc>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
     <xhtml:link
       rel="alternate"
-      hreflang="en"
-      href="http://localhost:1313/de/terms/"
-    />
-    <xhtml:link
-      rel="alternate"
       hreflang="it"
-      href="http://localhost:1313/terms/"
+      href="https://asglab.it/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="http://localhost:1313/en/terms/"
+      href="https://asglab.it/de/"
+    />
+    <xhtml:link
+      rel="alternate"
+      hreflang="en"
+      href="https://asglab.it/en/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="es"
-      href="http://localhost:1313/es/terms/"
+      href="https://asglab.it/es/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="fr"
-      href="http://localhost:1313/fr/terms/"
+      href="https://asglab.it/fr/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="pt"
-      href="http://localhost:1313/pt/terms/"
+      href="https://asglab.it/pt/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ru"
-      href="http://localhost:1313/ru/terms/"
+      href="https://asglab.it/ru/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ar"
-      href="http://localhost:1313/ar/terms/"
+      href="https://asglab.it/ar/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="hi"
-      href="http://localhost:1313/hi/terms/"
+      href="https://asglab.it/hi/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="zh-cn"
-      href="http://localhost:1313/zh-cn/terms/"
+      href="https://asglab.it/zh-cn/"
     />
   </url>
   <url>
-    <loc>http://localhost:1313/zh-cn/</loc>
+    <loc>https://asglab.it/zh-cn/contacts/</loc>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
     <xhtml:link
       rel="alternate"
       hreflang="it"
-      href="http://localhost:1313/"
+      href="https://asglab.it/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="http://localhost:1313/de/"
+      href="https://asglab.it/de/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="http://localhost:1313/en/"
+      href="https://asglab.it/en/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="es"
-      href="http://localhost:1313/es/"
+      href="https://asglab.it/es/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="fr"
-      href="http://localhost:1313/fr/"
+      href="https://asglab.it/fr/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="pt"
-      href="http://localhost:1313/pt/"
+      href="https://asglab.it/pt/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ru"
-      href="http://localhost:1313/ru/"
+      href="https://asglab.it/ru/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ar"
-      href="http://localhost:1313/ar/"
+      href="https://asglab.it/ar/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="hi"
-      href="http://localhost:1313/hi/"
+      href="https://asglab.it/hi/contacts/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="zh-cn"
-      href="http://localhost:1313/zh-cn/"
+      href="https://asglab.it/zh-cn/contacts/"
     />
   </url>
   <url>
-    <loc>http://localhost:1313/zh-cn/contacts/</loc>
+    <loc>https://asglab.it/zh-cn/privacy/</loc>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
     <xhtml:link
       rel="alternate"
+      hreflang="en"
+      href="https://asglab.it/de/privacy/"
+    />
+    <xhtml:link
+      rel="alternate"
       hreflang="it"
-      href="http://localhost:1313/contacts/"
+      href="https://asglab.it/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="en"
-      href="http://localhost:1313/de/contacts/"
-    />
-    <xhtml:link
-      rel="alternate"
-      hreflang="en"
-      href="http://localhost:1313/en/contacts/"
+      href="https://asglab.it/en/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="es"
-      href="http://localhost:1313/es/contacts/"
+      href="https://asglab.it/es/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="fr"
-      href="http://localhost:1313/fr/contacts/"
+      href="https://asglab.it/fr/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="pt"
-      href="http://localhost:1313/pt/contacts/"
+      href="https://asglab.it/pt/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ru"
-      href="http://localhost:1313/ru/contacts/"
+      href="https://asglab.it/ru/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="ar"
-      href="http://localhost:1313/ar/contacts/"
+      href="https://asglab.it/ar/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="hi"
-      href="http://localhost:1313/hi/contacts/"
+      href="https://asglab.it/hi/privacy/"
     />
     <xhtml:link
       rel="alternate"
       hreflang="zh-cn"
-      href="http://localhost:1313/zh-cn/contacts/"
+      href="https://asglab.it/zh-cn/privacy/"
     />
   </url>
 </urlset>
