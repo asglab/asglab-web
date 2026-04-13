@@ -1,0 +1,108 @@
+{{/* layouts/gestionale/single.html
+     Layout dedicato per la pagina gestionale ASG LAB.
+     Usa il wrapper Blowfish (head, theme toggle) ma body completamente custom.
+*/}}
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Lang }}"
+      dir="{{ .Site.Language.Params.direction | default "ltr" }}"
+      class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Gestionale — ASG LAB</title>
+
+  {{/* CSS Blowfish (tema, font, variabili colore) */}}
+  {{ $styles := resources.Get "css/compiled/main.css" }}
+  {{ if $styles }}
+    <link rel="stylesheet" href="{{ $styles.RelPermalink }}">
+  {{ end }}
+
+  {{/* Override variabili CSS per adattare i colori Blowfish alla dashboard */}}
+  <style>
+    /* Mappa variabili dashboard → variabili Blowfish */
+    :root {
+      --bg:       var(--color-neutral-100, #f0f2f5);
+      --bg1:      var(--color-neutral-0,   #ffffff);
+      --bg2:      var(--color-neutral-50,  #f7f8fa);
+      --bg3:      var(--color-neutral-100, #eaecf0);
+      --border:   var(--color-neutral-200, #c8cdd6);
+      --border2:  var(--color-neutral-400, #8e97a8);
+      --text:     var(--color-neutral-900, #0d1117);
+      --text2:    var(--color-neutral-800, #24292f);
+      --text3:    var(--color-neutral-600, #57606a);
+      --text4:    var(--color-neutral-500, #8c959f);
+      --blue:     var(--color-primary-600, #1a56db);
+      --blue-lt:  var(--color-primary-50,  #dbeafe);
+      --blue-bd:  var(--color-primary-300, #7fb3f5);
+      --blue-dk:  var(--color-primary-900, #1e3a8a);
+      --font:     var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+      /* Colori semantici invariati */
+      --green:#166534; --green-lt:#dcfce7; --green-bd:#6ee7a0;
+      --red:#991b1b;   --red-lt:#fee2e2;   --red-bd:#f87171;
+      --amber:#78350f; --amber-lt:#fef3c7; --amber-bd:#f59e0b;
+      --violet:#5b21b6;--violet-lt:#ede9fe;--violet-bd:#a78bfa;
+      --teal:#115e59;  --teal-lt:#ccfbf1;  --teal-bd:#2dd4bf;
+      --gray-lt:#f3f4f6; --gray-bd:#d1d5db;
+      --r:10px; --r-sm:7px; --r-lg:14px;
+      --sidebar-w:200px;
+    }
+    /* Dark mode — Blowfish usa classe .dark sul <html> */
+    html.dark {
+      --bg:#161b22;  --bg1:#0d1117; --bg2:#161b22; --bg3:#21262d;
+      --border:#30363d; --border2:#484f58;
+      --text:#e6edf3;  --text2:#cdd9e5; --text3:#8b949e; --text4:#6e7681;
+      --blue:#58a6ff;  --blue-lt:#1c2d44; --blue-bd:#388bfd; --blue-dk:#cae8ff;
+      --green:#3fb950; --green-lt:#122720; --green-bd:#2ea043;
+      --red:#f85149;   --red-lt:#2d1a1a;  --red-bd:#da3633;
+      --amber:#e3b341; --amber-lt:#2d1d00; --amber-bd:#d29922;
+    }
+    /* Nascondi il layout Blowfish e mostra solo la dashboard */
+    body { margin: 0; padding: 0; overflow: hidden; background: var(--bg); }
+    /* Altezza piena finestra */
+    #gestionale-app { width: 100vw; height: 100vh; }
+  </style>
+
+  {{/* CSS dashboard */}}
+  <link rel="stylesheet" href="/gestionale/dashboard.css">
+
+  {{/* Favicon dal sito */}}
+  {{ partial "favicons.html" . }}
+</head>
+
+<body class="{{ if .Site.Params.defaultTheme }}{{ .Site.Params.defaultTheme }}{{ end }}">
+
+  {{/* Auth check lato client — redirect se non autenticato */}}
+  <script>
+    (function(){
+      const k = 'asg_auth_ok';
+      if (!sessionStorage.getItem(k)) {
+        const pw = prompt('Password gestionale:');
+        if (pw !== '{{ .Site.Params.gestionalePassword | default "asglab2024" }}') {
+          document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#666">Accesso negato</div>';
+          return;
+        }
+        sessionStorage.setItem(k, '1');
+      }
+    })();
+  </script>
+
+  {{/* App dashboard — struttura identica alla v14 standalone */}}
+  <div id="gestionale-app">
+    {{/* Dashboard HTML - inline per evitare processing Hugo */}}
+    {{ readFile "/static/gestionale/dashboard-body.html" | safeHTML }}
+  </div>
+
+  {{/* JS dashboard */}}
+  <script src="/gestionale/dashboard.js"></script>
+
+  {{/* Theme sync: se Blowfish è in dark mode, applica dark anche alla dashboard */}}
+  <script>
+    (function(){
+      const isDark = document.documentElement.classList.contains('dark') ||
+                     localStorage.getItem('appearance') === 'dark';
+      if (isDark) document.documentElement.classList.add('dark');
+    })();
+  </script>
+</body>
+</html>
