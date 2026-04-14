@@ -217,15 +217,15 @@
           <div class="panel-body">
             <table style="width:100%;border-collapse:collapse;font-size:13px;">
               <thead><tr style="background:var(--bg2);font-size:11px;color:var(--text3);font-weight:600;">
-                <th style="padding:7px 14px;text-align:left">Tipo</th>
-                <th style="padding:7px 8px;text-align:left">N°</th>
+                <th style="padding:7px 10px;text-align:left;width:60px">Tipo</th>
+                <th style="padding:7px 8px;text-align:left;min-width:80px">N°</th>
                 <th style="padding:7px 8px;text-align:left">Cliente/Fornitore</th>
-                <th style="padding:7px 8px;text-align:right">Importo</th>
-                <th style="padding:7px 8px;text-align:left">Data</th>
-                <th style="padding:7px 8px;text-align:left">Scadenza</th>
-                <th style="padding:7px 8px;text-align:left">Stato</th>
-                <th style="padding:7px 8px;text-align:left">Conto</th>
-                <th style="padding:7px 8px;text-align:center">📄</th>
+                <th style="padding:7px 8px;text-align:right;width:80px">Importo</th>
+                <th style="padding:7px 8px;text-align:left;width:80px">Data</th>
+                <th style="padding:7px 8px;text-align:left;width:80px">Scadenza</th>
+                <th style="padding:7px 8px;text-align:left;width:70px">Stato</th>
+                <th style="padding:7px 8px;text-align:left;max-width:100px">Conto</th>
+                <th style="padding:7px 8px;text-align:center;width:30px">📄</th>
               </tr></thead>
               <tbody id="fatt-tbody">
                 <tr><td colspan="8" class="empty">Nessuna fattura — importa da Fattura24</td></tr>
@@ -724,6 +724,14 @@ const TIPO_BADGE={
 const CK='asg_config';
 function lCfg(){try{return JSON.parse(localStorage.getItem(CK)||'{}');}catch{return{};}}
 function sCfg(c){localStorage.setItem(CK,JSON.stringify(c));}
+// Legge valore da select nativo O da custom dropdown
+function getElVal(id){
+  const el=document.getElementById(id);
+  if(!el)return'';
+  if(el.classList&&el.classList.contains('csel'))return window._cselData?.[id]?.val||el.dataset.value||'';
+  return el.value||'';
+}
+
 function getCfg(){const c=lCfg();return{nc_url:c.nc_url||'',nc_user:c.nc_user||'',nc_pass:c.nc_pass||'',ok:!!(c.nc_url&&c.nc_user&&c.nc_pass)};}
 const K={comm:'asg_commesse',conti:'asg_conti',scad:'asg_scadenze',todo:'asg_todos',det:'asg_det',fatt:'asg_fatture',movimenti_fineco:'asg_mov_fineco',movimenti_sella:'asg_mov_sella'};
 
@@ -756,7 +764,7 @@ function navTo(viewId){
   if(ta){
     if(viewId==='home')ta.innerHTML='<span id="clk" style="font-size:12px;color:var(--text3)">'+new Date().toLocaleDateString('it-IT',{weekday:'long',day:'2-digit',month:'long'})+'</span>';
     else if(viewId==='commesse')ta.innerHTML='';
-    else if(viewId==='approv')ta.innerHTML='<button class="btn btn-ghost btn-sm" onclick="apriRFQTutti()">✉ Genera tutti RFQ</button>';
+    else if(viewId==='approv')ta.innerHTML='<button class="btn btn-ghost btn-sm" onclick="apriRDOTutti()">✉ Genera tutti RDO</button>';
     else ta.innerHTML='';
   }
   // Render specifico
@@ -935,7 +943,17 @@ async function parsePrimaNotaFile(file){
           const row = {};
           headers.forEach((h,j)=>{ row[h]=String(raw[i][j]??'').trim(); });
 
-          const dataPag = normDate(row['DATA PAG.']||row['Data pagamento']||'');
+          // Converti serial Excel in data se necessario
+          const excelDateToStr = v => {
+            if(!v)return'';
+            if(typeof v==='number'&&v>40000&&v<60000){
+              // Serial number Excel: giorni dal 1/1/1900
+              const d=new Date(Math.round((v-25569)*86400*1000));
+              return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');
+            }
+            return normDate(String(v));
+          };
+          const dataPag = excelDateToStr(row['DATA PAG.']||row['Data pagamento']||'');
           if(!dataPag) continue; // salta righe vuote
 
           const toNum = v => {
@@ -961,7 +979,7 @@ async function parsePrimaNotaFile(file){
             data_pag: dataPag,
             tipo: row['TIPO DOC.']||row['Tipo']||'',
             num_doc: row['NUM. DOC.']||row['Numero']||'',
-            data_doc: normDate(row['DATA DOC.']||row['Data doc.']||''),
+            data_doc: excelDateToStr(row['DATA DOC.']||row['Data doc.']||''),
             nota: row['NOTA']||row['Descrizione']||'',
             conto: row['CONTO']||row['Conto']||'',
             cliente: row['CLIENTE']||row['Cliente']||'',
