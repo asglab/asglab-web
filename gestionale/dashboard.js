@@ -5115,27 +5115,20 @@ function upgradeSelects(container){
 
 
 // ═══════════════════════════════════════════════
-// CUSTOM DROPDOWN v2 — position:fixed, zero eval
+// CUSTOM DROPDOWN v3 — overlay backdrop
 // ═══════════════════════════════════════════════
 (function(){
-  let _popup = null; // popup DOM element attualmente aperto
-  let _popupOwner = null; // .csel che ha aperto il popup
-  let _pickInProgress = false; // flag per evitare chiusura durante selezione
-
-  // Chiudi al click fuori — usa pointerdown, controlla che il click non sia dentro il popup
-  document.addEventListener('pointerdown', e => {
-    if (_popup && !_popup.contains(e.target) && !_popupOwner?.contains(e.target)) {
-      _hidePopup();
-    }
-  });
-
-  // Chiudi su scroll/resize
-  document.addEventListener('scroll', _hidePopup, true);
-  window.addEventListener('resize', _hidePopup);
+  let _popup = null;
+  let _backdrop = null;
+  let _popupOwner = null;
 
   function _hidePopup() {
+    if (_backdrop) { _backdrop.remove(); _backdrop = null; }
     if (_popup) { _popup.remove(); _popup = null; }
-    if (_popupOwner) { _popupOwner.querySelector('.csel-btn')?.classList.remove('open'); _popupOwner = null; }
+    if (_popupOwner) {
+      _popupOwner.querySelector('.csel-btn')?.classList.remove('open');
+      _popupOwner = null;
+    }
   }
 
   window._cselToggle = function(btn, id) {
@@ -5146,33 +5139,55 @@ function upgradeSelects(container){
     const data = window._cselData?.[id];
     if (!data) return;
 
+    // Backdrop trasparente — cattura click fuori senza interferire col popup
+    const backdrop = document.createElement('div');
+    backdrop.style.cssText = 'position:fixed;inset:0;z-index:99998;';
+    backdrop.addEventListener('click', _hidePopup);
+    document.body.appendChild(backdrop);
+    _backdrop = backdrop;
+
     // Crea popup
     const popup = document.createElement('div');
     popup.className = 'csel-popup show';
+    popup.style.zIndex = '99999';
     popup.innerHTML = data.opts.map(o => {
       if (o.group) {
         return `<div class="csel-group">${o.group}</div>` +
-          (o.items||[]).map(i => `<div class="csel-item${i.v===data.val?' active':''}" tabindex="0"
-            onpointerup="event.stopPropagation();window._cselPick(${JSON.stringify(id)},${JSON.stringify(i.v)},${JSON.stringify(i.l)})">${i.l}</div>`).join('');
+          (o.items||[]).map(i => `<div class="csel-item${i.v===data.val?' active':''}" tabindex="0">${i.l}</div>`).join('');
       }
-      return `<div class="csel-item${o.v===data.val?' active':''}${o.v===''?' ph':''}" tabindex="0"
-        onpointerup="event.stopPropagation();window._cselPick(${JSON.stringify(id)},${JSON.stringify(o.v)},${JSON.stringify(o.l)})">${o.l}</div>`;
+      return `<div class="csel-item${o.v===data.val?' active':''}${o.v===''?' ph':''}" tabindex="0">${o.l}</div>`;
     }).join('');
+
+    // Event delegation sul popup — un solo listener, nessun conflitto
+    popup.addEventListener('click', function(e) {
+      const item = e.target.closest('.csel-item');
+      if (!item) return;
+      e.stopPropagation();
+      // Trova valore dall'indice
+      const items = [...popup.querySelectorAll('.csel-item')];
+      const idx = items.indexOf(item);
+      const flat = [];
+      data.opts.forEach(o => { if(o.items) o.items.forEach(i=>flat.push(i)); else flat.push(o); });
+      const opt = flat[idx];
+      if (opt) window._cselPick(id, opt.v, opt.l);
+    });
 
     document.body.appendChild(popup);
     _popup = popup;
     _popupOwner = owner;
     btn.classList.add('open');
 
-    // Posiziona sotto il bottone
+    // Posiziona
     const rect = btn.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom - 8;
     const spaceAbove = rect.top - 8;
-    const ph = Math.min(280, popup.scrollHeight);
-    if (spaceBelow >= ph || spaceBelow >= spaceAbove) {
-      popup.style.top = (rect.bottom + 4) + 'px';
-    } else {
+    const ph = Math.min(280, 400);
+    if (spaceBelow < 150 && spaceAbove > spaceBelow) {
       popup.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+      popup.style.top = 'auto';
+    } else {
+      popup.style.top = (rect.bottom + 4) + 'px';
+      popup.style.bottom = 'auto';
     }
     popup.style.left = rect.left + 'px';
     popup.style.minWidth = rect.width + 'px';
@@ -5182,7 +5197,6 @@ function upgradeSelects(container){
     const data = window._cselData?.[id];
     if (!data) { _hidePopup(); return; }
     data.val = value;
-    // Aggiorna label nel bottone
     const owner = document.getElementById(id);
     if (owner) {
       const lbl = owner.querySelector('.csel-lbl');
@@ -5197,16 +5211,12 @@ function upgradeSelects(container){
   window._cselData = {};
 
   window.cselCreate = function(id, options, value, callback, {small=false, width='', placeholder='— seleziona —'}={}) {
-    // Flatten per trovare label corrente
     let label = placeholder;
     const flat = [];
     options.forEach(o => { if(o.items) o.items.forEach(i=>flat.push(i)); else flat.push(o); });
     const found = flat.find(o => o.v === value);
     if (found) label = found.l;
-
-    // Salva dati
     window._cselData[id] = { opts: options, val: value, cb: callback };
-
     const w = width ? `style="width:${width}"` : '';
     return `<div class="csel${small?' small':''}" id="${id}" ${w}>
       <button type="button" class="csel-btn" onclick="window._cselToggle(this,'${id}')">
@@ -5216,13 +5226,11 @@ function upgradeSelects(container){
     </div>`;
   };
 
-  // upgradeSelects: converte <select> nativi in csel nel container
   window.upgradeSelects = function(container) {
     const box = container || document.getElementById('modal-box');
     if (!box) return;
     box.querySelectorAll('select:not(.keep-native)').forEach(sel => {
       if (sel.closest('.csel')) return;
-
       const opts = [];
       Array.from(sel.children).forEach(child => {
         if (child.tagName === 'OPTGROUP') {
@@ -5233,24 +5241,15 @@ function upgradeSelects(container){
           opts.push({v: child.value, l: child.textContent.trim()});
         }
       });
-
       const value = sel.value || '';
       const id = 'csel-' + Math.random().toString(36).slice(2,8);
       const onchangeStr = sel.getAttribute('onchange') || '';
       const isSmall = sel.classList.contains('stato-approv-select') || sel.classList.contains('stato-sel') || sel.classList.contains('small');
       const w = sel.style.width || (sel.offsetWidth > 50 ? sel.offsetWidth + 'px' : '');
-
       const cb = onchangeStr ? function(v) {
-        // Crea un select temporaneo per simulare l'onchange
-        const tmp = document.createElement('select');
-        const opt = document.createElement('option');
-        opt.value = v; opt.selected = true;
-        tmp.appendChild(opt);
-        // Esegui onchange con this=tmp
-        try { (new Function('event', onchangeStr.replace(/this\.value/g, JSON.stringify(v)))).call(tmp, {}); }
+        try { (new Function(onchangeStr.replace(/this\.value/g, JSON.stringify(v)))).call({}); }
         catch(e) { try { eval(onchangeStr.replace(/this\.value/g, JSON.stringify(v))); } catch(e2) {} }
       } : null;
-
       const html = window.cselCreate(id, opts, value, cb, {small: isSmall, width: w});
       const div = document.createElement('div');
       div.innerHTML = html;
