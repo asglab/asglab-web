@@ -3287,12 +3287,12 @@ function pu10AddBlocco(sel){
   sel.value='';
   // Render lista blocchi
   const el=document.getElementById('pu10-blocchi-list');if(!el)return;
-  el.innerHTML=_pu10Blocchi.map((b,i)=>`<div style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:12px;">
-    <span style="font-family:monospace;font-weight:700;color:var(--green);min-width:50px">${b.cod}</span>
-    <span style="flex:1;color:var(--text2)">${b.desc}</span>
-    <span style="font-weight:700">€${fmt2(b.prezzo)}</span>
-    <button onclick="_pu10Blocchi.splice(${i},1);document.getElementById('pu10-blocchi-list').innerHTML='';_pu10Blocchi.forEach((_,j)=>_);pu10AddBlocco({value:''});pu10Update();" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 3px;">✕</button>
-  </div>`).join('');
+  el.innerHTML=_pu10Blocchi.map((b,i)=>'<div style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:12px;">'+
+    '<span style="font-family:monospace;font-weight:700;color:var(--green);min-width:50px">'+b.cod+'</span>'+
+    '<span style="flex:1;color:var(--text2)">'+b.desc+'</span>'+
+    '<span style="font-weight:700">€'+fmt2(b.prezzo)+'</span>'+
+    '<button onclick="_pu10Blocchi.splice('+i+',1);document.getElementById(\'pu10-blocchi-list\').innerHTML=\'\';_pu10Blocchi.forEach((_,j)=>_);pu10AddBlocco({value:\'\'});pu10Update();" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 3px;">✕</button>'+
+    '</div>').join('');
   pu10Update();
 }
 
