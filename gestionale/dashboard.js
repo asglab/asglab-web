@@ -2270,7 +2270,7 @@ function openModal(type,extra){
   if(type==='add-riga'){currentAddRigaNumero=extra||'';_tfRaSelected={A:null,B:null};_tfStdFiltro='';_tfDnAttuale=0;_raccScioltoFiltro='';_pu10Blocchi=[];_pu20Blocchi=[];}
   document.getElementById('modal-body').innerHTML=getModalHTML(type,extra);
   document.getElementById('modal-overlay').classList.add('show');
-  setTimeout(upgradeSelects,0);
+  setTimeout(()=>{upgradeSelects();precompilaMarkup();},0);
 }
 
 function closeM(){document.getElementById('modal-overlay').classList.remove('show');}
@@ -2687,7 +2687,7 @@ function getModalHTML(type,extra){
       <div class="fr"><label>Sezione</label><input id="f-sez" placeholder="es. Centralina, Raccorderia" list="sez-opt"><datalist id="sez-opt"><option value="Centralina"><option value="Cilindri"><option value="Raccorderia"><option value="Tubi flessibili"><option value="Elettrica"><option value="Generale"></datalist></div>
       <div class="fr"><label>Descrizione</label><textarea id="f-desc" style="min-height:50px"></textarea></div>
       <div class="fg3"><div class="fr"><label>Q.tà</label><input id="f-qty" type="number" value="1" min="1"></div><div class="fr"><label>Fornitore</label><input id="f-forn" placeholder="es. Pa.Co, GTA…" list="forn-list"><datalist id="forn-list">${FORNITORI.map(f=>`<option value="${f.nome}">`).join('')}</datalist></div><div class="fr"><label>Codice</label><input id="f-cod"></div></div>
-      <div class="fg3"><div class="fr"><label>Costo/cad (€)</label><input id="f-costo" type="number" step="0.01"></div><div class="fr"><label>Sconto (%)</label><input id="f-sconto" type="number" min="0" max="100" placeholder="0"></div><div class="fr"><label>Mark-up</label><input id="f-markup" type="number" step="0.01" value="2.25"></div></div>
+      <div class="fg3"><div class="fr"><label>Costo/cad (€)</label><input id="f-costo" type="number" step="0.01"></div><div class="fr"><label>Sconto (%)</label><input id="f-sconto" type="number" min="0" max="100" placeholder="0"></div><div class="fr"><label>Mark-up</label><input id="f-markup" type="number" step="0.01" value=""></div></div>
       <div class="fg2"><div class="fr"><label>Stato approvv.</label><select id="f-stato-a">${Object.entries(SAP).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div><div class="fr"><label>Data attesa</label><input id="f-datta" type="date"></div></div>
     </div>
     ${act("saveRiga('"+extra+"')")}
@@ -3037,13 +3037,29 @@ ERS-05-2025,ERS,Ricerca pompe reversibili,ricerca,0,2025-11-01,,chiusa,</div>
     <div id="cfg-f24status" style="font-size:12px;color:var(--text3);margin-top:4px">${c.f24_key?'✓ API key presente — stato: '+(c.f24_ok?'<span style="color:var(--green);font-weight:700">connessa</span>':'<span style="color:var(--amber);font-weight:700">da verificare</span>'):'API key non inserita'}</div>
   </div>
 
-  ${act('saveCfg2()')}`;
+  <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)">💰 Markup per cliente</div>
+  <p style="font-size:12px;color:var(--text3);margin-bottom:10px">Ricarico predefinito sui costi materiali per ogni cliente. Viene precompilato nel form "aggiungi componente".</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;" id="cfg-markup-grid">
+    ${Object.entries(CMAP).map(([cod,nome])=>'<div style="display:flex;align-items:center;gap:8px;"><label style="font-size:12px;color:var(--text2);flex:1;white-space:nowrap">'+nome.split('(')[0].trim()+' <span style="color:var(--text4);font-size:10px">('+cod+')</span></label><input id="cfg-mk-'+cod+'" type="number" step="0.05" min="1" max="10" value="'+(c.markup_clienti?.[cod]||2.25)+'" style="width:70px;border:1.5px solid var(--border);border-radius:6px;padding:4px 6px;font-size:12px;text-align:right;"></div>').join('')}
+  </div>
+
+  ${act('saveCfg2()')}\`;
   }
   return'';
 }
 
 // Ricerca Ares nel modal
 // ── Tab switcher modal add-riga ──
+// Precompila markup con valore per cliente corrente
+function precompilaMarkup(){
+  const el=document.getElementById('f-markup');
+  if(!el||el.value)return; // già compilato
+  const cfg=lCfg();
+  const cod=getCod(CC?.numero||'');
+  const val=cfg.markup_clienti?.[cod]||2.25;
+  el.value=val;
+}
+
 function switchAddTab(tab){
   ['listino','mag','tubo','racc','pu10','pu20','manuale'].forEach(t=>{
     const btn=document.getElementById('atab-'+t);
@@ -3978,6 +3994,12 @@ function saveCfg2(){
   const f24tipo=(document.getElementById('cfg-f24tipo')||{}).value||'all';
   const f24sync=(document.getElementById('cfg-f24sync')||{}).value||'60';
   const oldCfg=lCfg();
+  // Salva markup per cliente
+  const markup_clienti={};
+  Object.keys(CMAP).forEach(cod=>{
+    const el=document.getElementById('cfg-mk-'+cod);
+    if(el&&el.value)markup_clienti[cod]=parseFloat(el.value)||2.25;
+  });
   sCfg({
     nc_url:document.getElementById('cfg-url').value.trim().replace(/\/$/,''),
     nc_user:document.getElementById('cfg-user').value.trim(),
@@ -3985,7 +4007,8 @@ function saveCfg2(){
     f24_key:f24key||oldCfg.f24_key||'',
     f24_tipo:f24tipo,
     f24_sync:f24sync,
-    f24_ok:oldCfg.f24_ok||false
+    f24_ok:oldCfg.f24_ok||false,
+    markup_clienti
   });
   closeM();
   if(f24key&&f24key!==oldCfg.f24_key){
