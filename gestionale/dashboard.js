@@ -3578,8 +3578,9 @@ function fillAres(a){
 // SAVE
 // ═══════════════════════════════════════════════
 async function saveComm(){
-  const numero=document.getElementById('f-num').value.trim();if(!numero)return;
-  const row={id:uid(),numero,cliente:getCod(numero),oggetto:document.getElementById('f-ogg').value.trim(),tipo_commessa:document.getElementById('f-tipo').value,importo:document.getElementById('f-imp').value,data_apertura:document.getElementById('f-dat').value,data_consegna:document.getElementById('f-cons').value,stato:document.getElementById('f-stato').value,note:document.getElementById('f-note').value.trim()};
+  const numero=(document.getElementById('f-num')||{}).value?.trim();if(!numero)return;
+  const getF=id=>{const el=document.getElementById(id);if(!el)return'';if(el.classList?.contains('csel'))return window._cselData?.[id]?.val||'';return el.value||'';};
+  const row={id:uid(),numero,cliente:getCod(numero),oggetto:getF('f-ogg'),tipo_commessa:getF('f-tipo'),importo:getF('f-imp'),data_apertura:getF('f-dat'),data_consegna:getF('f-cons'),stato:getF('f-stato'),note:getF('f-note')};
   const data=lll('comm');data.unshift(row);ls('comm',data);
   const det=ll('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};ls('det',det);
   await wPut('commesse.csv',[row,...(SD.comm||[])],['numero','cliente','oggetto','tipo_commessa','importo','data_apertura','data_consegna','stato','note']);
