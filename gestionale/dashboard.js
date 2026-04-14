@@ -3084,12 +3084,7 @@ function magFilter(){
   const el=document.getElementById('mag-results');if(!el)return;
   const filt=q?items.filter(m=>(m.codice||'').toLowerCase().includes(q)||(m.descrizione||'').toLowerCase().includes(q)||(m.fornitore||'').toLowerCase().includes(q)):items;
   if(!filt.length){el.innerHTML='<div class="empty" style="padding:12px">Nessun risultato</div>';return;}
-  el.innerHTML=filt.map(m=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border);font-size:13px;">
-    <div style="flex:1;"><div style="font-weight:600">${m.codice?'<span style="font-family:monospace;color:var(--green);font-weight:700">'+m.codice+'</span> — ':''} ${m.descrizione||'—'}</div>
-    <div style="font-size:11px;color:var(--text3)">${m.fornitore||''} · giacenza: <strong style="color:${parseFloat(m.qty||0)>0?'var(--green)':'var(--red)'}">${m.qty||0}</strong></div></div>
-    <span style="font-weight:700;white-space:nowrap">€${fmt2(m.costo_cad||0)}</span>
-    <button style="background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;" onclick="usaMagazzino(${JSON.stringify(m).replace(/"/g,'&quot;')},currentAddRigaNumero)">+ usa</button>
-  </div>`).join('');
+  el.innerHTML=filt.map(m=>'<div style="display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border);font-size:13px;">'+'<div style="flex:1;"><div style="font-weight:600">'+(m.codice?'<span style="font-family:monospace;color:var(--green);font-weight:700">'+m.codice+'</span> \u2014 ':'')+(m.descrizione||'\u2014')+'</div>'+'<div style="font-size:11px;color:var(--text3)">'+(m.fornitore||'')+' \u00b7 giacenza: <strong style="color:'+(parseFloat(m.qty||0)>0?'var(--green)':'var(--red)')+'">'+( m.qty||0)+'</strong></div></div>'+'<span style="font-weight:700;white-space:nowrap">\u20ac'+fmt2(m.costo_cad||0)+'</span>'+'<button style="background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;" onclick="usaMagazzino('+JSON.stringify(m).replace(/"/g,'&quot;')+',currentAddRigaNumero)">+ usa</button></div>').join('');
 }
 
 let currentAddRigaNumero='';
@@ -3259,15 +3254,15 @@ function renderRaccSciolto(){
   // Raggruppa per standard
   const groups={};
   filt.forEach(r=>{if(!groups[r.std])groups[r.std]=[];groups[r.std].push(r);});
-  el.innerHTML=Object.entries(groups).map(([std,items])=>`
-    <div style="background:var(--bg2);padding:5px 10px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);position:sticky;top:0;">${std}</div>
-    ${items.map(r=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--border);font-size:12px;transition:background .1s;" onmouseenter="this.style.background='var(--bg2)'" onmouseleave="this.style.background='transparent'">
-      <span style="font-size:14px;flex-shrink:0">${figEmoji[r.fig]||figEmoji.default}</span>
-      <div style="flex:1;"><div style="font-weight:600;color:var(--text)">${r.mis}</div>
-        <div style="font-size:11px;color:var(--text3)">${r.cod} · ${r.forn}</div></div>
-      <span style="font-weight:700;white-space:nowrap;color:var(--text)">€${fmt2(r.p)}</span>
-      <button style="background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;flex-shrink:0;" onclick="usaRaccordoSciolto(${JSON.stringify(r).replace(/"/g,'&quot;')})">+ usa</button>
-    </div>`).join('')}`).join('');
+  el.innerHTML=Object.entries(groups).map(([std,items])=>'<div style="background:var(--bg2);padding:5px 10px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);position:sticky;top:0;">'+std+'</div>'+
+    items.map(r=>'<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--border);font-size:12px;">'+
+      '<span style="font-size:14px;flex-shrink:0">'+(figEmoji[r.fig]||figEmoji.default)+'</span>'+
+      '<div style="flex:1;"><div style="font-weight:600;color:var(--text)">'+r.mis+'</div>'+
+        '<div style="font-size:11px;color:var(--text3)">'+r.cod+' · '+r.forn+'</div></div>'+
+      '<span style="font-weight:700;white-space:nowrap;color:var(--text)">€'+fmt2(r.p)+'</span>'+
+      '<button style="background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;flex-shrink:0;" onclick="usaRaccordoSciolto('+JSON.stringify(r).replace(/"/g,'&quot;')+')">+ usa</button>'+
+    '</div>').join('')
+  ).join('');
 }
 
 function usaRaccordoSciolto(r){
