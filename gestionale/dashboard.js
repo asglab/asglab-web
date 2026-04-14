@@ -5122,12 +5122,12 @@ function upgradeSelects(container){
   let _popupOwner = null; // .csel che ha aperto il popup
   let _pickInProgress = false; // flag per evitare chiusura durante selezione
 
-  // Chiudi al click fuori — usa mousedown per anticipare ma controlla il flag
-  document.addEventListener('mousedown', e => {
-    if (_popup && !_popupOwner?.contains(e.target) && !_popup.contains(e.target)) {
+  // Chiudi al click fuori — usa pointerdown, controlla che il click non sia dentro il popup
+  document.addEventListener('pointerdown', e => {
+    if (_popup && !_popup.contains(e.target) && !_popupOwner?.contains(e.target)) {
       _hidePopup();
     }
-  }, true);
+  });
 
   // Chiudi su scroll/resize
   document.addEventListener('scroll', _hidePopup, true);
@@ -5153,10 +5153,10 @@ function upgradeSelects(container){
       if (o.group) {
         return `<div class="csel-group">${o.group}</div>` +
           (o.items||[]).map(i => `<div class="csel-item${i.v===data.val?' active':''}" tabindex="0"
-            onclick="event.stopPropagation();window._cselPick(${JSON.stringify(id)},${JSON.stringify(i.v)},${JSON.stringify(i.l)})">${i.l}</div>`).join('');
+            onpointerup="event.stopPropagation();window._cselPick(${JSON.stringify(id)},${JSON.stringify(i.v)},${JSON.stringify(i.l)})">${i.l}</div>`).join('');
       }
       return `<div class="csel-item${o.v===data.val?' active':''}${o.v===''?' ph':''}" tabindex="0"
-        onclick="event.stopPropagation();window._cselPick(${JSON.stringify(id)},${JSON.stringify(o.v)},${JSON.stringify(o.l)})">${o.l}</div>`;
+        onpointerup="event.stopPropagation();window._cselPick(${JSON.stringify(id)},${JSON.stringify(o.v)},${JSON.stringify(o.l)})">${o.l}</div>`;
     }).join('');
 
     document.body.appendChild(popup);
