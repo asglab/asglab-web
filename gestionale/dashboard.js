@@ -3433,11 +3433,11 @@ function syncLung(da){
   if(da==='mm'&&mmEl){
     const mm=parseFloat(mmEl.value||0);
     if(inEl&&mm)inEl.value=(mm/25.4).toFixed(1);
-    if(hint&&mm)hint.textContent=`${mm} mm = ${(mm/25.4).toFixed(1)}" = ${(mm/10).toFixed(0)} cm`;
+    if(hint&&mm)hint.textContent=mm+' mm = '+(mm/25.4).toFixed(1)+'" = '+(mm/10).toFixed(0)+' cm';
   } else if(da==='in'&&inEl){
     const ins=parseFloat(inEl.value||0);
     if(mmEl&&ins)mmEl.value=Math.round(ins*25.4);
-    if(hint&&ins)hint.textContent=`${(ins*25.4).toFixed(0)} mm = ${ins}" = ${(ins*2.54).toFixed(1)} cm`;
+    if(hint&&ins)hint.textContent=(ins*25.4).toFixed(0)+' mm = '+ins+'" = '+(ins*2.54).toFixed(1)+' cm';
   }
   aggTuboPreview();
 }
