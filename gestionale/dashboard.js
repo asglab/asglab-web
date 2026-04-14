@@ -3352,7 +3352,7 @@ function pu20AddBlocco(sel){
     const div=document.createElement('div');
     div.style.cssText='display:flex;align-items:center;gap:6px;font-size:12px;background:var(--bg2);padding:4px 8px;border-radius:5px;';
     const idx=_pu20Blocchi.length-1;
-    div.innerHTML=`<span style="flex:1">${p[0]} — ${p[2]||p[0]}</span><span style="color:var(--text3)">€${fmt2(parseFloat(p[1]||0))}</span><button class="xbtn" onclick="this.parentNode.remove();_pu20Blocchi.splice(${idx},1);pu20Update()">✕</button>`;
+    div.innerHTML='<span style="flex:1">'+p[0]+' — '+(p[2]||p[0])+'</span><span style="color:var(--text3)">€'+fmt2(parseFloat(p[1]||0))+'</span><button class="xbtn" onclick="this.parentNode.remove();_pu20Blocchi.splice('+idx+',1);pu20Update()">✕</button>';
     list.appendChild(div);
   }
   pu20Update();
