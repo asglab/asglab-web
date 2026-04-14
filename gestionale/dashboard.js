@@ -1981,7 +1981,7 @@ function tabDistinta(c,cd){
   }).join('');
   // Suggerimento leggero solo se distinta vuota
   const emptyHint=!dist.length?`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text3);display:flex;align-items:center;gap:8px;"><span>💡</span><span>Usa <strong>+ aggiungi componente</strong> per cercare nel listino Ares, nel magazzino o configurare un tubo flessibile.</span></div>`:'';
-  return`${emptyHint}<div class="dist-toolbar"><button class="btn btn-sm" onclick="openModal('add-riga','${c.numero}')">+ aggiungi componente</button><button class="btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="openModal('add-sezione','${c.numero}')">+ sezione</button></div>
+  return`${emptyHint}<div class="dist-toolbar"><button class="btn btn-sm" onclick="openModal('add-riga','${c.numero}')">+ aggiungi componente</button><button class="btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="openModal('add-sezione','${c.numero}')">+ sezione</button><button class="btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="exportDistintaPDF('${c.numero}')">📄 Stampa distinta</button></div>
   <div style="overflow-x:auto"><table>
     <thead><tr><th>Descrizione</th><th>Q.</th><th>Fornitore</th><th>Codice</th><th>Costo/cad</th><th>Sc.</th><th>Netto/cad</th><th>Vendita/cad</th><th>Stato</th><th>Data attesa</th><th></th></tr></thead>
     <tbody>${rows||'<tr><td colspan="11" class="empty">Nessun componente</td></tr>'}</tbody>
@@ -3000,7 +3000,12 @@ function switchAddTab(tab){
   if(tab==='racc')renderRaccSciolto();
   if(tab==='pu10'){_pu10Blocchi=[];pu10Update();const el=document.getElementById('pu10-blocchi-list');if(el)el.innerHTML='';}
   if(tab==='pu20'){_pu20Blocchi=[];pu20Update();const el=document.getElementById('pu20-blocchi-list');if(el)el.innerHTML='';}
-  setTimeout(upgradeSelects,0);
+  // Upgrade select nel pannello appena reso visibile
+  setTimeout(()=>{
+    const panel=document.getElementById('apanel-'+tab);
+    if(panel) upgradeSelects(panel);
+    upgradeSelects(); // anche il resto del modal
+  },0);
 }
 
 function magFilter(){
@@ -4932,6 +4937,57 @@ function exportReportCommesse(){
   win.document.close();
 }
 
+function exportDistintaPDF(numero){
+  const comms=lll('comm');
+  const c=comms.find(x=>x.numero===numero)||{numero,oggetto:'',cliente:'',importo:0};
+  const det=ll('det');
+  const cd=det[numero]||{distinta:[],ore:[]};
+  const dist=cd.distinta||[];
+  const ore=cd.ore||[];
+  const totC=dist.reduce((s,r)=>s+(parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)),0);
+  const totV=dist.reduce((s,r)=>s+(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)),0);
+  const totOreEur=ore.reduce((s,o)=>s+(parseFloat(o.ore||0)*parseFloat(o.tariffa||0)),0);
+  const totOreH=ore.reduce((s,o)=>s+parseFloat(o.ore||0),0);
+  const importoOff=parseFloat(cd.offerta?.importo_offerto||c.importo||0)||totV;
+  const margine=importoOff>0?((importoOff-totC-totOreEur)/importoOff*100):null;
+  const sezioni={};
+  dist.forEach(r=>{const s=r.sezione||'Generale';if(!sezioni[s])sezioni[s]=[];sezioni[s].push(r);});
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+  <title>Distinta ${numero}</title>
+  <style>
+    body{font-family:sans-serif;font-size:11px;color:#111;margin:20px;}
+    h1{font-size:15px;margin:0 0 2px}
+    .sub{color:#666;font-size:11px;margin-bottom:16px;}
+    h2{font-size:12px;font-weight:700;margin:14px 0 4px;padding:4px 8px;background:#f0f0f0;border-radius:3px;}
+    table{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:8px;}
+    th{background:#f7f7f7;padding:4px 6px;text-align:left;border-bottom:2px solid #ccc;font-size:10px;}
+    td{padding:3px 6px;border-bottom:1px solid #eee;vertical-align:top;}
+    .num{text-align:right;}
+    .tot{font-weight:700;background:#f7f7f7;border-top:2px solid #ccc;}
+    .summary{margin-top:16px;padding:10px;background:#f7f7f7;border-radius:5px;}
+    .green{color:#166534;font-weight:700;} .red{color:#991b1b;font-weight:700;}
+    @media print{button{display:none}}
+  </style></head><body>
+  <button onclick="window.print()" style="margin-bottom:12px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer">🖨 Stampa / Salva PDF</button>
+  <h1>Distinta materiali — ${numero}</h1>
+  <div class="sub">${c.oggetto||'—'} · ${CMAP[c.cliente]||c.cliente||'—'} · ${new Date().toLocaleDateString('it-IT')}</div>
+  ${Object.entries(sezioni).map(([sez,righe])=>
+    '<h2>'+sez+'</h2><table><thead><tr><th>Descrizione</th><th>Q.</th><th>Fornitore</th><th>Codice</th><th class=num>Costo</th><th class=num>Netto</th><th class=num>Vendita</th><th class=num>Tot.vendita</th><th>Stato</th></tr></thead><tbody>'+
+    righe.map(r=>'<tr><td>'+r.descrizione+'</td><td class=num>'+r.qty+'</td><td>'+(r.fornitore||'')+'</td><td style="font-family:monospace;font-size:9px">'+(r.codice||'')+'</td><td class=num>€'+fmt2(r.costo_cad||0)+'</td><td class=num>€'+fmt2(r.netto_cad||r.costo_cad||0)+'</td><td class=num>€'+fmt2(r.prezzo_vendita||0)+'</td><td class=num>€'+fmt2(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1))+'</td><td style="font-size:9px">'+(r.stato_approv||'')+'</td></tr>').join('')+
+    '<tr class=tot><td colspan=7 style="text-align:right">Totale sezione:</td><td class=num>€'+fmt2(righe.reduce((s,r)=>s+(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)),0))+'</td><td></td></tr>'+
+    '</tbody></table>'
+  ).join('')}
+  ${ore.length?'<h2>Ore di lavoro</h2><table><thead><tr><th>Data</th><th>Descrizione</th><th>Operatore</th><th class=num>Ore</th><th class=num>Tariffa</th><th class=num>Totale</th></tr></thead><tbody>'+ore.map(o=>'<tr><td>'+fmtD(o.data)+'</td><td>'+(o.descrizione||'')+'</td><td>'+(o.operatore||'')+'</td><td class=num>'+o.ore+'h</td><td class=num>€'+fmt2(o.tariffa||0)+'/h</td><td class=num>€'+fmt2(parseFloat(o.ore||0)*parseFloat(o.tariffa||0))+'</td></tr>').join('')+'<tr class=tot><td colspan=5 style="text-align:right">Totale ore:</td><td class=num>€'+fmt2(totOreEur)+' ('+totOreH+'h)</td></tr></tbody></table>':''}
+  <div class="summary">
+    Costi materiali: €${fmt2(totC)} | Costi ore: €${fmt2(totOreEur)} | <strong>Totale costi: €${fmt2(totC+totOreEur)}</strong> | 
+    Valore vendita: €${fmt2(totV)} ${importoOff>0?' | Offerta: €'+fmt2(importoOff)+' | <span class="'+(margine>=20?'green':'red')+'">Margine: '+(margine!==null?margine.toFixed(1)+'%':'—')+'</span>':''}
+  </div>
+  </body></html>`);
+  win.document.close();
+}
+
+
 
 // Tab styling fix: .tab → .det-tab
 document.addEventListener('DOMContentLoaded',()=>{
@@ -5231,6 +5287,7 @@ function upgradeSelects(container){
     if (!box) return;
     box.querySelectorAll('select:not(.keep-native)').forEach(sel => {
       if (sel.closest('.csel')) return;
+      // Non saltare per display:none — il pannello potrebbe essere nascosto ma il select va upgradato
       const opts = [];
       Array.from(sel.children).forEach(child => {
         if (child.tagName === 'OPTGROUP') {
