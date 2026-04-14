@@ -1364,14 +1364,20 @@ async function wPut(f,rows,fields){
   const esc=v=>{const s=String(v==null?'':v);return(s.includes(',')||s.includes('"')||s.includes('\n'))?'"'+s.replace(/"/g,'""')+'"':s;};
   const lines=[fields.join(',')].concat(rows.map(r=>fields.map(x=>esc(r[x]||'')).join(',')));
   const body=lines.join('\n')+'\n';
+  // Chunking per file grandi: se >300KB usa compressione testo (nessuna, Nextcloud accetta fino a 100MB)
+  // Il problema reale era timeout — usiamo un timeout più lungo
   try{
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),30000); // 30s timeout
     const r=await fetch(c.nc_url+'/remote.php/dav/files/'+c.nc_user+'/Dashboard/'+f,{
       method:'PUT',
       headers:{'Authorization':'Basic '+btoa(c.nc_user+':'+c.nc_pass),'Content-Type':'text/csv; charset=utf-8'},
-      body
+      body,
+      signal:ctrl.signal
     });
+    clearTimeout(timer);
     return r.ok||r.status===201||r.status===204;
-  }catch{return false;}
+  }catch(e){console.warn('wPut error:',e.message);return false;}
 };
 
 // ═══════════════════════════════════════════════
@@ -1399,7 +1405,8 @@ async function syncNow(){
     let ok=0;
     // Aggiorna SD + salva in localStorage per persistenza multi-dispositivo
     if(co){SD.comm=co;ls('comm',co);ok++;}
-    if(fa&&fa.length){SD.fatt=fa;ls('fatt',fa);ok++;}
+    if(fa&&fa.length>0){SD.fatt=fa;ls('fatt',fa);ok++;}
+    else if(!fa||fa.length===0){const local=lll('fatt');if(local.length){SD.fatt=local;}}// NC vuoto: mantieni locale
     if(sc){SD.scad=sc;ls('scad',sc);ok++;}
     if(ca){SD.cassa=ca;ls('conti',ca);ok++;}
     if(dj){SD.det=dj;ls('det',dj);ok++;}
