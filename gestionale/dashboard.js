@@ -516,9 +516,9 @@ async function parsePrimaNotaFile(file){
     const reader = new FileReader();
     reader.onload = e => {
       try{
-        const wb = XLSX.read(e.target.result, {type:'array', cellDates:false, dateNF:'dd/mm/yyyy'});
+        const wb = XLSX.read(e.target.result, {type:'array', cellDates:false, dateNF:'dd/mm/yyyy', cellText:true, raw:false});
         const ws = wb.Sheets[wb.SheetNames[0]];
-        const raw = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+        const raw = XLSX.utils.sheet_to_json(ws, {header:1, defval:'', raw:false});
 
         // Trova riga header (contiene "DATA PAG." o "TIPO DOC.")
         let hdrIdx = -1;
