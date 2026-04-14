@@ -326,6 +326,14 @@ const TIPO_BADGE={
 const CK='asg_config';
 function lCfg(){try{return JSON.parse(localStorage.getItem(CK)||'{}');}catch{return{};}}
 function sCfg(c){localStorage.setItem(CK,JSON.stringify(c));}
+// Legge valore da select nativo O da custom dropdown
+function getElVal(id){
+  const el=document.getElementById(id);
+  if(!el)return'';
+  if(el.classList&&el.classList.contains('csel'))return window._cselData?.[id]?.val||el.dataset.value||'';
+  return el.value||'';
+}
+
 function getCfg(){const c=lCfg();return{nc_url:c.nc_url||'',nc_user:c.nc_user||'',nc_pass:c.nc_pass||'',ok:!!(c.nc_url&&c.nc_user&&c.nc_pass)};}
 const K={comm:'asg_commesse',conti:'asg_conti',scad:'asg_scadenze',todo:'asg_todos',det:'asg_det',fatt:'asg_fatture',movimenti_fineco:'asg_mov_fineco',movimenti_sella:'asg_mov_sella'};
 
@@ -358,7 +366,7 @@ function navTo(viewId){
   if(ta){
     if(viewId==='home')ta.innerHTML='<span id="clk" style="font-size:12px;color:var(--text3)">'+new Date().toLocaleDateString('it-IT',{weekday:'long',day:'2-digit',month:'long'})+'</span>';
     else if(viewId==='commesse')ta.innerHTML='';
-    else if(viewId==='approv')ta.innerHTML='<button class="btn btn-ghost btn-sm" onclick="apriRFQTutti()">✉ Genera tutti RFQ</button>';
+    else if(viewId==='approv')ta.innerHTML='<button class="btn btn-ghost btn-sm" onclick="apriRDOTutti()">✉ Genera tutti RDO</button>';
     else ta.innerHTML='';
   }
   // Render specifico
@@ -516,9 +524,9 @@ async function parsePrimaNotaFile(file){
     const reader = new FileReader();
     reader.onload = e => {
       try{
-        const wb = XLSX.read(e.target.result, {type:'array', cellDates:false, dateNF:'dd/mm/yyyy'});
+        const wb = XLSX.read(e.target.result, {type:'array', cellDates:true, dateNF:'dd/mm/yyyy'});
         const ws = wb.Sheets[wb.SheetNames[0]];
-        const raw = XLSX.utils.sheet_to_json(ws, {header:1, defval:'', raw:true});
+        const raw = XLSX.utils.sheet_to_json(ws, {header:1, defval:'', raw:false, dateNF:'dd/mm/yyyy'});
 
         // Trova riga header (contiene "DATA PAG." o "TIPO DOC.")
         let hdrIdx = -1;
@@ -537,7 +545,17 @@ async function parsePrimaNotaFile(file){
           const row = {};
           headers.forEach((h,j)=>{ row[h]=String(raw[i][j]??'').trim(); });
 
-          const dataPag = normDate(row['DATA PAG.']||row['Data pagamento']||'');
+          // Converti serial Excel in data se necessario
+          const excelDateToStr = v => {
+            if(!v)return'';
+            if(typeof v==='number'&&v>40000&&v<60000){
+              // Serial number Excel: giorni dal 1/1/1900
+              const d=new Date(Math.round((v-25569)*86400*1000));
+              return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');
+            }
+            return normDate(String(v));
+          };
+          const dataPag = excelDateToStr(row['DATA PAG.']||row['Data pagamento']||'');
           if(!dataPag) continue; // salta righe vuote
 
           const toNum = v => {
@@ -563,7 +581,7 @@ async function parsePrimaNotaFile(file){
             data_pag: dataPag,
             tipo: row['TIPO DOC.']||row['Tipo']||'',
             num_doc: row['NUM. DOC.']||row['Numero']||'',
-            data_doc: normDate(row['DATA DOC.']||row['Data doc.']||''),
+            data_doc: excelDateToStr(row['DATA DOC.']||row['Data doc.']||''),
             nota: row['NOTA']||row['Descrizione']||'',
             conto: row['CONTO']||row['Conto']||'',
             cliente: row['CLIENTE']||row['Cliente']||'',
@@ -851,7 +869,7 @@ function renderApprov(){
         <span class="approv-group-nome">${forn}</span>
         <span class="approv-group-count">${items.length} componenti${nDaOrd>0?' · '+nDaOrd+' da ordinare':''}</span>
         <span style="flex:1"></span>
-        ${nDaOrd>0?`<button class="btn btn-primary btn-sm" onclick="apriRFQ('${forn.replace(/'/g,"\'")}')">✉ RFQ</button>`:''}
+        ${nDaOrd>0?`<button class="btn btn-primary btn-sm" onclick="apriRDO('${forn.replace(/'/g,"\'")}')">✉ RDO</button>`:''}
       </div>
       ${items.map(r=>`<div class="approv-row">
         <div class="approv-desc">
@@ -881,12 +899,12 @@ function aggiornaStatoApprov(numero,rid,nuovoStato){
   renderHome();
 }
 
-function apriRFQTutti(){
+function apriRDOTutti(){
   const aggr=getApprovAggregati('daordinare');
   const fornitori=Object.keys(aggr);
   if(!fornitori.length){showToast('Nessun componente da ordinare');return;}
-  // Apre il primo RFQ come esempio
-  apriRFQ(fornitori[0]);
+  // Apre il primo RDO come esempio
+  apriRDO(fornitori[0]);
 }
 
 // Scadenze nel tab contabilità
@@ -1405,8 +1423,11 @@ async function syncNow(){
     let ok=0;
     // Aggiorna SD + salva in localStorage per persistenza multi-dispositivo
     if(co){SD.comm=co;ls('comm',co);ok++;}
-    if(fa&&fa.length>0){SD.fatt=fa;ls('fatt',fa);ok++;}
-    else if(!fa||fa.length===0){const local=lll('fatt');if(local.length){SD.fatt=local;}}// NC vuoto: mantieni locale
+    // Fatture: salva da NC solo se ha più dati del locale (evita perdita dati)
+    {const localFatt=lll('fatt');
+     if(fa&&fa.length>0&&fa.length>=localFatt.length){SD.fatt=fa;ls('fatt',fa);ok++;}
+     else if(localFatt.length>0){SD.fatt=localFatt;} // mantieni locale se NC ha meno dati
+     else if(fa&&fa.length>0){SD.fatt=fa;ls('fatt',fa);ok++;}} // NC ha qualcosa, locale vuoto
     if(sc){SD.scad=sc;ls('scad',sc);ok++;}
     if(ca){SD.cassa=ca;ls('conti',ca);ok++;}
     if(dj){SD.det=dj;ls('det',dj);ok++;}
@@ -2010,15 +2031,15 @@ function tabApprov(c,cd){
     const prob=items.some(r=>r.stato_approv==='problema');
     const stk=prob?'a-problema':tutti?'a-arrivato':qualcuno?'a-ordinato':'a-daordinare';
     const stl=prob?'Problema':tutti?'Tutto arrivato':qualcuno?'Parziale':'Da ordinare';
-    // Trova ID fornitore per RFQ
+    // Trova ID fornitore per RDO
     const fornObj=FORNITORI.find(f2=>f2.nome.toLowerCase().includes(forn.toLowerCase().split(' ')[0])||forn.toLowerCase().includes(f2.nome.toLowerCase().split(' ')[0]));
-    const rfqBtn=`<button class="btn-ghost" style="font-size:11px;padding:3px 10px;" onclick="openRFQApprov('${c.numero}','${forn.replace(/'/g,"\\'")}')">✉ RFQ a ${forn.split(' ')[0]}</button>`;
+    const rdoBtn=`<button class="btn-ghost" style="font-size:11px;padding:3px 10px;" onclick="openRDOApprov('${c.numero}','${forn.replace(/'/g,"\\'")}')">✉ RDO a ${forn.split(' ')[0]}</button>`;
     return`<div class="approv-card">
       <div class="approv-head" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <span class="approv-name">${forn}</span>
         <span class="bdg ${stk}">${stl}</span>
         <span class="approv-meta">${items.length} art. · €${fmt2(tot)}</span>
-        <div style="margin-left:auto">${rfqBtn}</div>
+        <div style="margin-left:auto">${rdoBtn}</div>
       </div>
     <table><thead><tr><th>Descrizione</th><th>Q.</th><th>Codice</th><th>€ tot</th><th>Stato</th><th>Data attesa</th></tr></thead>
     <tbody>${items.map(r=>`<tr>
@@ -2033,32 +2054,32 @@ function tabApprov(c,cd){
   return cardsForn;
 }
 
-function openRFQApprov(numero,fornNome){
-  // Costruisce un testo RFQ precompilato con tutti i componenti del fornitore
+function openRDOApprov(numero,fornNome){
+  // Costruisce un testo RDO precompilato con tutti i componenti del fornitore
   const det=ll('det');const cd=det[numero]||{distinta:[]};
   const items=(cd.distinta||[]).filter(r=>!r._intestazione&&(r.fornitore||'Non assegnato')===fornNome);
   const c=(SD.comm||lll('comm')).find(x=>x.numero===numero)||{numero,oggetto:''};
   const oggi=new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'});
-  const templates=JSON.parse(localStorage.getItem('asg_rfq_templates')||'{}');
+  const templates=JSON.parse(localStorage.getItem('asg_rdo_templates')||'{}');
   const fornObj=FORNITORI.find(f=>f.nome.toLowerCase().includes(fornNome.toLowerCase().split(' ')[0])||fornNome.toLowerCase().includes(f.nome.toLowerCase().split(' ')[0]));
   const fornId=fornObj?fornObj.id:'';
   const baseTemplate=templates[fornId]||`Spett.le ${fornNome},\n\nin riferimento ai Vs. prodotti, con la presente siamo a richiedere conferma di disponibilità e tempi di consegna per i seguenti articoli, relativi alla commessa ${numero} — ${c.oggetto||''}:\n\n`;
   const righe=items.map((r,i)=>`${i+1}. ${r.codice?'['+r.codice+'] ':''}${r.descrizione||'—'} — qty ${r.qty||1}`).join('\n');
   const totNetto=items.reduce((s,r)=>s+(parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)),0);
   const testo=baseTemplate+righe+`\n\nSi prega di indicare:\n- Prezzi unitari IVA esclusa\n- Disponibilità a magazzino\n- Tempi di consegna\n- Condizioni di resa\n\nValore indicativo ordine: € ${fmt2(totNetto)} IVA esclusa\n\nRingraziamo e restiamo in attesa di riscontro.\n\nCordiali saluti,`;
-  const subj=`RFQ commessa ${numero} — ${c.oggetto||''}`;
+  const subj=`RDO commessa ${numero} — ${c.oggetto||''}`;
   // Mostra modal
   const email=fornObj?.contatti?.email||'';
   document.getElementById('modal-body').innerHTML=`
-    <h3>✉ RFQ a ${fornNome} — Commessa ${numero}</h3>
+    <h3>✉ RDO a ${fornNome} — Commessa ${numero}</h3>
     <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">${items.length} articoli · valore indicativo €${fmt2(totNetto)}</div>
-    <div class="form-row"><label>A (email)</label><input id="rfqa-to" value="${email}" placeholder="email@fornitore.it"></div>
-    <div class="form-row"><label>Oggetto</label><input id="rfqa-subj" value="${subj}"></div>
-    <div class="form-row"><label>Testo</label><textarea id="rfqa-body" style="min-height:260px;font-family:var(--font);font-size:13px;line-height:1.7">${testo}</textarea></div>
+    <div class="form-row"><label>A (email)</label><input id="rdoa-to" value="${email}" placeholder="email@fornitore.it"></div>
+    <div class="form-row"><label>Oggetto</label><input id="rdoa-subj" value="${subj}"></div>
+    <div class="form-row"><label>Testo</label><textarea id="rdoa-body" style="min-height:260px;font-family:var(--font);font-size:13px;line-height:1.7">${testo}</textarea></div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeM()">Annulla</button>
-      <button class="btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('rfqa-subj').value+'\\n\\n'+document.getElementById('rfqa-body').value).then(()=>showToast('Copiato!'))">📋 Copia</button>
-      ${email?`<a class="btn" href="mailto:${email}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(testo)}" onclick="closeM()">📧 Apri email</a>`:`<button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('rfqa-subj').value+'\\n\\n'+document.getElementById('rfqa-body').value).then(()=>{showToast('Copiato — incolla nel client email');closeM();})">📋 Copia tutto</button>`}
+      <button class="btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('rdoa-subj').value+'\\n\\n'+document.getElementById('rdoa-body').value).then(()=>showToast('Copiato!'))">📋 Copia</button>
+      ${email?`<a class="btn" href="mailto:${email}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(testo)}" onclick="closeM()">📧 Apri email</a>`:`<button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('rdoa-subj').value+'\\n\\n'+document.getElementById('rdoa-body').value).then(()=>{showToast('Copiato — incolla nel client email');closeM();})">📋 Copia tutto</button>`}
     </div>`;
   document.getElementById('modal-overlay').classList.add('show');
 }
@@ -2285,7 +2306,7 @@ function getModalHTML(type,extra){
   <div id="apanel-listino" style="border-top:1px solid var(--border);padding-top:12px;margin-top:2px;">
     <div style="display:flex;gap:8px;margin-bottom:8px;">
       <input id="ares-q" style="flex:1;border:1.5px solid var(--border);border-radius:7px;padding:7px 10px;font-size:14px;outline:none;" placeholder="Cerca sigla o descrizione… (es. B09, NCE, collettore)" oninput="aresFilter()">
-      <select id="ares-serie" style="border:1.5px solid var(--border);border-radius:7px;padding:7px 9px;font-size:13px;outline:none;" onchange="aresFilter()">
+      <select id="ares-serie" class="keep-native" style="border:1.5px solid var(--border);border-radius:7px;padding:7px 9px;font-size:13px;outline:none;" onchange="aresFilter()">
         <option value="">Tutte le serie</option>
         <option value="PU05">PU05</option>
         <option value="PU10">PU10</option>
@@ -2321,7 +2342,7 @@ function getModalHTML(type,extra){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
       <div>
         <label style="font-size:12px;font-weight:700;color:var(--text3);display:block;margin-bottom:4px">Tipo tubo</label>
-        <select id="tf-tipo" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:12px;outline:none;" onchange="onTuboTipoChange()">
+        <select id="tf-tipo" class="keep-native" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:12px;outline:none;" onchange="onTuboTipoChange()">
           <option value="">— seleziona —</option>
           <optgroup label="Trecciati — 1 treccia (R1AT/1SN)">
             <option value="1SN|R1AT|100|6|1/4&quot;">DN06 (¼&quot;) · R1AT/1SN · max 100 bar</option>
@@ -2429,7 +2450,7 @@ function getModalHTML(type,extra){
     <!-- Step 1: Collettore -->
     <div style="margin-bottom:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">1 — Collettore</div>
-      <select id="pu10-coll" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;" onchange="pu10Update()">
+      <select id="pu10-coll" class="keep-native" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;" onchange="pu10Update()">
         <option value="">— seleziona —</option>
         <option value="A1A|263.8|Collettore monopompa VMC1 P-T G1/4&quot;">A1A — monopompa VMC1, att. G1/4"</option>
         <option value="A1B|278.5|Collettore + valvola NC pilotata integrata">A1B — + valvola NC integrata</option>
@@ -2444,7 +2465,7 @@ function getModalHTML(type,extra){
     <!-- Step 2: Pompa -->
     <div style="margin-bottom:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">2 — Pompa</div>
-      <select id="pu10-pompa" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;" onchange="pu10Update()">
+      <select id="pu10-pompa" class="keep-native" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;" onchange="pu10Update()">
         <option value="">— seleziona —</option>
         <option value="PG04|88.0|Pompa Gr.1 2.00 cc/giro 250 bar 2.82 l/min @1500">PG04 — 2.0 cc/giro · 250 bar · 2.82 l/min @1500</option>
         <option value="PG05|92.0|Pompa Gr.1 2.50 cc/giro 250 bar 3.53 l/min @1500">PG05 — 2.5 cc/giro · 250 bar · 3.53 l/min @1500</option>
@@ -2458,7 +2479,7 @@ function getModalHTML(type,extra){
     <div style="margin-bottom:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">3 — Motore</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <select id="pu10-mot-tipo" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:12px;outline:none;" onchange="pu10Update()">
+        <select id="pu10-mot-tipo" class="keep-native" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:12px;outline:none;" onchange="pu10Update()">
           <option value="">— tipo —</option>
           <optgroup label="DC (corrente continua)">
             <option value="C104|148.0|DC 12V 1600W IP54">C104 — 12V DC 1600W IP54</option>
@@ -2477,7 +2498,7 @@ function getModalHTML(type,extra){
             <option value="M207|168.0|AC 1~ 1.1kW 2900rpm MEC80">M207 — AC 1~ 1.1 kW 2900 rpm MEC80</option>
           </optgroup>
         </select>
-        <select id="pu10-giunto" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:12px;outline:none;" onchange="pu10Update()">
+        <select id="pu10-giunto" class="keep-native" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:12px;outline:none;" onchange="pu10Update()">
           <option value="">— giunto/flangia —</option>
           <option value="FC02|28.5|Giunto per DC C104-C205">FC02 — per DC C104/C204/C205</option>
           <option value="FC01|22.4|Giunto per DC C202">FC01 — per DC C102/C103/C202</option>
@@ -2489,7 +2510,7 @@ function getModalHTML(type,extra){
     <!-- Step 4: Serbatoio -->
     <div style="margin-bottom:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">4 — Serbatoio</div>
-      <select id="pu10-serb" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;" onchange="pu10Update()">
+      <select id="pu10-serb" class="keep-native" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;" onchange="pu10Update()">
         <option value="">— seleziona —</option>
         <option value="SL44H|31.2|Serbatoio lamiera 4L orizzontale Ø123">SL44H — 4 L lamiera orizzontale</option>
         <option value="SL47H|38.5|Serbatoio lamiera 7L orizzontale Ø123">SL47H — 7 L lamiera orizzontale</option>
@@ -2502,7 +2523,7 @@ function getModalHTML(type,extra){
     <div style="margin-bottom:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">5 — Blocchi modulari <span style="font-weight:400;text-transform:none;color:var(--text4)">(opzionali, multipli)</span></div>
       <div id="pu10-blocchi-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;max-height:120px;overflow-y:auto;"></div>
-      <select id="pu10-blocco-add" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:6px;font-size:12px;outline:none;color:var(--text3);" onchange="pu10AddBlocco(this)">
+      <select id="pu10-blocco-add" class="keep-native" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:6px;font-size:12px;outline:none;color:var(--text3);" onchange="pu10AddBlocco(this)">
         <option value="">+ aggiungi blocco modulare…</option>
         <option value="B09|19.1|Distanziale H=18 pass-through P-T">B09 — Distanziale H=18</option>
         <option value="B01|25.6|Distanziale H=39">B01 — Distanziale H=39</option>
@@ -2536,7 +2557,7 @@ function getModalHTML(type,extra){
     <!-- Step 1: Collettore -->
     <div style="margin-bottom:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">1 — Collettore</div>
-      <select id="pu20-coll" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;" onchange="pu20Update()">
+      <select id="pu20-coll" class="keep-native" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;" onchange="pu20Update()">
         <option value="">— seleziona —</option>
         <option value="Z1A|574.6|Collettore monopompa VMZ1 P G3/8&quot; T G1/2&quot;">Z1A — monopompa VMZ1, P G3/8" T G1/2"</option>
         <option value="Z2A|988.6|Collettore doppia pompa 2×VMZ1">Z2A — doppia pompa 2×VMZ1</option>
@@ -2545,7 +2566,7 @@ function getModalHTML(type,extra){
     <!-- Step 2: Pompa -->
     <div style="margin-bottom:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">2 — Pompa (gruppo 2)</div>
-      <select id="pu20-pompa" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;" onchange="pu20Update()">
+      <select id="pu20-pompa" class="keep-native" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;" onchange="pu20Update()">
         <option value="">— seleziona —</option>
         <option value="PG20|165.0|Pompa Gr.2 8.0 cc/giro 200 bar 12.0 l/min @1500">PG20 — 8.0 cc/giro · 200 bar · 12.0 l/min @1500</option>
         <option value="PG21|172.0|Pompa Gr.2 10.0 cc/giro 200 bar 15.0 l/min @1500">PG21 — 10.0 cc/giro · 200 bar · 15.0 l/min @1500</option>
@@ -2559,7 +2580,7 @@ function getModalHTML(type,extra){
     <div style="margin-bottom:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">3 — Motore</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <select id="pu20-mot-tipo" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:12px;outline:none;" onchange="pu20Update()">
+        <select id="pu20-mot-tipo" class="keep-native" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:12px;outline:none;" onchange="pu20Update()">
           <option value="">— tipo —</option>
           <optgroup label="DC (corrente continua)">
             <option value="C204|162.0|DC 24V 2200W IP54">C204 — 24V DC 2200W IP54</option>
@@ -2577,7 +2598,7 @@ function getModalHTML(type,extra){
             <option value="M209|205.0|AC 1~ 2.2kW 2900rpm MEC90">M209 — AC 1~ 2.2 kW MEC90</option>
           </optgroup>
         </select>
-        <select id="pu20-giunto" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:12px;outline:none;" onchange="pu20Update()">
+        <select id="pu20-giunto" class="keep-native" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:12px;outline:none;" onchange="pu20Update()">
           <option value="">— giunto/flangia —</option>
           <option value="FC03|32.5|Giunto elastico per DC 24V Gr.2">FC03 — elastico DC 24V Gr.2</option>
           <option value="FA90|38.8|Flangia AC MEC90">FA90 — flangia AC MEC90</option>
@@ -2589,7 +2610,7 @@ function getModalHTML(type,extra){
     <!-- Step 4: Serbatoio -->
     <div style="margin-bottom:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">4 — Serbatoio</div>
-      <select id="pu20-serb" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;" onchange="pu20Update()">
+      <select id="pu20-serb" class="keep-native" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;" onchange="pu20Update()">
         <option value="">— seleziona —</option>
         <option value="SL28V|52.0|Serbatoio lamiera 8L verticale Ø165">SL28V — 8 L lamiera verticale Ø165</option>
         <option value="SL29V|58.0|Serbatoio lamiera 12L verticale Ø165">SL29V — 12 L lamiera verticale Ø165</option>
@@ -2603,7 +2624,7 @@ function getModalHTML(type,extra){
     <div style="margin-bottom:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">5 — Accessori <span style="font-weight:400;text-transform:none;color:var(--text4)">(opzionali)</span></div>
       <div id="pu20-blocchi-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;max-height:120px;overflow-y:auto;"></div>
-      <select id="pu20-blocco-add" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:6px;font-size:12px;outline:none;color:var(--text3);" onchange="pu20AddBlocco(this)">
+      <select id="pu20-blocco-add" class="keep-native" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:6px;font-size:12px;outline:none;color:var(--text3);" onchange="pu20AddBlocco(this)">
         <option value="">+ aggiungi accessorio…</option>
         <option value="G00|0.0|Senza supporto montaggio">G00 — senza supporto</option>
         <option value="G01|18.5|Supporto montaggio standard L=150 H=87">G01 — supporto standard L=150</option>
@@ -2875,32 +2896,32 @@ ERS-05-2025,ERS,Ricerca pompe reversibili,ricerca,0,2025-11-01,,chiusa,</div>
     <div class="fr"><label>Priorità</label><select id="f-pri"><option value="alta">Alta</option><option value="media" selected>Media</option><option value="bassa">Bassa</option></select></div>
   </div>${act('saveTodo()')}`;
 
-  if(type==='rfq'){
+  if(type==='rdo'){
     const f=FORNITORI.find(x=>x.id===extra)||{nome:'Fornitore',categorie:[],contatti:{}};
     const oggi=new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'});
     // Recupera template salvato per questo fornitore
-    const templates=JSON.parse(localStorage.getItem('asg_rfq_templates')||'{}');
+    const templates=JSON.parse(localStorage.getItem('asg_rdo_templates')||'{}');
     const defaultTpl=`Spett.le {FORNITORE},\n\nin riferimento ai Vs. prodotti/servizi, con la presente siamo a richiedere un'offerta per i seguenti articoli:\n\n1. [CODICE/DESCRIZIONE] — qty ___\n2. \n\nSi prega di indicare:\n- Prezzo unitario IVA esclusa\n- Disponibilità a magazzino\n- Tempi di consegna\n- Condizioni di resa\n\nRingraziamo anticipatamente e restiamo in attesa di un Vostro riscontro.\n\nCordiali saluti,`;
     const tpl=templates[extra]||defaultTpl;
     const testo=tpl.replace('{FORNITORE}',f.nome).replace('{DATA}',oggi);
     return`<h3>✉ Richiesta di offerta — ${f.nome}</h3>
     <div style="display:flex;gap:8px;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:12px;">
-      <button class="btn-ghost" style="font-size:12px;padding:4px 10px;" onclick="document.getElementById('rfq-panel-send').style.display='';document.getElementById('rfq-panel-tpl').style.display='none';this.style.background='var(--blue)';this.style.color='#fff';document.getElementById('rfq-tab-tpl').style.background='';document.getElementById('rfq-tab-tpl').style.color='';" id="rfq-tab-send">✉ Componi</button>
-      <button class="btn-ghost" style="font-size:12px;padding:4px 10px;" onclick="document.getElementById('rfq-panel-tpl').style.display='';document.getElementById('rfq-panel-send').style.display='none';this.style.background='var(--blue)';this.style.color='#fff';document.getElementById('rfq-tab-send').style.background='';document.getElementById('rfq-tab-send').style.color='';" id="rfq-tab-tpl">⚙ Modello testo</button>
+      <button class="btn-ghost" style="font-size:12px;padding:4px 10px;" onclick="document.getElementById('rdo-panel-send').style.display='';document.getElementById('rdo-panel-tpl').style.display='none';this.style.background='var(--blue)';this.style.color='#fff';document.getElementById('rdo-tab-tpl').style.background='';document.getElementById('rdo-tab-tpl').style.color='';" id="rdo-tab-send">✉ Componi</button>
+      <button class="btn-ghost" style="font-size:12px;padding:4px 10px;" onclick="document.getElementById('rdo-panel-tpl').style.display='';document.getElementById('rdo-panel-send').style.display='none';this.style.background='var(--blue)';this.style.color='#fff';document.getElementById('rdo-tab-send').style.background='';document.getElementById('rdo-tab-send').style.color='';" id="rdo-tab-tpl">⚙ Modello testo</button>
     </div>
-    <div id="rfq-panel-send">
-      <div class="form-row"><label>A (email fornitore)</label><input id="rfq-to" value="${f.contatti?.email||''}" placeholder="email@fornitore.it"></div>
-      <div class="form-row"><label>Oggetto</label><input id="rfq-subj" value="Richiesta di offerta — ${oggi}"></div>
-      <div class="form-row"><label>Testo</label><textarea id="rfq-body" style="min-height:220px;font-family:var(--font);font-size:13px;line-height:1.7">${testo}</textarea></div>
+    <div id="rdo-panel-send">
+      <div class="form-row"><label>A (email fornitore)</label><input id="rdo-to" value="${f.contatti?.email||''}" placeholder="email@fornitore.it"></div>
+      <div class="form-row"><label>Oggetto</label><input id="rdo-subj" value="Richiesta di offerta — ${oggi}"></div>
+      <div class="form-row"><label>Testo</label><textarea id="rdo-body" style="min-height:220px;font-family:var(--font);font-size:13px;line-height:1.7">${testo}</textarea></div>
       <div class="modal-actions">
         <button class="btn-ghost" onclick="closeM()">Annulla</button>
-        <button class="btn-ghost" onclick="copyRFQ()">📋 Copia testo</button>
-        ${f.contatti?.email?`<a class="btn" href="mailto:${f.contatti.email}?subject=${encodeURIComponent('Richiesta di offerta — '+oggi)}&body=${encodeURIComponent(testo)}" onclick="closeM()">📧 Apri email</a>`:'<button class="btn" onclick="copyRFQ()">📋 Copia tutto</button>'}
+        <button class="btn-ghost" onclick="copyRDO()">📋 Copia testo</button>
+        ${f.contatti?.email?`<a class="btn" href="mailto:${f.contatti.email}?subject=${encodeURIComponent('Richiesta di offerta — '+oggi)}&body=${encodeURIComponent(testo)}" onclick="closeM()">📧 Apri email</a>`:'<button class="btn" onclick="copyRDO()">📋 Copia tutto</button>'}
       </div>
     </div>
-    <div id="rfq-panel-tpl" style="display:none;">
+    <div id="rdo-panel-tpl" style="display:none;">
       <p style="font-size:13px;color:var(--text3);margin-bottom:10px;line-height:1.5">Personalizza il testo predefinito per <strong>${f.nome}</strong>. Variabili disponibili: <code style="background:var(--bg3);padding:1px 5px;border-radius:3px">{FORNITORE}</code> <code style="background:var(--bg3);padding:1px 5px;border-radius:3px">{DATA}</code></p>
-      <div class="form-row"><label>Modello testo per ${f.nome}</label><textarea id="rfq-tpl-body" style="min-height:240px;font-family:var(--font);font-size:13px;line-height:1.7">${templates[extra]||defaultTpl}</textarea></div>
+      <div class="form-row"><label>Modello testo per ${f.nome}</label><textarea id="rdo-tpl-body" style="min-height:240px;font-family:var(--font);font-size:13px;line-height:1.7">${templates[extra]||defaultTpl}</textarea></div>
       <div class="modal-actions">
         <button class="btn-ghost" onclick="closeM()">Annulla</button>
         <button class="btn-ghost" onclick="ripristinaTemplatePredefinito('${extra}')">↺ Ripristina predefinito</button>
@@ -2909,14 +2930,14 @@ ERS-05-2025,ERS,Ricerca pompe reversibili,ricerca,0,2025-11-01,,chiusa,</div>
     </div>`;
   }
 
-  if(type==='rfq-new'){
+  if(type==='rdo-new'){
     return`<h3>✉ Nuova richiesta di offerta</h3>
     <div class="form-row"><label>Fornitore</label>
-      <select id="rfq-forn">${FORNITORI.map(f=>`<option value="${f.id}">${f.nome}</option>`).join('')}</select>
+      <select id="rdo-forn">${FORNITORI.map(f=>`<option value="${f.id}">${f.nome}</option>`).join('')}</select>
     </div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeM()">Annulla</button>
-      <button class="btn" onclick="const v=document.getElementById('rfq-forn').value;closeM();openModal('rfq',v)">Continua →</button>
+      <button class="btn" onclick="const v=document.getElementById('rdo-forn').value;closeM();openModal('rdo',v)">Continua →</button>
     </div>`;
   }
 
@@ -3232,7 +3253,7 @@ function pu10AddBlocco(sel){
 }
 
 function pu10Update(){
-  const getVal=id=>{const el=document.getElementById(id);return el?el.value:'';};
+  const getVal=id=>{const el=document.getElementById(id);if(!el)return'';if(el.classList&&el.classList.contains('csel'))return window._cselData?.[id]?.val||el.dataset.value||'';return el.value||'';};
   const collV=getVal('pu10-coll');const pompaV=getVal('pu10-pompa');
   const motV=getVal('pu10-mot-tipo');const giunto=getVal('pu10-giunto');
   const serbV=getVal('pu10-serb');
@@ -3294,7 +3315,7 @@ function pu20AddBlocco(sel){
 }
 
 function pu20Update(){
-  const getVal=id=>{const el=document.getElementById(id);return el?el.value:'';};
+  const getVal=id=>{const el=document.getElementById(id);if(!el)return'';if(el.classList&&el.classList.contains('csel'))return window._cselData?.[id]?.val||el.dataset.value||'';return el.value||'';};
   const collV=getVal('pu20-coll');const pompaV=getVal('pu20-pompa');
   const motV=getVal('pu20-mot-tipo');const giunto=getVal('pu20-giunto');
   const serbV=getVal('pu20-serb');
@@ -4064,7 +4085,7 @@ const FORNITORI=[
     contatti:{tel:'',email:''}
   },
   {
-    id:'BART',nome:'La Bart (Bart Srl)',zona:'Milano (MI)',colore:'#0891b2',emoji:'🔬',
+    id:'BART',nome:'Bart Srl',zona:'Milano (MI)',colore:'#0891b2',emoji:'🔬',
     url:'https://www.bart-e.com',
     categorie:['Manometri a secco','Manometri a glicerina','Manometri ATEX','Manometri isometrici','Salvamanometri / esclusori','Termometri','Valvole a sfera inox','Raccordi strumentazione'],
     note:'Specialista manometri e strumentazione. Gamma completa da 0 a 1000 bar. Prodotti certificati CE/Accredia. Versioni ATEX disponibili. Salvamanometri esclusori di vari tipi.',
@@ -4164,31 +4185,31 @@ function showView(v){
   navTo(map[v]||v);
 }
 
-function copyRFQ(){
-  const txt=(document.getElementById('rfq-body')||{}).value||'';
-  const subj=(document.getElementById('rfq-subj')||{}).value||'';
+function copyRDO(){
+  const txt=(document.getElementById('rdo-body')||{}).value||'';
+  const subj=(document.getElementById('rdo-subj')||{}).value||'';
   const full=subj+'\n\n'+txt;
   navigator.clipboard.writeText(full).then(()=>showToast('Testo copiato negli appunti!'));
 }
 
 function salvaTemplate(fornId){
-  const tpl=(document.getElementById('rfq-tpl-body')||{}).value||'';
-  const templates=JSON.parse(localStorage.getItem('asg_rfq_templates')||'{}');
+  const tpl=(document.getElementById('rdo-tpl-body')||{}).value||'';
+  const templates=JSON.parse(localStorage.getItem('asg_rdo_templates')||'{}');
   templates[fornId]=tpl;
-  localStorage.setItem('asg_rfq_templates',JSON.stringify(templates));
+  localStorage.setItem('asg_rdo_templates',JSON.stringify(templates));
   showToast('✓ Modello salvato per questo fornitore');
   // Aggiorna il testo nel pannello componi se è visibile
   const f=FORNITORI.find(x=>x.id===fornId)||{nome:'Fornitore'};
   const oggi=new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'});
-  const bodyEl=document.getElementById('rfq-body');
+  const bodyEl=document.getElementById('rdo-body');
   if(bodyEl)bodyEl.value=tpl.replace('{FORNITORE}',f.nome).replace('{DATA}',oggi);
 }
 
 function ripristinaTemplatePredefinito(fornId){
-  const templates=JSON.parse(localStorage.getItem('asg_rfq_templates')||'{}');
+  const templates=JSON.parse(localStorage.getItem('asg_rdo_templates')||'{}');
   delete templates[fornId];
-  localStorage.setItem('asg_rfq_templates',JSON.stringify(templates));
-  const el=document.getElementById('rfq-tpl-body');
+  localStorage.setItem('asg_rdo_templates',JSON.stringify(templates));
+  const el=document.getElementById('rdo-tpl-body');
   if(el)el.value=`Spett.le {FORNITORE},\n\nin riferimento ai Vs. prodotti/servizi, con la presente siamo a richiedere un'offerta per i seguenti articoli:\n\n1. [CODICE/DESCRIZIONE] — qty ___\n2. \n\nSi prega di indicare:\n- Prezzo unitario IVA esclusa\n- Disponibilità a magazzino\n- Tempi di consegna\n- Condizioni di resa\n\nRingraziamo anticipatamente e restiamo in attesa di un Vostro riscontro.\n\nCordiali saluti,`;
   showToast('Modello ripristinato al predefinito');
 }
@@ -4252,7 +4273,7 @@ function renderFornCards(list){
     const extra=f.categorie.length>5?`<span class="fcat">+${f.categorie.length-5}</span>`:'';
     const urlBtn=f.url?`<a class="forn-btn" href="${f.url}" target="_blank">🌐 Sito</a>`:'';
     const telBtn=f.contatti.tel?`<a class="forn-btn" href="tel:${f.contatti.tel}">📞 Chiama</a>`:'';
-    const rfqBtn=`<button class="forn-btn primary" onclick="openRFQ('${f.id}')">✉ RFQ</button>`;
+    const rdoBtn=`<button class="forn-btn primary" onclick="openRDO('${f.id}')">✉ RDO</button>`;
     // Schede applicazione (solo per fornitori che le hanno)
     const appl=f.applicazioni&&f.applicazioni.length?`
       <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">
@@ -4281,7 +4302,7 @@ function renderFornCards(list){
       <div class="forn-body">
         <div class="forn-cats">${cats}${extra}</div>
         <div class="forn-note">${f.note}</div>
-        <div class="forn-actions">${urlBtn}${telBtn}${rfqBtn}</div>
+        <div class="forn-actions">${urlBtn}${telBtn}${rdoBtn}</div>
         ${appl}
       </div>
     </div>`;
@@ -4369,7 +4390,7 @@ function searchComp(){
         </div>
         <div class="comp-actions">
           ${f.url?`<a class="forn-btn" href="${f.url}" target="_blank">🌐</a>`:''}
-          <button class="forn-btn primary" onclick="openRFQ('${f.id}')">✉ RFQ</button>
+          <button class="forn-btn primary" onclick="openRDO('${f.id}')">✉ RDO</button>
         </div>
       </div>`;
     }).join('');
@@ -4388,10 +4409,10 @@ function addAresFromSearch(a){
   }
 }
 
-function openRFQ(fornId){
+function openRDO(fornId){
   const f=FORNITORI.find(x=>x.id===fornId);
   if(!f)return;
-  openModal('rfq',fornId);
+  openModal('rdo',fornId);
 }
 
 function showToast(msg){
@@ -4846,8 +4867,18 @@ function _updateMargine(){
 
 // Export PDF commesse con margini
 function exportReportCommesse(){
-  const comms=lll('comm');
+  const allComms=lll('comm');
   const det=ll('det');
+  // Rispetta filtri attivi
+  const filtroStato=document.getElementById('comm-anno')?.closest('.filter-bar')?.querySelector('[data-f-stato].active')?.dataset?.fStato||'';
+  const filtroAnno=(document.getElementById('comm-anno')||{}).value||'';
+  const filtroCliente=(document.getElementById('comm-cliente')||{}).value||'';
+  const comms=allComms.filter(c=>{
+    if(filtroStato&&c.stato!==filtroStato)return false;
+    if(filtroAnno&&!(c.numero||'').includes('-'+filtroAnno))return false;
+    if(filtroCliente&&c.cliente!==filtroCliente)return false;
+    return true;
+  });
   const anno=new Date().getFullYear();
 
   // Calcola margine per ogni commessa
@@ -5027,7 +5058,7 @@ function renderMagMetrics(){
   }
 }
 
-function apriRFQ(fornId){
+function apriRDO(fornId){
   // fornId può essere il nome del fornitore (da approvvigionamenti) o l'ID (da fornitori)
   const f=FORNITORI.find(x=>x.id===fornId||x.nome===fornId);
   if(f){
@@ -5035,16 +5066,16 @@ function apriRFQ(fornId){
     const aggr=getApprovAggregati('daordinare');
     const items=aggr[f.nome]||aggr[f.id]||[];
     if(items.length){
-      const templates=JSON.parse(localStorage.getItem('asg_rfq_templates')||'{}');
+      const templates=JSON.parse(localStorage.getItem('asg_rdo_templates')||'{}');
       if(!templates[f.id]){
         const righe=items.map(r=>`- ${r.descrizione||r.codice||'—'} (rif. ${r._commessa}) × ${r.qty||1}`).join('\n');
         const tplConArticoli=`Spett.le {FORNITORE},\n\nCon la presente richediamo offerta per:\n\n${righe}\n\nSi prega di indicare prezzi, disponibilità e tempi di consegna.\n\nCordiali saluti,`;
-        const tmp=JSON.parse(localStorage.getItem('asg_rfq_templates')||'{}');
+        const tmp=JSON.parse(localStorage.getItem('asg_rdo_templates')||'{}');
         tmp[f.id]=tplConArticoli;
-        localStorage.setItem('asg_rfq_templates',JSON.stringify(tmp));
+        localStorage.setItem('asg_rdo_templates',JSON.stringify(tmp));
       }
     }
-    openModal('rfq',f.id);
+    openModal('rdo',f.id);
     return;
   }
   // Fornitore non in rubrica — modal semplice con textarea
@@ -5052,7 +5083,7 @@ function apriRFQ(fornId){
   const items=aggr[fornId]||[];
   const righe=items.map(r=>`- ${r.descrizione||r.codice||'—'} (rif. ${r._commessa}) × ${r.qty||1}`).join('\n');
   const testo=`Spett.le ${fornId},\n\nSi richiede offerta per:\n\n${righe||'[articoli]'}\n\nCordiali saluti,\nASG LAB SRL`;
-  document.getElementById('modal-body').innerHTML=`<h3>✉ RFQ — ${fornId}</h3>
+  document.getElementById('modal-body').innerHTML=`<h3>✉ RDO — ${fornId}</h3>
     <textarea style="width:100%;min-height:200px;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px;font-size:13px;font-family:var(--font);line-height:1.7">${testo}</textarea>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeM()">Chiudi</button>
@@ -5060,19 +5091,19 @@ function apriRFQ(fornId){
     </div>`;
   document.getElementById('modal-overlay').classList.add('show');
 }
-if(typeof openRFQ==='undefined'){
-  function openRFQ(fornId){
+if(typeof openRDO==='undefined'){
+  function openRDO(fornId){
     const f=FORNITORI.find(x=>x.id===fornId);
-    if(f)apriRFQ(f.nome);
+    if(f)apriRDO(f.nome);
   }
 }
 
-// Se non esiste apriRFQApprov dal vecchio codice
-if(typeof apriRFQApprov==='undefined'){
-  function apriRFQApprov(numero,forn){apriRFQ(forn);}
+// Se non esiste apriRDOApprov dal vecchio codice
+if(typeof apriRDOApprov==='undefined'){
+  function apriRDOApprov(numero,forn){apriRDO(forn);}
 }
 
-// Modal RFQ manuale
+// Modal RDO manuale
 
 
 // Funzione per aprire dettaglio (alias)
