@@ -1283,8 +1283,14 @@ function getCod(n){const m=n.match(/^([A-Z]+)/);return m?m[1]:'';}
 function folderUrl(n,url){
   const a=getAnno(n),c=getCod(n),k=CMAP[c];
   if(!k||!a)return null;
-  // Usa cloud.asglab.it direttamente per i link cartelle (non il proxy dashboard)
   const ncBase='https://cloud.asglab.it';
+  // Prova a puntare alla cartella commessa specifica
+  const seqNum=parseInt((n||'').split('-')[1]||'0');
+  const comm=lll('comm').find(x=>x.numero===n);
+  if(comm?.oggetto){
+    const nomeCartella=`${c}-${seqNum}-${a} (${comm.oggetto})`;
+    return`${ncBase}/apps/files/?dir=${encodeURIComponent('/Clienti/'+k+'/'+a+'/'+nomeCartella)}`;
+  }
   return`${ncBase}/apps/files/?dir=${encodeURIComponent('/Clienti/'+k+'/'+a)}`;
 }
 
@@ -1397,6 +1403,33 @@ async function wPut(f,rows,fields){
     return r.ok||r.status===201||r.status===204;
   }catch(e){console.warn('wPut error:',e.message);return false;}
 };
+
+// Crea cartella su Nextcloud via WebDAV MKCOL (ignora se esiste già)
+async function wMkdir(path){
+  const c=getCfg();if(!c.ok)return false;
+  try{
+    const r=await fetch(c.nc_url+'/remote.php/dav/files/'+c.nc_user+encodeURI(path),{
+      method:'MKCOL',
+      headers:{'Authorization':'Basic '+btoa(c.nc_user+':'+c.nc_pass)}
+    });
+    return r.ok||r.status===405; // 405 = già esiste, va bene lo stesso
+  }catch{return false;}
+}
+
+// Crea la struttura cartelle per una commessa: /Clienti/Cliente/Anno/Numero (oggetto)/
+async function createCommFolder(numero, oggetto){
+  const anno=getAnno(numero), cod=getCod(numero), cliente=CMAP[cod];
+  if(!anno||!cliente)return false;
+  const seqNum=parseInt((numero||'').split('-')[1]||'0');
+  const nomeCartella=`${cod}-${seqNum}-${anno}${oggetto?' ('+oggetto+')':''}`;
+  // Crea in sequenza (ogni livello deve esistere prima del successivo)
+  await wMkdir('/Clienti');
+  await wMkdir('/Clienti/'+cliente);
+  await wMkdir('/Clienti/'+cliente+'/'+anno);
+  const fullPath='/Clienti/'+cliente+'/'+anno+'/'+nomeCartella;
+  const ok=await wMkdir(fullPath);
+  return ok?fullPath:false;
+}
 
 // ═══════════════════════════════════════════════
 // SYNC
@@ -3550,6 +3583,16 @@ async function saveComm(){
   const data=lll('comm');data.unshift(row);ls('comm',data);
   const det=ll('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};ls('det',det);
   await wPut('commesse.csv',[row,...(SD.comm||[])],['numero','cliente','oggetto','tipo_commessa','importo','data_apertura','data_consegna','stato','note']);
+  // Crea cartella Nextcloud in background
+  const cfg=getCfg();
+  if(cfg.ok){
+    createCommFolder(numero, row.oggetto).then(path=>{
+      if(path) showToast('✓ Commessa salvata · Cartella NC creata');
+      else showToast('✓ Commessa salvata (cartella NC non creata)');
+    });
+  } else {
+    showToast('✓ Commessa salvata');
+  }
   closeM();await syncNow();
 }
 
