@@ -4840,7 +4840,7 @@ function _updateMargine(){
     <span style="font-weight:600;color:var(--text2)">Margine lordo</span><span style="text-align:right;font-weight:600;color:${margLordo>=0?'var(--green)':'var(--red)'}">€${fmt2(margLordo)} ${percLordo!==null?'('+percLordo.toFixed(0)+'%)':''}</span>
     ${costiOre>0?`<span style="font-weight:600;color:var(--text2)">Margine netto</span><span style="text-align:right;font-weight:600;color:${col}">€${fmt2(margNetto)}</span>`:''}
   </div>
-  <button class="btn-ghost btn-sm" onclick="exportReportCommesse()" style="width:100%;margin-top:4px;font-size:10px">📄 Report PDF</button>`;
+  <button class="btn-ghost btn-sm" onclick="exportDistintaPDF(CC?.numero)" style="width:100%;margin-top:4px;font-size:10px">📄 Stampa distinta</button>`;
 }
 
 
