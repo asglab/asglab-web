@@ -3445,47 +3445,47 @@ function syncLung(da){
 function renderRaccordiSection(){
   const el=document.getElementById('tf-racc-section');if(!el)return;
   if(!_tfDnAttuale){
-    el.innerHTML=`<div style="font-size:12px;color:var(--text3);padding:10px;text-align:center;background:var(--bg2);border-radius:7px;">Seleziona prima il tipo di tubo per filtrare i raccordi compatibili</div>`;
+    el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:10px;text-align:center;background:var(--bg2);border-radius:7px;">Seleziona prima il tipo di tubo per filtrare i raccordi compatibili</div>';
     return;
   }
-
-  // Raccordi filtrati per DN attuale (compatibili nativamente o ±1 misura)
   const compatibili=RACCORDI_DB.filter(r=>r.dn.includes(_tfDnAttuale));
-  const tutti=RACCORDI_DB; // per mostrare tutti se filtro "tutti"
   const lista=_tfStdFiltro?compatibili.filter(r=>r.std===_tfStdFiltro):compatibili;
   const stds=[...new Set(compatibili.map(r=>r.std))];
 
-  el.innerHTML=`
-  <div style="margin-bottom:8px;">
-    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">
-      Raccordi compatibili con DN${_tfDnAttuale} — filtra per standard:
-    </div>
-    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">
-      <button onclick="setRaccFiltro('')" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1.5px solid ${!_tfStdFiltro?'var(--blue)':'var(--border)'};background:${!_tfStdFiltro?'var(--blue-lt)':'#fff'};color:${!_tfStdFiltro?'var(--blue)':'var(--text3)'};cursor:pointer;">Tutti</button>
-      ${stds.map(s=>`<button onclick="setRaccFiltro('${s}')" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1.5px solid ${_tfStdFiltro===s?'var(--blue)':'var(--border)'};background:${_tfStdFiltro===s?'var(--blue-lt)':'#fff'};color:${_tfStdFiltro===s?'var(--blue)':'var(--text3)'};cursor:pointer;">${s}</button>`).join('')}
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-    ${['A','B'].map(lato=>`
-    <div>
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">
-        Raccordo lato ${lato}
-        ${_tfRaSelected[lato]?`<span style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd);padding:1px 7px;border-radius:20px;font-size:10px;margin-left:4px;">✓ ${_tfRaSelected[lato].label.split(' ')[0]+' '+(_tfRaSelected[lato].label.split(' ')[1]||'')} ${_tfRaSelected[lato].curva||''}</span>`:''}
-      </div>
-      <div style="max-height:190px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;background:#fff;">
-        ${lista.map(r=>{
-          const varianti=[{k:'dritto',label:'↔ dritto'},...(!r.noCurva?[{k:'45°',label:'↗ curva 45°'},{k:'90°',label:'↕ curva 90°'}]:[])];
-          return varianti.map(v=>{
-            const isSelected=_tfRaSelected[lato]&&_tfRaSelected[lato].raccId===r.std+'_'+r.mis&&_tfRaSelected[lato].curva===v.k;
-            return`<div onclick="selRacc('${lato}','${r.std}','${r.mis.replace(/"/g,'&quot;')}','${r.label.replace(/"/g,'&quot;')}','${v.k}')" style="padding:6px 10px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12px;display:flex;align-items:center;justify-content:space-between;background:${isSelected?'var(--blue-lt)':'transparent'};color:${isSelected?'var(--blue)':'var(--text2)'};transition:background .1s;">
-              <span><span style="font-family:monospace;font-weight:700;font-size:11px;color:${isSelected?'var(--blue)':'var(--text3)'}">${r.std}</span> ${r.mis} <span style="font-size:11px;color:${isSelected?'var(--blue)':'var(--text4)'}">${v.label}</span></span>
-              ${isSelected?`<span style="font-size:14px;">✓</span>`:''}
-            </div>`;
-          }).join('');
-        }).join('')}
-      </div>
-    </div>`).join('')}
-  </div>`;
+  // Bottoni filtro standard
+  const btnTutti='<button onclick="setRaccFiltro('')" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1.5px solid '+(!_tfStdFiltro?'var(--blue)':'var(--border)')+'";background:'+(!_tfStdFiltro?'var(--blue-lt)':'#fff')+'";color:'+(!_tfStdFiltro?'var(--blue)':'var(--text3)')+';cursor:pointer;">Tutti</button>';
+  const btnStds=stds.map(s=>'<button onclick="setRaccFiltro(''+s+'')" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1.5px solid '+(_tfStdFiltro===s?'var(--blue)':'var(--border)')+'";background:'+(_tfStdFiltro===s?'var(--blue-lt)':'#fff')+'";color:'+(_tfStdFiltro===s?'var(--blue)':'var(--text3)')+';cursor:pointer;">'+s+'</button>').join('');
+
+  // Colonne A e B
+  const colHtml=['A','B'].map(lato=>{
+    const selInfo=_tfRaSelected[lato];
+    const selBadge=selInfo?'<span style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd);padding:1px 7px;border-radius:20px;font-size:10px;margin-left:4px;">✓ '+selInfo.label.split(' ').slice(0,2).join(' ')+' '+( selInfo.curva||'')+'</span>':'';
+    const rows=lista.map(r=>{
+      const varianti=[{k:'dritto',label:'↔ dritto'},...(!r.noCurva?[{k:'45°',label:'↗ curva 45°'},{k:'90°',label:'↕ curva 90°'}]:[])];
+      return varianti.map(v=>{
+        const isSel=selInfo&&selInfo.raccId===r.std+'_'+r.mis&&selInfo.curva===v.k;
+        const bg=isSel?'var(--blue-lt)':'transparent';
+        const col=isSel?'var(--blue)':'var(--text2)';
+        const colCode=isSel?'var(--blue)':'var(--text3)';
+        const colV=isSel?'var(--blue)':'var(--text4)';
+        return '<div onclick="selRacc(''+lato+'',''+r.std+'',''+r.mis.replace(/"/g,'&quot;')+'',''+r.label.replace(/"/g,'&quot;')+'',''+v.k+'')" style="padding:6px 10px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12px;display:flex;align-items:center;justify-content:space-between;background:'+bg+';color:'+col+';transition:background .1s;">'+
+          '<span><span style="font-family:monospace;font-weight:700;font-size:11px;color:'+colCode+'">'+r.std+'</span> '+r.mis+' <span style="font-size:11px;color:'+colV+'">'+v.label+'</span></span>'+
+          (isSel?'<span style="font-size:14px;">✓</span>':'')+
+          '</div>';
+      }).join('');
+    }).join('');
+    return '<div>'+
+      '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">Raccordo lato '+lato+selBadge+'</div>'+
+      '<div style="max-height:190px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;background:#fff;">'+rows+'</div>'+
+      '</div>';
+  }).join('');
+
+  el.innerHTML=
+    '<div style="margin-bottom:8px;">'+
+      '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">Raccordi compatibili con DN'+_tfDnAttuale+' — filtra per standard:</div>'+
+      '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">'+btnTutti+btnStds+'</div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'+colHtml+'</div>';
 }
 
 function setRaccFiltro(std){
