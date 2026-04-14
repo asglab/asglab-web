@@ -516,9 +516,9 @@ async function parsePrimaNotaFile(file){
     const reader = new FileReader();
     reader.onload = e => {
       try{
-        const wb = XLSX.read(e.target.result, {type:'array', cellDates:false, dateNF:'dd/mm/yyyy', cellText:true, raw:false});
+        const wb = XLSX.read(e.target.result, {type:'array', cellDates:false, dateNF:'dd/mm/yyyy'});
         const ws = wb.Sheets[wb.SheetNames[0]];
-        const raw = XLSX.utils.sheet_to_json(ws, {header:1, defval:'', raw:false});
+        const raw = XLSX.utils.sheet_to_json(ws, {header:1, defval:'', raw:true});
 
         // Trova riga header (contiene "DATA PAG." o "TIPO DOC.")
         let hdrIdx = -1;
@@ -541,10 +541,21 @@ async function parsePrimaNotaFile(file){
           if(!dataPag) continue; // salta righe vuote
 
           const toNum = v => {
-            if(!v||v===''||v==='-')return 0;
-            if(typeof v==='number')return v;
-            const s=String(v).replace(/\./g,'').replace(',','.');
-            return parseFloat(s)||0;
+            if(v===null||v===undefined||v===''||v==='-')return 0;
+            // SheetJS raw:true restituisce numeri JS nativi
+            if(typeof v==='number') return isFinite(v)?v:0;
+            const s=String(v).trim();
+            if(!s||s==='-')return 0;
+            // Rimuovi simbolo €  e spazi
+            const clean=s.replace(/[€\s]/g,'');
+            // Formato italiano: punto migliaia, virgola decimale → "1.234,56"
+            if(/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(clean))
+              return parseFloat(clean.replace(/\./g,'').replace(',','.'))||0;
+            // Formato con solo virgola decimale → "54,89"
+            if(/^\d+,\d+$/.test(clean))
+              return parseFloat(clean.replace(',','.'))||0;
+            // Già formato decimale con punto → "54.89"
+            return parseFloat(clean.replace(/,/g,''))||0;
           };
 
           rows.push({
