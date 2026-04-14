@@ -3310,24 +3310,24 @@ function pu10Update(){
   const prBlocchi=_pu10Blocchi.reduce((s,b)=>s+b.prezzo,0);
   const totale=prColl+prPompa+prMot+prGiunto+prSerb+prBlocchi;
   // Codice ordinazione semplificato
-  const cod=`PU10-${pC[0]||'?'}-${pP[0]||'?'}-${pM[0]||'?'}${giunto?'-'+pG[0]:''}${serbV?'-'+pS[0]:''}${_pu10Blocchi.map(b=>'-'+b.cod).join('')}`;
-  prev.innerHTML=`
-  <div style="font-weight:700;color:var(--green);font-size:13px;margin-bottom:6px">Centralina PU10 — ${pC[2]||''}</div>
-  <div style="display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;font-size:12px;margin-bottom:8px;">
-    <span style="color:var(--text3)">Collettore</span><span>${pC[2]||'—'}</span><span style="text-align:right">€${fmt2(prColl)}</span>
-    <span style="color:var(--text3)">Pompa</span><span>${pP[2]||'—'}</span><span style="text-align:right">€${fmt2(prPompa)}</span>
-    <span style="color:var(--text3)">Motore</span><span>${pM[2]||'—'}</span><span style="text-align:right">€${fmt2(prMot)}</span>
-    ${giunto?`<span style="color:var(--text3)">Giunto</span><span>${pG[2]||'—'}</span><span style="text-align:right">€${fmt2(prGiunto)}</span>`:''}
-    ${serbV?`<span style="color:var(--text3)">Serbatoio</span><span>${pS[2]||'—'}</span><span style="text-align:right">€${fmt2(prSerb)}</span>`:''}
-    ${_pu10Blocchi.map(b=>`<span style="color:var(--text3)">${b.cod}</span><span>${b.desc}</span><span style="text-align:right">€${fmt2(b.prezzo)}</span>`).join('')}
-  </div>
-  <div style="border-top:1px solid #6ee7a0;padding-top:6px;display:flex;justify-content:space-between;align-items:center;">
-    <span style="font-size:11px;font-family:monospace;color:var(--text3)">${cod}</span>
-    <span style="font-weight:800;font-size:15px;color:var(--green)">TOT. €${fmt2(totale)}</span>
-  </div>
-  <div style="font-size:10px;color:var(--text4);margin-top:3px;">Fornitore: Ares / Tecfluid · Prezzi listino 2022 — da confermare</div>`;
+  const cod='PU10-'+(pC[0]||'?')+'-'+(pP[0]||'?')+'-'+(pM[0]||'?')+(giunto?'-'+pG[0]:'')+(serbV?'-'+pS[0]:'')+_pu10Blocchi.map(b=>'-'+b.cod).join('');
+  prev.innerHTML=
+    '<div style="font-weight:700;color:var(--green);font-size:13px;margin-bottom:6px">Centralina PU10 — '+(pC[2]||'')+'</div>'+
+    '<div style="display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;font-size:12px;margin-bottom:8px;">'+
+    '<span style="color:var(--text3)">Collettore</span><span>'+(pC[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prColl)+'</span>'+
+    '<span style="color:var(--text3)">Pompa</span><span>'+(pP[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prPompa)+'</span>'+
+    '<span style="color:var(--text3)">Motore</span><span>'+(pM[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prMot)+'</span>'+
+    (giunto?'<span style="color:var(--text3)">Giunto</span><span>'+(pG[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prGiunto)+'</span>':'')+
+    (serbV?'<span style="color:var(--text3)">Serbatoio</span><span>'+(pS[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prSerb)+'</span>':'')+
+    _pu10Blocchi.map(b=>'<span style="color:var(--text3)">'+b.cod+'</span><span>'+b.desc+'</span><span style="text-align:right">€'+fmt2(b.prezzo)+'</span>').join('')+
+    '</div>'+
+    '<div style="border-top:1px solid #6ee7a0;padding-top:6px;display:flex;justify-content:space-between;align-items:center;">'+
+    '<span style="font-size:11px;font-family:monospace;color:var(--text3)">'+cod+'</span>'+
+    '<span style="font-weight:800;font-size:15px;color:var(--green)">TOT. €'+fmt2(totale)+'</span>'+
+    '</div>'+
+    '<div style="font-size:10px;color:var(--text4);margin-top:3px;">Fornitore: Ares / Tecfluid · Prezzi listino 2022 — da confermare</div>';
   prev.dataset.cod=cod;prev.dataset.tot=totale;
-  prev.dataset.desc=`Centralina PU10: ${pC[2]||''} · Pompa ${pP[0]} · Motore ${pM[0]}${giunto?' · '+pG[0]:''}${serbV?' · '+pS[0]:''}${_pu10Blocchi.length?' · Blocchi: '+_pu10Blocchi.map(b=>b.cod).join('+'):''}`;
+  prev.dataset.desc='Centralina PU10: '+(pC[2]||'')+' · Pompa '+pP[0]+' · Motore '+pM[0]+(giunto?' · '+pG[0]:'')+(serbV?' · '+pS[0]:'')+(  _pu10Blocchi.length?' · Blocchi: '+_pu10Blocchi.map(b=>b.cod).join('+'):'');
 }
 
 function usaCentralinaPU10(numero){
@@ -3375,24 +3375,24 @@ function pu20Update(){
   const prSerb=serbV?parseFloat(pS[1]||0):0;
   const prAcc=_pu20Blocchi.reduce((s,b)=>s+b.prezzo,0);
   const totale=prColl+prPompa+prMot+prGiunto+prSerb+prAcc;
-  const cod=`PU20-${pC[0]||'?'}-${pP[0]||'?'}-${pM[0]||'?'}${giunto?'-'+pG[0]:''}${serbV?'-'+pS[0]:''}${_pu20Blocchi.map(b=>'-'+b.cod).join('')}`;
-  prev.innerHTML=`
-  <div style="font-weight:700;color:var(--green);font-size:13px;margin-bottom:6px">Centralina PU20 — ${pC[2]||''}</div>
-  <div style="display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;font-size:12px;margin-bottom:8px;">
-    <span style="color:var(--text3)">Collettore</span><span>${pC[2]||'—'}</span><span style="text-align:right">€${fmt2(prColl)}</span>
-    <span style="color:var(--text3)">Pompa</span><span>${pP[2]||'—'}</span><span style="text-align:right">€${fmt2(prPompa)}</span>
-    <span style="color:var(--text3)">Motore</span><span>${pM[2]||'—'}</span><span style="text-align:right">€${fmt2(prMot)}</span>
-    ${giunto?`<span style="color:var(--text3)">Giunto</span><span>${pG[2]||'—'}</span><span style="text-align:right">€${fmt2(prGiunto)}</span>`:''}
-    ${serbV?`<span style="color:var(--text3)">Serbatoio</span><span>${pS[2]||'—'}</span><span style="text-align:right">€${fmt2(prSerb)}</span>`:''}
-    ${_pu20Blocchi.map(b=>`<span style="color:var(--text3)">${b.cod}</span><span>${b.desc}</span><span style="text-align:right">€${fmt2(b.prezzo)}</span>`).join('')}
-  </div>
-  <div style="border-top:1px solid #6ee7a0;padding-top:6px;display:flex;justify-content:space-between;align-items:center;">
-    <span style="font-size:11px;font-family:monospace;color:var(--text3)">${cod}</span>
-    <span style="font-weight:800;font-size:15px;color:var(--green)">TOT. €${fmt2(totale)}</span>
-  </div>
-  <div style="font-size:10px;color:var(--text4);margin-top:3px;">Fornitore: Ares / Tecfluid · Prezzi indicativi — da confermare</div>`;
+  const cod='PU20-'+(pC[0]||'?')+'-'+(pP[0]||'?')+'-'+(pM[0]||'?')+(giunto?'-'+pG[0]:'')+(serbV?'-'+pS[0]:'')+_pu20Blocchi.map(b=>'-'+b.cod).join('');
+  prev.innerHTML=
+    '<div style="font-weight:700;color:var(--green);font-size:13px;margin-bottom:6px">Centralina PU20 — '+(pC[2]||'')+'</div>'+
+    '<div style="display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;font-size:12px;margin-bottom:8px;">'+
+    '<span style="color:var(--text3)">Collettore</span><span>'+(pC[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prColl)+'</span>'+
+    '<span style="color:var(--text3)">Pompa</span><span>'+(pP[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prPompa)+'</span>'+
+    '<span style="color:var(--text3)">Motore</span><span>'+(pM[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prMot)+'</span>'+
+    (giunto?'<span style="color:var(--text3)">Giunto</span><span>'+(pG[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prGiunto)+'</span>':'')+
+    (serbV?'<span style="color:var(--text3)">Serbatoio</span><span>'+(pS[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prSerb)+'</span>':'')+
+    _pu20Blocchi.map(b=>'<span style="color:var(--text3)">'+b.cod+'</span><span>'+b.desc+'</span><span style="text-align:right">€'+fmt2(b.prezzo)+'</span>').join('')+
+    '</div>'+
+    '<div style="border-top:1px solid #6ee7a0;padding-top:6px;display:flex;justify-content:space-between;align-items:center;">'+
+    '<span style="font-size:11px;font-family:monospace;color:var(--text3)">'+cod+'</span>'+
+    '<span style="font-weight:800;font-size:15px;color:var(--green)">TOT. €'+fmt2(totale)+'</span>'+
+    '</div>'+
+    '<div style="font-size:10px;color:var(--text4);margin-top:3px;">Fornitore: Ares / Tecfluid · Prezzi listino 2022 — da confermare</div>';
   prev.dataset.cod=cod;prev.dataset.tot=totale;
-  prev.dataset.desc=`Centralina PU20: ${pC[2]||''} · Pompa ${pP[0]} · Motore ${pM[0]}${giunto?' · '+pG[0]:''}${serbV?' · '+pS[0]:''}${_pu20Blocchi.length?' · Accessori: '+_pu20Blocchi.map(b=>b.cod).join('+'):''}`;
+  prev.dataset.desc='Centralina PU20: '+(pC[2]||'')+' · Pompa '+pP[0]+' · Motore '+pM[0]+(giunto?' · '+pG[0]:'')+(serbV?' · '+pS[0]:'')+(  _pu20Blocchi.length?' · Accessori: '+_pu20Blocchi.map(b=>b.cod).join('+'):'');
 }
 
 function usaCentralinaPU20(numero){
