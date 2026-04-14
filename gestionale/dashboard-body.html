@@ -267,30 +267,6 @@
       </div>
     </div>
 
-    <!-- ══ VIEW: IMPORT FATTURE ══ -->
-    <div class="view" id="view-import-fatture">
-      <div class="panel">
-        <div class="panel-head"><span class="panel-title">Import fatture da Fattura24</span></div>
-        <div style="padding:16px">
-          <div class="drop-zone" id="drop-zone" ondrop="handleDrop(event)" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" onclick="document.getElementById('file-input').click()">
-            <div class="drop-zone-icon">📁</div>
-            <div>Trascina qui il file XLS esportato da Fattura24</div>
-            <div style="font-size:12px;color:var(--text4);margin-top:4px">oppure clicca per selezionare — FE (emesse) e FA (passive/ricevute)</div>
-          </div>
-          <input type="file" id="file-input" accept=".xls,.xlsx,.csv" multiple style="display:none" onchange="handleFileSelect(event)">
-          <div id="imp-preview-area" style="margin-top:12px"></div>
-          <div id="imp-actions" style="display:none;margin-top:12px;gap:8px;align-items:center;flex-wrap:wrap;">
-            <button class="btn btn-primary" id="btn-confirm-import" onclick="confirmImport()">✓ Conferma importazione</button>
-            <button class="btn btn-ghost" onclick="resetImport()">✕ Annulla</button>
-            <span id="imp-nc-status" style="font-size:12px;color:var(--text3)"></span>
-          </div>
-          <div id="imp-progress" style="display:none;font-size:12px;color:var(--text3);margin-top:8px">
-            <span id="imp-progress-text">Elaborazione…</span>
-          </div>
-          <div id="imp-status-body" style="margin-top:16px"></div>
-        </div>
-      </div>
-
       <!-- PRIMA NOTA -->
       <div class="cont-panel" id="cont-primanota">
         <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
@@ -338,7 +314,31 @@
         </div>
       </div>
 
-    </div>
+    <!-- ══ VIEW: IMPORT FATTURE ══ -->
+    <div class="view" id="view-import-fatture">
+      <div class="panel">
+        <div class="panel-head"><span class="panel-title">Import fatture da Fattura24</span></div>
+        <div style="padding:16px">
+          <div class="drop-zone" id="drop-zone" ondrop="handleDrop(event)" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" onclick="document.getElementById('file-input').click()">
+            <div class="drop-zone-icon">📁</div>
+            <div>Trascina qui il file XLS esportato da Fattura24</div>
+            <div style="font-size:12px;color:var(--text4);margin-top:4px">oppure clicca per selezionare — FE (emesse) e FA (passive/ricevute)</div>
+          </div>
+          <input type="file" id="file-input" accept=".xls,.xlsx,.csv" multiple style="display:none" onchange="handleFileSelect(event)">
+          <div id="imp-preview-area" style="margin-top:12px"></div>
+          <div id="imp-actions" style="display:none;margin-top:12px;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button class="btn btn-primary" id="btn-confirm-import" onclick="confirmImport()">✓ Conferma importazione</button>
+            <button class="btn btn-ghost" onclick="resetImport()">✕ Annulla</button>
+            <span id="imp-nc-status" style="font-size:12px;color:var(--text3)"></span>
+          </div>
+          <div id="imp-progress" style="display:none;font-size:12px;color:var(--text3);margin-top:8px">
+            <span id="imp-progress-text">Elaborazione…</span>
+          </div>
+          <div id="imp-status-body" style="margin-top:16px"></div>
+        </div>
+      </div>
+
+
 
     <!-- ══ VIEW: MAGAZZINO ══ -->
     <div class="view" id="view-magazzino">
@@ -1046,4 +1046,7 @@ function exportPrimaNotaPDF(){
   <div style="margin-top:12px;font-size:10px;color:#666">
     Saldo periodo: <strong style="color:${totEnt-totUsc>=0?'#166534':'#991b1b'}">€${fmt2(totEnt-totUsc)}</strong>
     · Estratto il ${new Date().toLocaleDateString('it-IT')}
-  </div>
+  </div
+
+    </div>
+>
