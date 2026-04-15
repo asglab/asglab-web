@@ -914,20 +914,21 @@ async function caricaFileNC(path){
       var openUrl=cfg.nc_url+'/apps/files/?dir='+encodeURIComponent(path)+(item.isDir?'/'+item.name:'');
       var downloadUrl=cfg.nc_url+'/remote.php/dav/files/'+cfg.nc_user+encodeURI(path+'/'+item.name);
       var sizeStr=item.size>0?(item.size>1048576?(item.size/1048576).toFixed(1)+'MB':(item.size>1024?(item.size/1024).toFixed(0)+'KB':item.size+'B')):'';
-      // Per file: link diretto WebDAV — su Android/GrapheneOS viene aperto dall'app giusta (Nextcloud, gestore file, viewer PDF...)
-      // Per cartelle: naviga dentro
+      // Click file: apre in NC web (sessione gia' attiva, no login richiesto)
+      // Click cartella: naviga dentro
+      var ncFileUrl=cfg.nc_url+'/apps/files/?dir='+encodeURIComponent(path)+'&openfile='+encodeURIComponent(item.name);
       var rowClick=item.isDir?
         'data-path="'+esc(path+'/'+item.name)+'" onclick="caricaFileNC(this.dataset.path)"':
-        'data-href="'+esc(downloadUrl)+'" onclick="window.open(this.dataset.href,\'_blank\')"';
-      html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer;active:background:var(--surface2)" '+rowClick+'>'+
+        'data-href="'+esc(ncFileUrl)+'" onclick="window.open(this.dataset.href,\'_blank\')";';
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer" '+rowClick+'>'+
         '<span style="font-size:20px;flex-shrink:0">'+(item.isDir?'&#128193;':ncFileEmoji(item.name))+'</span>'+
         '<div style="flex:1;min-width:0">'+
           '<div style="font-weight:'+(item.isDir?'700':'500')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(item.name)+'</div>'+
           (sizeStr?'<div style="font-size:11px;color:var(--text3)">'+sizeStr+'</div>':'')+
         '</div>'+
         (item.isDir?
-          '<span style="font-size:12px;color:var(--text3)">&#8250;</span>':
-          '<a href="'+esc(openUrl)+'" target="_blank" onclick="event.stopPropagation()" style="font-size:18px;color:var(--text3);text-decoration:none" title="Apri in Nextcloud web">&#8599;</a>')+
+          '<span style="font-size:14px;color:var(--text3)">&#8250;</span>':
+          '<a href="'+esc(downloadUrl)+'" target="_blank" onclick="event.stopPropagation()" style="font-size:16px;color:var(--text3);text-decoration:none;padding:4px 6px" title="Download">&#8595;</a>')+
       '</div>';
     });
     // Breadcrumb se siamo in sottocartella
