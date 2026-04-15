@@ -898,7 +898,7 @@ async function caricaFileNC(path){
       return{name:nameText,href:hrefText,isDir:isDir,
         size:size?parseInt(size.textContent):0,
         modified:modified?modified.textContent:''};
-    }).filter(function(i){return i.name&&i.name!=='.'});
+    }).filter(function(i){return i.name&&i.name!=='.'&&!i.name.startsWith('.')});
     // Ordina: cartelle prima, poi file
     items.sort(function(a,b){
       if(a.isDir&&!b.isDir)return-1;
@@ -992,12 +992,39 @@ async function saveComm(){
 async function updateComm(){
   var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
   if(!CC)return;
-  var all=lg('comm');var idx=all.findIndex(function(x){return x.numero===CC.numero});
-  var upd=Object.assign({},CC,{oggetto:G('f-ogg'),tipo_commessa:G('f-tipo'),importo:G('f-imp'),data_apertura:G('f-dat'),data_consegna:G('f-cons'),stato:G('f-stato'),note:G('f-note')});
+  var vecchioNum=CC.numero;
+  var nuovoNum=(G('f-num-edit')||vecchioNum).trim();
+  if(!nuovoNum){showToast('Numero obbligatorio');return}
+  var all=lg('comm');var idx=all.findIndex(function(x){return x.numero===vecchioNum});
+  var upd=Object.assign({},CC,{
+    numero:nuovoNum,cliente:getCod(nuovoNum),
+    oggetto:G('f-ogg'),tipo_commessa:G('f-tipo'),importo:G('f-imp'),
+    data_apertura:G('f-dat'),data_consegna:G('f-cons'),stato:G('f-stato'),note:G('f-note')
+  });
   if(idx>=0)all[idx]=upd;else all.unshift(upd);
-  ls('comm',all);CC=Object.assign({},upd,{_det:CC._det});
-  await wPut('commesse.csv',all,['numero','cliente','oggetto','tipo_commessa','importo','data_apertura','data_consegna','stato','note']);
-  closeM();renderDetail();showToast('Commessa aggiornata');
+  // Se il numero è cambiato, sposta anche det.json
+  if(nuovoNum!==vecchioNum){
+    var det=lgo('det');
+    if(det[vecchioNum]){det[nuovoNum]=det[vecchioNum];delete det[vecchioNum];ls('det',det);}
+    // Aggiorna anche le righe distinta in approvvigionamenti
+    Object.keys(det).forEach(function(k){
+      if(det[k]&&det[k].distinta){
+        det[k].distinta.forEach(function(r){if(r._commessa===vecchioNum)r._commessa=nuovoNum;});
+      }
+    });
+    ls('det',det);
+    wPutJSON('det.json',det);
+  }
+  ls('comm',all);CC=Object.assign({},upd,{_det:lgo('det')[nuovoNum]||CC._det});
+  await wPut('commesse.csv',all,['numero','cliente','oggetto','tipo_commessa','importo','data_apertura','data_consegna','stato','note','nc_path']);
+  closeM();
+  if(nuovoNum!==vecchioNum){
+    navTo('commessa-det');
+    showToast('Numero aggiornato: '+vecchioNum+' → '+nuovoNum);
+  } else {
+    showToast('Commessa aggiornata');
+  }
+  renderDetail();
 }
 
 // DISTINTA
@@ -1528,6 +1555,9 @@ function getModalHTML(type,extra){
     '<div class="form-group"><label>Note</label><textarea class="form-control" id="f-note" rows="2"></textarea></div>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveComm()">Crea</button></div>'};
   if(type==='edit-commessa'){var c=CC||{};return{title:'Modifica commessa',body:
+    '<div style="background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--amber);margin-bottom:14px">'+
+    '&#9888; Modificare il numero aggiorna il riferimento ovunque ma non rinomina la cartella Nextcloud.</div>'+
+    '<div class="form-group"><label>Numero commessa</label><input class="form-control" id="f-num-edit" value="'+esc(c.numero||'')+'"></div>'+
     '<div class="form-row"><div class="form-group" style="flex:2"><label>Oggetto</label><input class="form-control" id="f-ogg" value="'+esc(c.oggetto||'')+'"></div>'+
     '<div class="form-group"><label>Tipo</label><select class="form-control" id="f-tipo">'+
     ['realizzazione-centralina','manutenzione','ricerca-componenti','prestazione-ore','fornitura'].map(function(t){return'<option value="'+t+'"'+(c.tipo_commessa===t?' selected':'')+'>'+t+'</option>'}).join('')+
