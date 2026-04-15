@@ -120,6 +120,12 @@ tbody tr:hover td{background:var(--surface2)}
 .flow-step:not(:first-child){border-left:none}
 .flow-step.active{background:var(--blue);border-color:var(--blue);color:#fff}
 .flow-step.done{background:var(--green-lt);border-color:var(--green-bd);color:var(--green)}
+.stato-select-wrap{margin-top:8px;display:none}
+.stato-select-wrap select{font-size:12px;font-weight:700;padding:5px 10px;border-radius:var(--r-sm)}
+@media(max-width:700px){
+  .flow-bar{display:none}
+  .stato-select-wrap{display:block}
+}
 .dist-section-head{background:var(--surface2);padding:6px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);border-top:2px solid var(--border)}
 .dist-toolbar{display:flex;gap:8px;align-items:center;padding:10px 0 14px;flex-wrap:wrap}
 .margine-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:6px 0}
@@ -1625,13 +1631,35 @@ function updateRiga(rid,numero){
   if(idx<0)return;
   var costo=parseFloat(G('f-costo')||0);var sconto=parseFloat(G('f-sconto')||0);var markup=parseFloat(G('f-markup')||2.25);
   var netto=costo*(1-sconto/100);
-  det[numero].distinta[idx]=Object.assign(det[numero].distinta[idx],{
-    descrizione:G('f-desc'),sezione:G('f-sez')||'Generale',
+  var nuovaSezione=G('f-sez')||'Generale';
+  var rigaAggiornata=Object.assign({},det[numero].distinta[idx],{
+    descrizione:G('f-desc'),sezione:nuovaSezione,
     qty:parseInt(G('f-qty')||1),fornitore:G('f-forn'),codice:G('f-cod'),
     costo_cad:costo,sconto:sconto,netto_cad:parseFloat(netto.toFixed(4)),
     markup:markup,prezzo_vendita:parseFloat((netto*markup).toFixed(4)),
     stato_approv:G('f-stato-a')||'daordinare',data_attesa:G('f-datta')
   });
+  // Rimuovi dalla posizione attuale
+  det[numero].distinta.splice(idx,1);
+  // Inserisci dopo l'ultima riga della sezione di destinazione
+  var dist=det[numero].distinta;
+  var insertAt=dist.length; // default: in fondo
+  var sezFound=false;
+  for(var k=0;k<dist.length;k++){
+    if(dist[k].sezione===nuovaSezione||dist[k].descrizione===nuovaSezione&&dist[k]._intestazione){
+      sezFound=true;
+    } else if(sezFound){
+      // Prima riga di una sezione diversa — inserisci qui
+      insertAt=k;
+      break;
+    }
+  }
+  // Se la sezione non esiste ancora, aggiungi intestazione e riga
+  if(!sezFound&&nuovaSezione!=='Generale'){
+    dist.push({id:uid(),_intestazione:true,descrizione:nuovaSezione,sezione:nuovaSezione});
+  }
+  dist.splice(insertAt,0,rigaAggiornata);
+  det[numero].distinta=dist;
   ls('det',det);CC._det=det[numero];
   closeM();renderDetTab('distinta',document.getElementById('det-content'));renderMargine();syncDetBg();
   showToast('Riga aggiornata');
