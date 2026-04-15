@@ -3620,7 +3620,7 @@ async function updateComm(){
   // aggiorna header senza ricaricare tutto
   document.getElementById('det-title').textContent=updated.oggetto||'—';
   const tipo=updated.tipo_commessa||'';
-  document.getElementById('det-meta').innerHTML=`<span class="bdg s-${(updated.stato||'offerta').replace(' ','-')}">${SL[updated.stato]||'—'}</span>${tipo?'<span class="bdg ${TIPO_C[tipo]||\'\'}">${TIPI[tipo]||tipo}</span>':''}<span style="font-size:12px;color:var(--text2)">${CNAMES[getCod(c.numero)]||c.cliente||'—'}</span>`;
+  document.getElementById('det-meta').innerHTML='<span class="bdg s-'+(updated.stato||'offerta').replace(' ','-')+'">'+(SL[updated.stato]||'\u2014')+'</span>'+(tipo?'<span class="bdg '+(TIPO_C[tipo]||'')+'">'+(TIPI[tipo]||tipo)+'</span>':'')+'<span style="font-size:12px;color:var(--text2)">'+(CNAMES[getCod(c.numero)]||c.cliente||'\u2014')+'</span>';
   buildTabs(tipo,updated,CC._det);
 }
 
