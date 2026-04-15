@@ -1422,7 +1422,7 @@ function getModalHTML(type,extra){
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveScad()">Salva</button></div>'};
   if(type==='conto'){
     var contiEsist=lg('conti');
-    var bancheDefault=['Banca Fineco','Tot. S.p.A. (ex Sella)','Revolut'];
+    var bancheDefault=['Banca Fineco','Banca Tot. (Sella)','Banca Revolut'];
     var optsConti='';
     // Prima le banche default, poi eventuali conti custom già salvati
     var tuttiConti=[...new Set(bancheDefault.concat(contiEsist.map(function(c){return c.conto||''})).filter(Boolean))];
@@ -2049,9 +2049,9 @@ function exportAll(){var data={comm:lg('comm'),fatt:lg('fatt'),scad:lg('scad'),c
 (function(){
   // Migrazione nomi banche
   var bancaMap={'Banca Fineco':'Banca Fineco','Fineco':'Banca Fineco',
-    'Banca Sella':'Tot. S.p.A. (ex Sella)','Sella':'Tot. S.p.A. (ex Sella)',
-    'Tot. S.p.A.':'Tot. S.p.A. (ex Sella)',
-    'Revolut':'Revolut','Revolut Bank':'Revolut'};
+    'Banca Sella':'Banca Tot. (Sella)','Sella':'Banca Tot. (Sella)',
+    'Tot. S.p.A.':'Banca Tot. (Sella)','Tot. S.p.A. (ex Sella)':'Banca Tot. (Sella)',
+    'Revolut':'Banca Revolut','Revolut Bank':'Banca Revolut'};
   var conti=lg('conti');var changed=false;
   conti.forEach(function(c){
     if(bancaMap[c.conto]&&bancaMap[c.conto]!==c.conto){c.conto=bancaMap[c.conto];changed=true;}
