@@ -919,9 +919,10 @@ async function caricaFileNC(path){
       // Click file: apre in NC web (sessione gia' attiva, no login richiesto)
       // Click cartella: naviga dentro
       var ncFileUrl=cfg.nc_url+'/apps/files/?dir='+encodeURIComponent(path)+'&openfile='+encodeURIComponent(item.name);
+      var filePath=path+'/'+item.name;
       var rowClick=item.isDir?
         'data-path="'+esc(path+'/'+item.name)+'" onclick="caricaFileNC(this.dataset.path)"':
-        'data-href="'+esc(ncFileUrl)+'" onclick="window.open(this.dataset.href,\'_blank\')";';
+        'data-fp="'+esc(filePath)+'" data-fn="'+esc(item.name)+'" onclick="apriFileNC(this.dataset.fp,this.dataset.fn)";';
       html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer" '+rowClick+'>'+
         '<span style="font-size:20px;flex-shrink:0">'+(item.isDir?'&#128193;':ncFileEmoji(item.name))+'</span>'+
         '<div style="flex:1;min-width:0">'+
@@ -2443,6 +2444,23 @@ async function caricaFileNCPicker(path){
     el.innerHTML=html;
   }catch(e){el.innerHTML='<div style="padding:12px;color:var(--red)">Errore: '+esc(e.message)+'</div>'}
 }
+function apriFileNC(filePath,fileName){
+  // Prova ad aprire nell'app Nextcloud con intent nc://
+  // L'account Nextcloud deve corrispondere a quello configurato
+  var cfg=getCfg();
+  var host=cfg.nc_url.replace(/^https?:\/\//,'');
+  var ncIntent='nc://open-file?accountName='+encodeURIComponent(cfg.nc_user+'@'+host)+
+    '&path='+encodeURIComponent(filePath)+
+    '&fileName='+encodeURIComponent(fileName);
+  var webUrl=cfg.nc_url+'/apps/files/?dir='+encodeURIComponent(filePath.split('/').slice(0,-1).join('/'))+
+    '&openfile='+encodeURIComponent(fileName);
+  // Su Android: prova nc:// - se non si apre dopo 1.5s apri il web
+  var timer=setTimeout(function(){window.open(webUrl,'_blank');},1500);
+  window.location.href=ncIntent;
+  // Cancella il timer se la pagina perde il focus (app aperta)
+  window.addEventListener('blur',function onBlur(){clearTimeout(timer);window.removeEventListener('blur',onBlur);},{once:true});
+}
+
 function selezionaFileNC(url,name){
   if(_ncPickerTarget){var el=document.getElementById(_ncPickerTarget);if(el)el.value=url;}
   closeM();showToast('File selezionato: '+name);
