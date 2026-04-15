@@ -630,7 +630,7 @@ function renderDetTab(tab,el){
   if(tab==='riepilogo'){
     var cM=dist.reduce(function(s,r){return s+parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)},0);
     var vM=dist.reduce(function(s,r){return s+parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)},0);
-    var cO=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);
+    var ricavoOreD=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);
     el.innerHTML='<div class="grid-2">'+
       '<div class="card"><div class="card-head"><div class="card-title">Dati commessa</div>'+
       '<button class="btn btn-secondary btn-sm" onclick="openModal(\'edit-commessa\')">Modifica</button></div>'+
@@ -641,7 +641,7 @@ function renderDetTab(tab,el){
       '</table></div></div>'+
       '<div class="card"><div class="card-head"><div class="card-title">Riepilogo economico</div></div>'+
       '<div class="card-body"><table style="width:100%">'+
-      [['Offerta','€'+fmt(c.importo)],['Costi materiali','€'+fmt(cM)],['Ore fatturate','€'+fmt(ricavoOre)],['Valore vendita mat.','€'+fmt(vM)]]
+      [['Offerta','€'+fmt(c.importo)],['Costi materiali','€'+fmt(cM)],['Ore fatturate (ricavo)','€'+fmt(ricavoOreD)],['Valore vendita mat.','€'+fmt(vM)]]
       .map(function(r){return'<tr><td style="padding:5px 0;font-size:12px;color:var(--text3);width:160px">'+esc(r[0])+'</td><td style="padding:5px 0;font-size:13px;font-weight:700">'+esc(r[1])+'</td></tr>'}).join('')+
       '</table></div></div></div>';
   }
@@ -1182,13 +1182,18 @@ function aggiornaOreModal(){
   var orEl=document.getElementById('f-ore');
   var tarEl=document.getElementById('f-tariffa');
   var totEl=document.getElementById('f-ore-tot');
-  if(!cat||!fig||!tarEl||!totEl)return;
-  var t=TARIFFE_ORE[cat.value]||{ms:60,ts:60,te:60};
+  var lblEl=document.getElementById('f-tariffa-lbl');
+  if(!cat||!fig)return;
+  var t=TARIFFE_ORE[cat.value]||{ms:60,ts:80,te:100,label:'',unita:'h'};
   var tariffa=t[fig.value]||60;
-  tarEl.value=tariffa;
+  var unita=t.unita||'h';
+  var figLabel={ms:'Montatore Spec.',ts:'Tecnico Spec.',te:'Tecnico Elett.'}[fig.value]||fig.value;
+  if(tarEl)tarEl.value=tariffa;
+  if(lblEl)lblEl.textContent='€'+tariffa+'/'+unita+' — '+figLabel+' / '+esc2(t.label||cat.value);
   var q=parseFloat(orEl&&orEl.value||0);
   if(totEl)totEl.textContent='€ '+(q*tariffa).toFixed(2);
 }
+function esc2(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
 
 function aggiornaKmModal(){
   var g=function(id){var e=document.getElementById(id);return e?parseFloat(e.value||0):0;};
@@ -1879,13 +1884,49 @@ function getModalHTML(type,extra){
     '<button class="btn btn-danger btn-sm" data-id="'+esc(rid)+'" data-num="'+esc(num)+'" onclick="delRiga(this.dataset.id,this.dataset.num)">Elimina</button>'+
     '<button class="btn btn-primary" data-id="'+esc(rid)+'" data-num="'+esc(num)+'" onclick="updateRiga(this.dataset.id,this.dataset.num)">Salva</button></div>'}}
 
-  if(type==='add-ora'){var num2=extra||'';return{title:'Aggiungi ore',body:
-    '<div class="form-row"><div class="form-group"><label>Data</label><input class="form-control" id="f-data" type="date" value="'+today()+'"></div>'+
-    '<div class="form-group"><label>Operatore</label><input class="form-control" id="f-oper"></div></div>'+
-    '<div class="form-group"><label>Descrizione</label><input class="form-control" id="f-desc"></div>'+
-    '<div class="form-row"><div class="form-group"><label>Ore</label><input class="form-control" id="f-ore" type="number" step="0.5" value="8"></div>'+
-    '<div class="form-group"><label>Tariffa (€/h)</label><input class="form-control" id="f-tariffa" type="number" value="65"></div></div>'+
-    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveOra(\''+esc(num2)+'\')">Aggiungi</button></div>'}}
+  if(type==='add-ora'){var num2=extra||'';return{title:'Aggiungi ore prestazione',body:
+    '<div class="form-row">'+
+      '<div class="form-group"><label>Data</label><input class="form-control" id="f-data" type="date" value="'+today()+'"></div>'+
+      '<div class="form-group"><label>Operatore</label><input class="form-control" id="f-oper" placeholder="es. Rossi M."></div>'+
+    '</div>'+
+    '<div class="form-group"><label>Descrizione attivita</label><input class="form-control" id="f-desc" placeholder="es. Installazione valvola, collaudo..."></div>'+
+    '<div class="form-row">'+
+      '<div class="form-group"><label>Figura professionale</label>'+
+        '<select class="form-control" id="f-figura" onchange="aggiornaOreModal()">'+
+          '<option value="ms">Montatore Specializzato</option>'+
+          '<option value="ts">Tecnico Specializzato</option>'+
+          '<option value="te">Tecnico Elettronico</option>'+
+        '</select>'+
+      '</div>'+
+      '<div class="form-group"><label>Categoria oraria</label>'+
+        '<select class="form-control" id="f-cat" onchange="aggiornaOreModal()">'+
+          '<option value="diurna_ord">Diurne ordinarie (8h/gg)</option>'+
+          '<option value="diurna_str">Diurne straordinarie (fino 20:00)</option>'+
+          '<option value="notturna_str">Notturne straordinarie (20-6)</option>'+
+          '<option value="festiva">Festive (€/ora)</option>'+
+          '<option value="inoperoso">Giorno inoperoso a disp. (€/gg)</option>'+
+          '<option value="viaggio">Viaggio e attesa inoperosa (€/ora)</option>'+
+        '</select>'+
+      '</div>'+
+    '</div>'+
+    '<div style="background:var(--surface2);border-radius:5px;padding:8px 12px;font-size:12px;margin-bottom:10px">'+
+      '<span style="color:var(--text3)">Tariffa applicata (tabella ASG LAB 2026): </span>'+
+      '<strong id="f-tariffa-lbl" style="color:var(--blue)">€ 60/h</strong>'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-group"><label>Quantita (ore o giorni)</label>'+
+        '<input class="form-control" id="f-ore" type="number" step="0.5" value="8" oninput="aggiornaOreModal()">'+
+      '</div>'+
+      '<div class="form-group"><label>Tariffa unitaria €</label>'+
+        '<input class="form-control" id="f-tariffa" type="number" value="60" readonly style="background:var(--surface2);color:var(--blue);font-weight:700">'+
+      '</div>'+
+    '</div>'+
+    '<div style="background:var(--surface2);border-radius:6px;padding:10px 14px;font-size:13px;display:flex;align-items:center;justify-content:space-between">'+
+      '<span style="color:var(--text3)">Totale voce</span>'+
+      '<strong id="f-ore-tot" style="color:var(--blue);font-size:18px">€ 480.00</strong>'+
+    '</div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
+    '<button class="btn btn-primary" onclick="saveOra(\''+esc(num2)+'\')">Aggiungi</button></div>'}}
   if(type==='add-trasferta'){var num3=extra||'';return{title:'Aggiungi trasferta / rimborso spese',body:
     '<div class="form-row">'+
       '<div class="form-group"><label>Data</label><input class="form-control" id="f-data" type="date" value="'+today()+'"></div>'+
@@ -2516,11 +2557,22 @@ function saveMag(){var G=function(id){var el=document.getElementById(id);return 
 function calcNetto(){var costo=parseFloat((document.getElementById('f-costo')||{}).value||0);var sc=parseFloat((document.getElementById('f-sconto')||{}).value||0);var mk=parseFloat((document.getElementById('f-markup')||{}).value||2.25);var netto=costo*(1-sc/100);var pre=document.getElementById('calc-preview');if(pre)pre.textContent='Netto: €'+fmt(netto)+' → Vendita: €'+fmt(netto*mk)}
 
 // EXPORT PDF
-function exportReportCommesse(){var comms=lg('comm');var det=lgo('det');var w=window.open('','_blank');var rows=comms.map(function(c){var cd=det[c.numero]||{distinta:[],ore:[]};var cM=cd.distinta.reduce(function(s,r){return s+parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)},0);var ricavoOre=cd.ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);var imp=parseFloat(c.importo||0)||(vM+ricavoOre);var tot=cM;var pct=imp>0?((imp-tot)/imp*100):null;return Object.assign({},c,{cM:cM,cO:cO,tot:tot,imp:imp,pct:pct})});w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title><style>body{font-family:sans-serif;font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th{background:#f0f0f0;padding:5px 6px;border-bottom:2px solid #ccc;text-align:left;font-size:10px}td{padding:4px 6px;border-bottom:1px solid #eee}.num{text-align:right}.g{color:green;font-weight:700}.r{color:red;font-weight:700}@media print{button{display:none}}</style></head><body>'+
+function exportReportCommesse(){var comms=lg('comm');var det=lgo('det');var w=window.open('','_blank');var rows=comms.map(function(c){var cd=det[c.numero]||{distinta:[],ore:[]};var cM=cd.distinta.reduce(function(s,r){return s+parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)},0);var ricavoOre=cd.ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);var imp=parseFloat(c.importo||0)||(vM+ricavoOre);var tot=cM;var pct=imp>0?((imp-tot)/imp*100):null;return Object.assign({},c,{cM:cM,ricavoOre:ricavoOre,tot:tot,imp:imp,pct:pct})});w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title><style>body{font-family:sans-serif;font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th{background:#f0f0f0;padding:5px 6px;border-bottom:2px solid #ccc;text-align:left;font-size:10px}td{padding:4px 6px;border-bottom:1px solid #eee}.num{text-align:right}.g{color:green;font-weight:700}.r{color:red;font-weight:700}@media print{button{display:none}}</style></head><body>'+
   '<button onclick="window.print()" style="margin-bottom:12px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer">Stampa</button>'+
   '<h2 style="margin-bottom:4px">Report Commesse — ASG LAB</h2><p style="color:#666;margin-bottom:12px">'+comms.length+' commesse · '+new Date().toLocaleDateString('it-IT')+'</p>'+
-  '<table><thead><tr><th>N.</th><th>Cliente</th><th>Oggetto</th><th>Stato</th><th class="num">Offerta</th><th class="num">Costi</th><th class="num">Margine %</th></tr></thead><tbody>'+
-  rows.map(function(r){var cls=r.pct===null?'':r.pct>=30?'g':'r';return'<tr><td style="font-family:monospace">'+esc(r.numero)+'</td><td>'+esc(CNAMES[r.cliente]||r.cliente||'—')+'</td><td>'+esc(r.oggetto||'—')+'</td><td>'+esc(SL[r.stato]||'—')+'</td><td class="num">'+(r.imp>0?'€'+fmt(r.imp):'—')+'</td><td class="num r">'+(r.tot>0?'€'+fmt(r.tot):'—')+'</td><td class="num '+cls+'">'+(r.pct!==null?r.pct.toFixed(0)+'%':'—')+'</td></tr>'}).join('')+
+  '<table><thead><tr><th>N.</th><th>Cliente</th><th>Oggetto</th><th>Stato</th>'+
+  '<th class="num">Offerta/Ricavo</th><th class="num">Costi mat.</th><th class="num" style="color:green">Ore fatturate</th><th class="num">Margine %</th><th class="num">Margine €</th></tr></thead><tbody>'+
+  rows.map(function(r){var cls=r.pct===null?'':r.pct>=30?'g':'r';var margEuro=r.imp>0?r.imp-r.tot:null;return'<tr>'+
+    '<td style="font-family:monospace">'+esc(r.numero)+'</td>'+
+    '<td>'+esc(CNAMES[r.cliente]||r.cliente||'—')+'</td>'+
+    '<td>'+esc(r.oggetto||'—')+'</td>'+
+    '<td>'+esc(SL[r.stato]||'—')+'</td>'+
+    '<td class="num">'+(r.imp>0?'€'+fmt(r.imp):'—')+'</td>'+
+    '<td class="num r">'+(r.tot>0?'€'+fmt(r.tot):'—')+'</td>'+
+    '<td class="num" style="color:green">'+(r.ricavoOre>0?'€'+fmt(r.ricavoOre):'—')+'</td>'+
+    '<td class="num '+cls+'">'+(r.pct!==null?r.pct.toFixed(0)+'%':'—')+'</td>'+
+    '<td class="num '+cls+'">'+(margEuro!==null?'€'+fmt(margEuro):'—')+'</td>'+
+  '</tr>'}).join('')+
   '</tbody></table></body></html>');w.document.close()}
 
 function exportDistintaPDF(numero){var c=lg('comm').find(function(x){return x.numero===numero})||{numero:numero};var det=lgo('det');var cd=det[numero]||{distinta:[],ore:[]};var dist=cd.distinta||[];var ore=cd.ore||[];var totM=dist.reduce(function(s,r){return s+parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)},0);var cM=dist.reduce(function(s,r){return s+parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)},0);var totO=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);var w=window.open('','_blank');w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Distinta '+numero+'</title><style>body{font-family:sans-serif;font-size:10px;margin:20px}h1{font-size:14px}table{width:100%;border-collapse:collapse}th{background:#f7f7f7;padding:4px 6px;border-bottom:2px solid #ccc;text-align:left}td{padding:3px 6px;border-bottom:1px solid #eee}.num{text-align:right}.tot{font-weight:700;background:#f7f7f7;border-top:2px solid #ccc}@media print{button{display:none}}</style></head><body>'+
@@ -2529,7 +2581,7 @@ function exportDistintaPDF(numero){var c=lg('comm').find(function(x){return x.nu
   '<table><thead><tr><th>Descrizione</th><th>Q.</th><th>Fornitore</th><th>Codice</th><th class="num">Netto</th><th class="num">Vendita</th><th class="num">Totale</th><th>Stato</th></tr></thead><tbody>'+
   dist.filter(function(r){return!r._intestazione}).map(function(r){return'<tr><td>'+esc(r.descrizione||'—')+'</td><td class="num">'+esc(String(r.qty||1))+'</td><td style="font-size:9px">'+esc(r.fornitore||'—')+'</td><td style="font-family:monospace;font-size:9px">'+esc(r.codice||'—')+'</td><td class="num">€'+fmt(r.netto_cad||r.costo_cad||0)+'</td><td class="num">€'+fmt(r.prezzo_vendita||0)+'</td><td class="num">€'+fmt(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1))+'</td><td style="font-size:9px">'+esc(r.stato_approv||'—')+'</td></tr>'}).join('')+
   '<tr class="tot"><td colspan="6" class="num">Totale vendita:</td><td class="num">€'+fmt(totM)+'</td><td></td></tr></tbody></table>'+
-  (ore.length?'<h2 style="margin:14px 0 4px;font-size:12px">Ore</h2><table><thead><tr><th>Data</th><th>Descrizione</th><th>Operatore</th><th class="num">Ore</th><th class="num">Totale</th></tr></thead><tbody>'+ore.map(function(o){return'<tr><td>'+fmtD(o.data)+'</td><td>'+esc(o.descrizione||'')+'</td><td>'+esc(o.operatore||'')+'</td><td class="num">'+o.ore+'h</td><td class="num">€'+fmt(parseFloat(o.ore||0)*parseFloat(o.tariffa||0))+'</td></tr>'}).join('')+'<tr class="tot"><td colspan="4" class="num">Totale ore:</td><td class="num">€'+fmt(totO)+'</td></tr></tbody></table>':'')  +
+  (ore.length?'<h2 style="margin:14px 0 4px;font-size:12px">Ore di prestazione (ricavo)</h2><table><thead><tr><th>Data</th><th>Descrizione</th><th>Operatore</th><th>Figura / Categoria</th><th class="num">Q.ta</th><th class="num">Tariffa</th><th class="num">Totale</th></tr></thead><tbody>'+ore.map(function(o){var catL={diurna_ord:'Diurne ord.',diurna_str:'Diurne straord.',notturna_str:'Notturne straord.',festiva:'Festive',inoperoso:'Inoperoso',viaggio:'Viaggio'}[o.categoria||'diurna_ord']||'—';var figL={ms:'Mont.Spec.',ts:'Tecn.Spec.',te:'Tecn.Elett.'}[o.figura||'ms']||'—';return'<tr><td>'+fmtD(o.data)+'</td><td>'+esc(o.descrizione||'')+'</td><td>'+esc(o.operatore||'')+'</td><td style="font-size:10px">'+figL+' / '+catL+'</td><td class="num">'+o.ore+(o.unita||'h')+'</td><td class="num">€'+fmt(o.tariffa||0)+'</td><td class="num">€'+fmt(parseFloat(o.ore||0)*parseFloat(o.tariffa||0))+'</td></tr>'}).join('')+'<tr class="tot"><td colspan="6" class="num">Totale ore fatturate (ricavo):</td><td class="num">€'+fmt(totO)+'</td></tr></tbody></table>':'')  +
   '<div style="margin-top:12px;padding:8px;background:#f7f7f7;border-radius:4px;font-size:11px">Costi: €'+fmt(cM+totO)+' | Valore vendita: €'+fmt(totM)+'</div>'+
   '</body></html>');w.document.close()}
 
