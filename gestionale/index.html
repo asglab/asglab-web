@@ -2056,7 +2056,7 @@ function exportAll(){var data={comm:lg('comm'),fatt:lg('fatt'),scad:lg('scad'),c
   conti.forEach(function(c){
     if(bancaMap[c.conto]&&bancaMap[c.conto]!==c.conto){c.conto=bancaMap[c.conto];changed=true;}
   });
-  if(changed){ls('conti',conti);}
+  if(changed){ls('conti',conti);renderCassa();}
   var cfg=getCfg();
   if(!cfg.ok)document.getElementById('cfg-banner').classList.add('show');
   else syncNow();
