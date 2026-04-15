@@ -107,6 +107,26 @@ select:focus{border-color:var(--blue)}
 /* EXPORT */
 .exp-panel{padding:12px 14px;border-top:1px solid var(--border);background:var(--bg3)}
 .exp-pre{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);white-space:pre-wrap;line-height:1.7;max-height:110px;overflow-y:auto;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px;margin-bottom:8px}
+
+/* ══ MOBILE ══════════════════════════════════════════════════════ */
+@media(max-width:700px){
+  .layout{grid-template-columns:1fr;height:auto}
+  .sidebar{display:none}
+  .centro{padding:12px;border:none}
+  .destra{border-left:none;border-top:1px solid var(--border)}
+  .tab-bar{overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
+  .tab-btn{padding:9px 14px;font-size:11px}
+  /* Selector mobile forme */
+  .mobile-forma-sel{display:block!important}
+  .row2{grid-template-columns:1fr}
+  .chips .chip{padding:7px 14px;font-size:13px} /* più grandi da toccare */
+  .result-panel{padding:12px}
+  .lista-panel{padding:12px;min-height:200px}
+}
+@media(min-width:701px){.mobile-forma-sel{display:none!important}}
+/* Zoom overlay */
+#img-overlay{animation:fadeIn .15s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
 </head>
 <body>
@@ -126,6 +146,12 @@ select:focus{border-color:var(--blue)}
 
 <!-- ═══════════════════════════ DIN 2353 ═══════════════════════════ -->
 <div class="tab-panel on" id="tab-din">
+<!-- Select forme visibile solo su mobile -->
+<div class="mobile-forma-sel" style="padding:10px 12px;background:var(--bg2);border-bottom:1px solid var(--border)">
+  <select id="mobile-forma-sel-din" onchange="dinSelForma(this.value)" style="font-size:14px;padding:8px 12px;border:1.5px solid var(--border2);border-radius:var(--r-sm);width:100%;background:var(--bg2);font-family:Inter,sans-serif">
+    <option value="">— Seleziona forma raccordo —</option>
+  </select>
+</div>
 <div class="layout">
 
   <!-- SIDEBAR -->
@@ -456,6 +482,20 @@ var DLista = [];
 function buildSidebarDin(){
   var el=document.getElementById('forme-din');
   var lastCat='';
+  // Popola select mobile
+  var msel=document.getElementById('mobile-forma-sel-din');
+  if(msel){
+    var lastCatM='';
+    msel.innerHTML='<option value="">— Seleziona forma raccordo —</option>';
+    FORME_DIN.forEach(function(f){
+      if(f.cat!==lastCatM){
+        var og=document.createElement('optgroup');og.label=f.cat;msel.appendChild(og);lastCatM=f.cat;
+      }
+      var op=document.createElement('option');op.value=f.id;op.textContent=f.nome+' ('+f.rastelli+')';
+      if(f.id===DS.forma)op.selected=true;
+      msel.lastChild.appendChild(op);
+    });
+  }
   el.innerHTML=FORME_DIN.map(function(f){
     var catHd=f.cat!==lastCat?'<div class="sidebar-hd" style="font-size:9px">'+f.cat+'</div>':'';
     lastCat=f.cat;
@@ -641,8 +681,16 @@ function dinCsv(){
   a.download='raccordi_din_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 function dinInvia(){
-  if(window.opener&&window.opener._riceviRaccordi){window.opener._riceviRaccordi(DLista);window.close();}
-  else{navigator.clipboard.writeText(JSON.stringify(DLista,null,2)).then(function(){alert('Dati JSON copiati.');});}
+  if(window.opener&&window.opener._riceviRaccordi){
+    window.opener._riceviRaccordi(DLista);
+    window.close();
+  } else if(window.opener){
+    alert('La finestra del gestionale non è più aperta. Copia il CSV e importalo manualmente.');
+  } else {
+    navigator.clipboard.writeText(JSON.stringify(DLista,null,2)).then(function(){
+      alert('Dati copiati come JSON.'+(_commessaNum?' Apri il gestionale e incolla nella distinta della commessa '+_commessaNum:''));
+    });
+  }
 }
 
 // ── ZOOM IMMAGINE ─────────────────────────────────────────────
@@ -660,6 +708,13 @@ function dinZoomImg(src,alt){
 }
 
 // ── INIT ──────────────────────────────────────────────────────
+// Legge numero commessa dall'URL se aperto dalla commessa
+var _commessaNum=(new URLSearchParams(window.location.search)).get('num')||'';
+if(_commessaNum){
+  document.querySelector('.topbar-sub').textContent='Commessa: '+_commessaNum+' — seleziona raccordi e premi "→ Aggiungi a commessa"';
+  // Rinomina il bottone invia per chiarezza
+  document.querySelectorAll('[onclick="dinInvia()"]').forEach(function(b){b.textContent='→ Aggiungi a '+_commessaNum;});
+}
 buildSidebarDin();
 dinSelForma('TN92');
 </script>

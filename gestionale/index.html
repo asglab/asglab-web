@@ -651,7 +651,7 @@ function renderDetTab(tab,el){
       '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-pu\',\''+esc(c.numero)+'|PU10\')">PU10</button>'+
       '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-pu\',\''+esc(c.numero)+'|PU20\')">PU20</button>'+
       '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-tubo\',\''+esc(c.numero)+'\')">&#129348; Tubo flex</button>'+
-      '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-raccordi\',\''+esc(c.numero)+'\')">&#128295; Raccordi</button>'+
+      '<button class="btn btn-secondary btn-sm" data-num="'+esc(c.numero)+'" onclick="apriConfRaccordi(this.dataset.num)">&#128295; Raccordi DIN</button>'+
       '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-tubo-rigido\',\''+esc(c.numero)+'\')">&#128296; Tubo rigido</button>'+
       '<div style="flex:1"></div>'+
       '<button class="btn btn-ghost btn-sm" onclick="openModal(\'add-sezione\',\''+esc(c.numero)+'\')">+ Sezione</button>'+
@@ -2576,6 +2576,35 @@ function saveTuboRigido(numero){
   ls('det',det);CC._det=det[numero];
   closeM();renderDetTab('distinta',document.getElementById('det-content'));renderMargine();syncDetBg();
   showToast('Tubo rigido aggiunto');
+}
+
+function apriConfRaccordi(numero){
+  var url='/gestionale/raccordi/?num='+encodeURIComponent(numero);
+  var w=window.open(url,'raccordi_conf','width=1100,height=750,resizable=yes,scrollbars=yes');
+  // Callback per ricevere i raccordi selezionati
+  window._riceviRaccordi=function(lista){
+    if(!lista||!lista.length)return;
+    var det=lgo('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
+    var cfg2=getCfg();var cod2=getCod(numero);var defMk=cfg2.markup_clienti&&cfg2.markup_clienti[cod2]?cfg2.markup_clienti[cod2]:2.25;
+    var righe=lista.map(function(item){
+      return{id:uid(),sezione:'Raccorderia',
+        descrizione:item.rastelli+(item.desc?' — '+item.desc:''),
+        qty:item.qty||1,
+        fornitore:'Pa.Co Fluid & Air Group',
+        codice:item.rastelli||'',
+        note:'Parker: '+(item.parker||'')+(item.paco?' · PaCo: '+item.paco:''),
+        costo_cad:item.prezzo||0,sconto:0,
+        netto_cad:item.prezzo||0,markup:defMk,
+        prezzo_vendita:parseFloat(((item.prezzo||0)*defMk).toFixed(4)),
+        stato_approv:'daordinare',data_attesa:''};
+    });
+    det[numero].distinta.push(...righe);
+    ls('det',det);if(CC&&CC.numero===numero)CC._det=det[numero];
+    renderDetTab('distinta',document.getElementById('det-content'));
+    renderMargine();syncDetBg();
+    showToast(righe.length+' raccordi aggiunti alla distinta');
+    delete window._riceviRaccordi;
+  };
 }
 
 function exportAll(){var data={comm:lg('comm'),fatt:lg('fatt'),scad:lg('scad'),conti:lg('conti'),det:lgo('det'),mag:lg('mag'),pn:lg('pn')};var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='asglab-backup-'+today()+'.json';a.click()}
