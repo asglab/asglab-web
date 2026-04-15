@@ -162,7 +162,7 @@ tbody tr:hover td{background:var(--surface2)}
     <a class="nav-item" data-view="fornitori" href="#" onclick="navTo('fornitori');return false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Fornitori</span></a>
     <div class="sidebar-footer">
       <button onclick="syncNow()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg><span>Sync Nextcloud</span></button>
-      <a href="#" onclick="openModal('config');return false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Configurazione</span></a>
+      <a href="#" onclick="openModal(&quot;config&quot;);return false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Configurazione</span></a>
       <a href="#" onclick="exportAll();return false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Backup JSON</span></a>
       <div class="build-tag" id="build-tag">v16</div>
     </div>
@@ -175,7 +175,7 @@ tbody tr:hover td{background:var(--surface2)}
       <div class="sync-pill" onclick="syncNow()"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">—</span></div>
     </div>
     <div id="content">
-      <div class="config-banner" id="cfg-banner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Nextcloud non configurato — </span><a href="#" onclick="openModal('config');return false" style="color:var(--amber);font-weight:700">configura ora</a></div>
+      <div class="config-banner" id="cfg-banner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Nextcloud non configurato — </span><a href="#" onclick="openModal(&quot;config&quot;);return false" style="color:var(--amber);font-weight:700">configura ora</a></div>
       <!-- HOME -->
       <div class="view active" id="view-home"><div class="metrics-grid" id="home-metrics"></div><div class="grid-2"><div class="card"><div class="card-head"><div class="card-title">Commesse in corso</div><a href="#" class="btn btn-ghost btn-sm" onclick="navTo('commesse');return false">tutte</a></div><div id="home-commesse"><div class="empty">Caricamento...</div></div></div><div class="card"><div class="card-head"><div class="card-title">Scadenze urgenti</div></div><div id="home-scadenze"><div class="empty">Caricamento...</div></div></div></div></div>
       <!-- COMMESSE -->
@@ -191,7 +191,7 @@ tbody tr:hover td{background:var(--surface2)}
           <select id="comm-cliente" onchange="renderCommesse()"><option value="">Tutti i clienti</option></select>
           <div style="flex:1"></div>
           <button class="btn btn-secondary btn-sm" onclick="exportReportCommesse()">Report</button>
-          <button class="btn btn-primary btn-sm" onclick="openModal('commessa')">+ Nuova</button>
+          <button class="btn btn-primary btn-sm" onclick="openModal(&quot;commessa&quot;)">+ Nuova</button>
         </div>
         <div class="card"><div id="comm-list"><div class="empty">Caricamento...</div></div></div>
       </div>
@@ -241,12 +241,12 @@ tbody tr:hover td{background:var(--surface2)}
             <div class="chip" onclick="setChip(this,'scad-filtro','pagamento');renderScad()">Da pagare</div>
             <div style="flex:1"></div>
             <button class="btn btn-ghost btn-sm" onclick="rigeneraScadenzeBtn()">&#8635; Rigenera da fatture</button>
-            <button class="btn btn-secondary btn-sm" onclick="openModal('scadenza')">+ Nuova</button>
+            <button class="btn btn-secondary btn-sm" onclick="openModal(&quot;scadenza&quot;)">+ Nuova</button>
           </div>
           <div class="card" id="scad-content"><div class="empty">Caricamento...</div></div>
         </div>
         <div class="tab-panel" id="tab-cassa">
-          <div class="filter-bar"><button class="btn btn-secondary btn-sm" onclick="openModal('conto')">+ Aggiorna saldo</button></div>
+          <div class="filter-bar"><button class="btn btn-secondary btn-sm" onclick="openModal(&quot;conto&quot;)">+ Aggiorna saldo</button></div>
           <div class="conti-grid" id="conti-grid"></div>
         </div>
         <div class="tab-panel" id="tab-primanota">
@@ -257,7 +257,7 @@ tbody tr:hover td{background:var(--surface2)}
             <button class="btn btn-ghost btn-sm" onclick="resetPNFiltri()">Reset</button>
             <div style="flex:1"></div>
             <button class="btn btn-secondary btn-sm" onclick="exportPNpdf()">PDF</button>
-            <button class="btn btn-primary btn-sm" onclick="openModal('import-primanota')">Import</button>
+            <button class="btn btn-primary btn-sm" onclick="openModal(&quot;import-primanota&quot;)">Import</button>
           </div>
           <div class="conti-grid" id="pn-saldi"></div>
           <div class="card"><div class="table-wrap"><table><thead><tr><th>Data pag.</th><th>Tipo</th><th>N. Doc.</th><th>Data doc.</th><th>Soggetto</th><th>Nota</th><th>Conto</th><th style="text-align:right">Entrata</th><th style="text-align:right">Uscita</th><th style="text-align:right">Saldo</th></tr></thead><tbody id="pn-tbody"><tr><td colspan="10" class="empty">Nessun movimento</td></tr></tbody><tfoot id="pn-tfoot"></tfoot></table></div></div>
@@ -286,7 +286,7 @@ tbody tr:hover td{background:var(--surface2)}
           <input type="text" class="search-input" id="mag-search" placeholder="Cerca..." oninput="renderMag()">
           <select id="mag-cat" onchange="renderMag()"><option value="">Tutte le categorie</option></select>
           <div style="flex:1"></div>
-          <button class="btn btn-primary btn-sm" onclick="openModal('add-mag')">+ Aggiungi</button>
+          <button class="btn btn-primary btn-sm" onclick="openModal(&quot;add-mag&quot;)">+ Aggiungi</button>
         </div>
         <div class="card"><div id="mag-list"><div class="empty">Caricamento...</div></div></div>
       </div>
@@ -1078,26 +1078,59 @@ function renderMag(){
 function delMag(id){if(!confirm('Eliminare?'))return;ls('mag',lg('mag').filter(function(m){return m.id!==id}));renderMag();wPut('magazzino.csv',lg('mag'),['id','codice','descrizione','fornitore','categoria','costo_cad','qty','soglia_min'])}
 
 // FORNITORI
-var FORNITORI=[
-  {id:'ARES',nome:'Ares / Tecfluid',emoji:'&#128295;',contatti:{tel:'',email:''},url:'',categorie:['Centraline','Idraulica']},
-  {id:'PACO',nome:'Pa.Co Fluid & Air Group',emoji:'&#128297;',contatti:{tel:'',email:''},url:'',categorie:['Tubi flessibili','Raccorderia']},
-  {id:'BART',nome:'Bart Srl',emoji:'&#128300;',contatti:{tel:'',email:''},url:'',categorie:['Componenti']},
-  {id:'SMEM',nome:'SMEM s.r.l.',emoji:'&#9881;',contatti:{tel:'',email:''},url:'',categorie:['Meccanica']},
-  {id:'COLFER',nome:'COLFER Srl',emoji:'&#127981;',contatti:{tel:'',email:''},url:'',categorie:['Componenti']},
-  {id:'OLEO',nome:'Oleo Meccanica Industriale',emoji:'&#128226;',contatti:{tel:'',email:''},url:'',categorie:['Oleodinamica']},
+var FORNITORI_DEFAULT=[
+  {id:'ARES',nome:'Ares / Tecfluid',emoji:'\u{1F527}',contatti:{tel:'',email:'',referente:''},url:'',categorie:['Centraline','Idraulica'],note:'',sconto_abituale:0,template_rdo:'Gentili Ares / Tecfluid,\n\nRichiediamo disponibilit\u00e0 e quotazione per i seguenti articoli:\n\n{lista_articoli}\n\nData di consegna richiesta: {data_consegna}\n\nCordiali saluti\nASG LAB S.r.l.'},
+  {id:'PACO',nome:'Pa.Co Fluid & Air Group',emoji:'\u{1F529}',contatti:{tel:'',email:'',referente:''},url:'',categorie:['Tubi flessibili','Raccorderia'],note:'',sconto_abituale:0,template_rdo:'Gentili Pa.Co,\n\nRichiediamo quotazione per i seguenti tubi raccordati e raccorderia:\n\n{lista_articoli}\n\nCordiali saluti\nASG LAB S.r.l.'},
+  {id:'BART',nome:'Bart Srl',emoji:'\u{1F52C}',contatti:{tel:'',email:'',referente:''},url:'',categorie:['Componenti'],note:'',sconto_abituale:0,template_rdo:''},
+  {id:'SMEM',nome:'SMEM s.r.l.',emoji:'\u2699',contatti:{tel:'',email:'',referente:''},url:'',categorie:['Motori elettrici','Meccanica'],note:'',sconto_abituale:0,template_rdo:'Gentili SMEM,\n\nRichiediamo quotazione per i seguenti motori elettrici:\n\n{lista_articoli}\n\nCordiali saluti\nASG LAB S.r.l.'},
+  {id:'COLFER',nome:'COLFER Srl',emoji:'\u{1F3ED}',contatti:{tel:'',email:'',referente:''},url:'',categorie:['Serbatoi','Carpenteria'],note:'',sconto_abituale:0,template_rdo:'Gentili Colfer,\n\nRichiediamo quotazione per:\n\n{lista_articoli}\n\nCordiali saluti\nASG LAB S.r.l.'},
+  {id:'OLEO',nome:'Oleo Meccanica Industriale',emoji:'\u{1F6E2}',contatti:{tel:'',email:'',referente:''},url:'',categorie:['Oleodinamica'],note:'',sconto_abituale:0,template_rdo:''},
+  {id:'MORATTI',nome:'M.B. Moratti (Luca)',emoji:'\u{1F527}',contatti:{tel:'',email:'',referente:'Luca'},url:'',categorie:['Cilindri a disegno','CAD/Officina'],note:'Officina tecnica — cilindri oleodinamici a disegno. Scambiare schizzi/PDF/CAD.',sconto_abituale:0,template_rdo:'Ciao Luca,\n\nHo bisogno di un preventivo per:\n\n{lista_articoli}\n\nTi mando i disegni a parte.\n\nGrazie\nAndrea — ASG LAB'},
+  {id:'TECNAL',nome:'Tecnical Impianti / FIZ',emoji:'\u{1F4CB}',contatti:{tel:'',email:'',referente:''},url:'',categorie:['Tubi','Raccorderia','Impianti'],note:'',sconto_abituale:0,template_rdo:''},
 ];
+
+function getFornitori(){
+  try{
+    var saved=JSON.parse(localStorage.getItem('asg_fornitori')||'null');
+    if(saved&&saved.length)return saved;
+  }catch(e){}
+  return FORNITORI_DEFAULT;
+}
+function setFornitori(arr){localStorage.setItem('asg_fornitori',JSON.stringify(arr))}
+var FORNITORI=getFornitori();
 function renderFornitori(){
+  FORNITORI=getFornitori();
   var q=(document.getElementById('forn-search')||{}).value||'';
   var rows=FORNITORI;if(q)rows=rows.filter(function(f){return f.nome.toLowerCase().includes(q.toLowerCase())});
-  document.getElementById('forn-grid').innerHTML=rows.map(function(f){
-    return '<div class="forn-card" onclick="openModal(\'forn-det\',\''+esc(f.id)+'\')">' +
-      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'+
+  var grid=document.getElementById('forn-grid');
+  var html=rows.map(function(f){
+    var hasTel=f.contatti&&f.contatti.tel;
+    var hasEmail=f.contatti&&f.contatti.email;
+    return '<div class="forn-card">'+
+      '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">'+
         '<span style="font-size:24px">'+f.emoji+'</span>'+
-        '<div><div style="font-size:14px;font-weight:700;color:var(--text)">'+esc(f.nome)+'</div></div>'+
+        '<div style="flex:1">'+
+          '<div style="font-size:14px;font-weight:700;color:var(--text)">'+esc(f.nome)+'</div>'+
+          (f.contatti&&f.contatti.referente?'<div style="font-size:11px;color:var(--text3)">ref: '+esc(f.contatti.referente)+'</div>':'')+
+        '<button class="btn-icon" data-id="'+esc(f.id)+'" onclick="openModal(&quot;edit-forn&quot;,this.dataset.id)" title="Modifica">&#9998;</button>'+
+        '<button class="btn-icon" data-id="'+esc(f.id)+'" onclick="openModal(&quot;edit-forn&quot;,this.dataset.id)" title="Modifica">&#9998;</button>'+
       '</div>'+
-      '<div style="display:flex;gap:4px;flex-wrap:wrap">'+f.categorie.map(function(c){return'<span class="forn-tag">'+esc(c)+'</span>'}).join('')+'</div>'+
+      '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">'+
+        f.categorie.map(function(c){return'<span class="forn-tag">'+esc(c)+'</span>'}).join('')+
+      '</div>'+
+      (f.note?'<div style="font-size:11px;color:var(--text3);margin-bottom:8px;font-style:italic">'+esc(f.note)+'</div>':'')+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+        (hasTel?'<a href="tel:'+esc(f.contatti.tel)+'" class="btn btn-ghost btn-sm" style="font-size:11px">&#128222; '+esc(f.contatti.tel)+'</a>':'')+
+        '<button class="btn btn-secondary btn-sm" style="font-size:11px" data-id="'+esc(f.id)+'" onclick="openModal(&quot;forn-listino&quot;,this.dataset.id)">&#128203; Listino</button>'+
+        '<button class="btn btn-secondary btn-sm" style="font-size:11px" data-id="'+esc(f.id)+'" onclick="openModal(&quot;forn-rdo-template&quot;,this.dataset.id)">&#9993; Template RDO</button>'+
+        '<button class="btn btn-secondary btn-sm" style="font-size:11px" data-id="'+esc(f.id)+'" onclick="openModal(&quot;forn-rdo-template&quot;,this.dataset.id)">&#9993; Template RDO</button>'+
+      '</div>'+
     '</div>';
   }).join('');
+  html+='<div class="forn-card" style="border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;min-height:120px" onclick="openModal(&quot;add-forn&quot;)">'+
+    '<div style="text-align:center;color:var(--text3)"><div style="font-size:28px;margin-bottom:6px">+</div><div style="font-size:13px;font-weight:600">Aggiungi fornitore</div></div>'+
+  '</div>';
+  grid.innerHTML=html;
 }
 
 // IMPORT FATTURE
@@ -1391,10 +1424,84 @@ function getModalHTML(type,extra){
   if(type==='forn-det'){var f=FORNITORI.find(function(x){return x.id===extra});if(!f)return null;
     return{title:f.nome,body:
     '<div style="font-size:13px;color:var(--text2)">'+
-    (f.contatti.tel?'<div style="margin-bottom:6px">Tel: <a href="tel:'+esc(f.contatti.tel)+'">'+esc(f.contatti.tel)+'</a></div>':'')+
-    (f.contatti.email?'<div style="margin-bottom:6px">Email: <a href="mailto:'+esc(f.contatti.email)+'">'+esc(f.contatti.email)+'</a></div>':'')+
+    (f.contatti&&f.contatti.tel?'<div style="margin-bottom:6px">&#128222; <a href="tel:'+esc(f.contatti.tel)+'">'+esc(f.contatti.tel)+'</a></div>':'')+
+    (f.contatti&&f.contatti.email?'<div style="margin-bottom:6px">&#9993; <a href="mailto:'+esc(f.contatti.email)+'">'+esc(f.contatti.email)+'</a></div>':'')+
+    (f.note?'<div style="margin:10px 0;font-size:12px;color:var(--text3);font-style:italic">'+esc(f.note)+'</div>':'')+
     '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:12px">'+f.categorie.map(function(c){return'<span class="forn-tag">'+esc(c)+'</span>'}).join('')+'</div>'+
-    '</div><div class="modal-foot"><button class="btn btn-primary" onclick="closeM()">Chiudi</button></div>'}}
+    '</div><div class="modal-foot">'+
+    '<button class="btn btn-secondary btn-sm" data-id="'+esc(extra)+'" onclick="closeM();openModal(&quot;edit-forn&quot;,this.dataset.id)">&#9998; Modifica</button>'+
+    '<button class="btn btn-secondary btn-sm" data-id="'+esc(extra)+'" onclick="closeM();openModal(&quot;edit-forn&quot;,this.dataset.id)">&#9998; Modifica</button>'+
+    '</div>'}}
+
+  if(type==='edit-forn'||type==='add-forn'){
+    var isNew=(type==='add-forn');
+    var f2=isNew?{id:'',nome:'',emoji:'&#127981;',contatti:{tel:'',email:'',referente:''},url:'',categorie:[],note:'',sconto_abituale:0,template_rdo:''}:
+      (FORNITORI.find(function(x){return x.id===extra})||{});
+    return{title:isNew?'Nuovo fornitore':'Modifica — '+esc(f2.nome),body:
+    '<div class="form-row"><div class="form-group" style="flex:3"><label>Nome *</label><input class="form-control" id="ff-nome" value="'+esc(f2.nome||'')+'"></div>'+
+    '<div class="form-group" style="flex:1"><label>Emoji</label><input class="form-control" id="ff-emoji" value="'+esc(f2.emoji||'&#127981;')+'" style="text-align:center;font-size:18px"></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Telefono</label><input class="form-control" id="ff-tel" value="'+esc((f2.contatti&&f2.contatti.tel)||'')+'" type="tel"></div>'+
+    '<div class="form-group"><label>Email</label><input class="form-control" id="ff-email" value="'+esc((f2.contatti&&f2.contatti.email)||'')+'" type="email"></div>'+
+    '<div class="form-group"><label>Referente</label><input class="form-control" id="ff-ref" value="'+esc((f2.contatti&&f2.contatti.referente)||'')+'"></div></div>'+
+    '<div class="form-group"><label>Sito web</label><input class="form-control" id="ff-url" value="'+esc(f2.url||'')+'" type="url" placeholder="https://"></div>'+
+    '<div class="form-group"><label>Categorie (separate da virgola)</label><input class="form-control" id="ff-cat" value="'+esc((f2.categorie||[]).join(', '))+'"></div>'+
+    '<div class="form-group"><label>Note interne</label><textarea class="form-control" id="ff-note" rows="2">'+esc(f2.note||'')+'</textarea></div>'+
+    '<div class="form-group"><label>Sconto abituale (%)</label><input class="form-control" id="ff-sconto" type="number" step="0.5" value="'+esc(String(f2.sconto_abituale||0))+'"></div>'+
+    (isNew?'':'<div class="modal-foot" style="justify-content:space-between">'+
+      '<button class="btn btn-danger btn-sm" data-id="'+esc(extra)+'" onclick="delFornitore(this.dataset.id)">Elimina</button>'+
+      '<div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
+      '<button class="btn btn-primary" data-id="'+esc(extra)+'" onclick="saveFornitore(this.dataset.id)">Salva</button></div></div>')+
+    (isNew?'<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="addFornitore()">Aggiungi</button></div>':'')+
+    ''}}
+
+  if(type==='forn-rdo-template'){
+    var f3=FORNITORI.find(function(x){return x.id===extra});if(!f3)return null;
+    return{title:'Template RDO — '+esc(f3.nome),body:
+    '<p style="font-size:12px;color:var(--text3);margin-bottom:12px">Variabili disponibili: <code>{lista_articoli}</code> <code>{data_consegna}</code> <code>{fornitore}</code></p>'+
+    '<div class="form-group"><label>Template testo RDO</label>'+
+    '<textarea class="form-control" id="rdo-template-ta" rows="10" style="font-family:monospace;font-size:12px">'+esc(f3.template_rdo||'')+'</textarea></div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
+    '<button class="btn btn-primary" data-id="'+esc(extra)+'" onclick="saveRdoTemplate(this.dataset.id)">Salva template</button></div>'}}
+
+  if(type==='forn-listino'){
+    var f4=FORNITORI.find(function(x){return x.id===extra});if(!f4)return null;
+    var listino=getListino(f4.id);
+    return{title:'Listino — '+esc(f4.nome),body:
+    '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">'+
+    '<button class="btn btn-secondary btn-sm" onclick="document.getElementById(&quot;listino-file&quot;).click()">&#128229; Importa XLS/CSV</button>'+
+    '<input type="file" id="listino-file" accept=".xls,.xlsx,.csv" style="display:none" data-forn="'+esc(f4.id)+'" onchange="importListino(this.dataset.forn,this)">'+
+    '<div style="display:flex;align-items:center;gap:6px"><label style="font-size:12px;color:var(--text3)">Moltiplicatore:</label>'+
+    '<input id="listino-mult" type="number" step="0.05" min="0.1" max="5" value="'+esc(String(f4.sconto_abituale||1))+'" class="form-control" style="width:70px"></div>'+
+    '<button class="btn btn-ghost btn-sm" data-forn="'+esc(f4.id)+'" onclick="openModal(&quot;add-listino-riga&quot;,this.dataset.forn)">+ Riga manuale</button>'+
+    '<button class="btn btn-ghost btn-sm" data-id="'+esc(f4.id)+'" onclick="clearListino(this.dataset.id)">&#128465; Svuota</button>'+
+    '</div>'+
+    (listino.length?
+      '<div style="font-size:12px;color:var(--text3);margin-bottom:8px">'+listino.length+' articoli</div>'+
+      '<div class="table-wrap" style="max-height:300px;overflow-y:auto"><table>'+
+      '<thead><tr><th>Codice</th><th>Descrizione</th><th style="text-align:right">Prezzo listino</th><th style="text-align:right">Tuo prezzo</th></tr></thead><tbody>'+
+      listino.slice(0,100).map(function(r){
+        var mult=parseFloat(f4.sconto_abituale||1);
+        var tuo=parseFloat(r.prezzo||0)*mult;
+        return'<tr><td style="font-family:monospace;font-size:11px">'+esc(r.codice||'—')+'</td>'+
+          '<td style="font-size:12px">'+esc(r.descrizione||'—')+'</td>'+
+          '<td style="text-align:right">&#8364;'+fmt(r.prezzo||0)+'</td>'+
+          '<td style="text-align:right;font-weight:700;color:var(--green)">&#8364;'+fmt(tuo)+'</td>'+
+          '</tr>';
+      }).join('')+
+      '</tbody></table></div>'+
+      (listino.length>100?'<p style="font-size:11px;color:var(--text3);padding:4px 8px">... e altri '+(listino.length-100)+' articoli</p>':'')
+      :'<div class="empty">Listino vuoto — importa un file o aggiungi righe manualmente</div>')+
+    '<div class="modal-foot">'+
+    '<button class="btn btn-ghost" onclick="closeM()">Chiudi</button>'+
+    '<button class="btn btn-primary" data-id="'+esc(f4.id)+'" onclick="saveListinoMult(this.dataset.id)">Salva moltiplicatore</button></div>'}}
+
+  if(type==='add-listino-riga'){var fornId=extra||'';return{title:'Aggiungi riga listino',body:
+    '<div class="form-group"><label>Descrizione *</label><input class="form-control" id="lr-desc"></div>'+
+    '<div class="form-row"><div class="form-group"><label>Codice</label><input class="form-control" id="lr-cod"></div>'+
+    '<div class="form-group"><label>Prezzo listino (€)</label><input class="form-control" id="lr-prezzo" type="number" step="0.01" value="0"></div></div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
+    '<button class="btn btn-primary" data-forn="'+esc(fornId)+'" onclick="addListinoRiga(this.dataset.forn)">Aggiungi</button></div>'}}
+
   return null;
 }
 
@@ -1610,6 +1717,198 @@ function delDoc(id,numero){
   det[numero].documenti=(det[numero].documenti||[]).filter(function(d){return d.id!==id});
   ls('det',det);if(CC&&CC.numero===numero)CC._det=det[numero];
   renderDetTab('documenti',document.getElementById('det-content'));syncDetBg();
+}
+
+// ── GESTIONE FORNITORI ──────────────────────────────────────────
+
+function saveFornitore(id){
+  var G=function(eid){var el=document.getElementById(eid);return el?el.value||'':''};
+  var arr=getFornitori();
+  var idx=arr.findIndex(function(x){return x.id===id});if(idx<0)return;
+  arr[idx]=Object.assign(arr[idx],{
+    nome:G('ff-nome'),emoji:G('ff-emoji'),
+    contatti:{tel:G('ff-tel'),email:G('ff-email'),referente:G('ff-ref')},
+    url:G('ff-url'),
+    categorie:G('ff-cat').split(',').map(function(s){return s.trim()}).filter(Boolean),
+    note:G('ff-note'),sconto_abituale:parseFloat(G('ff-sconto')||0)
+  });
+  setFornitori(arr);FORNITORI=arr;
+  closeM();renderFornitori();showToast('Fornitore aggiornato');
+}
+
+function addFornitore(){
+  var G=function(eid){var el=document.getElementById(eid);return el?el.value||'':''};
+  var arr=getFornitori();
+  var nome=G('ff-nome').trim();if(!nome)return;
+  var newF={
+    id:uid().toUpperCase(),nome:nome,emoji:G('ff-emoji')||'\u{1F3ED}',
+    contatti:{tel:G('ff-tel'),email:G('ff-email'),referente:G('ff-ref')},
+    url:G('ff-url'),
+    categorie:G('ff-cat').split(',').map(function(s){return s.trim()}).filter(Boolean),
+    note:G('ff-note'),sconto_abituale:parseFloat(G('ff-sconto')||0),template_rdo:''
+  };
+  arr.push(newF);setFornitori(arr);FORNITORI=arr;
+  closeM();renderFornitori();showToast('Fornitore aggiunto');
+}
+
+function delFornitore(id){
+  if(!confirm('Eliminare questo fornitore?'))return;
+  var arr=getFornitori().filter(function(x){return x.id!==id});
+  setFornitori(arr);FORNITORI=arr;
+  closeM();renderFornitori();showToast('Fornitore eliminato');
+}
+
+function saveRdoTemplate(id){
+  var ta=document.getElementById('rdo-template-ta');if(!ta)return;
+  var arr=getFornitori();var idx=arr.findIndex(function(x){return x.id===id});if(idx<0)return;
+  arr[idx].template_rdo=ta.value;
+  setFornitori(arr);FORNITORI=arr;
+  closeM();showToast('Template RDO salvato');
+}
+
+// ── LISTINI ──────────────────────────────────────────────────────
+
+function getListino(fornId){
+  try{return JSON.parse(localStorage.getItem('asg_listino_'+fornId)||'[]')}catch{return[]}
+}
+function setListino(fornId,arr){localStorage.setItem('asg_listino_'+fornId,JSON.stringify(arr))}
+
+function saveListinoMult(fornId){
+  var el=document.getElementById('listino-mult');if(!el)return;
+  var arr=getFornitori();var idx=arr.findIndex(function(x){return x.id===fornId});if(idx<0)return;
+  arr[idx].sconto_abituale=parseFloat(el.value||1);
+  setFornitori(arr);FORNITORI=arr;
+  closeM();showToast('Moltiplicatore salvato');
+}
+
+function clearListino(fornId){
+  if(!confirm('Svuotare il listino?'))return;
+  setListino(fornId,[]);closeM();showToast('Listino svuotato');
+}
+
+function addListinoRiga(fornId){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var desc=G('lr-desc').trim();if(!desc)return;
+  var listino=getListino(fornId);
+  listino.push({id:uid(),codice:G('lr-cod'),descrizione:desc,prezzo:parseFloat(G('lr-prezzo')||0)});
+  setListino(fornId,listino);
+  closeM();showToast('Riga aggiunta al listino');
+}
+
+async function importListino(fornId,input){
+  var file=input.files[0];if(!file)return;
+  try{
+    var data=await new Promise(function(res,rej){
+      var r=new FileReader();
+      r.onload=function(e){res(e.target.result)};
+      r.onerror=function(){rej(new Error('Errore lettura'))};
+      r.readAsArrayBuffer(file);
+    });
+    if(typeof XLSX==='undefined')throw new Error('XLSX non disponibile');
+    var wb=XLSX.read(data,{type:'array'});
+    var ws=wb.Sheets[wb.SheetNames[0]];
+    var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    // Mostra anteprima per mapping colonne
+    _listinoImportData={fornId:fornId,rows:rows};
+    openModal('map-listino-cols',fornId);
+  }catch(e){showToast('Errore import: '+e.message)}
+}
+
+var _listinoImportData=null;
+
+function getModalHTML_listino(extra){
+  if(!_listinoImportData)return null;
+  var rows=_listinoImportData.rows;
+  var header=rows[0]||[];
+  var preview=rows.slice(1,4);
+  var opts='<option value="">— non usare —</option>'+header.map(function(h,i){return'<option value="'+i+'">'+esc(String(h||'Col '+i))+'</option>'}).join('');
+  // Cerca colonne automaticamente
+  var guessCol=function(keywords){
+    for(var i=0;i<header.length;i++){
+      var h=String(header[i]||'').toLowerCase();
+      if(keywords.some(function(k){return h.includes(k)}))return i;
+    }
+    return '';
+  };
+  var gCod=guessCol(['codice','cod','code','articolo','art']);
+  var gDesc=guessCol(['descrizione','desc','nome','name','denominazione']);
+  var gPrezzo=guessCol(['prezzo','price','costo','cost','listino','eur','euro']);
+  return{title:'Mappa colonne listino',body:
+    '<p style="font-size:12px;color:var(--text3);margin-bottom:12px">'+rows.length+' righe trovate. Seleziona le colonne corrispondenti:</p>'+
+    '<div class="form-row">'+
+    '<div class="form-group"><label>Colonna Codice</label><select class="form-control" id="mc-cod">'+opts.replace('value="'+gCod+'"','value="'+gCod+'" selected')+'</select></div>'+
+    '<div class="form-group"><label>Colonna Descrizione *</label><select class="form-control" id="mc-desc">'+opts.replace('value="'+gDesc+'"','value="'+gDesc+'" selected')+'</select></div>'+
+    '<div class="form-group"><label>Colonna Prezzo *</label><select class="form-control" id="mc-prezzo">'+opts.replace('value="'+gPrezzo+'"','value="'+gPrezzo+'" selected')+'</select></div>'+
+    '</div>'+
+    '<div class="form-group"><label>Riga header (da saltare)</label><input class="form-control" id="mc-skip" type="number" value="1" min="0"></div>'+
+    '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:11px;margin-bottom:14px">'+
+    '<strong>Anteprima prime 3 righe:</strong><br>'+
+    preview.map(function(r){return r.slice(0,6).map(function(c){return esc(String(c||''))}).join(' | ')}).join('<br>')+
+    '</div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
+    '<button class="btn btn-primary" onclick="confirmImportListino()">Importa</button></div>'};
+}
+
+function confirmImportListino(){
+  if(!_listinoImportData)return;
+  var G=function(id){var el=document.getElementById(id);return el?el.value:''}; 
+  var colCod=G('mc-cod');var colDesc=G('mc-desc');var colPrezzo=G('mc-prezzo');
+  var skip=parseInt(G('mc-skip')||1);
+  if(colDesc===''||colPrezzo===''){showToast('Seleziona almeno Descrizione e Prezzo');return}
+  var rows=_listinoImportData.rows.slice(skip);
+  var risultato=[];
+  rows.forEach(function(r){
+    var desc=String(r[parseInt(colDesc)]||'').trim();
+    var prezzo=parseFloat(String(r[parseInt(colPrezzo)]||'0').replace(',','.').replace(/[^0-9.]/g,''))||0;
+    if(!desc||!prezzo)return;
+    risultato.push({
+      id:uid(),
+      codice:colCod!==''?String(r[parseInt(colCod)]||'').trim():'',
+      descrizione:desc,
+      prezzo:prezzo
+    });
+  });
+  setListino(_listinoImportData.fornId,risultato);
+  _listinoImportData=null;
+  closeM();
+  showToast(risultato.length+' articoli importati nel listino');
+}
+
+// Override getModalHTML per aggiungere map-listino-cols
+var _origGetModalHTML=getModalHTML;
+function getModalHTML(type,extra){
+  if(type==='map-listino-cols')return getModalHTML_listino(extra);
+  return _origGetModalHTML(type,extra);
+}
+
+// ── APRI RDO con template fornitore ──────────────────────────────
+
+function apriRDO(fornId){
+  FORNITORI=getFornitori();
+  var f=FORNITORI.find(function(x){return x.id===fornId||x.nome===fornId});
+  var nome=f?f.nome:fornId;
+  var det=lgo('det'),comm=lg('comm');
+  var items=[];
+  comm.forEach(function(c){
+    var d=det[c.numero]||{distinta:[]};
+    (d.distinta||[]).forEach(function(r){
+      if(!r._intestazione&&(r.fornitore||'').includes(nome.split(' ')[0])&&r.stato_approv!=='arrivato')
+        items.push(Object.assign({},r,{_commessa:c.numero}));
+    });
+  });
+  var lista=items.map(function(r,i){return(i+1)+'. '+(r.descrizione||'—')+(r.codice?' ['+r.codice+']':'')+' x'+esc(String(r.qty||1))+' — rif. '+r._commessa}).join('\n');
+  var oggi=new Date().toLocaleDateString('it-IT');
+  var template=f&&f.template_rdo?f.template_rdo:
+    'Gentili '+nome+',\n\nRichiediamo disponibilit\u00e0 e quotazione per:\n\n{lista_articoli}\n\nCordiali saluti\nASG LAB S.r.l.';
+  var testo=template
+    .replace('{lista_articoli}',lista)
+    .replace('{fornitore}',nome)
+    .replace('{data_consegna}',oggi)
+    .replace('{data}',oggi);
+  var email=f&&f.contatti&&f.contatti.email?f.contatti.email:'';
+  var subj='Richiesta di Offerta — ASG LAB — '+new Date().toLocaleDateString('it-IT');
+  if(email)window.open('mailto:'+email+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(testo));
+  else navigator.clipboard.writeText(subj+'\n\n'+testo).then(function(){showToast('\u2713 Testo RDO copiato')});
 }
 
 function exportAll(){var data={comm:lg('comm'),fatt:lg('fatt'),scad:lg('scad'),conti:lg('conti'),det:lgo('det'),mag:lg('mag'),pn:lg('pn')};var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='asglab-backup-'+today()+'.json';a.click()}
