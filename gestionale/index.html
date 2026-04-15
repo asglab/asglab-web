@@ -465,7 +465,7 @@ var FLOW=['bozza','offerta','inviata','confermata','in-corso','chiusa'];
 function statoBadge(s){return '<span class="stato-chip stato-'+esc(s)+'">'+esc(SL[s]||s)+'</span>'}
 
 // CONFIG
-function getCfg(){var c=lgo('cfg');return{nc_url:c.nc_url||'',nc_web_url:c.nc_web_url||c.nc_url||'',nc_user:c.nc_user||'',nc_pass:c.nc_pass||'',markup_clienti:c.markup_clienti||{},ok:!!(c.nc_url&&c.nc_user&&c.nc_pass)}}
+function getCfg(){var c=lgo('cfg');return{nc_url:c.nc_url||'',nc_web_url:c.nc_web_url||'https://cloud.asglab.it',nc_user:c.nc_user||'',nc_pass:c.nc_pass||'',markup_clienti:c.markup_clienti||{},ok:!!(c.nc_url&&c.nc_user&&c.nc_pass)}}
 function sCfg(d){localStorage.setItem(K.cfg,JSON.stringify(d))}
 
 // WEBDAV
@@ -920,7 +920,7 @@ async function caricaFileNC(path){
       // Tutto apre in NC web con sessione attiva — niente WebDAV, niente login
       var rowClick=item.isDir?
         'data-path="'+esc(path+'/'+item.name)+'" onclick="caricaFileNC(this.dataset.path)"':
-        'data-href="'+esc(fileUrl)+'" onclick="window.open(this.dataset.href,\'_blank\')"';
+        'data-href="'+esc(fileUrl)+'" onclick="location.href=this.dataset.href"';
       html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer" '+rowClick+'>'+
         '<span style="font-size:20px;flex-shrink:0">'+(item.isDir?'&#128193;':ncFileEmoji(item.name))+'</span>'+
         '<div style="flex:1;min-width:0">'+
@@ -2476,25 +2476,42 @@ function selezionaFileNC(url,name){
 // ── CONFIGURATORE RACCORDI ────────────────────────────────────────
 function aggiungiRigaRaccordo(){
   var lista=document.getElementById('raccordi-lista');if(!lista)return;
-  var FIGURE=['Dritto DIN','Curva 90° DIN normale','Curva 90° DIN compatta','T maschio DIN','T femmina DIN','Croce DIN','Orientabile DIN','Dritto GAS','Curva 90° GAS','T GAS','Riduzione GAS'];
-  var MISURE=['6','8','10','12','14','16','18','20','22','25'];
-  var idx=lista.children.length;
+  var FIGURE_DIN=['Dritto DIN','Curva 90\u00b0 DIN normale','Curva 90\u00b0 DIN compatta','T maschio DIN','T femmina DIN','Croce DIN','Orientabile DIN'];
+  var FIGURE_GAS=['Dritto GAS','Curva 90\u00b0 GAS','T GAS','Riduzione GAS'];
+  var FIGURE=FIGURE_DIN.concat(FIGURE_GAS);
+  var MISURE=['6','8','10','12','14','16','18','20','22','25','28','30','38'];
   var div=document.createElement('div');
-  div.style.cssText='display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid var(--border)';
+  div.style.cssText='padding:8px 0;border-bottom:1px solid var(--border)';
+  div.setAttribute('data-row','1');
   div.innerHTML=
     '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;width:100%">'+
-    '<select class="form-control" style="flex:2;min-width:160px">'+FIGURE.map(function(f){return'<option>'+f+'</option>'}).join('')+'</select>'+
-    '<select class="form-control" style="width:80px">'+MISURE.map(function(m){return'<option value="'+m+'">Ø'+m+'</option>'}).join('')+'</select>'+
+    '<select class="form-control" style="flex:2;min-width:160px" onchange="aggiornaSerieRacc(this)">'+
+      FIGURE.map(function(f){return'<option>'+f+'</option>'}).join('')+
+    '</select>'+
+    '<select class="form-control" style="width:80px">'+
+      MISURE.map(function(m){return'<option value="'+m+'">\u00d8'+m+'</option>'}).join('')+
+    '</select>'+
+    '<select class="form-control serie-din" style="width:80px" title="Serie DIN">'+
+      '<option value="L">Serie L</option>'+
+      '<option value="S">Serie S</option>'+
+    '</select>'+
     '<select class="form-control" style="width:90px"><option>Acciaio</option><option>Inox</option></select>'+
-    '<input class="form-control" type="number" value="1" min="1" style="width:55px" title="Quantità" placeholder="Q.">'+
-    '<button class="btn-icon" style="color:var(--red);flex-shrink:0" onclick="this.closest(&quot;div[data-row]&quot;).remove()">&#10005;</button>'+
+    '<input class="form-control" type="number" value="1" min="1" style="width:55px" title="Q." placeholder="Q.">'+
+    '<button class="btn-icon" style="color:var(--red);flex-shrink:0" onclick="this.closest(\'[data-row]\').remove()">&#10005;</button>'+
     '</div>'+
     '<div style="display:flex;gap:6px;align-items:center;margin-top:4px;flex-wrap:wrap;width:100%">'+
-    '<input class="form-control" style="width:120px" placeholder="Codice (opz.)">'+
-    '<input class="form-control" type="number" step="0.01" min="0" value="0" style="width:90px" title="Prezzo cad. €" placeholder="€/cad">'+
+    '<input class="form-control" style="flex:1;min-width:100px" placeholder="Codice (opz.)">'+
+    '<input class="form-control" type="number" step="0.01" min="0" value="0" style="width:90px" title="Prezzo cad. €" placeholder="\u20ac/cad">'+
+    '<input class="form-control" style="flex:2;min-width:120px" placeholder="Note (opz.)">'+
     '</div>';
-  div.setAttribute('data-row','1');
   lista.appendChild(div);
+}
+
+function aggiornaSerieRacc(sel){
+  // Mostra/nasconde serie L/S solo per raccordi DIN, non GAS
+  var isDIN=sel.value.includes('DIN');
+  var serieSel=sel.closest('[data-row]').querySelector('.serie-din');
+  if(serieSel)serieSel.style.display=isDIN?'':'none';
 }
 function saveRaccordi(numero){
   var forn=document.getElementById('racc-forn');forn=forn?forn.value:'Pa.Co Fluid & Air Group';
@@ -2503,13 +2520,19 @@ function saveRaccordi(numero){
   var lista=document.getElementById('raccordi-lista');if(!lista)return;
   var righe=[];
   var cfg2=getCfg();var cod2=getCod(numero);var defMk=cfg2.markup_clienti&&cfg2.markup_clienti[cod2]?cfg2.markup_clienti[cod2]:2.25;
+  var cfg2=getCfg();var cod2=getCod(numero);var defMk=cfg2.markup_clienti&&cfg2.markup_clienti[cod2]?cfg2.markup_clienti[cod2]:2.25;
   Array.from(lista.children).forEach(function(div){
     var sels=div.querySelectorAll('select');
     var inputs=div.querySelectorAll('input');
-    // inputs: [qty, codice, prezzo]
-    var qty=inputs[0],codice=inputs[1],prezzoEl=inputs[2];
+    // sels: [figura, misura, serie, materiale]  inputs: [qty, codice, prezzo, note]
+    var qty=inputs[0],codice=inputs[1],prezzoEl=inputs[2],noteEl=inputs[3];
     if(!sels[0]||!sels[0].value)return;
-    var desc='Raccordo '+sels[0].value+' Ø'+sels[1].value+'mm '+(sels[2]?sels[2].value:'');
+    var figura=sels[0].value;
+    var misura=sels[1]?sels[1].value:'';
+    var serie=sels[2]&&sels[2].style.display!=='none'&&figura.includes('DIN')?sels[2].value:'';
+    var mat=sels[3]?sels[3].value:'Acciaio';
+    var desc='Raccordo '+figura+(serie?' ser.'+serie:'')+' \u00d8'+misura+'mm '+mat;
+    if(noteEl&&noteEl.value.trim())desc+=' \u2014 '+noteEl.value.trim();
     var qtyVal=parseInt(qty?qty.value:1)||1;
     var cod=codice?codice.value.trim():'';
     var costo=parseFloat(prezzoEl?prezzoEl.value:0)||0;
@@ -2519,7 +2542,6 @@ function saveRaccordi(numero){
       markup:defMk,prezzo_vendita:parseFloat((netto*defMk).toFixed(4)),
       stato_approv:'daordinare',data_attesa:''});
   });
-  if(!righe.length){showToast('Aggiungi almeno un raccordo');return}
   det[numero].distinta.push(...righe);
   ls('det',det);CC._det=det[numero];
   closeM();renderDetTab('distinta',document.getElementById('det-content'));renderMargine();syncDetBg();
