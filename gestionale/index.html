@@ -970,15 +970,21 @@ function cambiaStato(s){
 }
 
 function folderUrl(num){
-  var a=getAnno(num),cod=getCod(num),k=CMAP[cod];if(!k||!a)return null;
-  var seq=parseInt((num||'').split('-')[1]||'0');
+  var cfg=getCfg();
+  var base=cfg.nc_url||'https://cloud.asglab.it';
   var comm=lg('comm').find(function(x){return x.numero===num});
-  var base='https://cloud.asglab.it';
-  if(comm&&comm.oggetto){
-    var nome=cod+'-'+seq+'-'+a+' ('+comm.oggetto+')';
-    return base+'/apps/files/?dir='+encodeURIComponent('/Clienti/'+k+'/'+a+'/'+nome);
+  // Usa nc_path personalizzato se presente
+  var path=comm&&comm.nc_path?comm.nc_path:null;
+  if(!path){
+    // Calcolo automatico
+    var a=getAnno(num),cod=getCod(num),k=CNAMES[cod];if(!k||!a)return null;
+    var seq=parseInt((num||'').split('-')[1]||'0');
+    if(comm&&comm.oggetto)
+      path='/Clienti/'+k+'/'+a+'/'+cod+'-'+seq+'-'+a+' ('+comm.oggetto+')';
+    else
+      path='/Clienti/'+k+'/'+a;
   }
-  return base+'/apps/files/?dir='+encodeURIComponent('/Clienti/'+k+'/'+a);
+  return base+'/apps/files/?dir='+encodeURIComponent(path);
 }
 
 // SAVE COMMESSA
