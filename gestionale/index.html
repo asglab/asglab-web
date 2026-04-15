@@ -1419,11 +1419,26 @@ function getModalHTML(type,extra){
     '<option value="fiscale">Fiscale</option><option value="pagamento">Pagamento</option><option value="incasso">Incasso</option><option value="altro">Altro</option></select></div>'+
     '<div class="form-group"><label>Stato</label><select class="form-control" id="f-stato"><option value="daf">Da fare</option><option value="pagata">Fatto</option></select></div></div>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveScad()">Salva</button></div>'};
-  if(type==='conto')return{title:'Aggiorna saldo conto',body:
-    '<div class="form-group"><label>Nome conto</label><input class="form-control" id="f-conto"></div>'+
-    '<div class="form-group"><label>Saldo (€)</label><input class="form-control" id="f-saldo" type="number" step="0.01"></div>'+
-    '<div class="form-group"><label>Data</label><input class="form-control" id="f-data" type="date" value="'+today()+'"></div>'+
-    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveConto()">Salva</button></div>'};
+  if(type==='conto'){
+    var contiEsist=lg('conti');
+    var bancheDefault=['Banca Fineco','Tot. S.p.A. (ex Sella)','Revolut'];
+    var optsConti='';
+    // Prima le banche default, poi eventuali conti custom già salvati
+    var tuttiConti=[...new Set(bancheDefault.concat(contiEsist.map(function(c){return c.conto||''})).filter(Boolean))];
+    tuttiConti.forEach(function(nome){
+      var c=contiEsist.find(function(x){return x.conto===nome});
+      optsConti+='<option value="'+esc(nome)+'">'+(c?esc(nome)+' (saldo: \u20ac'+fmt(c.saldo)+')':esc(nome))+'</option>';
+    });
+    return{title:'Aggiorna saldo conto',body:
+    '<div class="form-group"><label>Conto / Banca</label>'+
+    '<select class="form-control" id="f-conto" onchange="prefillSaldo(this.value)">'+
+    '<option value="">— seleziona —</option>'+optsConti+
+    '</select>'+
+    '<input class="form-control" id="f-conto-custom" placeholder="oppure scrivi nome conto..." style="margin-top:6px">'+
+    '</div>'+
+    '<div class="form-group"><label>Saldo attuale (€)</label><input class="form-control" id="f-saldo" type="number" step="0.01" placeholder="0.00"></div>'+
+    '<div class="form-group"><label>Data rilevazione</label><input class="form-control" id="f-data" type="date" value="'+today()+'"></div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveConto()">Salva</button></div>'};};
   if(type==='add-mag')return{title:'Aggiungi magazzino',body:
     '<div class="form-group"><label>Descrizione *</label><input class="form-control" id="f-desc"></div>'+
     '<div class="form-row"><div class="form-group"><label>Codice</label><input class="form-control" id="f-cod"></div>'+
@@ -1780,7 +1795,28 @@ function saveTuboRacc(numero){
   showToast('Tubo raccordato aggiunto alla distinta');
 }
 function saveCfg(){var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};var mk={};Object.keys(CMAP).forEach(function(cod){var el=document.getElementById('cfg-mk-'+cod);if(el&&el.value)mk[cod]=parseFloat(el.value)||2.25});sCfg({nc_url:G('cfg-url').trim().replace(/\/$/,''),nc_user:G('cfg-user').trim(),nc_pass:G('cfg-pass').trim(),markup_clienti:mk});closeM();showToast('Configurazione salvata');syncNow()}
-function saveConto(){var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};var conti=lg('conti');var nome=G('f-conto').trim();if(!nome)return;var idx=conti.findIndex(function(c){return c.conto===nome});var row={id:idx>=0?conti[idx].id:uid(),conto:nome,saldo:G('f-saldo'),data_rilevazione:G('f-data'),note:''};if(idx>=0)conti[idx]=row;else conti.push(row);ls('conti',conti);closeM();renderCassa();wPut('cassa.csv',conti,['conto','saldo','data_rilevazione','note']);showToast('Saldo aggiornato')}
+function prefillSaldo(nome){
+  if(!nome)return;
+  var conti=lg('conti');
+  var c=conti.find(function(x){return x.conto===nome});
+  var el=document.getElementById('f-saldo');
+  if(el&&c)el.value=c.saldo||'';
+}
+function saveConto(){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var conti=lg('conti');
+  // Usa il campo custom se compilato, altrimenti il select
+  var nome=(G('f-conto-custom').trim()||G('f-conto')).trim();
+  if(!nome){showToast('Inserisci il nome del conto');return}
+  var saldo=G('f-saldo');
+  if(!saldo){showToast('Inserisci il saldo');return}
+  var idx=conti.findIndex(function(c){return c.conto===nome});
+  var row={id:idx>=0?conti[idx].id:uid(),conto:nome,saldo:saldo,data_rilevazione:G('f-data')||today(),note:''};
+  if(idx>=0)conti[idx]=row;else conti.push(row);
+  ls('conti',conti);closeM();renderCassa();
+  wPut('cassa.csv',conti,['conto','saldo','data_rilevazione','note']);
+  showToast('Saldo aggiornato: '+nome+' \u20ac'+fmt(saldo));
+}
 function saveScad(){var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};var scad=lg('scad');var row={id:uid(),data:G('f-data'),importo:G('f-importo'),descrizione:G('f-desc'),tipo:G('f-tipo'),stato:G('f-stato')};if(!row.data)return;scad.push(row);ls('scad',scad);closeM();wPut('scadenze.csv',scad,['id','data','importo','descrizione','tipo','stato']);showToast('Scadenza aggiunta');renderScad()}
 function saveMag(){var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};var mag=lg('mag');var row={id:uid(),descrizione:G('f-desc'),codice:G('f-cod'),fornitore:G('f-forn'),categoria:G('f-cat'),costo_cad:G('f-costo'),qty:G('f-qty'),soglia_min:G('f-soglia')};if(!row.descrizione)return;mag.push(row);ls('mag',mag);closeM();wPut('magazzino.csv',mag,['id','codice','descrizione','fornitore','categoria','costo_cad','qty','soglia_min']);showToast('Componente aggiunto');renderMag()}
 function calcNetto(){var costo=parseFloat((document.getElementById('f-costo')||{}).value||0);var sc=parseFloat((document.getElementById('f-sconto')||{}).value||0);var mk=parseFloat((document.getElementById('f-markup')||{}).value||2.25);var netto=costo*(1-sc/100);var pre=document.getElementById('calc-preview');if(pre)pre.textContent='Netto: €'+fmt(netto)+' → Vendita: €'+fmt(netto*mk)}
