@@ -1317,6 +1317,7 @@ function rigeneraScadenzeBtn(){
 // MODAL HTML
 function getModalHTML(type,extra){
   var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  if(type==='map-listino-cols')return getModalHTML_listino(extra);
   if(type==='commessa')return{title:'Nuova commessa',body:
     '<div class="form-group"><label>Numero *</label><input class="form-control" id="f-num" placeholder="es. KFG-1-2026"></div>'+
     '<div class="form-row"><div class="form-group" style="flex:2"><label>Oggetto</label><input class="form-control" id="f-ogg"></div>'+
@@ -2010,12 +2011,7 @@ function confirmImportListino(){
   showToast(risultato.length+' articoli importati nel listino');
 }
 
-// Override getModalHTML per aggiungere map-listino-cols
-var _origGetModalHTML=getModalHTML;
-function getModalHTML(type,extra){
-  if(type==='map-listino-cols')return getModalHTML_listino(extra);
-  return _origGetModalHTML(type,extra);
-}
+
 
 // ── APRI RDO con template fornitore ──────────────────────────────
 
@@ -2051,6 +2047,16 @@ function exportAll(){var data={comm:lg('comm'),fatt:lg('fatt'),scad:lg('scad'),c
 
 // INIT
 (function(){
+  // Migrazione nomi banche
+  var bancaMap={'Banca Fineco':'Banca Fineco','Fineco':'Banca Fineco',
+    'Banca Sella':'Tot. S.p.A. (ex Sella)','Sella':'Tot. S.p.A. (ex Sella)',
+    'Tot. S.p.A.':'Tot. S.p.A. (ex Sella)',
+    'Revolut':'Revolut','Revolut Bank':'Revolut'};
+  var conti=lg('conti');var changed=false;
+  conti.forEach(function(c){
+    if(bancaMap[c.conto]&&bancaMap[c.conto]!==c.conto){c.conto=bancaMap[c.conto];changed=true;}
+  });
+  if(changed){ls('conti',conti);}
   var cfg=getCfg();
   if(!cfg.ok)document.getElementById('cfg-banner').classList.add('show');
   else syncNow();
