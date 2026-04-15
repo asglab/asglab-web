@@ -444,8 +444,19 @@ function setChip(el,group,val){
 function getChip(g){return _chipState[g]||''}
 
 // CONSTANTS
-var CMAP={KFG:'KF Group (KFG)',MABE:'Mabe Engineering (MABE)',FIZ:'F.I.Z. Srl (FIZ)',TRIME:'Trime Spa (TRIME)',MAVENT:'Mavent Srl (MAVENT)',BBImp:'BB Impianti (BBImp)',COLFER:'Colfer Srl (COLFER)',PAOLO:'Paolo Masciocchi (PAOLO)'};
-var CNAMES={KFG:'KF Group',MABE:'Mabe Engineering',FIZ:'F.I.Z. Srl',TRIME:'Trime Spa',MAVENT:'Mavent Srl',BBImp:'BB Impianti',COLFER:'Colfer Srl',PAOLO:'Paolo Masciocchi'};
+var CLIENTI_DEFAULT={
+  KFG:'KF Group',MABE:'Mabe Engineering',FIZ:'F.I.Z. Srl',
+  TRIME:'Trime Spa',MAVENT:'Mavent Srl',BBImp:'BB Impianti',
+  COLFER:'Colfer Srl',PAOLO:'Paolo Masciocchi',ZMN:'Zeminian'
+};
+function getClienti(){
+  try{var s=JSON.parse(localStorage.getItem('asg_clienti')||'null');if(s&&Object.keys(s).length)return s;}catch(e){}
+  return CLIENTI_DEFAULT;
+}
+function setClienti(obj){localStorage.setItem('asg_clienti',JSON.stringify(obj))}
+var CNAMES=getClienti();
+var CMAP={};
+Object.entries(CNAMES).forEach(function(e){CMAP[e[0]]=e[1]+' ('+e[0]+')'});
 function getCod(num){return(num||'').split('-')[0]||''}
 function getAnno(num){return(num||'').split('-')[2]||''}
 var SL={bozza:'Bozza',offerta:'Offerta',inviata:'Inviata',confermata:'Confermata','in-corso':'In lavoro',chiusa:'Chiusa'};
@@ -1456,6 +1467,9 @@ function getModalHTML(type,extra){
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-bottom:16px">'+
     Object.entries(CMAP).map(function(e){return'<div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;flex:1">'+esc(e[1].split('(')[0].trim())+'</span><input id="cfg-mk-'+esc(e[0])+'" type="number" step="0.05" min="1" max="10" value="'+esc(String(mk2[e[0]]||2.25))+'" class="form-control" style="width:70px"></div>'}).join('')+
     '</div>'+
+    '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)">Clienti</div>'+
+    '<p style="font-size:12px;color:var(--text3);margin-bottom:10px">Sigla → Nome completo, separati da virgola, uno per riga.</p>'+
+    '<textarea class="form-control" id="cfg-clienti" rows="5" style="font-family:monospace;font-size:12px">'+Object.entries(getClienti()).map(function(e){return e[0]+','+e[1]}).join('\n')+'</textarea>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveCfg()">Salva</button></div>'}}
   if(type==='import-primanota')return{title:'Import Prima Nota',body:
     '<p style="font-size:13px;color:var(--text3);margin-bottom:14px">Esporta da Fattura24 → Contabilita → Prima Nota → Esporta XLS</p>'+
@@ -1891,7 +1905,16 @@ function saveTuboRacc(numero){
   closeM();renderDetTab('distinta',document.getElementById('det-content'));renderMargine();syncDetBg();
   showToast('Tubo raccordato aggiunto alla distinta');
 }
-function saveCfg(){var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};var mk={};Object.keys(CMAP).forEach(function(cod){var el=document.getElementById('cfg-mk-'+cod);if(el&&el.value)mk[cod]=parseFloat(el.value)||2.25});sCfg({nc_url:G('cfg-url').trim().replace(/\/$/,''),nc_user:G('cfg-user').trim(),nc_pass:G('cfg-pass').trim(),markup_clienti:mk});closeM();showToast('Configurazione salvata');syncNow()}
+function saveCfg(){var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};var mk={};Object.keys(CMAP).forEach(function(cod){var el=document.getElementById('cfg-mk-'+cod);if(el&&el.value)mk[cod]=parseFloat(el.value)||2.25});var clientiTa=document.getElementById('cfg-clienti');
+  if(clientiTa&&clientiTa.value.trim()){
+    var newClienti={};
+    clientiTa.value.trim().split('\n').forEach(function(line){
+      var parts=line.split(',');var sigla=parts[0].trim();var nome=parts.slice(1).join(',').trim();
+      if(sigla&&nome)newClienti[sigla]=nome;
+    });
+    if(Object.keys(newClienti).length){setClienti(newClienti);CNAMES=newClienti;CMAP={};Object.entries(newClienti).forEach(function(e){CMAP[e[0]]=e[1]+' ('+e[0]+')';});}
+  }
+  sCfg({nc_url:G('cfg-url').trim().replace(/\/$/,''),nc_user:G('cfg-user').trim(),nc_pass:G('cfg-pass').trim(),markup_clienti:mk});closeM();showToast('Configurazione salvata');syncNow()}
 function prefillSaldo(nome){
   if(!nome)return;
   var conti=lg('conti');
