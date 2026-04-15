@@ -1818,6 +1818,10 @@ function getModalHTML(type,extra){
     '<input class="form-control" id="trig-forn" list="forn-list-trig" value="Pa.Co Fluid &amp; Air Group">'+
     '<datalist id="forn-list-trig">'+FORNITORI.map(function(f){return'<option value="'+esc(f.nome)+'">'}).join('')+'</datalist></div>'+
     '<div class="form-group"><label>Sezione distinta</label><input class="form-control" id="trig-sez" value="Tubi rigidi"></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Codice articolo (opz.)</label>'+
+    '<input class="form-control" id="trig-codice" placeholder="es. PA-TR-12-INOX"></div>'+
+    '<div class="form-group"><label>Q.tà</label>'+
+    '<input class="form-control" id="trig-qty" type="number" value="1" min="1"></div></div>'+
     '<div class="form-row"><div class="form-group"><label>Costo stimato (€)</label>'+
     '<input class="form-control" id="trig-costo" type="number" step="0.01" value="0" oninput="calcNettoTRig()"></div>'+
     '<div class="form-group"><label>Markup</label>'+
@@ -2478,11 +2482,18 @@ function aggiungiRigaRaccordo(){
   var div=document.createElement('div');
   div.style.cssText='display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid var(--border)';
   div.innerHTML=
+    '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;width:100%">'+
     '<select class="form-control" style="flex:2;min-width:160px">'+FIGURE.map(function(f){return'<option>'+f+'</option>'}).join('')+'</select>'+
     '<select class="form-control" style="width:80px">'+MISURE.map(function(m){return'<option value="'+m+'">Ø'+m+'</option>'}).join('')+'</select>'+
     '<select class="form-control" style="width:90px"><option>Acciaio</option><option>Inox</option></select>'+
-    '<input class="form-control" type="number" value="1" min="1" style="width:55px" placeholder="Q.">'+
-    '<button class="btn-icon" style="color:var(--red)" onclick="this.parentElement.remove()">&#10005;</button>';
+    '<input class="form-control" type="number" value="1" min="1" style="width:55px" title="Quantità" placeholder="Q.">'+
+    '<button class="btn-icon" style="color:var(--red);flex-shrink:0" onclick="this.closest(&quot;div[data-row]&quot;).remove()">&#10005;</button>'+
+    '</div>'+
+    '<div style="display:flex;gap:6px;align-items:center;margin-top:4px;flex-wrap:wrap;width:100%">'+
+    '<input class="form-control" style="width:120px" placeholder="Codice (opz.)">'+
+    '<input class="form-control" type="number" step="0.01" min="0" value="0" style="width:90px" title="Prezzo cad. €" placeholder="€/cad">'+
+    '</div>';
+  div.setAttribute('data-row','1');
   lista.appendChild(div);
 }
 function saveRaccordi(numero){
@@ -2491,12 +2502,21 @@ function saveRaccordi(numero){
   var det=lgo('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
   var lista=document.getElementById('raccordi-lista');if(!lista)return;
   var righe=[];
+  var cfg2=getCfg();var cod2=getCod(numero);var defMk=cfg2.markup_clienti&&cfg2.markup_clienti[cod2]?cfg2.markup_clienti[cod2]:2.25;
   Array.from(lista.children).forEach(function(div){
-    var sels=div.querySelectorAll('select');var inp=div.querySelector('input[type="number"]');
+    var sels=div.querySelectorAll('select');
+    var inputs=div.querySelectorAll('input');
+    // inputs: [qty, codice, prezzo]
+    var qty=inputs[0],codice=inputs[1],prezzoEl=inputs[2];
     if(!sels[0]||!sels[0].value)return;
     var desc='Raccordo '+sels[0].value+' Ø'+sels[1].value+'mm '+(sels[2]?sels[2].value:'');
-    righe.push({id:uid(),sezione:sez,descrizione:desc.trim(),qty:parseInt(inp?inp.value:1)||1,
-      fornitore:forn,codice:'',costo_cad:0,sconto:0,netto_cad:0,markup:2.25,prezzo_vendita:0,
+    var qtyVal=parseInt(qty?qty.value:1)||1;
+    var cod=codice?codice.value.trim():'';
+    var costo=parseFloat(prezzoEl?prezzoEl.value:0)||0;
+    var netto=costo;
+    righe.push({id:uid(),sezione:sez,descrizione:desc.trim(),qty:qtyVal,
+      fornitore:forn,codice:cod,costo_cad:costo,sconto:0,netto_cad:netto,
+      markup:defMk,prezzo_vendita:parseFloat((netto*defMk).toFixed(4)),
       stato_approv:'daordinare',data_attesa:''});
   });
   if(!righe.length){showToast('Aggiungi almeno un raccordo');return}
@@ -2519,13 +2539,14 @@ function saveTuboRigido(numero){
   var ra=G('trig-ra');var rb=G('trig-rb');var note=G('trig-note');
   var forn=G('trig-forn')||'Pa.Co Fluid & Air Group';
   var sez=G('trig-sez')||'Tubi rigidi';
+  var codice=G('trig-codice');var qty=parseInt(G('trig-qty')||1)||1;
   var costo=parseFloat(G('trig-costo')||0);var markup=parseFloat(G('trig-markup')||2.25);
   var desc='Tubo rigido Ø'+diam+'mm '+mat;
   if(lung)desc+=' L='+lung+'mm';
   var racc=[];if(ra)racc.push('A: '+ra);if(rb)racc.push('B: '+rb);
   if(racc.length)desc+=' ('+racc.join(', ')+')';
   if(note)desc+=' — '+note;
-  var row={id:uid(),sezione:sez,descrizione:desc,qty:1,fornitore:forn,codice:'',
+  var row={id:uid(),sezione:sez,descrizione:desc,qty:qty,fornitore:forn,codice:codice,
     costo_cad:costo,sconto:0,netto_cad:costo,markup:markup,
     prezzo_vendita:parseFloat((costo*markup).toFixed(4)),stato_approv:'daordinare',data_attesa:''};
   var det=lgo('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
