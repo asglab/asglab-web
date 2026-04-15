@@ -186,10 +186,13 @@ tbody tr:hover td{background:var(--surface2)}
           <div class="chip" onclick="setChip(this,'comm-stato','in-corso');renderCommesse()">In lavoro</div>
           <div class="chip" onclick="setChip(this,'comm-stato','confermata');renderCommesse()">Confermate</div>
           <div class="chip" onclick="setChip(this,'comm-stato','offerta');renderCommesse()">Offerta</div>
-          <div class="chip" onclick="setChip(this,'comm-stato','chiusa');renderCommesse()">Chiuse</div>
           <select id="comm-anno" onchange="renderCommesse()"><option value="">Tutti gli anni</option></select>
           <select id="comm-cliente" onchange="renderCommesse()"><option value="">Tutti i clienti</option></select>
           <div style="flex:1"></div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);cursor:pointer;padding:4px 8px;border:1.5px solid var(--border);border-radius:20px;background:var(--surface);transition:all .15s" id="toggle-chiuse-label">
+            <input type="checkbox" id="toggle-chiuse" onchange="renderCommesse()" style="cursor:pointer">
+            <span>&#128190; Archivio chiuse</span>
+          </label>
           <button class="btn btn-secondary btn-sm" onclick="exportReportCommesse()">Report</button>
           <button class="btn btn-primary btn-sm" onclick="openModal(&quot;commessa&quot;)">+ Nuova</button>
         </div>
@@ -464,29 +467,44 @@ function renderCommesse(){
   var stato=getChip('comm-stato');
   var anno=(document.getElementById('comm-anno')||{}).value||'';
   var cli=(document.getElementById('comm-cliente')||{}).value||'';
+  var mostraChiuse=(document.getElementById('toggle-chiuse')||{}).checked||false;
+
   var anni=[...new Set(comm.map(function(c){return getAnno(c.numero)}).filter(Boolean))].sort().reverse();
   var as=document.getElementById('comm-anno');
   if(as)as.innerHTML='<option value="">Tutti gli anni</option>'+anni.map(function(a){return'<option value="'+a+'"'+(anno===a?' selected':'')+'>'+a+'</option>'}).join('');
   var clienti=[...new Set(comm.map(function(c){return c.cliente}).filter(Boolean))].sort();
   var cs=document.getElementById('comm-cliente');
   if(cs)cs.innerHTML='<option value="">Tutti i clienti</option>'+clienti.map(function(k){return'<option value="'+k+'"'+(cli===k?' selected':'')+'>'+esc(CNAMES[k]||k)+'</option>'}).join('');
+
+  var nChiuse=comm.filter(function(c){return c.stato==='chiusa'}).length;
+  var lbl=document.getElementById('toggle-chiuse-label');
+  if(lbl){lbl.style.borderColor=mostraChiuse?'var(--blue)':'var(--border)';lbl.style.color=mostraChiuse?'var(--blue)':'var(--text3)';}
+  var span=document.querySelector('#toggle-chiuse-label span');
+  if(span)span.textContent='\u{1F4BE} Archivio chiuse'+(nChiuse?' ('+nChiuse+')':'');
+
   var rows=comm;
+  if(!mostraChiuse)rows=rows.filter(function(c){return c.stato!=='chiusa'});
   if(q)rows=rows.filter(function(c){return(c.numero+c.oggetto+c.cliente).toLowerCase().includes(q.toLowerCase())});
   if(stato)rows=rows.filter(function(c){return c.stato===stato});
   if(anno)rows=rows.filter(function(c){return getAnno(c.numero)===anno});
   if(cli)rows=rows.filter(function(c){return c.cliente===cli});
+
   var inCorso=comm.filter(function(c){return c.stato==='in-corso'||c.stato==='confermata'}).length;
   var b=document.getElementById('badge-commesse');if(b){b.textContent=inCorso;b.style.display=inCorso?'':'none'}
   var el=document.getElementById('comm-list');
-  if(!rows.length){el.innerHTML='<div class="empty">Nessuna commessa</div>';return}
+  if(!rows.length){
+    el.innerHTML='<div class="empty">'+(mostraChiuse||stato==='chiusa'?'Nessuna commessa':'Nessuna commessa attiva'+(nChiuse?' — '+nChiuse+' in archivio':''))+'</div>';
+    return;
+  }
   el.innerHTML=rows.map(function(c){
     var imp=parseFloat(c.importo||0);
-    return '<div class="comm-row" onclick="openDetail(\''+esc(c.numero)+'\')">'+
+    var isChiusa=c.stato==='chiusa';
+    return '<div class="comm-row" style="'+(isChiusa?'opacity:.55':'')+'" data-num="'+esc(c.numero)+'" onclick="openDetail(this.dataset.num)">'+
       '<span class="comm-num">'+esc(c.numero)+'</span>'+
-      '<span style="font-size:12px;font-weight:600;color:var(--text3);min-width:80px">'+esc(CNAMES[c.cliente]||c.cliente||'—')+'</span>'+
-      '<span class="comm-obj">'+esc(c.oggetto||'—')+'</span>'+
+      '<span style="font-size:12px;font-weight:600;color:var(--text3);min-width:80px">'+esc(CNAMES[c.cliente]||c.cliente||'\u2014')+'</span>'+
+      '<span class="comm-obj">'+esc(c.oggetto||'\u2014')+'</span>'+
       statoBadge(c.stato)+
-      (imp>0?'<span style="font-size:12px;font-weight:700;color:var(--green);min-width:80px;text-align:right">€'+fmt(imp)+'</span>':'')+
+      (imp>0?'<span style="font-size:12px;font-weight:700;color:var(--green);min-width:80px;text-align:right">\u20ac'+fmt(imp)+'</span>':'')+
       '</div>';
   }).join('');
 }
