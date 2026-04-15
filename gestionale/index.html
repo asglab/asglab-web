@@ -781,12 +781,15 @@ function renderDetTab(tab,el){
           '<td style="font-family:monospace;font-size:12px">'+fmtD(t.data)+'</td>'+
           '<td>'+esc(t.destinazione||'—')+'</td>'+
           '<td style="font-size:11px;color:var(--text3)">'+esc(t.operatore||'—')+'</td>'+
-          '<td style="font-size:11px">'+
-            (t.km>0?'<span style="color:var(--text2)">🚗 '+t.km+'km ('+esc(t.veicolo||'—')+') €'+fmt(t.rimb_km||0)+'</span><br>':'')+
-            (t.diaria>0?'<span style="color:var(--text2)">🏨 Diaria €'+fmt(t.diaria)+'</span><br>':'')+
-            (t.trasporto>0?'<span style="color:var(--text2)">🚆 Trasporto €'+fmt(t.trasporto)+'</span><br>':'')+
-            (t.vitto>0?'<span style="color:var(--text2)">🍽 Vitto €'+fmt(t.vitto)+'</span><br>':'')+
-            (t.altro>0?'<span style="color:var(--text2)">+ Altro €'+fmt(t.altro)+'</span>':'')+
+          '<td style="font-size:11px;line-height:1.8">'+
+            (t.km>0?'<span>🚗 '+t.km+'km × €'+fmt(t.aci_km||0)+'/km <strong>= €'+fmt(t.rimb_km||0)+'</strong></span><br>':'')+
+            (t.diaria>0?'<span>🏨 Diaria €'+fmt(t.diaria)+(t.ngg>1?' ('+t.ngg+'gg)':'')+'</span><br>':'')+
+            (t.treno>0?'<span>🚆 Treno €'+fmt(t.treno)+'</span><br>':'')+
+            (t.aereo>0?'<span>✈ Aereo €'+fmt(t.aereo)+'</span><br>':'')+
+            (t.pedaggi>0?'<span>🛣 Pedaggi €'+fmt(t.pedaggi)+'</span><br>':'')+
+            (t.parcheggio>0?'<span>🅿 Parcheggio €'+fmt(t.parcheggio)+'</span><br>':'')+
+            (t.vitto>0?'<span>🍽 Vitto €'+fmt(t.vitto)+'</span><br>':'')+
+            (t.altro>0?'<span>📎 Altro €'+fmt(t.altro)+'</span>':'')+
           '</td>'+
           '<td style="text-align:right;font-weight:700;color:var(--blue)">€'+fmt(t.totale||0)+'</td>'+
           '<td>'+esc(t.note||'')+'</td>'+
@@ -1188,44 +1191,53 @@ function aggiornaOreModal(){
 }
 
 function aggiornaKmModal(){
-  var kmEl=document.getElementById('f-km');
-  var tarEl=document.getElementById('f-aci-km');
-  var totEl=document.getElementById('f-km-tot');
-  if(!kmEl||!tarEl||!totEl)return;
-  var km=parseFloat(kmEl.value||0);
-  var tar=parseFloat(tarEl.value||0.4774);
-  totEl.textContent='€ '+(km*tar).toFixed(2);
-  // aggiorna totale trasferta
+  var g=function(id){var e=document.getElementById(id);return e?parseFloat(e.value||0):0;};
+  var km=g('f-km');
+  var tar=parseFloat((document.getElementById('f-aci-km')||{value:0.4774}).value||0.4774);
+  var rimb=km*tar;
+  var dispEl=document.getElementById('f-rimb-km-disp');
+  if(dispEl)dispEl.value='€ '+rimb.toFixed(2);
   aggiornaTotTrasferta();
 }
 
 function aggiornaTotTrasferta(){
-  var km=parseFloat((document.getElementById('f-km')||{value:0}).value||0);
+  var g=function(id){var e=document.getElementById(id);return e?parseFloat(e.value||0):0;};
+  var km=g('f-km');
   var aciKm=parseFloat((document.getElementById('f-aci-km')||{value:0.4774}).value||0.4774);
-  var diaria=parseFloat((document.getElementById('f-diaria')||{value:0}).value||0);
-  var trasporto=parseFloat((document.getElementById('f-trasporto')||{value:0}).value||0);
-  var vitto=parseFloat((document.getElementById('f-vitto')||{value:0}).value||0);
-  var altro=parseFloat((document.getElementById('f-altro')||{value:0}).value||0);
   var rimbKm=km*aciKm;
-  var tot=rimbKm+diaria+trasporto+vitto+altro;
+  var diaria=g('f-diaria')*Math.max(1,g('f-ngg'));
+  var treno=g('f-treno');
+  var aereo=g('f-aereo');
+  var pedaggi=g('f-pedaggi');
+  var parcheggio=g('f-parcheggio');
+  var vitto=g('f-vitto');
+  var altro=g('f-altro');
+  var tot=rimbKm+diaria+treno+aereo+pedaggi+parcheggio+vitto+altro;
   var el=document.getElementById('f-trasf-tot');
   if(el)el.textContent='€ '+tot.toFixed(2);
 }
 
 function saveTrasferta(numero){
   var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
-  var km=parseFloat(G('f-km')||0);
+  var gN=function(id){return parseFloat(G(id)||0);};
+  var km=gN('f-km');
   var aciKm=parseFloat(G('f-aci-km')||0.4774);
   var rimbKm=parseFloat((km*aciKm).toFixed(2));
-  var diaria=parseFloat(G('f-diaria')||0);
-  var trasporto=parseFloat(G('f-trasporto')||0);
-  var vitto=parseFloat(G('f-vitto')||0);
-  var altro=parseFloat(G('f-altro')||0);
-  var tot=parseFloat((rimbKm+diaria+trasporto+vitto+altro).toFixed(2));
+  var ngg=Math.max(1,gN('f-ngg'));
+  var diaria=parseFloat((gN('f-diaria')*ngg).toFixed(2));
+  var treno=gN('f-treno');
+  var aereo=gN('f-aereo');
+  var pedaggi=gN('f-pedaggi');
+  var parcheggio=gN('f-parcheggio');
+  var vitto=gN('f-vitto');
+  var altro=gN('f-altro');
+  var tot=parseFloat((rimbKm+diaria+treno+aereo+pedaggi+parcheggio+vitto+altro).toFixed(2));
   var row={id:uid(),data:G('f-data')||today(),
     destinazione:G('f-dest'),operatore:G('f-oper'),
     km:km,veicolo:G('f-veicolo'),aci_km:aciKm,rimb_km:rimbKm,
-    diaria:diaria,trasporto:trasporto,vitto:vitto,altro:altro,
+    ngg:ngg,diaria:diaria,
+    treno:treno,aereo:aereo,pedaggi:pedaggi,parcheggio:parcheggio,
+    vitto:vitto,altro:altro,
     totale:tot,note:G('f-note')};
   var det=lgo('det');
   if(!det[numero])det[numero]={distinta:[],ore:[],trasferte:[]};
@@ -1262,8 +1274,14 @@ function stampaNoteSpese(numero){
   }
   var trasfHtml='';
   if(trasferte.length){
-    trasfHtml='<h2>Trasferte e rimborsi spese</h2><table><thead><tr><th>Data</th><th>Operatore</th><th>Destinazione</th><th class=num>Km (€/km)</th><th class=num>Diaria</th><th class=num>Trasporto</th><th class=num>Vitto</th><th class=num>Altro</th><th class=num>Totale</th><th>Note</th></tr></thead><tbody>'+
-      trasferte.map(function(t){return'<tr><td>'+fmtD(t.data)+'</td><td>'+esc(t.operatore||'—')+'</td><td>'+esc(t.destinazione||'—')+'</td><td class=num>'+(t.km>0?t.km+'km<br><span class=sub>€'+fmt(t.aci_km||0)+'/km = €'+fmt(t.rimb_km||0)+'</span>':'—')+'</td><td class=num>'+(t.diaria>0?'€'+fmt(t.diaria):'—')+'</td><td class=num>'+(t.trasporto>0?'€'+fmt(t.trasporto):'—')+'</td><td class=num>'+(t.vitto>0?'€'+fmt(t.vitto):'—')+'</td><td class=num>'+(t.altro>0?'€'+fmt(t.altro):'—')+'</td><td class=num>€'+fmt(t.totale||0)+'</td><td class=sub>'+esc(t.note||'')+'</td></tr>';}).join('')+
+    trasfHtml='<h2>Trasferte e rimborsi spese</h2><table><thead><tr><th>Data</th><th>Operatore</th><th>Destinazione</th><th>Dettaglio spese</th><th class=num>Totale</th><th>Note</th></tr></thead><tbody>'+
+      trasferte.map(function(t){var vv=function(v,l){return v>0?'<tr><td class=sub>'+l+'</td><td class=num>€'+fmt(v)+'</td></tr>':''};return'<tr><td>'+fmtD(t.data)+'</td><td>'+esc(t.operatore||'—')+'</td><td>'+esc(t.destinazione||'—')+'</td>'+
+        '<td><table style=width:100%;font-size:9px;border:none>'+
+        (t.km>0?'<tr><td>🚗 '+t.km+'km × €'+fmt(t.aci_km||0)+'/km</td><td class=num>€'+fmt(t.rimb_km||0)+'</td></tr>':'')+
+        (t.diaria>0?'<tr><td>🏨 Diaria'+(t.ngg>1?' ('+t.ngg+'gg)':'')+'</td><td class=num>€'+fmt(t.diaria)+'</td></tr>':'')+
+        vv(t.treno,'🚆 Treno')+vv(t.aereo,'✈ Aereo')+vv(t.pedaggi,'🛣 Pedaggi')+vv(t.parcheggio,'🅿 Parcheggio')+vv(t.vitto,'🍽 Vitto')+vv(t.altro,'📎 Altro')+
+        '</table></td>'+
+        '<td class=num><strong>€'+fmt(t.totale||0)+'</strong></td><td class=sub>'+esc(t.note||'')+'</td></tr>';}).join('')+
       '<tr class=tot><td colspan=8 class=num>Totale trasferte</td><td class=num>€'+fmt(totTrasf)+'</td><td></td></tr></tbody></table>';
   }
   var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Nota Spese — '+esc(numero)+'</title><style>'+css+'</style></head><body>'+
@@ -1868,6 +1886,84 @@ function getModalHTML(type,extra){
     '<div class="form-row"><div class="form-group"><label>Ore</label><input class="form-control" id="f-ore" type="number" step="0.5" value="8"></div>'+
     '<div class="form-group"><label>Tariffa (€/h)</label><input class="form-control" id="f-tariffa" type="number" value="65"></div></div>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveOra(\''+esc(num2)+'\')">Aggiungi</button></div>'}}
+  if(type==='add-trasferta'){var num3=extra||'';return{title:'Aggiungi trasferta / rimborso spese',body:
+    '<div class="form-row">'+
+      '<div class="form-group"><label>Data</label><input class="form-control" id="f-data" type="date" value="'+today()+'"></div>'+
+      '<div class="form-group"><label>Operatore</label><input class="form-control" id="f-oper" placeholder="es. Rossi M."></div>'+
+    '</div>'+
+    '<div class="form-group"><label>Destinazione / luogo intervento</label><input class="form-control" id="f-dest" placeholder="es. Milano, Via Roma 5 — cliente XYZ"></div>'+
+
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:14px 0 8px;border-bottom:1px solid var(--border);padding-bottom:4px">🚗 Rimborso chilometrico ACI</div>'+
+    '<div class="form-row">'+
+      '<div class="form-group"><label>Km percorsi (andata+ritorno)</label>'+
+        '<input class="form-control" id="f-km" type="number" step="1" value="0" oninput="aggiornaKmModal()">'+
+      '</div>'+
+      '<div class="form-group"><label>Veicolo (per documentazione)</label>'+
+        '<input class="form-control" id="f-veicolo" placeholder="es. Fiat Panda 1.2 benzina">'+
+      '</div>'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-group"><label>Tariffa ACI 2026 (€/km)</label>'+
+        '<select class="form-control" id="f-aci-km" onchange="aggiornaKmModal()">'+
+          '<option value="0.4774">Benzina — €0.4774/km</option>'+
+          '<option value="0.4521">Diesel — €0.4521/km</option>'+
+          '<option value="0.4650">Ibrida (non plug-in) — €0.4650/km</option>'+
+          '<option value="0.3890">Elettrica / Plug-in — €0.3890/km</option>'+
+        '</select>'+
+      '</div>'+
+      '<div class="form-group"><label>Rimborso km calcolato</label>'+
+        '<input class="form-control" id="f-rimb-km-disp" readonly value="€ 0.00" style="background:var(--surface2);color:var(--blue);font-weight:700;cursor:not-allowed">'+
+      '</div>'+
+    '</div>'+
+
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:14px 0 8px;border-bottom:1px solid var(--border);padding-bottom:4px">🏨 Trasferta diaria e vitto</div>'+
+    '<div style="background:var(--surface2);border-radius:5px;padding:8px 10px;font-size:11px;color:var(--text3);margin-bottom:10px">'+
+      'Diaria €130/gg = 2 pernottamenti (€65 cad.) + pranzo (€32.50) + cena (€32.50). Inserire importo effettivo rendicontato.'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-group"><label>Diaria giornaliera (€)</label>'+
+        '<input class="form-control" id="f-diaria" type="number" step="0.01" value="0" placeholder="0.00" oninput="aggiornaTotTrasferta()">'+
+      '</div>'+
+      '<div class="form-group"><label>N. giorni</label>'+
+        '<input class="form-control" id="f-ngg" type="number" step="1" value="1" oninput="aggiornaTotTrasferta()">'+
+      '</div>'+
+    '</div>'+
+
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:14px 0 8px;border-bottom:1px solid var(--border);padding-bottom:4px">🚆 Trasporti e altre spese</div>'+
+    '<div class="form-row">'+
+      '<div class="form-group"><label>Treno / Trenitalia (€)</label>'+
+        '<input class="form-control" id="f-treno" type="number" step="0.01" value="0" placeholder="0.00" oninput="aggiornaTotTrasferta()">'+
+      '</div>'+
+      '<div class="form-group"><label>Aereo / IATA (€)</label>'+
+        '<input class="form-control" id="f-aereo" type="number" step="0.01" value="0" placeholder="0.00" oninput="aggiornaTotTrasferta()">'+
+      '</div>'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-group"><label>Pedaggi autostrada (€)</label>'+
+        '<input class="form-control" id="f-pedaggi" type="number" step="0.01" value="0" placeholder="0.00" oninput="aggiornaTotTrasferta()">'+
+      '</div>'+
+      '<div class="form-group"><label>Posteggio / parcheggio (€)</label>'+
+        '<input class="form-control" id="f-parcheggio" type="number" step="0.01" value="0" placeholder="0.00" oninput="aggiornaTotTrasferta()">'+
+      '</div>'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-group"><label>Pasti / vitto extra (€)</label>'+
+        '<input class="form-control" id="f-vitto" type="number" step="0.01" value="0" placeholder="0.00" oninput="aggiornaTotTrasferta()">'+
+      '</div>'+
+      '<div class="form-group"><label>Altro (€)</label>'+
+        '<input class="form-control" id="f-altro" type="number" step="0.01" value="0" placeholder="0.00" oninput="aggiornaTotTrasferta()">'+
+      '</div>'+
+    '</div>'+
+    '<div class="form-group"><label>Descrizione / note / riferimenti ricevute</label>'+
+      '<input class="form-control" id="f-note" placeholder="es. Fattura n. 123, biglietto Milano-Roma, scontrino hotel...">'+
+    '</div>'+
+    '<div style="background:var(--surface2);border-radius:6px;padding:10px 14px;font-size:13px;display:flex;align-items:center;justify-content:space-between;margin-top:4px">'+
+      '<span style="color:var(--text3)">Totale trasferta</span>'+
+      '<strong id="f-trasf-tot" style="color:var(--blue);font-size:18px">€ 0.00</strong>'+
+    '</div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
+    '<button class="btn btn-primary" onclick="saveTrasferta(\''+esc(num3)+'\')">Salva trasferta</button></div>'}}
+
   if(type==='config'){var cfg2=lgo('cfg');var mk2=cfg2.markup_clienti||{};return{title:'Configurazione',body:
     '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">Nextcloud</div>'+
     '<div class="form-group"><label>URL WebDAV / API (proxy)</label><input class="form-control" id="cfg-url" value="'+esc(cfg2.nc_url||'https://dash.asglab.it:8766')+'" placeholder="https://dash.asglab.it:8766"></div>'+
