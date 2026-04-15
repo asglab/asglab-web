@@ -761,7 +761,7 @@ function renderHome(){
         return`<div class="list-row" onclick="navTo('contabilita');setTimeout(()=>{contTab('scadenze');openModal('edit-scad','${s.id}')},80)">
           <div class="sdot ${d<=3?'sdot-red':d<=7?'sdot-amber':'sdot-gray'}"></div>
           <div class="list-row-main"><div class="list-row-title" style="font-size:12px">${s.descrizione||'—'}</div><div class="list-row-sub">${fmtD(s.data)}</div></div>
-          ${imp>0?`<div class="list-row-val ${isInc?'green':'red'}">${isInc?'+':'−'}€${fmt(imp)}</div>`:'<div class="list-row-val" style="color:var(--text4);font-size:11px">da def.</div>'}
+          ${imp>0?'<div class="list-row-val '+(isInc?'green':'red')+'">'+( isInc?'+':'−')+'€'+fmt(imp)+'</div>':'<div class="list-row-val" style="color:var(--text4);font-size:11px">da def.</div>'}
         </div>`;
       }).join('');
     }
@@ -869,7 +869,7 @@ function renderApprov(){
         <span class="approv-group-nome">${forn}</span>
         <span class="approv-group-count">${items.length} componenti${nDaOrd>0?' · '+nDaOrd+' da ordinare':''}</span>
         <span style="flex:1"></span>
-        ${nDaOrd>0?`<button class="btn btn-primary btn-sm" onclick="apriRDO('${forn.replace(/'/g,"\'")}')">✉ RDO</button>`:''}
+        ${nDaOrd>0?'<button class="btn btn-primary btn-sm" onclick="apriRDO(\'${forn.replace(/\'/g,"\\'")}\')">✉ RDO</button>':''}
       </div>
       ${items.map(r=>`<div class="approv-row">
         <div class="approv-desc">
@@ -1037,8 +1037,8 @@ function renderFlussoCassa(){
       </div>
     </div>
 
-    ${minSaldo<0?`<div style="background:var(--red-lt);border:1px solid var(--red-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--red);font-weight:600;">⚠ Attenzione: la proiezione mostra un possibile deficit di cassa. Considera di anticipare incassi o posticipare pagamenti.</div>`:''}
-    ${minSaldo>=0&&minSaldo<saldoAttuale*0.2?`<div style="background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--amber);font-weight:600;">⚡ Il saldo scenderà significativamente — tieni monitorati gli incassi.</div>`:''}
+    ${minSaldo<0?'<div style="background:var(--red-lt);border:1px solid var(--red-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--red);font-weight:600;">⚠ Attenzione: la proiezione mostra un possibile deficit di cassa. Considera di anticipare incassi o posticipare pagamenti.</div>':''}
+    ${minSaldo>=0&&minSaldo<saldoAttuale*0.2?'<div style="background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--amber);font-weight:600;">⚡ Il saldo scenderà significativamente — tieni monitorati gli incassi.</div>':''}
   </div>`;
 }
 
@@ -1138,10 +1138,10 @@ function renderScadContabilita(){
         <div style="font-size:10px;color:${saldoProiettato30<0?'var(--red)':saldoProiettato30<saldoAtt*0.2?'var(--amber)':'var(--green)'}">${saldoProiettato30<0?'⚠ deficit atteso':saldoProiettato30<totUscite30*0.5?'⚡ tieni monitorato':'✓ ok'}</div>
       </div>
     </div>
-    ${totUscite30>0?`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;">
-      <button class="filter-chip" onclick="setFiltroScad(this,'pagamento')" style="font-size:11px">↓ Vedi pagamenti da fare</button>
-      <button class="filter-chip" onclick="setFiltroScad(this,'incasso')" style="font-size:11px">↑ Vedi incassi attesi</button>
-    </div>`:''}
+    ${totUscite30>0?'<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;">'+
+      '<button class="filter-chip" onclick="setFiltroScad(this,\'pagamento\')" style="font-size:11px">\u2193 Vedi pagamenti da fare</button>'+
+      '<button class="filter-chip" onclick="setFiltroScad(this,\'incasso\')" style="font-size:11px">\u2191 Vedi incassi attesi</button>'+
+    '</div>':''}
   </div>`:'';
 
   if(summary)summary.innerHTML=(cashPanel||'')+`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
@@ -1593,7 +1593,7 @@ function renderMag(){
           <span class="mono" style="${qtyColor};min-width:28px;text-align:center;">${r.qty||0}</span>
           <button onclick="aggMagQty('${r.id}',+1)" style="border:1px solid var(--border);background:#fff;border-radius:5px;width:22px;height:22px;cursor:pointer;font-weight:700;font-size:14px;line-height:1;">+</button>
         </div>
-        ${low?`<div style="font-size:10px;color:var(--red);font-weight:700;margin-top:2px;">⚠ sotto scorta</div>`:''}
+        ${low?'<div style="font-size:10px;color:var(--red);font-weight:700;margin-top:2px;">⚠ sotto scorta</div>':''}
       </td>
       <td class="mono" style="text-align:center;color:var(--text3)">${r.qty_min||0}</td>
       <td class="mono">€${fmt2(r.costo_cad||0)}</td>
@@ -1654,7 +1654,7 @@ function renderFatt(){
       <td style="padding:7px 8px;color:${scadColor}">${fmtD(f.data_scad)||'—'}</td>
       <td style="padding:7px 8px"><span class="badge ${pagata?'badge-green':'badge-amber'}">${pagata?'Pagata':'Aperta'}</span></td>
       <td style="padding:7px 8px;font-size:11px;color:var(--text3)">${f.conto||'—'}</td>
-      <td style="padding:7px 8px;text-align:center">${link?`<a href="${link}" target="_blank" style="font-size:14px;text-decoration:none;opacity:.6">📁</a>`:'—'}</td>
+      <td style="padding:7px 8px;text-align:center">${link?'<a href="'+link+'" target="_blank" style="font-size:14px;text-decoration:none;opacity:.6">📁</a>':'—'}</td>
     </tr>`;
   }).join('');
 }
@@ -1768,9 +1768,9 @@ function renderCassa(){
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-top:12px;">
       <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Proiezione liquidità (fatture aperte)</div>
       <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px;">
-        ${totIncasso>0?`<div><div style="font-size:10px;color:var(--text3)">Da incassare (${daIncassare.length} FE)</div><div style="font-size:16px;font-weight:700;color:var(--green)">+€${fmt(totIncasso)}</div></div>`:''}
-        ${totUscite>0?`<div><div style="font-size:10px;color:var(--text3)">Da pagare (${daPagare.length} FA)</div><div style="font-size:16px;font-weight:700;color:var(--red)">−€${fmt(totUscite)}</div></div>`:''}
-        ${totFiscali>0?`<div><div style="font-size:10px;color:var(--text3)">Scadenze fiscali 90gg</div><div style="font-size:16px;font-weight:700;color:var(--amber)">−€${fmt(totFiscali)}</div></div>`:''}
+        ${totIncasso>0?'<div><div style="font-size:10px;color:var(--text3)">Da incassare (${daIncassare.length} FE)</div><div style="font-size:16px;font-weight:700;color:var(--green)">+€${fmt(totIncasso)}</div></div>':''}
+        ${totUscite>0?'<div><div style="font-size:10px;color:var(--text3)">Da pagare (${daPagare.length} FA)</div><div style="font-size:16px;font-weight:700;color:var(--red)">−€${fmt(totUscite)}</div></div>':''}
+        ${totFiscali>0?'<div><div style="font-size:10px;color:var(--text3)">Scadenze fiscali 90gg</div><div style="font-size:16px;font-weight:700;color:var(--amber)">−€${fmt(totFiscali)}</div></div>':''}
       </div>
       <div style="border-top:1px solid var(--border);padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
         <span style="font-size:12px;color:var(--text3)">Proiezione netta</span>
@@ -1786,7 +1786,7 @@ function renderTodo(){
   const sorted=[...data].sort((a,b)=>(a.done?1:0)-(b.done?1:0)||({'alta':0,'media':1,'bassa':2}[a.pri]||1)-({'alta':0,'media':1,'bassa':2}[b.pri]||1));
   const list=document.getElementById('todo-list');
   if(!sorted.length){list.innerHTML='<div class="empty">Nessuna azione pendente</div>';return;}
-  list.innerHTML=sorted.map(t=>`<div class="item"><input type="checkbox" class="tcb" ${t.done?'checked':''} onchange="togTodo('${t.id}')"><div class="ttx ${t.done?'done':''}">${t.testo}</div>${t.pri&&t.pri!=='bassa'?`<span class="tpr pr-${t.pri}">${t.pri}</span>`:''}<button class="xbtn" onclick="delLoc('todo','${t.id}')">✕</button></div>`).join('');
+  list.innerHTML=sorted.map(t=>`<div class="item"><input type="checkbox" class="tcb" ${t.done?'checked':''} onchange="togTodo('${t.id}')"><div class="ttx ${t.done?'done':''}">${t.testo}</div>${t.pri&&t.pri!=='bassa'?'<span class="tpr pr-${t.pri}">${t.pri}</span>':''}<button class="xbtn" onclick="delLoc('todo','${t.id}')">✕</button></div>`).join('');
 }
 
 
@@ -1838,9 +1838,9 @@ function openDetail(numero){
   <div style="font-size:11px;color:var(--text3);margin-top:4px">${FLOW_DESC[stato]}</div>`;
 
   document.getElementById('det-meta').innerHTML=`
-    ${tipo?`<span class="bdg ${TIPO_C[tipo]||''}">${TIPI[tipo]||tipo}</span>`:''}
+    ${tipo?'<span class="bdg ${TIPO_C[tipo]||\'\'}">${TIPI[tipo]||tipo}</span>':''}
     <span style="font-size:13px;color:var(--text2);font-weight:500">${CNAMES[getCod(numero)]||c.cliente||'—'}</span>
-    ${c.data_apertura?`<span style="font-size:11px;color:var(--text3)">aperta ${fmtD(c.data_apertura)}</span>`:''}
+    ${c.data_apertura?'<span style="font-size:11px;color:var(--text3)">aperta ${fmtD(c.data_apertura)}</span>':''}
     ${flowHTML}
   `;
 
@@ -1917,7 +1917,7 @@ function tabRiepilogo(c,cd){
   </div>
   <div class="panel"><div class="info-grid">
     ${[['Numero',c.numero],['Tipo',TIPI[c.tipo_commessa]||'—'],['Stato',SL[c.stato]||'—'],['Cliente',CNAMES[getCod(c.numero)]||c.cliente||'—'],['Apertura',fmtD(c.data_apertura)],['Consegna prev.',fmtD(c.data_consegna)]].map(([l,v])=>`<div><div class="ir-l">${l}</div><div class="ir-v">${v}</div></div>`).join('')}
-    ${c.note?`<div style="grid-column:1/-1"><div class="ir-l">Note</div><div class="ir-v">${c.note}</div></div>`:''}
+    ${c.note?'<div style="grid-column:1/-1"><div class="ir-l">Note</div><div class="ir-v">${c.note}</div></div>':''}
   </div></div>`;
 }
 
@@ -1962,10 +1962,10 @@ function tabOfferta(c,cd){
     <label style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:6px;">Note interne — risposta cliente</label>
     <textarea id="off-note-cliente" style="width:100%;min-height:60px;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.6;color:var(--text2);font-family:var(--font);outline:none;resize:vertical;" placeholder="Annotazioni interne su feedback, trattative, revisioni richieste…">${off.note_cliente||''}</textarea>
   </div>
-  ${off.storico&&off.storico.length?`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;">
-    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">📋 Storico</div>
-    ${off.storico.slice(-6).reverse().map(s=>`<div style="font-size:12px;color:var(--text3);padding:4px 0;border-bottom:1px solid var(--border);">${s.data.slice(0,10)} — <strong>${stati[s.stato]||s.stato}</strong>${s.nota?' · '+s.nota:''}</div>`).join('')}
-  </div>`:''}`;
+  ${off.storico&&off.storico.length?'<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;">'+
+    '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">📋 Storico</div>'+
+    off.storico.slice(-6).reverse().map(s=>'<div style="font-size:12px;color:var(--text3);padding:4px 0;border-bottom:1px solid var(--border);">'+s.data.slice(0,10)+' — <strong>'+(stati[s.stato]||s.stato)+'</strong>'+(s.nota?' · '+s.nota:'')+' </div>').join('')+
+  '</div>':''}`;
 }
 
 function aggiornaColoreBordoOfferta(sel){
@@ -2112,7 +2112,7 @@ function openRDOApprov(numero,fornNome){
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeM()">Annulla</button>
       <button class="btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('rdoa-subj').value+'\\n\\n'+document.getElementById('rdoa-body').value).then(()=>showToast('Copiato!'))">📋 Copia</button>
-      ${email?`<a class="btn" href="mailto:${email}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(testo)}" onclick="closeM()">📧 Apri email</a>`:`<button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('rdoa-subj').value+'\\n\\n'+document.getElementById('rdoa-body').value).then(()=>{showToast('Copiato — incolla nel client email');closeM();})">📋 Copia tutto</button>`}
+      ${email?'<a class="btn" href="mailto:${email}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(testo)}" onclick="closeM()">📧 Apri email</a>':'<button class="btn" onclick="navigator.clipboard.writeText(document.getElementById(\'rdoa-subj\').value+\'\\n\\n\'+document.getElementById(\'rdoa-body\').value).then(()=>{showToast(\'Copiato — incolla nel client email\');closeM();})">📋 Copia tutto</button>'}
     </div>`;
   document.getElementById('modal-overlay').classList.add('show');
 }
@@ -2181,32 +2181,32 @@ function tabDocumenti(c,cd){
 
   return`
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-    ${ncFolder?`<a id="nc-folder-link-${c.numero}" href="${ncFolder}" target="_blank" class="btn btn-primary btn-sm">📂 Apri cartella NC</a>`:''}
+    ${ncFolder?'<a id="nc-folder-link-${c.numero}" href="${ncFolder}" target="_blank" class="btn btn-primary btn-sm">📂 Apri cartella NC</a>':''}
     <button class="btn btn-ghost btn-sm" onclick="openModal('add-doc','${c.numero}')">+ Aggiungi riferimento</button>
-    ${ncPath&&cfg.ok?`<button class="btn btn-ghost btn-sm" onclick="(async()=>{document.getElementById('${fileListId}').innerHTML='<span style='font-size:12px;color:var(--text4)'>Aggiornamento…</span>';const files=await wListNC('${ncPath}');document.getElementById('${fileListId}').innerHTML=files.length?files.map(f=>'<div>'+f.name+'</div>').join(''):'Nessun file';})()">↻ Aggiorna</button>`:''}
+    ${ncPath&&cfg.ok?'<button class="btn btn-ghost btn-sm" onclick="(async()=>{document.getElementById(\'${fileListId}\').innerHTML=\'<span style=\'font-size:12px;color:var(--text4)\'>Aggiornamento…</span>\';const files=await wListNC(\'${ncPath}\');document.getElementById(\'${fileListId}\').innerHTML=files.length?files.map(f=>\'<div>\'+f.name+\'</div>\').join(\'\'):\'Nessun file\';})()">↻ Aggiorna</button>':''}
   </div>
 
-  ${ncPath&&cfg.ok?`<div style="margin-bottom:12px;">
-    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">File su Nextcloud — ${ncPath}</div>
-    <div id="${fileListId}"><span style="color:var(--text4);font-size:12px">In caricamento…</span></div>
-  </div>`:`<div style="background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;color:var(--amber);margin-bottom:12px;">Configura Nextcloud per vedere i file della commessa</div>`}
+  ${ncPath&&cfg.ok?'<div style="margin-bottom:12px;">'+
+    '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">File su Nextcloud \u2014 '+ncPath+'</div>'+
+    '<div id="'+fileListId+'"><span style="color:var(--text4);font-size:12px">In caricamento\u2026</span></div>'+
+  '</div>':'<div style="background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;color:var(--amber);margin-bottom:12px;">Configura Nextcloud per vedere i file della commessa</div>'}
 
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
     <div style="font-size:13px;font-weight:700;color:var(--text)">Riferimenti documenti</div>
     <button class="btn btn-sm" onclick="openModal('add-doc','${c.numero}')">+ aggiungi riferimento</button>
   </div>
 
-  ${docs.length?`<div style="display:grid;gap:8px;">
-    ${docs.map(d=>`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:flex-start;gap:12px;">
-      <span style="font-size:20px;flex-shrink:0">${tipoDocEmoji(d.tipo)}</span>
-      <div style="flex:1;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">${d.nome||'—'}</div>
-        <div style="font-size:12px;color:var(--text3)">${d.tipo||''} ${d.data?'· '+fmtD(d.data):''} ${d.note?'· '+d.note:''}</div>
-        ${d.url?`<a href="${d.url}" target="_blank" style="font-size:11px;color:var(--blue);font-weight:600;">↗ apri</a>`:''}
-      </div>
-      <button class="xbtn" onclick="delDoc('${d.id}','${c.numero}')">✕</button>
-    </div>`).join('')}
-  </div>`:`<div class="empty">Nessun documento collegato. Usa il bottone sopra per aggiungere un riferimento (link Nextcloud, numero schema, nota).</div>`}`;
+  ${docs.length?'<div style="display:grid;gap:8px;">'+
+    docs.map(d=>'<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:flex-start;gap:12px;">'+
+      '<span style="font-size:20px;flex-shrink:0">'+tipoDocEmoji(d.tipo)+'</span>'+
+      '<div style="flex:1;">'+
+        '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">'+(d.nome||'\u2014')+'</div>'+
+        '<div style="font-size:12px;color:var(--text3)">'+(d.tipo||'')+' '+(d.data?'\u00b7 '+fmtD(d.data):'')+' '+(d.note?'\u00b7 '+d.note:'')+'</div>'+
+        (d.url?'<a href="'+d.url+'" target="_blank" style="font-size:11px;color:var(--blue);font-weight:600;">&nearr; apri</a>':'')+
+      '</div>'+
+      '<button class="xbtn" onclick="delDoc(\''+d.id+'\',\''+c.numero+'\')">&times;</button>'+
+    '</div>').join('')+
+  '</div>':'<div class="empty">Nessun documento collegato. Usa il bottone sopra per aggiungere un riferimento (link Nextcloud, numero schema, nota).</div>'}`;  
 }
 
 function tipoDocEmoji(t){const m={schema:'📐',foto:'📷',email:'📧',offerta:'📄',ordine:'🧾',certificato:'📋',disegno:'✏️',altro:'📎'};return m[t]||'📎';}
@@ -2351,18 +2351,18 @@ function getModalHTML(type,extra){
 
   <!-- Panel: Magazzino -->
   <div id="apanel-mag" style="display:none;border-top:1px solid var(--border);padding-top:12px;margin-top:2px;">
-    ${magItems.length?`
-    <input id="mag-q" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px 10px;font-size:14px;outline:none;margin-bottom:8px;" placeholder="🔍 cerca nel magazzino…" oninput="magFilter()">
-    <div id="mag-results" style="max-height:280px;overflow-y:auto;">
-      ${magItems.map(m=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border);font-size:13px;">
-        <div style="flex:1;">
-          <div style="font-weight:600">${m.codice?'<span style="font-family:monospace;color:var(--green);font-weight:700">'+m.codice+'</span> — ':''} ${m.descrizione||'—'}</div>
-          <div style="font-size:11px;color:var(--text3)">${m.fornitore||''} · giacenza: <strong style="color:${parseFloat(m.qty||0)>0?'var(--green)':'var(--red)'}">${m.qty||0}</strong></div>
-        </div>
-        <span style="font-weight:700;white-space:nowrap">€${fmt2(m.costo_cad||0)}</span>
-        <button style="background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;" onclick="usaMagazzino(${JSON.stringify(m).replace(/"/g,'&quot;')},'${extra}')">+ usa</button>
-      </div>`).join('')}
-    </div>`:'<div class="empty" style="padding:20px">Magazzino vuoto — aggiungi componenti nella sezione 📦 Magazzino</div>'}
+    ${magItems.length?
+    '<input id="mag-q" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px 10px;font-size:14px;outline:none;margin-bottom:8px;" placeholder="\ud83d\udd0d cerca nel magazzino\u2026" oninput="magFilter()">'+
+    '<div id="mag-results" style="max-height:280px;overflow-y:auto;">'+
+      magItems.map(m=>'<div style="display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border);font-size:13px;">'+
+        '<div style="flex:1;">'+
+          '<div style="font-weight:600">'+(m.codice?'<span style="font-family:monospace;color:var(--green);font-weight:700">'+m.codice+'</span> \u2014 ':'')+' '+(m.descrizione||'\u2014')+'</div>'+
+          '<div style="font-size:11px;color:var(--text3)">'+(m.fornitore||'')+' \u00b7 giacenza: <strong style="color:'+(parseFloat(m.qty||0)>0?'var(--green)':'var(--red)')+'">'+(m.qty||0)+'</strong></div>'+
+        '</div>'+
+        '<span style="font-weight:700;white-space:nowrap">\u20ac'+fmt2(m.costo_cad||0)+'</span>'+
+        '<button style="background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;" onclick="usaMagazzino('+JSON.stringify(m).replace(/"/g,'&quot;')+',\''+extra+'\')">&plus; usa</button>'+
+      '</div>').join('')+
+    '</div>':'<div class="empty" style="padding:20px">Magazzino vuoto \u2014 aggiungi componenti nella sezione \ud83d\udce6 Magazzino</div>'}
   </div>
 
   <!-- Panel: Configuratore tubo flessibile -->
@@ -2949,7 +2949,7 @@ ERS-05-2025,ERS,Ricerca pompe reversibili,ricerca,0,2025-11-01,,chiusa,</div>
       <div class="modal-actions">
         <button class="btn-ghost" onclick="closeM()">Annulla</button>
         <button class="btn-ghost" onclick="copyRDO()">📋 Copia testo</button>
-        ${f.contatti?.email?`<a class="btn" href="mailto:${f.contatti.email}?subject=${encodeURIComponent('Richiesta di offerta — '+oggi)}&body=${encodeURIComponent(testo)}" onclick="closeM()">📧 Apri email</a>`:'<button class="btn" onclick="copyRDO()">📋 Copia tutto</button>'}
+        ${f.contatti?.email?'<a class="btn" href="mailto:'+f.contatti.email+'?subject='+encodeURIComponent('Richiesta di offerta \u2014 '+oggi)+'&body='+encodeURIComponent(testo)+'" onclick="closeM()">📧 Apri email</a>':'<button class="btn" onclick="copyRDO()">📋 Copia tutto</button>'}
       </div>
     </div>
     <div id="rdo-panel-tpl" style="display:none;">
@@ -3521,11 +3521,11 @@ function aggTuboPreview(){
   const codT=p[0]||'';const normaT=p[1]||'';const pressT=p[2]||'';const dn=parseInt(p[3]||0);const pollici=p[4]||'';
 
   const lungIn=(lung/25.4).toFixed(1);
-  const raStr=`${ra.label} ${ra.curva==='dritto'?'↔':'curva '+ra.curva}`;
-  const rbStr=`${rb.label} ${rb.curva==='dritto'?'↔':'curva '+rb.curva}`;
+  const raStr=ra.label+' '+(ra.curva==='dritto'?'↔':'curva '+ra.curva);
+  const rbStr=rb.label+' '+(rb.curva==='dritto'?'↔':'curva '+rb.curva);
 
-  let desc=`Tubo flessibile raccordato — ${normaT} DN${dn} (${pollici}) · ${lung} mm (${lungIn}")\n  Lato A: ${raStr}\n  Lato B: ${rbStr}`;
-  if(doubleCurva)desc+=`\n  Orientamento doppia curva: ${orient}°`;
+  let desc='Tubo flessibile raccordato \u2014 '+normaT+' DN'+dn+' ('+pollici+') \u00b7 '+lung+' mm ('+lungIn+'")\n  Lato A: '+raStr+'\n  Lato B: '+rbStr;
+  if(doubleCurva)desc+='\n  Orientamento doppia curva: '+orient+'°';
 
   const raShort=ra.std+ra.mis.replace(/[^0-9/]/g,'').replace('/','');
   const rbShort=rb.std+rb.mis.replace(/[^0-9/]/g,'').replace('/','');
@@ -3542,7 +3542,7 @@ function aggTuboPreview(){
     <div style="font-size:12px;color:var(--text3)">Norma: ${normaT} · Pressione max: ${pressT} bar · Fornitore: Pa.Co Fluid</div>
     <div style="font-size:12px;color:var(--text3);margin-top:3px;font-family:monospace">${codice}</div>
     <div style="font-size:12px;color:var(--text2);margin-top:4px">Prezzo stimato: <strong>€${fmt2(prezzoStimato)}</strong> cad — <em>da confermare con Pa.Co Fluid</em></div>
-    ${doubleCurva?`<div style="font-size:11px;background:#fef3c7;border:1px solid #f59e0b;border-radius:5px;padding:4px 8px;margin-top:6px;color:#78350f;">⚠ Doppia curva orientamento ${orient}° — comunicare esplicitamente a Pa.Co nell'ordine.</div>`:''}`;
+    ${doubleCurva?'<div style="font-size:11px;background:#fef3c7;border:1px solid #f59e0b;border-radius:5px;padding:4px 8px;margin-top:6px;color:#78350f;">⚠ Doppia curva orientamento ${orient}° — comunicare esplicitamente a Pa.Co nell\'ordine.</div>':''}`;
 
   prev.dataset.desc=desc.replace(/\n/g,' | ');
   prev.dataset.cod=codice;prev.dataset.prezzo=prezzoStimato;prev.dataset.qty=qty;
@@ -3620,7 +3620,7 @@ async function updateComm(){
   // aggiorna header senza ricaricare tutto
   document.getElementById('det-title').textContent=updated.oggetto||'—';
   const tipo=updated.tipo_commessa||'';
-  document.getElementById('det-meta').innerHTML=`<span class="bdg s-${(updated.stato||'offerta').replace(' ','-')}">${SL[updated.stato]||'—'}</span>${tipo?`<span class="bdg ${TIPO_C[tipo]||''}">${TIPI[tipo]||tipo}</span>`:''}<span style="font-size:12px;color:var(--text2)">${CNAMES[getCod(c.numero)]||c.cliente||'—'}</span>`;
+  document.getElementById('det-meta').innerHTML=`<span class="bdg s-${(updated.stato||'offerta').replace(' ','-')}">${SL[updated.stato]||'—'}</span>${tipo?'<span class="bdg ${TIPO_C[tipo]||\'\'}">${TIPI[tipo]||tipo}</span>':''}<span style="font-size:12px;color:var(--text2)">${CNAMES[getCod(c.numero)]||c.cliente||'—'}</span>`;
   buildTabs(tipo,updated,CC._det);
 }
 
@@ -3730,7 +3730,7 @@ async function parseMovimenti(file, banca){
       renderCassa();
     }
 
-    const msg=`✓ ${nuovi.length} nuovi mov. su ${movimenti.length} totali${saldoFinale!==null?` · saldo aggiornato: €${fmt(saldoFinale)}`:''}`;
+    const msg=`✓ ${nuovi.length} nuovi mov. su ${movimenti.length} totali${saldoFinale!==null?' · saldo aggiornato: €${fmt(saldoFinale)}':''}`;
     if(resEl)resEl.innerHTML=`<span style="color:var(--green);font-weight:600">${msg}</span>`;
     showToast(msg);
 
@@ -4358,7 +4358,7 @@ function renderFornCards(list){
         <div>
           <div class="forn-name">${f.nome}</div>
           <div class="forn-zone">📍 ${f.zona}</div>
-          ${f.accordo?`<div style="font-size:10px;color:var(--green);font-weight:700;margin-top:2px">✓ ${f.accordo}</div>`:''}
+          ${f.accordo?'<div style="font-size:10px;color:var(--green);font-weight:700;margin-top:2px">✓ ${f.accordo}</div>':''}
         </div>
       </div>
       <div class="forn-body">
@@ -4451,7 +4451,7 @@ function searchComp(){
           <div class="comp-sub">📍 ${f.zona} ${f.accordo?'· ✓ '+f.accordo:''}</div>
         </div>
         <div class="comp-actions">
-          ${f.url?`<a class="forn-btn" href="${f.url}" target="_blank">🌐</a>`:''}
+          ${f.url?'<a class="forn-btn" href="${f.url}" target="_blank">🌐</a>':''}
           <button class="forn-btn primary" onclick="openRDO('${f.id}')">✉ RDO</button>
         </div>
       </div>`;
@@ -4655,8 +4655,8 @@ function renderImportPreview(rows){
   const preview=rows.slice(0,8);
   el.innerHTML=`
   <div style="display:flex;gap:12px;flex-wrap:wrap;margin:12px 0">
-    ${fe.length?`<div style="background:#dcfce7;border:1px solid #6ee7a0;border-radius:8px;padding:8px 14px;font-size:13px"><strong style="color:#166534">${fe.length} fatture emesse</strong><span style="color:#166534;margin-left:6px">€ ${totFE.toFixed(2)}</span></div>`:''}
-    ${fa.length?`<div style="background:#dbeafe;border:1px solid #7fb3f5;border-radius:8px;padding:8px 14px;font-size:13px"><strong style="color:#1e40af">${fa.length} fatture ricevute</strong><span style="color:#1e40af;margin-left:6px">€ ${totFA.toFixed(2)}</span></div>`:''}
+    ${fe.length?'<div style="background:#dcfce7;border:1px solid #6ee7a0;border-radius:8px;padding:8px 14px;font-size:13px"><strong style="color:#166534">${fe.length} fatture emesse</strong><span style="color:#166534;margin-left:6px">€ ${totFE.toFixed(2)}</span></div>':''}
+    ${fa.length?'<div style="background:#dbeafe;border:1px solid #7fb3f5;border-radius:8px;padding:8px 14px;font-size:13px"><strong style="color:#1e40af">${fa.length} fatture ricevute</strong><span style="color:#1e40af;margin-left:6px">€ ${totFA.toFixed(2)}</span></div>':''}
   </div>
   <div class="imp-preview">
     <div class="imp-preview-hd">📋 Anteprima — prime ${Math.min(8,rows.length)} righe su ${rows.length}</div>
@@ -4672,7 +4672,7 @@ function renderImportPreview(rows){
         <td style="color:var(--text3);white-space:nowrap">${fmtD(r.data_scad)||'—'}</td>
       </tr>`).join('')}</tbody>
     </table></div>
-    ${rows.length>8?`<div style="padding:6px 12px;font-size:11px;color:var(--text3)">… e altre ${rows.length-8} righe</div>`:''}
+    ${rows.length>8?'<div style="padding:6px 12px;font-size:11px;color:var(--text3)">… e altre ${rows.length-8} righe</div>':''}
   </div>`;
 }
 
@@ -4876,10 +4876,10 @@ function renderCommesse(){
         <div class="list-row-title">${c.numero} <span class="text-muted text-sm" style="font-weight:400">· ${cliente}</span></div>
         <div class="list-row-sub">${c.oggetto||'—'} · ${c.tipo_commessa||''}</div>
       </div>
-      ${importo>0?`<div class="list-row-val">${'€'+fmt(importo)}</div>`:''}
-      ${margPct!==null?`<div class="list-row-val ${margPct>=30?'green':margPct>=15?'amber':'red'}" style="font-size:11px">${margPct}%</div>`:''}
+      ${importo>0?'<div class="list-row-val">${\'€\'+fmt(importo)}</div>':''}
+      ${margPct!==null?'<div class="list-row-val ${margPct>=30?\'green\':margPct>=15?\'amber\':\'red\'}" style="font-size:11px">${margPct}%</div>':''}
       <span class="badge ${badge}">${st}</span>
-      ${fu?`<a href="${fu}" target="_blank" onclick="event.stopPropagation()" style="font-size:14px;text-decoration:none;opacity:.5;padding:2px 6px;" title="Apri cartella Nextcloud">📁</a>`:'<span style="width:22px"></span>'}
+      ${fu?'<a href="'+fu+'" target="_blank" onclick="event.stopPropagation()" style="font-size:14px;text-decoration:none;opacity:.5;padding:2px 6px;" title="Apri cartella Nextcloud">📁</a>':'<span style="width:22px"></span>'}
     </div>`;
   }).join('');
 }
@@ -4919,9 +4919,9 @@ function _updateMargine(){
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;font-size:10px;color:var(--text3);margin-bottom:6px;">
     <span>Offerta</span><span style="text-align:right;font-weight:600;color:var(--text2)">€${fmt2(valRef)}</span>
     <span>Costi materiali</span><span style="text-align:right;color:var(--red)">−€${fmt2(costiDist)}</span>
-    ${costiOre>0?`<span>Ore (${totOreH}h)</span><span style="text-align:right;color:var(--red)">−€${fmt2(costiOre)}</span>`:''}
+    ${costiOre>0?'<span>Ore (${totOreH}h)</span><span style="text-align:right;color:var(--red)">−€${fmt2(costiOre)}</span>':''}
     <span style="font-weight:600;color:var(--text2)">Margine lordo</span><span style="text-align:right;font-weight:600;color:${margLordo>=0?'var(--green)':'var(--red)'}">€${fmt2(margLordo)} ${percLordo!==null?'('+percLordo.toFixed(0)+'%)':''}</span>
-    ${costiOre>0?`<span style="font-weight:600;color:var(--text2)">Margine netto</span><span style="text-align:right;font-weight:600;color:${col}">€${fmt2(margNetto)}</span>`:''}
+    ${costiOre>0?'<span style="font-weight:600;color:var(--text2)">Margine netto</span><span style="text-align:right;font-weight:600;color:${col}">€${fmt2(margNetto)}</span>':''}
   </div>
   <button class="btn-ghost btn-sm" onclick="exportDistintaPDF(CC?.numero)" style="width:100%;margin-top:4px;font-size:10px">📄 Stampa distinta</button>`;
 }
