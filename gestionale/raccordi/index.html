@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuratore Raccordi Oleodinamici</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{
+  --bg:#0c0e14;--bg2:#131620;--bg3:#1a1e2a;--bg4:#1f2436;
+  --border:#232838;--border2:#2d3348;--border3:#3a4060;
+  --text:#e4e8f5;--text2:#8892b0;--text3:#4a5470;
+  --blue:#4f8ef7;--blue-d:#1a3a7a;--blue-lt:#1d3a7022;
+  --green:#34d399;--green-d:#064e3b;
+  --amber:#fbbf24;
+  --red:#f87171;--red-d:#450a0a;
+  --inox:#94a3b8;--inox-d:#1e2a38;
+  --purple:#a78bfa;--purple-d:#2e1065;
+  --r:8px;--r-sm:5px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px 16px;font-size:14px}
+h1{font-size:clamp(20px,3vw,30px);font-weight:700;background:linear-gradient(135deg,#4f8ef7,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.02em}
+.subtitle{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);margin-top:4px}
+.layout{display:grid;grid-template-columns:1fr 360px;gap:16px;max-width:1100px;margin:20px auto 0}
+@media(max-width:800px){.layout{grid-template-columns:1fr}}
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.ph{padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)}
+.ph .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.pb{padding:16px}
+.step{margin-bottom:18px}
+.step-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.step-num{background:var(--blue-d);color:var(--blue);width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:5px 12px;border-radius:20px;border:1.5px solid var(--border2);font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;color:var(--text2);user-select:none;background:var(--bg3)}
+.chip:hover{border-color:var(--blue);color:var(--blue)}
+.chip.on{background:var(--blue-lt);border-color:var(--blue);color:var(--blue)}
+.chip.on-inox{background:var(--inox-d);border-color:var(--inox);color:var(--inox)}
+.fig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:6px}
+.fig-btn{border:1.5px solid var(--border2);border-radius:var(--r);padding:8px 6px;cursor:pointer;text-align:center;background:var(--bg3);transition:all .12s;display:flex;flex-direction:column;align-items:center;gap:4px}
+.fig-btn:hover{border-color:var(--blue)}
+.fig-btn.on{border-color:var(--blue);background:var(--blue-lt)}
+.fig-icon{font-size:18px;line-height:1.3}
+.fig-name{font-size:10px;font-weight:600;color:var(--text2);line-height:1.3}
+.fig-cod{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3)}
+.fig-btn.on .fig-name{color:var(--blue)}
+.fig-btn.on .fig-cod{color:#4f8ef760}
+.result-box{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.codice-main{font-family:'JetBrains Mono',monospace;font-size:clamp(14px,2.5vw,19px);font-weight:700;color:#60a5fa;word-break:break-all;line-height:1.4}
+.codice-alt{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);margin-top:3px}
+.desc-text{font-size:12px;color:var(--text2);margin-top:8px;line-height:1.5}
+.tags{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:2px 8px;border-radius:10px}
+.tag-din{background:#1e3a6e;color:#60a5fa}
+.tag-bsp{background:#2e1065;color:#a78bfa}
+.tag-jic{background:#064e3b;color:#34d399}
+.tag-orfs{background:#451a03;color:#fbbf24}
+.tag-inox{background:#1e2a38;color:#94a3b8}
+.tag-acc{background:#1a1e28;color:#64748b}
+.price-row{display:flex;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;flex-wrap:wrap}
+.price-val{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--green)}
+.price-lbl{color:var(--text3);margin-bottom:2px}
+.info-box{background:var(--bg4);border-left:3px solid var(--amber);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:8px 12px;font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:12px}
+.qty-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.qty-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.qty-btn:hover{border-color:var(--blue);color:var(--blue)}
+.qty-num{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;width:36px;text-align:center}
+.btn{padding:9px 16px;border-radius:var(--r-sm);border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .12s}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#3a7de8}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue)}
+.btn-danger{background:var(--red-d);color:var(--red);border:1px solid #7f1d1d}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-full{width:100%}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);margin-bottom:6px;background:var(--bg3)}
+.item-code{font-family:'JetBrains Mono',monospace;font-size:12px;color:#60a5fa;word-break:break-all}
+.item-desc{font-size:11px;color:var(--text3);margin-top:2px}
+.iq-btn{width:20px;height:20px;border-radius:3px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center}
+.iq-num{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;width:24px;text-align:center}
+.export-pre{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);white-space:pre-wrap;line-height:1.7;max-height:160px;overflow-y:auto;margin-bottom:10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px}
+.sep{height:1px;background:var(--border);margin:12px 0}
+.empty{text-align:center;padding:28px;color:var(--text3);font-size:13px}
+select,input[type=text]{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 10px;outline:none;cursor:pointer}
+select:focus,input:focus{border-color:var(--blue)}
+</style>
+</head>
+<body>
+<div style="max-width:1100px;margin:0 auto">
+  <div style="text-align:center;margin-bottom:4px">
+    <h1>Configuratore Raccordi Oleodinamici</h1>
+    <p class="subtitle">DIN 2353 / ISO 8434-1 · BSP · JIC 37° · ORFS — codici Pa.Co / Parker Ermeto / Foscarin</p>
+  </div>
+  <div class="layout">
+    <!-- SINISTRA: configurazione -->
+    <div>
+      <div class="panel">
+        <div class="ph"><div class="dot" style="background:var(--blue)"></div>Configurazione</div>
+        <div class="pb">
+
+          <div class="step">
+            <div class="step-label"><span class="step-num">1</span>Standard / Norma</div>
+            <div class="chips" id="chips-std">
+              <div class="chip on" data-v="DIN" onclick="pick('std',this);buildFig()">DIN 2353</div>
+              <div class="chip" data-v="BSP" onclick="pick('std',this);buildFig()">BSP (GAS)</div>
+              <div class="chip" data-v="JIC" onclick="pick('std',this);buildFig()">JIC 37°</div>
+              <div class="chip" data-v="ORFS" onclick="pick('std',this);buildFig()">ORFS SAE</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-label"><span class="step-num">2</span>Figura</div>
+            <div class="fig-grid" id="fig-grid"></div>
+          </div>
+
+          <div class="step">
+            <div class="step-label"><span class="step-num">3</span>Ø Tubo (mm)</div>
+            <div class="chips" id="chips-diam">
+              <div class="chip" data-v="6" onclick="pick('diam',this);calc()">6</div>
+              <div class="chip" data-v="8" onclick="pick('diam',this);calc()">8</div>
+              <div class="chip" data-v="10" onclick="pick('diam',this);calc()">10</div>
+              <div class="chip on" data-v="12" onclick="pick('diam',this);calc()">12</div>
+              <div class="chip" data-v="14" onclick="pick('diam',this);calc()">14</div>
+              <div class="chip" data-v="16" onclick="pick('diam',this);calc()">16</div>
+              <div class="chip" data-v="18" onclick="pick('diam',this);calc()">18</div>
+              <div class="chip" data-v="20" onclick="pick('diam',this);calc()">20</div>
+              <div class="chip" data-v="22" onclick="pick('diam',this);calc()">22</div>
+              <div class="chip" data-v="25" onclick="pick('diam',this);calc()">25</div>
+              <div class="chip" data-v="28" onclick="pick('diam',this);calc()">28</div>
+              <div class="chip" data-v="30" onclick="pick('diam',this);calc()">30</div>
+              <div class="chip" data-v="38" onclick="pick('diam',this);calc()">38</div>
+              <div class="chip" data-v="42" onclick="pick('diam',this);calc()">42</div>
+            </div>
+          </div>
+
+          <div class="step" id="step-serie">
+            <div class="step-label"><span class="step-num">4</span>Serie (DIN)</div>
+            <div class="chips" id="chips-serie">
+              <div class="chip on" data-v="L" onclick="pick('serie',this);calc()">L — leggera ≤315 bar</div>
+              <div class="chip" data-v="S" onclick="pick('serie',this);calc()">S — pesante ≤630 bar</div>
+              <div class="chip" data-v="LL" onclick="pick('serie',this);calc()">LL — extra leggera ≤100 bar</div>
+            </div>
+          </div>
+
+          <div class="step" id="step-conn">
+            <div class="step-label"><span class="step-num">5</span>Connessione lato impianto</div>
+            <div class="chips" id="chips-conn">
+              <div class="chip on" data-v="EDG" onclick="pick('conn',this);updateFilOptions();calc()">Gas cil. BSP (EDG)</div>
+              <div class="chip" data-v="EOM" onclick="pick('conn',this);updateFilOptions();calc()">Metrico cil. (EOM)</div>
+              <div class="chip" data-v="EOC" onclick="pick('conn',this);updateFilOptions();calc()">Metrico conico</div>
+              <div class="chip" data-v="EKO" onclick="pick('conn',this);updateFilOptions();calc()">Gas conico BSPT</div>
+              <div class="chip" data-v="SV" onclick="pick('conn',this);updateFilOptions();calc()">SV 60° O-Ring</div>
+            </div>
+            <div style="margin-top:8px">
+              <select id="sel-fil" onchange="calc()"></select>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-label"><span class="step-num">6</span>Materiale</div>
+            <div class="chips" id="chips-mat">
+              <div class="chip on" data-v="ACC" onclick="pick('mat',this);calc()">Acciaio (zincato)</div>
+              <div class="chip" data-v="INOX" onclick="pick('mat',this);calc()">Inox 316L</div>
+              <div class="chip" data-v="INOX304" onclick="pick('mat',this);calc()">Inox 304</div>
+            </div>
+          </div>
+
+          <div class="step" id="step-rid">
+            <div class="step-label"><span class="step-num">7</span>Riduzione al piede (opzionale)</div>
+            <div class="chips" id="chips-rid">
+              <div class="chip on" data-v="" onclick="pick('rid',this);calc()">Nessuna</div>
+              <div class="chip" data-v="01" onclick="pick('rid',this);calc()">G 1/8"</div>
+              <div class="chip" data-v="02" onclick="pick('rid',this);calc()">G 1/4"</div>
+              <div class="chip" data-v="03" onclick="pick('rid',this);calc()">G 3/8"</div>
+              <div class="chip" data-v="04" onclick="pick('rid',this);calc()">G 1/2"</div>
+              <div class="chip" data-v="06" onclick="pick('rid',this);calc()">G 3/4"</div>
+              <div class="chip" data-v="08" onclick="pick('rid',this);calc()">G 1"</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- DESTRA: risultato + lista -->
+    <div>
+      <div class="panel" style="margin-bottom:14px">
+        <div class="ph"><div class="dot" style="background:var(--green)"></div>Codice generato</div>
+        <div class="pb">
+          <div class="result-box">
+            <div id="out-codice" class="codice-main">—</div>
+            <div id="out-codice-alt" class="codice-alt"></div>
+            <div id="out-desc" class="desc-text">Seleziona figura e parametri</div>
+            <div id="out-tags" class="tags"></div>
+            <div id="out-price" class="price-row" style="display:none">
+              <div><div class="price-lbl">Acciaio</div><div class="price-val" id="p-acc">—</div></div>
+              <div><div class="price-lbl">Inox 316L</div><div class="price-val" id="p-inox">—</div></div>
+            </div>
+          </div>
+          <div class="info-box" id="out-note" style="display:none"></div>
+          <div class="qty-row">
+            <button class="qty-btn" onclick="qd(-1)">−</button>
+            <span class="qty-num" id="qty-d">1</span>
+            <button class="qty-btn" onclick="qd(1)">+</button>
+            <span style="font-size:12px;color:var(--text3)">pz</span>
+          </div>
+          <button class="btn btn-primary btn-full" id="btn-add" onclick="addL()">+ Aggiungi alla lista</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="ph"><div class="dot" style="background:var(--amber)"></div>Lista ordine <span id="lista-c" style="margin-left:auto;font-weight:400;font-size:10px">vuota</span></div>
+        <div class="pb">
+          <div id="lista-el"><div class="empty">Nessun raccordo aggiunto</div></div>
+          <div id="exp-box" style="display:none">
+            <div class="sep"></div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:8px">Testo per RDO / ordine</div>
+            <div class="export-pre" id="exp-pre"></div>
+            <div class="btn-row">
+              <button class="btn btn-ghost btn-sm" onclick="copia()">📋 Copia</button>
+              <button class="btn btn-ghost btn-sm" onclick="escsv()">⬇ CSV</button>
+              <button class="btn btn-ghost btn-sm" onclick="invia()">→ Gestionale</button>
+            </div>
+            <div class="sep"></div>
+            <button class="btn btn-danger btn-sm" onclick="svuota()">🗑 Svuota</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var FIGURE={
+  DIN:[
+    {id:'902',ico:'━⟐',nome:'Dritto M',desc:'Raccordo terminale diritto maschio DIN — connessione tubo rigido + filetto impianto',pref:'902EDG',parker:'EO-DIN'},
+    {id:'903',ico:'↙⟐',nome:'Gomito 90° M',desc:'Raccordo terminale gomito 90° maschio DIN (forma lunga)',pref:'903EWG',parker:'EO-90'},
+    {id:'904',ico:'↙⟐',nome:'Gomito 90° compatto M',desc:'Raccordo terminale gomito 90° compatto maschio DIN (forma corta/serrata)',pref:'904DCP',parker:'EO-90C'},
+    {id:'906',ico:'┳⟐',nome:'T maschio',desc:'Raccordo a T — due uscite DIN + 1 filetto impianto al piede',pref:'906OC',parker:'EO-T'},
+    {id:'907',ico:'✛',nome:'Croce M',desc:'Raccordo a croce — quattro uscite maschio DIN',pref:'907OG',parker:'EO-X'},
+    {id:'910',ico:'⟳⟐',nome:'Orientabile 360° M',desc:'Raccordo orientabile maschio DIN — si orienta poi si blocca',pref:'910BSV',parker:'EO-OR'},
+    {id:'911',ico:'⟳⊙',nome:'Orientabile 360° F',desc:'Raccordo orientabile femmina girevole DIN',pref:'911OC',parker:'EO-ORF'},
+    {id:'918',ico:'━⊙',nome:'Dritto F girevole',desc:'Raccordo terminale diritto femmina girevole DIN',pref:'918EDG',parker:'EO-F'},
+    {id:'919',ico:'━━',nome:'Nipple dritto M-M',desc:'Nipple dritto doppio maschio DIN-DIN per giunzione di tubi',pref:'919NP',parker:'EO-NP'},
+    {id:'920',ico:'━○',nome:'Tubo-Tubo dritto',desc:'Raccordo intermedio diretto tubo DIN - tubo DIN (stesso diametro)',pref:'920TR',parker:'EO-TT'},
+    {id:'921',ico:'↙○',nome:'Tubo-Tubo 90°',desc:'Raccordo intermedio gomito 90° tubo DIN - tubo DIN',pref:'921TR',parker:'EO-TT90'},
+    {id:'934',ico:'◁━',nome:'Riduttore diretto',desc:'Riduttore diretto maschio DIN — raccorda due diametri tubo diversi',pref:'934RI',parker:'EO-RD'},
+    {id:'935',ico:'◁⊙',nome:'Riduttore F girevole',desc:'Riduttore femmina girevole DIN — raccorda due diametri tubo diversi',pref:'935RI',parker:'EO-RF'},
+    {id:'945',ico:'↙⊙',nome:'Gomito 90° F compatto',desc:'Raccordo terminale gomito 90° compatto femmina girevole DIN',pref:'945DCP',parker:'EO-90CF'},
+    {id:'952',ico:'━|━',nome:'Passaparete dritto M',desc:'Raccordo passaparete diritto maschio DIN — per passaggi a parete/pannello',pref:'952PP',parker:'EO-PP'},
+    {id:'960',ico:'●━',nome:'Tappo maschio DIN',desc:'Tappo maschio DIN — chiusura uscita impianto',pref:'960TP',parker:'EO-TP'},
+    {id:'961',ico:'○⊙',nome:'Tappo F girevole DIN',desc:'Tappo femmina girevole DIN — chiusura con dado libero',pref:'961TP',parker:'EO-TF'},
+  ],
+  BSP:[
+    {id:'BSP-D',  ico:'━⟐',nome:'Dritto M BSP',    desc:'Raccordo dritto maschio BSP cilindrico — standard adattatore idraulico',pref:'BSP-D'},
+    {id:'BSP-90', ico:'↙⟐',nome:'Gomito 90° BSP',  desc:'Raccordo gomito 90° maschio BSP',pref:'BSP-90'},
+    {id:'BSP-45', ico:'╱⟐',nome:'Gomito 45° BSP',  desc:'Raccordo gomito 45° maschio BSP',pref:'BSP-45'},
+    {id:'BSP-T',  ico:'┳⟐',nome:'T BSP',           desc:'Raccordo a T maschio BSP',pref:'BSP-T'},
+    {id:'BSP-OR', ico:'⟳⟐',nome:'Orientabile BSP', desc:'Raccordo orientabile maschio BSP con O-ring di tenuta',pref:'BSP-OR'},
+    {id:'BSP-R',  ico:'◁━',nome:'Riduzione BSP M/F',desc:'Riduzione maschio/femmina BSP per cambiare filetto',pref:'BSP-R'},
+    {id:'BSP-PP', ico:'●━',nome:'Tappo M BSP',      desc:'Tappo maschio BSP',pref:'BSP-TP'},
+    {id:'BSP-FF', ico:'○⊙',nome:'Tappo F BSP',      desc:'Tappo femmina BSP',pref:'BSP-TF'},
+  ],
+  JIC:[
+    {id:'JIC-D',  ico:'━▷',nome:'Dritto JIC M',    desc:'Raccordo dritto JIC 37° maschio — richiede svasatura tubo a 37°',pref:'J-D'},
+    {id:'JIC-90', ico:'↙▷',nome:'Gomito 90° JIC',  desc:'Raccordo gomito 90° JIC 37°',pref:'J-90'},
+    {id:'JIC-45', ico:'╱▷',nome:'Gomito 45° JIC',  desc:'Raccordo gomito 45° JIC 37°',pref:'J-45'},
+    {id:'JIC-T',  ico:'┳▷',nome:'T JIC',           desc:'Raccordo a T JIC 37°',pref:'J-T'},
+    {id:'JIC-R',  ico:'◁▷',nome:'Riduzione JIC',   desc:'Riduzione JIC maschio/femmina',pref:'J-R'},
+  ],
+  ORFS:[
+    {id:'ORFS-D',  ico:'━◎',nome:'Dritto ORFS M',   desc:'Raccordo dritto ORFS maschio SAE J1453 — tenuta O-Ring su sede piana',pref:'ORFS-D'},
+    {id:'ORFS-90', ico:'↙◎',nome:'Gomito 90° ORFS', desc:'Raccordo gomito 90° ORFS',pref:'ORFS-90'},
+    {id:'ORFS-45', ico:'╱◎',nome:'Gomito 45° ORFS', desc:'Raccordo gomito 45° ORFS',pref:'ORFS-45'},
+    {id:'ORFS-T',  ico:'┳◎',nome:'T ORFS',          desc:'Raccordo a T ORFS maschio',pref:'ORFS-T'},
+  ],
+};
+
+var FIL_BSP=['G 1/8"','G 1/4"','G 3/8"','G 1/2"','G 3/4"','G 1"','G 1.1/4"','G 1.1/2"','G 2"'];
+var FIL_MET=['M10×1','M12×1.5','M14×1.5','M16×1.5','M18×1.5','M22×1.5','M26×1.5','M30×2','M36×2','M42×2'];
+var FIL_CODES_BSP=['01','02','03','04','06','08','10','12','16'];
+var FIL_CODES_MET=['M10','M12','M14','M16','M18','M22','M26','M30','M36','M42'];
+
+var PREZZI={'902':2.8,'903':4.2,'904':5.5,'906':5.8,'907':7.5,'910':6.5,'911':7.0,
+  '918':3.2,'919':2.5,'920':3.5,'921':5.0,'934':3.0,'935':3.5,'945':6.0,
+  '952':4.5,'960':1.8,'961':2.0,
+  'BSP-D':2.2,'BSP-90':3.5,'BSP-45':3.2,'BSP-T':4.8,'BSP-OR':5.5,'BSP-R':2.0,'BSP-PP':1.5,'BSP-FF':1.3,
+  'JIC-D':3.0,'JIC-90':4.5,'JIC-45':4.0,'JIC-T':6.0,'JIC-R':2.8,
+  'ORFS-D':4.0,'ORFS-90':6.0,'ORFS-45':5.5,'ORFS-T':8.0};
+var FD={'6':0.6,'8':0.75,'10':0.9,'12':1.0,'14':1.1,'16':1.2,'18':1.35,'20':1.5,'22':1.7,'25':2.0,'28':2.4,'30':2.7,'38':3.5,'42':4.2};
+var FS={'LL':0.8,'L':1.0,'S':1.25};
+var FM={'ACC':1.0,'INOX':2.9,'INOX304':2.5};
+
+var NOTE={
+  'DIN':'Raccordi DIN 2353: anello tagliente + dado di serraggio venduti insieme al raccordo (set completo). Per inox: usare dado e anello inox specifici, lubrificare in montaggio.',
+  'BSP':'Raccordi BSP: tenuta su cono interno 60°. Non applicare teflon se la tenuta avviene sul cono metallico. Usare guarnizione in rame o alluminio se necessaria tenuta aggiuntiva.',
+  'JIC':'Raccordi JIC 37°: richiedono svasatura del tubo a esattamente 37°. Non intercambiabili con DIN 24° o BSP. Standard USA molto diffuso su macchinari industriali.',
+  'ORFS':'Raccordi ORFS SAE J1453: tenuta garantita dall\'O-Ring sulla sede piana. Verificare sempre integrità O-Ring. Massima impermeabilità, ideale per gas e fluidi critici.',
+};
+
+var S={std:'DIN',fig:'902',diam:'12',serie:'L',conn:'EDG',fil:'02',mat:'ACC',rid:'',qty:1};
+var lista=[];
+
+function pick(g,el){
+  document.querySelectorAll('#chips-'+g+' .chip').forEach(function(c){c.className='chip';});
+  el.classList.add('on');
+  if(g==='mat'&&el.dataset.v!=='ACC') el.classList.add('on-inox');
+  S[g]=el.dataset.v;
+}
+function getV(g){var el=document.querySelector('#chips-'+g+' .chip.on');return el?el.dataset.v:'';}
+
+function updateFilOptions(){
+  var conn=getV('conn')||S.conn;
+  var sel=document.getElementById('sel-fil');
+  var isMet=conn==='EOM'||conn==='EOC'||conn==='SV';
+  var opts=isMet?FIL_MET:FIL_BSP;
+  var codes=isMet?FIL_CODES_MET:FIL_CODES_BSP;
+  sel.innerHTML=opts.map(function(o,i){return'<option value="'+codes[i]+'" '+(codes[i]==='02'||codes[i]==='M14'?'selected':'')+'>'+o+'</option>';}).join('');
+}
+
+function buildFig(){
+  S.std=getV('std');
+  var figs=FIGURE[S.std]||[];
+  document.getElementById('fig-grid').innerHTML=figs.map(function(f){
+    return'<div class="fig-btn'+(S.fig===f.id?' on':'')+'" onclick="selFig(\''+f.id+'\')" title="'+f.desc+'">'+
+      '<span class="fig-icon">'+f.ico+'</span>'+
+      '<span class="fig-name">'+f.nome+'</span>'+
+      '<span class="fig-cod">'+f.pref+'</span>'+
+    '</div>';
+  }).join('');
+  var isDIN=S.std==='DIN';
+  document.getElementById('step-serie').style.display=isDIN?'':'none';
+  document.getElementById('step-conn').style.display=(isDIN||S.std==='BSP')?'':'none';
+  document.getElementById('step-rid').style.display=isDIN?'':'none';
+  if(!figs.find(function(f){return f.id===S.fig;})){
+    S.fig=figs[0]?figs[0].id:'';
+    var first=document.querySelector('.fig-btn');
+    if(first)first.classList.add('on');
+  }
+  updateFilOptions();
+  calc();
+}
+
+function selFig(id){
+  S.fig=id;
+  document.querySelectorAll('.fig-btn').forEach(function(b){
+    b.classList.toggle('on',b.getAttribute('onclick')==="selFig('"+id+"')");
+  });
+  calc();
+}
+
+function calc(){
+  S.diam=getV('diam')||S.diam;
+  S.serie=getV('serie')||S.serie;
+  S.conn=getV('conn')||S.conn;
+  S.mat=getV('mat')||S.mat;
+  S.rid=getV('rid');
+  var sel=document.getElementById('sel-fil');
+  if(sel)S.fil=sel.value;
+
+  var figs=FIGURE[S.std]||[];
+  var fig=figs.find(function(f){return f.id===S.fig;});
+  if(!fig){document.getElementById('out-codice').textContent='—';return;}
+
+  var cod='',alt='',desc='',tags=[],note='';
+  var matSuf=S.mat==='ACC'?'':('-'+(S.mat==='INOX'?'INOX':'INOX304'));
+  var ridMap={'01':'1/8','02':'1/4','03':'3/8','04':'1/2','06':'3/4','08':'1'};
+
+  if(S.std==='DIN'){
+    // Formato Pa.Co: [PREF]-[DIAM][SERIE][-RID][-INOX]
+    // Es: 902EDG-12L-INOX  |  902EDG-12L-04-INOX  |  903EWG-12S
+    cod=fig.pref+'-'+S.diam+S.serie;
+    if(S.rid)cod+='-'+S.rid;
+    cod+=matSuf;
+    // Parker/Ermeto equivalente
+    if(fig.parker)alt='Parker Ermeto: '+fig.parker+'-'+S.diam+(S.serie||'L')+(S.mat!=='ACC'?'-SS':'');
+    desc=fig.desc+'\nØ'+S.diam+'mm · Serie '+S.serie;
+    if(S.rid)desc+=' · Rid. G '+ridMap[S.rid]+'"';
+    if(S.mat!=='ACC')desc+=' · '+(S.mat==='INOX'?'Inox 316L':'Inox 304');
+    tags=[['DIN 2353','tag-din'],[S.serie+' ('+{L:'≤315bar',S:'≤630bar',LL:'≤100bar'}[S.serie]+')','tag-acc']];
+    if(S.mat!=='ACC')tags.push(['INOX','tag-inox']);
+    note=NOTE.DIN;
+  } else if(S.std==='BSP'){
+    // Formato: BSP-[TIPO]-[FIL][-INOX]
+    cod=fig.pref+'-'+S.fil+matSuf;
+    desc=fig.desc+'\nFiletto: '+document.querySelector('#sel-fil option:checked').textContent;
+    if(S.mat!=='ACC')desc+=' · Inox';
+    tags=[['BSP','tag-bsp']];if(S.mat!=='ACC')tags.push(['INOX','tag-inox']);
+    note=NOTE.BSP;
+  } else if(S.std==='JIC'){
+    cod=fig.pref+'-'+S.diam+matSuf;
+    alt='Parker Triple-Lok®: TL-'+S.diam+(S.mat!=='ACC'?'-SS':'');
+    desc=fig.desc+'\nØ'+S.diam+'mm · Svasatura 37°';
+    if(S.mat!=='ACC')desc+=' · Inox';
+    tags=[['JIC 37°','tag-jic'],['SAE J514','tag-acc']];if(S.mat!=='ACC')tags.push(['INOX','tag-inox']);
+    note=NOTE.JIC;
+  } else if(S.std==='ORFS'){
+    cod=fig.pref+'-'+S.diam+matSuf;
+    desc=fig.desc+'\nØ'+S.diam+'mm · O-Ring sede piana';
+    if(S.mat!=='ACC')desc+=' · Inox';
+    tags=[['ORFS','tag-orfs'],['SAE J1453','tag-acc']];if(S.mat!=='ACC')tags.push(['INOX','tag-inox']);
+    note=NOTE.ORFS;
+  }
+
+  var pb=PREZZI[S.fig]||3.5;
+  var pd=FD[S.diam]||1.0;
+  var ps=FS[S.serie||'L']||1.0;
+  var pAcc=pb*pd*ps, pInox=pAcc*2.9;
+
+  document.getElementById('out-codice').textContent=cod;
+  document.getElementById('out-codice-alt').textContent=alt;
+  document.getElementById('out-desc').innerHTML=desc.replace(/\n/g,'<br>');
+  document.getElementById('out-tags').innerHTML=tags.map(function(t){return'<span class="tag '+t[1]+'">'+t[0]+'</span>';}).join('');
+  document.getElementById('out-price').style.display='';
+  document.getElementById('p-acc').textContent='~\u20ac'+pAcc.toFixed(2)+'/pz';
+  document.getElementById('p-inox').textContent='~\u20ac'+pInox.toFixed(2)+'/pz';
+  var noteEl=document.getElementById('out-note');
+  noteEl.textContent='\u26a0 '+note; noteEl.style.display='';
+
+  S._cod=cod; S._desc=desc.replace(/\n/g,' \u00b7 '); S._pAcc=pAcc; S._pInox=pInox;
+  S._prezzo=S.mat==='ACC'?pAcc:pInox;
+}
+
+function qd(d){S.qty=Math.max(1,S.qty+d);document.getElementById('qty-d').textContent=S.qty;}
+
+function addL(){
+  if(!S._cod||S._cod==='—')return;
+  var ex=lista.find(function(i){return i.cod===S._cod;});
+  if(ex)ex.qty+=S.qty;
+  else lista.push({cod:S._cod,desc:S._desc,qty:S.qty,prezzo:S._prezzo});
+  renderL();
+  var b=document.getElementById('btn-add');
+  b.textContent='\u2713 Aggiunto!';b.style.background='var(--green-d)';b.style.color='var(--green)';b.style.border='1px solid var(--green)';
+  setTimeout(function(){b.textContent='+ Aggiungi alla lista';b.style.cssText='';},1200);
+}
+
+function renderL(){
+  var el=document.getElementById('lista-el'),eb=document.getElementById('exp-box'),lc=document.getElementById('lista-c');
+  if(!lista.length){
+    el.innerHTML='<div class="empty">Nessun raccordo aggiunto</div>';
+    eb.style.display='none';lc.textContent='vuota';return;
+  }
+  var totPz=lista.reduce(function(s,i){return s+i.qty;},0);
+  lc.textContent=lista.length+' art. \u00b7 '+totPz+' pz';
+  el.innerHTML=lista.map(function(item,i){
+    return'<div class="item">'+
+      '<div style="flex:1;min-width:0">'+
+        '<div class="item-code">'+item.cod+'</div>'+
+        '<div class="item-desc">'+item.desc+'</div>'+
+        '<div style="font-size:10px;color:var(--green);margin-top:2px">~\u20ac'+(item.prezzo*item.qty).toFixed(2)+' tot</div>'+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:4px;flex-shrink:0">'+
+        '<button class="iq-btn" data-i="'+i+'" onclick="iqd(this.dataset.i,-1)">&#8722;</button>'+
+        '<span class="iq-num">'+item.qty+'</span>'+
+        '<button class="iq-btn" data-i="'+i+'" onclick="iqd(this.dataset.i,1)">+</button>'+
+        '<button class="btn btn-danger btn-sm" data-i="'+i+'" onclick="del(this.dataset.i)" style="margin-left:4px;padding:3px 7px">&#10005;</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  var lines=['LISTA RACCORDI \u2014 '+new Date().toLocaleDateString('it-IT'),''];
+  lista.forEach(function(item){lines.push(item.qty+'x  '+item.cod+'  \u2014  '+item.desc);});
+  lines.push('');
+  var tot=lista.reduce(function(s,i){return s+i.prezzo*i.qty;},0);
+  lines.push('TOTALE IND.: ~\u20ac'+tot.toFixed(2)+' (acciaio/inox secondo scelta \u2014 verificare con fornitore)');
+  lines.push('Fornitori suggeriti: Pa.Co Fluid & Air Group, Foscarin Group, Parker NECO');
+  document.getElementById('exp-pre').textContent=lines.join('\n');
+  eb.style.display='';
+}
+
+function iqd(i,d){lista[parseInt(i)].qty=Math.max(1,lista[parseInt(i)].qty+d);renderL();}
+function del(i){lista.splice(parseInt(i),1);renderL();}
+function svuota(){if(confirm('Svuotare la lista?')){lista=[];renderL();}}
+function copia(){navigator.clipboard.writeText(document.getElementById('exp-pre').textContent).then(function(){alert('Copiato!');});}
+function escsv(){
+  var c='Codice,Descrizione,Qty,Prezzo_ind\n';
+  lista.forEach(function(i){c+='"'+i.cod+'","'+i.desc+'",'+i.qty+','+i.prezzo.toFixed(2)+'\n';});
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));
+  a.download='raccordi_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+function invia(){
+  if(window.opener&&window.opener._riceviRaccordi){window.opener._riceviRaccordi(lista);window.close();}
+  else{navigator.clipboard.writeText(JSON.stringify(lista,null,2)).then(function(){alert('Dati JSON copiati negli appunti.');});}
+}
+
+buildFig();
+</script>
+</body>
+</html>
