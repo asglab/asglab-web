@@ -412,6 +412,7 @@ function openModal(type,extra){
   document.getElementById('modal-body').innerHTML=h.body||'';
   document.getElementById('modal-overlay').classList.add('show');
   if(h.init)setTimeout(h.init,0);
+  if(h.onOpen)setTimeout(h.onOpen,50);
 }
 function closeM(){document.getElementById('modal-overlay').classList.remove('show');_mType='';_mExtra=''}
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeM()});
@@ -464,7 +465,7 @@ var FLOW=['bozza','offerta','inviata','confermata','in-corso','chiusa'];
 function statoBadge(s){return '<span class="stato-chip stato-'+esc(s)+'">'+esc(SL[s]||s)+'</span>'}
 
 // CONFIG
-function getCfg(){var c=lgo('cfg');return{nc_url:c.nc_url||'',nc_user:c.nc_user||'',nc_pass:c.nc_pass||'',markup_clienti:c.markup_clienti||{},ok:!!(c.nc_url&&c.nc_user&&c.nc_pass)}}
+function getCfg(){var c=lgo('cfg');return{nc_url:c.nc_url||'',nc_web_url:c.nc_web_url||c.nc_url||'',nc_user:c.nc_user||'',nc_pass:c.nc_pass||'',markup_clienti:c.markup_clienti||{},ok:!!(c.nc_url&&c.nc_user&&c.nc_pass)}}
 function sCfg(d){localStorage.setItem(K.cfg,JSON.stringify(d))}
 
 // WEBDAV
@@ -913,8 +914,8 @@ async function caricaFileNC(path){
     }
     var html='';
     items.forEach(function(item){
-      var dirUrl=cfg.nc_url+'/apps/files/?dir='+encodeURIComponent(path+(item.isDir?'/'+item.name:''));
-      var fileUrl=cfg.nc_url+'/apps/files/?dir='+encodeURIComponent(path)+'&openfile='+encodeURIComponent(item.name);
+      var dirUrl=cfg.nc_web_url+'/apps/files/?dir='+encodeURIComponent(path+(item.isDir?'/'+item.name:''));
+      var fileUrl=cfg.nc_web_url+'/apps/files/?dir='+encodeURIComponent(path)+'&openfile='+encodeURIComponent(item.name);
       var sizeStr=item.size>0?(item.size>1048576?(item.size/1048576).toFixed(1)+'MB':(item.size>1024?(item.size/1024).toFixed(0)+'KB':item.size+'B')):'';
       // Tutto apre in NC web con sessione attiva — niente WebDAV, niente login
       var rowClick=item.isDir?
@@ -971,7 +972,7 @@ function cambiaStato(s){
 
 function folderUrl(num){
   var cfg=getCfg();
-  var base=cfg.nc_url||'https://cloud.asglab.it';
+  var base=cfg.nc_web_url||'https://cloud.asglab.it';
   var comm=lg('comm').find(function(x){return x.numero===num});
   // Usa nc_path personalizzato se presente
   var path=comm&&comm.nc_path?comm.nc_path:null;
@@ -1638,7 +1639,8 @@ function getModalHTML(type,extra){
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveOra(\''+esc(num2)+'\')">Aggiungi</button></div>'}}
   if(type==='config'){var cfg2=lgo('cfg');var mk2=cfg2.markup_clienti||{};return{title:'Configurazione',body:
     '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">Nextcloud</div>'+
-    '<div class="form-group"><label>URL proxy</label><input class="form-control" id="cfg-url" value="'+esc(cfg2.nc_url||'https://dash.asglab.it:8766')+'"></div>'+
+    '<div class="form-group"><label>URL WebDAV / API (proxy)</label><input class="form-control" id="cfg-url" value="'+esc(cfg2.nc_url||'https://dash.asglab.it:8766')+'" placeholder="https://dash.asglab.it:8766"></div>'+
+    '<div class="form-group"><label>URL web Nextcloud (per aprire file nel browser)</label><input class="form-control" id="cfg-web-url" value="'+esc(cfg2.nc_web_url||'https://cloud.asglab.it')+'" placeholder="https://cloud.asglab.it"></div>'+
     '<div class="form-row"><div class="form-group"><label>Utente</label><input class="form-control" id="cfg-user" value="'+esc(cfg2.nc_user||'andrea')+'"></div>'+
     '<div class="form-group"><label>App Password</label><input class="form-control" id="cfg-pass" type="password" value="'+esc(cfg2.nc_pass||'')+'"></div></div>'+
     '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)">Markup clienti</div>'+
@@ -1776,13 +1778,13 @@ function getModalHTML(type,extra){
     '<p style="font-size:12px;color:var(--text3);margin-bottom:12px">Aggiungi raccordi alla distinta. Ogni riga è un tipo/misura separato.</p>'+
     '<div id="raccordi-lista" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>'+
     '<button class="btn btn-secondary btn-sm" onclick="aggiungiRigaRaccordo()">+ Aggiungi raccordo</button>'+
-    '<script>window._raccordiOpts={figure:"'+optsF+'",misure:"'+optsM+'"};window._raccordiRighe=[];<\/script>'+
     '<div class="form-row" style="margin-top:16px"><div class="form-group"><label>Fornitore</label>'+
     '<input class="form-control" id="racc-forn" list="forn-list-racc" value="Pa.Co Fluid &amp; Air Group">'+
     '<datalist id="forn-list-racc">'+FORNITORI.map(function(f){return'<option value="'+esc(f.nome)+'">'}).join('')+'</datalist></div>'+
     '<div class="form-group"><label>Sezione distinta</label><input class="form-control" id="racc-sez" value="Raccorderia"></div></div>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
-    '<button class="btn btn-primary" data-num="'+esc(num)+'" onclick="saveRaccordi(this.dataset.num)">Aggiungi a distinta</button></div>'}}
+    '<button class="btn btn-primary" data-num="'+esc(num)+'" onclick="saveRaccordi(this.dataset.num)">Aggiungi a distinta</button></div>',
+    onOpen:function(){aggiungiRigaRaccordo();}}}
 
   if(type==='cfg-tubo-rigido'){var num=extra||'';
     var cfg5=getCfg();var cod5=getCod(num);var defMk5=cfg5.markup_clienti&&cfg5.markup_clienti[cod5]?cfg5.markup_clienti[cod5]:2.25;
@@ -2155,7 +2157,7 @@ function saveCfg(){var G=function(id){var el=document.getElementById(id);return 
     });
     if(Object.keys(newClienti).length){setClienti(newClienti);CNAMES=newClienti;CMAP={};Object.entries(newClienti).forEach(function(e){CMAP[e[0]]=e[1]+' ('+e[0]+')';});}
   }
-  sCfg({nc_url:G('cfg-url').trim().replace(/\/$/,''),nc_user:G('cfg-user').trim(),nc_pass:G('cfg-pass').trim(),markup_clienti:mk});closeM();showToast('Configurazione salvata');syncNow()}
+  sCfg({nc_url:G('cfg-url').trim().replace(/\/$/,''),nc_web_url:G('cfg-web-url').trim().replace(/\/$/,'')||'https://cloud.asglab.it',nc_user:G('cfg-user').trim(),nc_pass:G('cfg-pass').trim(),markup_clienti:mk});closeM();showToast('Configurazione salvata');syncNow()}
 function prefillSaldo(nome){
   if(!nome)return;
   var conti=lg('conti');
@@ -2433,7 +2435,7 @@ async function caricaFileNCPicker(path){
     if(segs.length){var parent='/'+segs.slice(0,-1).join('/');html+='<button class="btn btn-ghost btn-sm" data-p="'+esc(parent)+'" onclick="caricaFileNCPicker(this.dataset.p)">&#8592;</button>';}
     html+='<span style="color:var(--text3);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(path)+'</span></div>';
     html+=items.map(function(item){
-      var ncUrl=cfg.nc_url+'/apps/files/?dir='+encodeURIComponent(path)+'&openfile='+encodeURIComponent(item.name);
+      var ncUrl=(cfg.nc_web_url||cfg.nc_url)+'/apps/files/?dir='+encodeURIComponent(path)+'&openfile='+encodeURIComponent(item.name);
       if(item.isDir)
         return'<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer" data-p="'+esc(item.fullPath)+'" onclick="caricaFileNCPicker(this.dataset.p)">'+
           '<span style="font-size:18px">&#128193;</span><span style="flex:1;font-weight:700">'+esc(item.name)+'</span><span style="color:var(--text3)">&#8250;</span></div>';
@@ -2453,7 +2455,7 @@ function apriFileNC(filePath,fileName){
   var ncIntent='nc://open-file?accountName='+encodeURIComponent(cfg.nc_user+'@'+host)+
     '&path='+encodeURIComponent(filePath)+
     '&fileName='+encodeURIComponent(fileName);
-  var webUrl=cfg.nc_url+'/apps/files/?dir='+encodeURIComponent(filePath.split('/').slice(0,-1).join('/'))+
+  var webUrl=(cfg.nc_web_url||cfg.nc_url)+'/apps/files/?dir='+encodeURIComponent(filePath.split('/').slice(0,-1).join('/'))+
     '&openfile='+encodeURIComponent(fileName);
   // Su Android: prova nc:// - se non si apre dopo 1.5s apri il web
   var timer=setTimeout(function(){window.open(webUrl,'_blank');},1500);
