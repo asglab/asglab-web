@@ -775,28 +775,43 @@ function renderDetTab(tab,el){
   }
   else if(tab==='documenti'){
     var ncFolder=folderUrl(c.numero);
+    var ncPath=getNcPath(c.numero);
     var docs=(cd.documenti||[]);
-    el.innerHTML='<div class="card" style="margin-bottom:12px"><div class="card-head"><div class="card-title">Cartella Nextcloud</div>'+
-      (ncFolder?'<a href="'+esc(ncFolder)+'" target="_blank" class="btn btn-primary btn-sm">&#128193; Apri cartella</a>':'')+
-      '</div><div class="card-body" style="font-size:13px;color:var(--text3)">'+
-      (ncFolder?'Cartella commessa su Nextcloud.':'Configura Nextcloud per vedere i documenti.')+
-      '</div></div>'+
-      '<div class="card"><div class="card-head"><div class="card-title">Riferimenti</div>'+
-      '<button class="btn btn-secondary btn-sm" data-commessa="'+esc(c.numero)+'" onclick="openModal(&quot;add-doc&quot;,this.dataset.commessa)">+ Aggiungi</button>'+
+    var fileListId='nc-files-'+c.numero;
+    var html='';
+    // Sezione file Nextcloud
+    html+='<div class="card" style="margin-bottom:12px"><div class="card-head">'+
+      '<div class="card-title">&#128193; File Nextcloud</div>'+
+      '<div style="display:flex;gap:6px">'+
+        (ncFolder?'<a href="'+esc(ncFolder)+'" target="_blank" class="btn btn-ghost btn-sm">&#8599; Apri cartella</a>':'')+
+        (ncPath?'<button class="btn btn-secondary btn-sm" data-path="'+esc(ncPath)+'" onclick="caricaFileNC(this.dataset.path)">&#8635; Aggiorna</button>':'')+
       '</div>'+
-      (docs.length?
-        '<div>'+docs.map(function(d){
-          return '<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px">'+
-            '<span style="font-size:20px">'+({schema:'&#128208;',foto:'&#128247;',email:'&#9993;',offerta:'&#128196;',ordine:'&#129534;',certificato:'&#127881;'}[d.tipo]||'&#128196;')+'</span>'+
-            '<div style="flex:1"><div style="font-weight:600">'+esc(d.nome||'—')+'</div>'+
-            '<div style="font-size:11px;color:var(--text3)">'+esc(d.tipo||'')+(d.data?' · '+fmtD(d.data):'')+(d.note?' · '+d.note:'')+'</div>'+
-            (d.url?'<a href="'+esc(d.url)+'" target="_blank" style="font-size:11px;color:var(--blue)">&#8599; apri</a>':'')+
-            '</div>'+
-            '<button class="btn-icon" style="color:var(--red)" data-id="'+esc(d.id)+'" data-num="'+esc(c.numero)+'" onclick="delDoc(this.dataset.id,this.dataset.num)">&#10005;</button>'+
-            '</div>';
-        }).join('')+'</div>'
-        :'<div class="empty">Nessun documento collegato</div>')+
-      '</div>';
+    '</div>'+
+    (ncPath?
+      '<div id="'+fileListId+'" style="padding:8px 0"><div style="padding:12px 16px;font-size:12px;color:var(--text3)">Caricamento file...</div></div>'
+      :'<div class="card-body" style="font-size:13px;color:var(--text3)">Configura Nextcloud e verifica che la cartella commessa esista.</div>')+
+    '</div>';
+    // Riferimenti manuali
+    html+='<div class="card"><div class="card-head">'+
+      '<div class="card-title">Riferimenti manuali</div>'+
+      '<button class="btn btn-secondary btn-sm" data-commessa="'+esc(c.numero)+'" onclick="openModal(&quot;add-doc&quot;,this.dataset.commessa)">+ Aggiungi link</button>'+
+    '</div>'+
+    (docs.length?
+      '<div>'+docs.map(function(d){
+        return '<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px">'+
+          '<span style="font-size:18px">'+({schema:'&#128208;',foto:'&#128247;',email:'&#9993;',offerta:'&#128196;',ordine:'&#129534;',certificato:'&#127881;'}[d.tipo]||'&#128196;')+'</span>'+
+          '<div style="flex:1"><div style="font-weight:600">'+esc(d.nome||'—')+'</div>'+
+          '<div style="font-size:11px;color:var(--text3)">'+esc(d.tipo||'')+(d.data?' · '+fmtD(d.data):'')+(d.note?' · '+d.note:'')+'</div>'+
+          (d.url?'<a href="'+esc(d.url)+'" target="_blank" style="font-size:11px;color:var(--blue)">&#8599; apri</a>':'')+
+          '</div>'+
+          '<button class="btn-icon" style="color:var(--red)" data-id="'+esc(d.id)+'" data-num="'+esc(c.numero)+'" onclick="delDoc(this.dataset.id,this.dataset.num)">&#10005;</button>'+
+          '</div>';
+      }).join('')+'</div>'
+      :'<div class="empty" style="padding:20px">Nessun riferimento manuale</div>')+
+    '</div>';
+    el.innerHTML=html;
+    // Carica file NC se path disponibile
+    if(ncPath)caricaFileNC(ncPath);
   }
   else el.innerHTML='<div class="empty">Tab non implementato</div>';
 }
@@ -821,6 +836,103 @@ function renderMargine(){
     '<div style="font-size:11px;color:var(--text3)">Costi: €'+fmt(tot)+'</div>'+
     (cO>0?'<div style="font-size:11px;color:var(--text3)">Ore: '+totH+'h (€'+fmt(cO)+')</div>':'')+
     '<button class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;font-size:11px" onclick="exportDistintaPDF(\''+esc(CC.numero)+'\')">PDF Distinta</button>';
+}
+
+// ── NEXTCLOUD FILE BROWSER ──────────────────────────────────────
+
+function getNcPath(numero){
+  var a=getAnno(numero),cod=getCod(numero),k=CMAP[cod]?CNAMES[cod]:null;
+  if(!k||!a)return null;
+  var seq=parseInt((numero||'').split('-')[1]||'0');
+  var comm=lg('comm').find(function(x){return x.numero===numero});
+  if(comm&&comm.oggetto)
+    return '/Clienti/'+k+'/'+a+'/'+cod+'-'+seq+'-'+a+' ('+comm.oggetto+')';
+  return '/Clienti/'+k+'/'+a;
+}
+
+function ncFileEmoji(name){
+  var ext=(name||'').split('.').pop().toLowerCase();
+  var map={pdf:'&#128196;',doc:'&#128196;',docx:'&#128196;',
+    xls:'&#128202;',xlsx:'&#128202;',csv:'&#128202;',
+    png:'&#128247;',jpg:'&#128247;',jpeg:'&#128247;',gif:'&#128247;',
+    md:'&#128209;',txt:'&#128209;',
+    zip:'&#128230;',rar:'&#128230;',
+    dwg:'&#128208;',dxf:'&#128208;',step:'&#128208;',stp:'&#128208;',
+    mp4:'&#127916;',mov:'&#127916;'};
+  return map[ext]||'&#128196;';
+}
+
+async function caricaFileNC(path){
+  var cfg=getCfg();
+  var listId=document.querySelector('[id^="nc-files-"]');
+  if(!listId)return;
+  if(!cfg.ok){listId.innerHTML='<div style="padding:12px 16px;font-size:12px;color:var(--red)">Nextcloud non configurato</div>';return}
+  try{
+    var url=cfg.nc_url+'/remote.php/dav/files/'+cfg.nc_user+encodeURI(path)+'/';
+    var body='<?xml version="1.0"?><d:propfind xmlns:d="DAV:"><d:prop><d:displayname/><d:resourcetype/><d:getcontenttype/><d:getcontentlength/><d:getlastmodified/></d:prop></d:propfind>';
+    var r=await fetch(url,{method:'PROPFIND',headers:{'Authorization':'Basic '+btoa(cfg.nc_user+':'+cfg.nc_pass),'Content-Type':'application/xml','Depth':'1'},body:body});
+    if(!r.ok){
+      // Prova senza trailing slash
+      r=await fetch(cfg.nc_url+'/remote.php/dav/files/'+cfg.nc_user+encodeURI(path),{method:'PROPFIND',headers:{'Authorization':'Basic '+btoa(cfg.nc_user+':'+cfg.nc_pass),'Content-Type':'application/xml','Depth':'1'},body:body});
+    }
+    if(!r.ok){listId.innerHTML='<div style="padding:12px 16px;font-size:12px;color:var(--red)">Cartella non trovata ('+r.status+'). Verifica che la cartella esista su Nextcloud.</div>';return}
+    var xml=await r.text();
+    var parser=new DOMParser();
+    var doc2=parser.parseFromString(xml,'application/xml');
+    var responses=Array.from(doc2.querySelectorAll('response'));
+    // Salta il primo (è la cartella stessa)
+    var items=responses.slice(1).map(function(resp){
+      var href=resp.querySelector('href');
+      var name=resp.querySelector('displayname');
+      var isDir=resp.querySelector('collection')!==null;
+      var size=resp.querySelector('getcontentlength');
+      var modified=resp.querySelector('getlastmodified');
+      var hrefText=href?decodeURIComponent(href.textContent):'';
+      var nameText=name?name.textContent:(hrefText.split('/').filter(Boolean).pop()||'');
+      return{name:nameText,href:hrefText,isDir:isDir,
+        size:size?parseInt(size.textContent):0,
+        modified:modified?modified.textContent:''};
+    }).filter(function(i){return i.name&&i.name!=='.'});
+    // Ordina: cartelle prima, poi file
+    items.sort(function(a,b){
+      if(a.isDir&&!b.isDir)return-1;
+      if(!a.isDir&&b.isDir)return 1;
+      return a.name.localeCompare(b.name);
+    });
+    if(!items.length){
+      listId.innerHTML='<div style="padding:12px 16px;font-size:12px;color:var(--text3)">Cartella vuota</div>';
+      return;
+    }
+    var html='';
+    items.forEach(function(item){
+      var openUrl=cfg.nc_url+'/apps/files/?dir='+encodeURIComponent(path)+(item.isDir?'/'+item.name:'');
+      var downloadUrl=cfg.nc_url+'/remote.php/dav/files/'+cfg.nc_user+encodeURI(path+'/'+item.name);
+      var sizeStr=item.size>0?(item.size>1048576?(item.size/1048576).toFixed(1)+'MB':(item.size>1024?(item.size/1024).toFixed(0)+'KB':item.size+'B')):'';
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:13px">'+
+        '<span style="font-size:18px;flex-shrink:0">'+(item.isDir?'&#128193;':ncFileEmoji(item.name))+'</span>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-weight:'+(item.isDir?'700':'500')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(item.name)+'</div>'+
+          (sizeStr?'<div style="font-size:11px;color:var(--text3)">'+sizeStr+'</div>':'')+
+        '</div>'+
+        (item.isDir?
+          '<button class="btn btn-ghost btn-sm" style="font-size:11px" data-path="'+esc(path+'/'+item.name)+'" onclick="caricaFileNC(this.dataset.path)">Apri</button>':
+          '<a href="'+esc(downloadUrl)+'" target="_blank" class="btn btn-ghost btn-sm" style="font-size:11px">&#8595; Scarica</a>')+
+        '<a href="'+esc(openUrl)+'" target="_blank" class="btn btn-ghost btn-sm" style="font-size:11px">&#8599; NC</a>'+
+      '</div>';
+    });
+    // Breadcrumb se siamo in sottocartella
+    var basePath=getNcPath(CC?CC.numero:'');
+    if(path!==basePath&&basePath){
+      var parentPath=path.split('/').slice(0,-1).join('/');
+      html='<div style="padding:8px 16px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;display:flex;align-items:center;gap:8px">'+
+        '<button class="btn btn-ghost btn-sm" data-path="'+esc(parentPath)+'" onclick="caricaFileNC(this.dataset.path)">&#8592; Indietro</button>'+
+        '<span style="color:var(--text3)">'+esc(path.split('/').pop())+'</span>'+
+      '</div>'+html;
+    }
+    listId.innerHTML=html;
+  }catch(e){
+    if(listId)listId.innerHTML='<div style="padding:12px 16px;font-size:12px;color:var(--red)">Errore: '+esc(e.message)+'</div>';
+  }
 }
 
 function cambiaStato(s){
