@@ -1094,7 +1094,6 @@ function resetImport(){_importRows=[];var act=document.getElementById('imp-actio
 function rigeneraScadenze(){
   var fatt=lg('fatt');
   var scad=lg('scad');
-  // Mantieni solo scadenze manuali (non generate da fatture)
   var manuali=scad.filter(function(s){return!s._da_fattura});
   var generate=[];
   fatt.forEach(function(f){
@@ -1106,15 +1105,15 @@ function rigeneraScadenze(){
       _da_fattura:true,
       data:f.data_scad,
       importo:f.importo,
-      descrizione:(f.tipo==='FE'?'Incasso ':'Pagamento ')+esc(f.numero||'')+(f.cliente?' — '+f.cliente:''),
+      descrizione:(f.tipo==='FE'?'Incasso ':'Pagamento ')+(f.numero||'')+(f.cliente?' — '+f.cliente:''),
       tipo:tipo,
       stato:'daf',
       _fatt_id:f.id
     });
   });
-  var merged=manuali.concat(generated);
+  var merged=manuali.concat(generate);
   ls('scad',merged);
-  return generated.length;
+  return generate.length;
 }
 function rigeneraScadenzeBtn(){
   var n=rigeneraScadenze();
@@ -1167,6 +1166,33 @@ function getModalHTML(type,extra){
     '<option value="daordinare">Da ordinare</option><option value="ordinato">Ordinato</option><option value="arrivato">Arrivato</option></select></div>'+
     '<div class="form-group"><label>Data attesa</label><input class="form-control" id="f-datta" type="date"></div></div>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveRiga(\''+esc(num)+'\')">Aggiungi</button></div>'}}
+  if(type==='edit-riga'){
+    var parts=(extra||'').split('|');var num=parts[0];var rid=parts[1];
+    var det=lgo('det');var dist=(det[num]&&det[num].distinta)||[];
+    var r=dist.find(function(x){return x.id===rid});
+    if(!r)return{title:'Errore',body:'<p>Riga non trovata</p>'};
+    var cfg2=getCfg();var cod2=getCod(num);var defMk2=cfg2.markup_clienti&&cfg2.markup_clienti[cod2]?cfg2.markup_clienti[cod2]:2.25;
+    return{title:'Modifica componente',body:
+    '<div class="form-group"><label>Descrizione *</label><input class="form-control" id="f-desc" value="'+esc(r.descrizione||'')+'"></div>'+
+    '<div class="form-row"><div class="form-group"><label>Sezione</label><input class="form-control" id="f-sez" value="'+esc(r.sezione||'Generale')+'"></div>'+
+    '<div class="form-group"><label>Q.ta</label><input class="form-control" id="f-qty" type="number" value="'+esc(String(r.qty||1))+'"></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Fornitore</label>'+
+    '<input class="form-control" id="f-forn" list="forn-list-modal2" value="'+esc(r.fornitore||'')+'">'+
+    '<datalist id="forn-list-modal2">'+FORNITORI.map(function(f){return'<option value="'+esc(f.nome)+'">'}).join('')+'</datalist>'+
+    '</div>'+
+    '<div class="form-group"><label>Codice</label><input class="form-control" id="f-cod" value="'+esc(r.codice||'')+'"></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Costo/cad</label><input class="form-control" id="f-costo" type="number" step="0.01" value="'+esc(String(r.costo_cad||0))+'" oninput="calcNetto()"></div>'+
+    '<div class="form-group"><label>Sconto %</label><input class="form-control" id="f-sconto" type="number" value="'+esc(String(r.sconto||0))+'" oninput="calcNetto()"></div>'+
+    '<div class="form-group"><label>Markup</label><input class="form-control" id="f-markup" type="number" step="0.05" value="'+esc(String(r.markup||defMk2))+'" oninput="calcNetto()"></div></div>'+
+    '<div id="calc-preview" style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:8px 12px;font-size:12px;color:var(--text3);margin-bottom:14px">Netto: \u20ac'+fmt(r.netto_cad||0)+' \u2192 Vendita: \u20ac'+fmt(r.prezzo_vendita||0)+'</div>'+
+    '<div class="form-row"><div class="form-group"><label>Stato approvv.</label><select class="form-control" id="f-stato-a">'+
+    ['daordinare','ordinato','arrivato'].map(function(s){return'<option value="'+s+'"'+(r.stato_approv===s?' selected':'')+'>'+s+'</option>'}).join('')+
+    '</select></div>'+
+    '<div class="form-group"><label>Data attesa</label><input class="form-control" id="f-datta" type="date" value="'+esc(r.data_attesa||'')+'"></div></div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
+    '<button class="btn btn-danger btn-sm" data-id="'+esc(rid)+'" data-num="'+esc(num)+'" onclick="delRiga(this.dataset.id,this.dataset.num)">Elimina</button>'+
+    '<button class="btn btn-primary" data-id="'+esc(rid)+'" data-num="'+esc(num)+'" onclick="updateRiga(this.dataset.id,this.dataset.num)">Salva</button></div>'}}
+
   if(type==='add-ora'){var num2=extra||'';return{title:'Aggiungi ore',body:
     '<div class="form-row"><div class="form-group"><label>Data</label><input class="form-control" id="f-data" type="date" value="'+today()+'"></div>'+
     '<div class="form-group"><label>Operatore</label><input class="form-control" id="f-oper"></div></div>'+
@@ -1286,6 +1312,25 @@ function saveDoc(numero){
   showToast('Documento aggiunto');
 }
 
+function updateRiga(rid,numero){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var det=lgo('det');if(!det[numero])return;
+  var idx=det[numero].distinta.findIndex(function(r){return r.id===rid});
+  if(idx<0)return;
+  var costo=parseFloat(G('f-costo')||0);var sconto=parseFloat(G('f-sconto')||0);var markup=parseFloat(G('f-markup')||2.25);
+  var netto=costo*(1-sconto/100);
+  det[numero].distinta[idx]=Object.assign(det[numero].distinta[idx],{
+    descrizione:G('f-desc'),sezione:G('f-sez')||'Generale',
+    qty:parseInt(G('f-qty')||1),fornitore:G('f-forn'),codice:G('f-cod'),
+    costo_cad:costo,sconto:sconto,netto_cad:parseFloat(netto.toFixed(4)),
+    markup:markup,prezzo_vendita:parseFloat((netto*markup).toFixed(4)),
+    stato_approv:G('f-stato-a')||'daordinare',data_attesa:G('f-datta')
+  });
+  ls('det',det);CC._det=det[numero];
+  closeM();renderDetTab('distinta',document.getElementById('det-content'));renderMargine();syncDetBg();
+  showToast('Riga aggiornata');
+}
+
 function saveSezione(numero){
   var el=document.getElementById('f-sez-nome');var nome=(el?el.value||'':'').trim();if(!nome)return;
   var det=lgo('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
@@ -1294,23 +1339,50 @@ function saveSezione(numero){
   closeM();renderDetTab('distinta',document.getElementById('det-content'));syncDetBg();
 }
 
-function calcNettoPU(){var c=parseFloat((document.getElementById('pu-costo')||{}).value||0);var mk=parseFloat((document.getElementById('pu-markup')||{}).value||2.25);var pre=document.getElementById('pu-preview');if(pre)pre.textContent='Vendita: \u20ac'+fmt(c*mk)}
+function calcNettoPU(){var c=parseFloat((document.getElementById('pu-costo')||{}).value||0);var mk=parseFloat((document.getElementById('pu-markup')||{}).value||2.25);var pre=document.getElementById('pu-preview');if(pre)pre.textContent='Netto: \u20ac'+fmt(c)+' \u2192 Vendita: \u20ac'+fmt(c*mk)}
 function calcNettoTR(){var c=parseFloat((document.getElementById('tr-costo')||{}).value||0);var mk=parseFloat((document.getElementById('tr-markup')||{}).value||2.25);var pre=document.getElementById('tr-preview');if(pre)pre.textContent='Vendita: \u20ac'+fmt(c*mk)}
 
 function savePU(numero,modello){
-  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
-  var cil=G('pu-cil');var press=G('pu-press');var motore=G('pu-motore');var serb=G('pu-serb');var note=G('pu-note');
+  var G=function(id){var el=document.getElementById(id);return el?el.value.trim()||'':''};
+  var chk=function(id){var el=document.getElementById(id);return el?el.checked:false};
+  var cil=G('pu-cil');var press=G('pu-press');var port=G('pu-port');
   var costo=parseFloat(G('pu-costo')||0);var markup=parseFloat(G('pu-markup')||2.25);
-  var desc=modello+(cil?' cil.'+cil+'cc/g':'')+(press?' '+press+'bar':'')+(motore?' mot.'+motore:'')+(serb?' serb.'+serb+'L':'')+(note?' — '+note:'');
-  var row={id:uid(),sezione:'Centralina',descrizione:desc,qty:1,
-    fornitore:'Ares / Tecfluid',codice:'',
-    costo_cad:costo,sconto:0,netto_cad:costo,markup:markup,
-    prezzo_vendita:parseFloat((costo*markup).toFixed(4)),
-    stato_approv:'daordinare',data_attesa:''};
   var det=lgo('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
-  det[numero].distinta.push(row);ls('det',det);CC._det=det[numero];
+  var spec=modello+(cil?' cil.'+cil+'cc/g':'')+(press?' '+press+'bar':'')+(port?' '+port+'L/min':'');
+  var righe=[];
+  // Intestazione sezione
+  righe.push({id:uid(),_intestazione:true,descrizione:modello+' — '+spec,sezione:'Centralina'});
+  // Kit Ares (pompa + valvole + accessori)
+  if(chk('pu-inc-pompa')||chk('pu-inc-valv')||chk('pu-inc-acc')){
+    var descAres=[];
+    if(chk('pu-inc-pompa')&&G('pu-pompa'))descAres.push(G('pu-pompa'));
+    if(chk('pu-inc-valv')&&G('pu-valv'))descAres.push(G('pu-valv'));
+    if(chk('pu-inc-acc')&&G('pu-acc'))descAres.push(G('pu-acc'));
+    var descKit='Kit idraulico '+modello+(descAres.length?' ('+descAres.join(', ')+')':'');
+    righe.push({id:uid(),sezione:'Centralina',descrizione:descKit,qty:1,
+      fornitore:'Ares / Tecfluid',codice:'',
+      costo_cad:costo,sconto:0,netto_cad:costo,markup:markup,
+      prezzo_vendita:parseFloat((costo*markup).toFixed(4)),
+      stato_approv:'daordinare',data_attesa:''});
+  }
+  // Motore (fornitore separato)
+  if(chk('pu-inc-mot')&&G('pu-motore')){
+    righe.push({id:uid(),sezione:'Centralina',descrizione:'Motore elettrico '+G('pu-motore'),qty:1,
+      fornitore:G('pu-mot-forn')||'SMEM s.r.l.',codice:'',
+      costo_cad:0,sconto:0,netto_cad:0,markup:markup,prezzo_vendita:0,
+      stato_approv:'daordinare',data_attesa:''});
+  }
+  // Serbatoio (fornitore separato)
+  if(chk('pu-inc-serb')&&G('pu-serb')){
+    righe.push({id:uid(),sezione:'Centralina',descrizione:'Serbatoio '+G('pu-serb'),qty:1,
+      fornitore:G('pu-serb-forn')||'COLFER Srl',codice:'',
+      costo_cad:0,sconto:0,netto_cad:0,markup:markup,prezzo_vendita:0,
+      stato_approv:'daordinare',data_attesa:''});
+  }
+  det[numero].distinta.push(...righe);
+  ls('det',det);CC._det=det[numero];
   closeM();renderDetTab('distinta',document.getElementById('det-content'));renderMargine();syncDetBg();
-  showToast(modello+' aggiunto alla distinta');
+  showToast(modello+': '+righe.length+' righe aggiunte');
 }
 
 function saveTuboRacc(numero){
