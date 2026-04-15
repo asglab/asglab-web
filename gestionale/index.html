@@ -649,7 +649,9 @@ function renderDetTab(tab,el){
       '<button class="btn btn-primary btn-sm" onclick="openModal(\'add-riga\',\''+esc(c.numero)+'\')">+ Componente</button>'+
       '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-pu\',\''+esc(c.numero)+'|PU10\')">PU10</button>'+
       '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-pu\',\''+esc(c.numero)+'|PU20\')">PU20</button>'+
-      '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-tubo\',\''+esc(c.numero)+'\')">Tubo raccordato</button>'+
+      '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-tubo\',\''+esc(c.numero)+'\')">&#129348; Tubo flex</button>'+
+      '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-raccordi\',\''+esc(c.numero)+'\')">&#128295; Raccordi</button>'+
+      '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-tubo-rigido\',\''+esc(c.numero)+'\')">&#128296; Tubo rigido</button>'+
       '<div style="flex:1"></div>'+
       '<button class="btn btn-ghost btn-sm" onclick="openModal(\'add-sezione\',\''+esc(c.numero)+'\')">+ Sezione</button>'+
       '<button class="btn btn-ghost btn-sm" onclick="exportDistintaPDF(\''+esc(c.numero)+'\')">PDF</button></div>';
@@ -1547,6 +1549,10 @@ function rigeneraScadenzeBtn(){
 function getModalHTML(type,extra){
   var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
   if(type==='map-listino-cols')return getModalHTML_listino(extra);
+  if(type==='nc-picker')return{title:'Scegli file da Nextcloud',body:
+    '<div id="nc-picker-list" style="max-height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r-sm)">'+
+    '<div style="padding:12px;color:var(--text3)">Caricamento...</div></div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button></div>'}
   if(type==='commessa')return{title:'Nuova commessa',body:
     '<div class="form-group"><label>Numero *</label><input class="form-control" id="f-num" placeholder="es. KFG-1-2026"></div>'+
     '<div class="form-row"><div class="form-group" style="flex:2"><label>Oggetto</label><input class="form-control" id="f-ogg"></div>'+
@@ -1710,7 +1716,11 @@ function getModalHTML(type,extra){
     '</select></div>'+
     '<div class="form-group"><label>Data risposta cliente</label><input class="form-control" id="off-drisposta" type="date" value="'+esc(off.data_risposta||'')+'"></div></div>'+
     '<div class="form-group"><label>Note risposta</label><input class="form-control" id="off-nrisposta" value="'+esc(off.note_risposta||'')+'"></div>'+
-    '<div class="form-group"><label>URL file esistente (opzionale)</label><input class="form-control" id="off-url" type="url" value="'+esc(off.url||'')+'" placeholder="Link a file su Nextcloud o Drive"></div>'+
+    '<div class="form-group"><label>Documento offerta</label>'+
+    '<div style="display:flex;gap:6px">'+
+    '<input class="form-control" id="off-url" value="'+esc(off.url||'')+'" placeholder="URL file (Nextcloud, Drive...)">'+
+    '<button type="button" class="btn btn-secondary btn-sm" style="flex-shrink:0;white-space:nowrap" data-num="'+esc(num)+'" data-target="off-url" onclick="apriPickerNC(this.dataset.num,this.dataset.target)">&#128193; Sfoglia NC</button>'+
+    '</div></div>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
     '<button class="btn btn-primary" data-num="'+esc(num)+'" onclick="saveOfferta(this.dataset.num)">Salva offerta</button></div>'}}
 
@@ -1752,6 +1762,65 @@ function getModalHTML(type,extra){
     '<div id="tr-preview" style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:8px 12px;font-size:12px;color:var(--text3);margin-bottom:14px">Vendita: €0.00</div>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
     '<button class="btn btn-primary" data-num="'+esc(num)+'" onclick="saveTuboRacc(this.dataset.num)">Aggiungi a distinta</button></div>'}}
+
+  if(type==='cfg-raccordi'){var num=extra||'';
+    var cfg4=getCfg();var cod4=getCod(num);var defMk4=cfg4.markup_clienti&&cfg4.markup_clienti[cod4]?cfg4.markup_clienti[cod4]:2.25;
+    var FIGURE_DIN=['Dritto','Curva 90° normale','Curva 90° compatta','T maschio','T femmina','Croce','Orientabile 360°'];
+    var FIGURE_GAS=['Dritto GAS','Curva 90° GAS','T GAS','Riduzione GAS'];
+    var MISURE=['6','8','10','12','14','16','18','20','22','25'];
+    var optsF=FIGURE_DIN.concat(FIGURE_GAS).map(function(f){return'<option value="'+f+'">'+f+'</option>'}).join('');
+    var optsM=MISURE.map(function(m){return'<option value="'+m+'">Ø'+m+'</option>'}).join('');
+    return{title:'Configuratore Raccordi',body:
+    '<p style="font-size:12px;color:var(--text3);margin-bottom:12px">Aggiungi raccordi alla distinta. Ogni riga è un tipo/misura separato.</p>'+
+    '<div id="raccordi-lista" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>'+
+    '<button class="btn btn-secondary btn-sm" onclick="aggiungiRigaRaccordo()">+ Aggiungi raccordo</button>'+
+    '<script>window._raccordiOpts={figure:"'+optsF+'",misure:"'+optsM+'"};window._raccordiRighe=[];<\/script>'+
+    '<div class="form-row" style="margin-top:16px"><div class="form-group"><label>Fornitore</label>'+
+    '<input class="form-control" id="racc-forn" list="forn-list-racc" value="Pa.Co Fluid &amp; Air Group">'+
+    '<datalist id="forn-list-racc">'+FORNITORI.map(function(f){return'<option value="'+esc(f.nome)+'">'}).join('')+'</datalist></div>'+
+    '<div class="form-group"><label>Sezione distinta</label><input class="form-control" id="racc-sez" value="Raccorderia"></div></div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
+    '<button class="btn btn-primary" data-num="'+esc(num)+'" onclick="saveRaccordi(this.dataset.num)">Aggiungi a distinta</button></div>'}}
+
+  if(type==='cfg-tubo-rigido'){var num=extra||'';
+    var cfg5=getCfg();var cod5=getCod(num);var defMk5=cfg5.markup_clienti&&cfg5.markup_clienti[cod5]?cfg5.markup_clienti[cod5]:2.25;
+    return{title:'Configuratore Tubo Rigido Raccordato',body:
+    '<div class="form-row"><div class="form-group"><label>Diametro esterno (mm)</label>'+
+    '<select class="form-control" id="trig-diam">'+
+    ['6','8','10','12','14','16','18','20','22','25','28','30','35','38','42'].map(function(d){return'<option value="'+d+'"'+(d==='12'?' selected':'')+'>Ø'+d+'mm</option>'}).join('')+
+    '</select></div>'+
+    '<div class="form-group"><label>Materiale</label>'+
+    '<select class="form-control" id="trig-mat">'+
+    '<option value="Acciaio">Acciaio (nero)</option>'+
+    '<option value="Inox 316L">Inox 316L</option>'+
+    '<option value="Inox 304">Inox 304</option>'+
+    '<option value="Rame">Rame</option>'+
+    '</select></div>'+
+    '<div class="form-group"><label>Lunghezza (mm)</label>'+
+    '<input class="form-control" id="trig-lung" type="number" placeholder="es. 500"></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Raccordo lato A</label>'+
+    '<select class="form-control" id="trig-ra">'+
+    '<option value="">— nessuno —</option>'+
+    ['Dritto DIN','Curva 90° DIN normale','Curva 90° DIN compatta','T DIN','Orientabile DIN','Dritto GAS','Curva 90° GAS'].map(function(f){return'<option value="'+f+'">'+f+'</option>'}).join('')+
+    '</select></div>'+
+    '<div class="form-group"><label>Raccordo lato B</label>'+
+    '<select class="form-control" id="trig-rb">'+
+    '<option value="">— nessuno —</option>'+
+    ['Dritto DIN','Curva 90° DIN normale','Curva 90° DIN compatta','T DIN','Orientabile DIN','Dritto GAS','Curva 90° GAS'].map(function(f){return'<option value="'+f+'">'+f+'</option>'}).join('')+
+    '</select></div></div>'+
+    '<div class="form-group"><label>Note / descrizione aggiuntiva</label>'+
+    '<input class="form-control" id="trig-note" placeholder="es. curva 90° lato A raggio 40mm, sagomato a L"></div>'+
+    '<div class="form-row"><div class="form-group"><label>Fornitore</label>'+
+    '<input class="form-control" id="trig-forn" list="forn-list-trig" value="Pa.Co Fluid &amp; Air Group">'+
+    '<datalist id="forn-list-trig">'+FORNITORI.map(function(f){return'<option value="'+esc(f.nome)+'">'}).join('')+'</datalist></div>'+
+    '<div class="form-group"><label>Sezione distinta</label><input class="form-control" id="trig-sez" value="Tubi rigidi"></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Costo stimato (€)</label>'+
+    '<input class="form-control" id="trig-costo" type="number" step="0.01" value="0" oninput="calcNettoTRig()"></div>'+
+    '<div class="form-group"><label>Markup</label>'+
+    '<input class="form-control" id="trig-markup" type="number" step="0.05" value="'+defMk5+'" oninput="calcNettoTRig()"></div></div>'+
+    '<div id="trig-preview" style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:8px 12px;font-size:12px;color:var(--text3);margin-bottom:14px">Vendita: €0.00</div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
+    '<button class="btn btn-primary" data-num="'+esc(num)+'" onclick="saveTuboRigido(this.dataset.num)">Aggiungi a distinta</button></div>'}}
 
   if(type==='forn-det'){var f=FORNITORI.find(function(x){return x.id===extra});if(!f)return null;
     return{title:f.nome,body:
@@ -2329,6 +2398,120 @@ function apriRDO(fornId){
   var subj='Richiesta di Offerta — ASG LAB — '+new Date().toLocaleDateString('it-IT');
   if(email)window.open('mailto:'+email+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(testo));
   else navigator.clipboard.writeText(subj+'\n\n'+testo).then(function(){showToast('\u2713 Testo RDO copiato')});
+}
+
+// ── PICKER FILE NC ───────────────────────────────────────────────
+var _ncPickerTarget=null;
+async function apriPickerNC(numero,targetId){
+  _ncPickerTarget=targetId;
+  openModal('nc-picker',numero);
+  var path=getNcPath(numero)||'/';
+  setTimeout(function(){caricaFileNCPicker(path);},150);
+}
+async function caricaFileNCPicker(path){
+  var el=document.getElementById('nc-picker-list');if(!el)return;
+  var cfg=getCfg();if(!cfg.ok){el.innerHTML='<div style="padding:12px;color:var(--red)">NC non configurato</div>';return}
+  el.innerHTML='<div style="padding:12px;color:var(--text3)">Caricamento...</div>';
+  try{
+    var url=cfg.nc_url+'/remote.php/dav/files/'+cfg.nc_user+encodeURI(path)+'/';
+    var body='<?xml version="1.0"?><d:propfind xmlns:d="DAV:"><d:prop><d:displayname/><d:resourcetype/><d:getcontentlength/></d:prop></d:propfind>';
+    var r=await fetch(url,{method:'PROPFIND',headers:{'Authorization':'Basic '+btoa(cfg.nc_user+':'+cfg.nc_pass),'Content-Type':'application/xml','Depth':'1'},body:body});
+    if(!r.ok){el.innerHTML='<div style="padding:12px;color:var(--red)">Cartella non trovata ('+r.status+')</div>';return}
+    var doc2=(new DOMParser()).parseFromString(await r.text(),'application/xml');
+    var items=Array.from(doc2.querySelectorAll('response')).slice(1).map(function(resp){
+      var href=resp.querySelector('href');var name=resp.querySelector('displayname');
+      var isDir=resp.querySelector('collection')!==null;
+      var hrefTxt=href?decodeURIComponent(href.textContent):'';
+      var nameTxt=name?name.textContent:(hrefTxt.split('/').filter(Boolean).pop()||'');
+      return{name:nameTxt,isDir:isDir,fullPath:path+'/'+nameTxt};
+    }).filter(function(i){return i.name&&!i.name.startsWith('.')});
+    items.sort(function(a,b){return(a.isDir===b.isDir)?a.name.localeCompare(b.name):a.isDir?-1:1});
+    var html='<div style="padding:5px 10px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:11px;display:flex;align-items:center;gap:6px">';
+    var segs=path.split('/').filter(Boolean);
+    if(segs.length){var parent='/'+segs.slice(0,-1).join('/');html+='<button class="btn btn-ghost btn-sm" data-p="'+esc(parent)+'" onclick="caricaFileNCPicker(this.dataset.p)">&#8592;</button>';}
+    html+='<span style="color:var(--text3);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(path)+'</span></div>';
+    html+=items.map(function(item){
+      var ncUrl=cfg.nc_url+'/apps/files/?dir='+encodeURIComponent(path)+'&openfile='+encodeURIComponent(item.name);
+      if(item.isDir)
+        return'<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer" data-p="'+esc(item.fullPath)+'" onclick="caricaFileNCPicker(this.dataset.p)">'+
+          '<span style="font-size:18px">&#128193;</span><span style="flex:1;font-weight:700">'+esc(item.name)+'</span><span style="color:var(--text3)">&#8250;</span></div>';
+      return'<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer" data-url="'+esc(ncUrl)+'" data-name="'+esc(item.name)+'" onclick="selezionaFileNC(this.dataset.url,this.dataset.name)">'+
+        '<span style="font-size:18px">'+ncFileEmoji(item.name)+'</span>'+
+        '<span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(item.name)+'</span>'+
+        '<span style="font-size:11px;color:var(--blue);flex-shrink:0">Seleziona</span></div>';
+    }).join('');
+    el.innerHTML=html;
+  }catch(e){el.innerHTML='<div style="padding:12px;color:var(--red)">Errore: '+esc(e.message)+'</div>'}
+}
+function selezionaFileNC(url,name){
+  if(_ncPickerTarget){var el=document.getElementById(_ncPickerTarget);if(el)el.value=url;}
+  closeM();showToast('File selezionato: '+name);
+}
+
+// ── CONFIGURATORE RACCORDI ────────────────────────────────────────
+function aggiungiRigaRaccordo(){
+  var lista=document.getElementById('raccordi-lista');if(!lista)return;
+  var FIGURE=['Dritto DIN','Curva 90° DIN normale','Curva 90° DIN compatta','T maschio DIN','T femmina DIN','Croce DIN','Orientabile DIN','Dritto GAS','Curva 90° GAS','T GAS','Riduzione GAS'];
+  var MISURE=['6','8','10','12','14','16','18','20','22','25'];
+  var idx=lista.children.length;
+  var div=document.createElement('div');
+  div.style.cssText='display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid var(--border)';
+  div.innerHTML=
+    '<select class="form-control" style="flex:2;min-width:160px">'+FIGURE.map(function(f){return'<option>'+f+'</option>'}).join('')+'</select>'+
+    '<select class="form-control" style="width:80px">'+MISURE.map(function(m){return'<option value="'+m+'">Ø'+m+'</option>'}).join('')+'</select>'+
+    '<select class="form-control" style="width:90px"><option>Acciaio</option><option>Inox</option></select>'+
+    '<input class="form-control" type="number" value="1" min="1" style="width:55px" placeholder="Q.">'+
+    '<button class="btn-icon" style="color:var(--red)" onclick="this.parentElement.remove()">&#10005;</button>';
+  lista.appendChild(div);
+}
+function saveRaccordi(numero){
+  var forn=document.getElementById('racc-forn');forn=forn?forn.value:'Pa.Co Fluid & Air Group';
+  var sez=document.getElementById('racc-sez');sez=sez?sez.value:'Raccorderia';
+  var det=lgo('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
+  var lista=document.getElementById('raccordi-lista');if(!lista)return;
+  var righe=[];
+  Array.from(lista.children).forEach(function(div){
+    var sels=div.querySelectorAll('select');var inp=div.querySelector('input[type="number"]');
+    if(!sels[0]||!sels[0].value)return;
+    var desc='Raccordo '+sels[0].value+' Ø'+sels[1].value+'mm '+(sels[2]?sels[2].value:'');
+    righe.push({id:uid(),sezione:sez,descrizione:desc.trim(),qty:parseInt(inp?inp.value:1)||1,
+      fornitore:forn,codice:'',costo_cad:0,sconto:0,netto_cad:0,markup:2.25,prezzo_vendita:0,
+      stato_approv:'daordinare',data_attesa:''});
+  });
+  if(!righe.length){showToast('Aggiungi almeno un raccordo');return}
+  det[numero].distinta.push(...righe);
+  ls('det',det);CC._det=det[numero];
+  closeM();renderDetTab('distinta',document.getElementById('det-content'));renderMargine();syncDetBg();
+  showToast(righe.length+' raccordi aggiunti');
+}
+
+// ── CONFIGURATORE TUBO RIGIDO ─────────────────────────────────────
+function calcNettoTRig(){
+  var c=parseFloat((document.getElementById('trig-costo')||{}).value||0);
+  var mk=parseFloat((document.getElementById('trig-markup')||{}).value||2.25);
+  var pre=document.getElementById('trig-preview');
+  if(pre)pre.textContent='Netto: €'+fmt(c)+' → Vendita: €'+fmt(c*mk);
+}
+function saveTuboRigido(numero){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var diam=G('trig-diam');var mat=G('trig-mat');var lung=G('trig-lung');
+  var ra=G('trig-ra');var rb=G('trig-rb');var note=G('trig-note');
+  var forn=G('trig-forn')||'Pa.Co Fluid & Air Group';
+  var sez=G('trig-sez')||'Tubi rigidi';
+  var costo=parseFloat(G('trig-costo')||0);var markup=parseFloat(G('trig-markup')||2.25);
+  var desc='Tubo rigido Ø'+diam+'mm '+mat;
+  if(lung)desc+=' L='+lung+'mm';
+  var racc=[];if(ra)racc.push('A: '+ra);if(rb)racc.push('B: '+rb);
+  if(racc.length)desc+=' ('+racc.join(', ')+')';
+  if(note)desc+=' — '+note;
+  var row={id:uid(),sezione:sez,descrizione:desc,qty:1,fornitore:forn,codice:'',
+    costo_cad:costo,sconto:0,netto_cad:costo,markup:markup,
+    prezzo_vendita:parseFloat((costo*markup).toFixed(4)),stato_approv:'daordinare',data_attesa:''};
+  var det=lgo('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
+  det[numero].distinta.push(row);
+  ls('det',det);CC._det=det[numero];
+  closeM();renderDetTab('distinta',document.getElementById('det-content'));renderMargine();syncDetBg();
+  showToast('Tubo rigido aggiunto');
 }
 
 function exportAll(){var data={comm:lg('comm'),fatt:lg('fatt'),scad:lg('scad'),conti:lg('conti'),det:lgo('det'),mag:lg('mag'),pn:lg('pn')};var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='asglab-backup-'+today()+'.json';a.click()}
