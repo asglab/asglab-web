@@ -237,6 +237,7 @@ tbody tr:hover td{background:var(--surface2)}
             <div class="chip" onclick="setChip(this,'scad-filtro','incasso');renderScad()">Da incassare</div>
             <div class="chip" onclick="setChip(this,'scad-filtro','pagamento');renderScad()">Da pagare</div>
             <div style="flex:1"></div>
+            <button class="btn btn-ghost btn-sm" onclick="rigeneraScadenzeBtn()">&#8635; Rigenera da fatture</button>
             <button class="btn btn-secondary btn-sm" onclick="openModal('scadenza')">+ Nuova</button>
           </div>
           <div class="card" id="scad-content"><div class="empty">Caricamento...</div></div>
@@ -406,6 +407,7 @@ async function syncNow(){
     var localFatt=lg('fatt');if(fa&&fa.length>=localFatt.length)ls('fatt',fa);
     if(sc)ls('scad',sc);if(ca)ls('conti',ca);if(dj)ls('det',dj);if(mg&&mg.length)ls('mag',mg);if(pn&&pn.length)ls('pn',pn);
     setSyncUI('ok',new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}));
+    rigeneraScadenze();
     renderAll();
   }catch(e){setSyncUI('err','errore')}
 }
@@ -506,7 +508,7 @@ function renderDetail(){
     return '<div class="'+cls+'" onclick="cambiaStato(\''+s+'\')">'+esc(SL[s])+'</div>';
   }).join('');
   renderMargine();
-  var tabs=[{id:'riepilogo',l:'Riepilogo'},{id:'distinta',l:'Distinta'},{id:'ore',l:'Ore'},{id:'offerta',l:'Offerta'},{id:'note',l:'Note'}];
+  var tabs=[{id:'riepilogo',l:'Riepilogo'},{id:'distinta',l:'Distinta'},{id:'ore',l:'Ore'},{id:'offerta',l:'Offerta'},{id:'documenti',l:'Documenti'},{id:'note',l:'Note'}];
   document.getElementById('det-tabs').innerHTML=tabs.map(function(t){
     return '<button class="tab-btn'+(t.id==='riepilogo'?' active':'')+'" onclick="detTab(\''+t.id+'\',this)">'+t.l+'</button>';
   }).join('');
@@ -543,7 +545,12 @@ function renderDetTab(tab,el){
   else if(tab==='distinta'){
     var html='<div class="dist-toolbar">'+
       '<button class="btn btn-primary btn-sm" onclick="openModal(\'add-riga\',\''+esc(c.numero)+'\')">+ Componente</button>'+
-      '<button class="btn btn-ghost btn-sm" onclick="exportDistintaPDF(\''+esc(c.numero)+'\')">PDF Distinta</button></div>';
+      '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-pu\',\''+esc(c.numero)+'|PU10\')">PU10</button>'+
+      '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-pu\',\''+esc(c.numero)+'|PU20\')">PU20</button>'+
+      '<button class="btn btn-secondary btn-sm" onclick="openModal(\'cfg-tubo\',\''+esc(c.numero)+'\')">Tubo raccordato</button>'+
+      '<div style="flex:1"></div>'+
+      '<button class="btn btn-ghost btn-sm" onclick="openModal(\'add-sezione\',\''+esc(c.numero)+'\')">+ Sezione</button>'+
+      '<button class="btn btn-ghost btn-sm" onclick="exportDistintaPDF(\''+esc(c.numero)+'\')">PDF</button></div>';
     if(!dist.length)html+='<div class="empty">Distinta vuota</div>';
     else html+='<div class="card"><div class="table-wrap"><table>'+
       '<thead><tr><th>Descrizione</th><th>Q.</th><th>Fornitore</th><th>Codice</th>'+
@@ -599,6 +606,31 @@ function renderDetTab(tab,el){
       (off.importo_offerto?'<div style="font-size:24px;font-weight:800;color:var(--green);margin-bottom:12px">€'+fmt(off.importo_offerto)+'</div>':'')+
       (off.testo?'<div style="font-size:13px;white-space:pre-wrap;color:var(--text2)">'+esc(off.testo)+'</div>':'<div style="color:var(--text3)">Nessuna offerta</div>')+
       '</div></div>';
+  }
+  else if(tab==='documenti'){
+    var ncFolder=folderUrl(c.numero);
+    var docs=(cd.documenti||[]);
+    el.innerHTML='<div class="card" style="margin-bottom:12px"><div class="card-head"><div class="card-title">Cartella Nextcloud</div>'+
+      (ncFolder?'<a href="'+esc(ncFolder)+'" target="_blank" class="btn btn-primary btn-sm">&#128193; Apri cartella</a>':'')+
+      '</div><div class="card-body" style="font-size:13px;color:var(--text3)">'+
+      (ncFolder?'Cartella commessa su Nextcloud.':'Configura Nextcloud per vedere i documenti.')+
+      '</div></div>'+
+      '<div class="card"><div class="card-head"><div class="card-title">Riferimenti</div>'+
+      '<button class="btn btn-secondary btn-sm" onclick="openModal('add-doc',''+esc(c.numero)+'')">+ Aggiungi</button>'+
+      '</div>'+
+      (docs.length?
+        '<div>'+docs.map(function(d){
+          return '<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px">'+
+            '<span style="font-size:20px">'+({schema:'&#128208;',foto:'&#128247;',email:'&#9993;',offerta:'&#128196;',ordine:'&#129534;',certificato:'&#127881;'}[d.tipo]||'&#128196;')+'</span>'+
+            '<div style="flex:1"><div style="font-weight:600">'+esc(d.nome||'—')+'</div>'+
+            '<div style="font-size:11px;color:var(--text3)">'+esc(d.tipo||'')+(d.data?' · '+fmtD(d.data):'')+(d.note?' · '+d.note:'')+'</div>'+
+            (d.url?'<a href="'+esc(d.url)+'" target="_blank" style="font-size:11px;color:var(--blue)">&#8599; apri</a>':'')+
+            '</div>'+
+            '<button class="btn-icon" style="color:var(--red)" onclick="delDoc(''+esc(d.id)+'',''+esc(c.numero)+'')">&#10005;</button>'+
+            '</div>';
+        }).join('')+'</div>'
+        :'<div class="empty">Nessun documento collegato</div>')+
+      '</div>';
   }
   else el.innerHTML='<div class="empty">Tab non implementato</div>';
 }
@@ -1037,6 +1069,7 @@ async function confirmImport(){
   merged.sort(function(a,b){return(b.data||'').localeCompare(a.data||'')});
   ls('fatt',merged);_importRows=[];
   var act=document.getElementById('imp-actions');if(act)act.style.display='none';
+  rigeneraScadenze();
   showToast(merged.length+' fatture salvate');
   var ncEl=document.getElementById('imp-nc-status');
   if(getCfg().ok){
@@ -1047,6 +1080,39 @@ async function confirmImport(){
   }
 }
 function resetImport(){_importRows=[];var act=document.getElementById('imp-actions');if(act)act.style.display='none';var pre=document.getElementById('imp-preview');if(pre)pre.innerHTML=''}
+
+// RIGENERA SCADENZE DA FATTURE
+function rigeneraScadenze(){
+  var fatt=lg('fatt');
+  var scad=lg('scad');
+  // Mantieni solo scadenze manuali (non generate da fatture)
+  var manuali=scad.filter(function(s){return!s._da_fattura});
+  var generate=[];
+  fatt.forEach(function(f){
+    if(!f.data_scad||!f.importo)return;
+    if(f.stato==='pagata')return;
+    var tipo=f.tipo==='FE'?'incasso':'pagamento';
+    generate.push({
+      id:'scad_fatt_'+f.id,
+      _da_fattura:true,
+      data:f.data_scad,
+      importo:f.importo,
+      descrizione:(f.tipo==='FE'?'Incasso ':'Pagamento ')+esc(f.numero||'')+(f.cliente?' — '+f.cliente:''),
+      tipo:tipo,
+      stato:'daf',
+      _fatt_id:f.id
+    });
+  });
+  var merged=manuali.concat(generated);
+  ls('scad',merged);
+  return generated.length;
+}
+function rigeneraScadenzeBtn(){
+  var n=rigeneraScadenze();
+  showToast('Rigenerate '+n+' scadenze da fatture');
+  renderScad();
+  wPut('scadenze.csv',lg('scad'),['id','data','importo','descrizione','tipo','stato']);
+}
 
 // MODAL HTML
 function getModalHTML(type,extra){
@@ -1079,7 +1145,10 @@ function getModalHTML(type,extra){
     '<div class="form-group"><label>Descrizione *</label><input class="form-control" id="f-desc"></div>'+
     '<div class="form-row"><div class="form-group"><label>Sezione</label><input class="form-control" id="f-sez" value="Generale"></div>'+
     '<div class="form-group"><label>Q.ta</label><input class="form-control" id="f-qty" type="number" value="1"></div></div>'+
-    '<div class="form-row"><div class="form-group"><label>Fornitore</label><input class="form-control" id="f-forn"></div>'+
+    '<div class="form-row"><div class="form-group"><label>Fornitore</label>'+
+    '<input class="form-control" id="f-forn" list="forn-list-modal">'+
+    '<datalist id="forn-list-modal">'+FORNITORI.map(function(f){return'<option value="'+esc(f.nome)+'">'}).join('')+'</datalist>'+
+    '</div>'+
     '<div class="form-group"><label>Codice</label><input class="form-control" id="f-cod"></div></div>'+
     '<div class="form-row"><div class="form-group"><label>Costo/cad</label><input class="form-control" id="f-costo" type="number" step="0.01" value="0" oninput="calcNetto()"></div>'+
     '<div class="form-group"><label>Sconto %</label><input class="form-control" id="f-sconto" type="number" value="0" oninput="calcNetto()"></div>'+
@@ -1137,6 +1206,54 @@ function getModalHTML(type,extra){
     '<div class="form-group"><label>Scorta min.</label><input class="form-control" id="f-soglia" type="number" value="0"></div></div>'+
     '<div class="form-group"><label>Costo/cad</label><input class="form-control" id="f-costo" type="number" step="0.01" value="0"></div>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveMag()">Aggiungi</button></div>'};
+  if(type==='add-doc'){var num=extra||'';return{title:'Aggiungi riferimento',body:
+    '<div class="form-group"><label>Nome *</label><input class="form-control" id="f-nome" placeholder="es. Schema idraulico v2"></div>'+
+    '<div class="form-row"><div class="form-group"><label>Tipo</label><select class="form-control" id="f-tipo">'+
+    '<option value="schema">Schema</option><option value="offerta">Offerta</option><option value="ordine">Ordine</option>'+
+    '<option value="certificato">Certificato</option><option value="foto">Foto</option><option value="email">Email</option><option value="altro">Altro</option>'+
+    '</select></div><div class="form-group"><label>Data</label><input class="form-control" id="f-data" type="date"></div></div>'+
+    '<div class="form-group"><label>URL (opzionale)</label><input class="form-control" id="f-url" placeholder="https://..."></div>'+
+    '<div class="form-group"><label>Note</label><input class="form-control" id="f-note" placeholder="Breve nota..."></div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveDoc(''+esc(num)+'')">Aggiungi</button></div>'}}
+  if(type==='add-sezione'){var num=extra||'';return{title:'+ Sezione',body:
+    '<div class="form-group"><label>Nome sezione</label><input class="form-control" id="f-sez-nome" placeholder="es. Valvole, Raccorderia..."></div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveSezione(''+esc(num)+'')">Aggiungi</button></div>'}}
+
+  if(type==='cfg-pu'){
+    var parts=(extra||'').split('|');var num=parts[0];var modello=parts[1]||'PU10';
+    var cfg2=getCfg();var cod2=getCod(num);var defMk2=cfg2.markup_clienti&&cfg2.markup_clienti[cod2]?cfg2.markup_clienti[cod2]:2.25;
+    return{title:'Configuratore '+modello,body:
+    '<div class="form-row"><div class="form-group"><label>Cilindrata (cc/giro)</label><input class="form-control" id="pu-cil" type="number" step="0.1" placeholder="es. 2.5"></div>'+
+    '<div class="form-group"><label>Pressione max (bar)</label><input class="form-control" id="pu-press" type="number" placeholder="es. 250"></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Motore</label><input class="form-control" id="pu-motore" placeholder="es. 0.75kW 4p B3"></div>'+
+    '<div class="form-group"><label>Serbatoio (L)</label><input class="form-control" id="pu-serb" type="number" placeholder="es. 10"></div></div>'+
+    '<div class="form-group"><label>Note configurazione</label><input class="form-control" id="pu-note" placeholder="Optional..."></div>'+
+    '<div class="form-row"><div class="form-group"><label>Costo stimato (€)</label><input class="form-control" id="pu-costo" type="number" step="0.01" value="0" oninput="calcNettoPU()"></div>'+
+    '<div class="form-group"><label>Markup</label><input class="form-control" id="pu-markup" type="number" step="0.05" value="'+defMk2+'" oninput="calcNettoPU()"></div></div>'+
+    '<div id="pu-preview" style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:8px 12px;font-size:12px;color:var(--text3);margin-bottom:14px">Vendita: €0.00</div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
+    '<button class="btn btn-primary" onclick="savePU(''+esc(num)+'',''+esc(modello)+'')">Aggiungi a distinta</button></div>'}}
+
+  if(type==='cfg-tubo'){var num=extra||'';
+    var cfg3=getCfg();var cod3=getCod(num);var defMk3=cfg3.markup_clienti&&cfg3.markup_clienti[cod3]?cfg3.markup_clienti[cod3]:2.25;
+    return{title:'Configuratore Tubo Raccordato',body:
+    '<div class="form-row"><div class="form-group"><label>Norma / Tipo</label><select class="form-control" id="tr-norma">'+
+    '<option value="EN853-2SN">EN853-2SN</option><option value="EN857-2SC">EN857-2SC</option>'+
+    '<option value="EN856-4SH">EN856-4SH</option><option value="SAE100R1">SAE100R1</option>'+
+    '<option value="SAE100R2">SAE100R2</option></select></div>'+
+    '<div class="form-group"><label>DN (mm)</label><select class="form-control" id="tr-dn">'+
+    ['6','8','10','12','16','19','25','32','38','51'].map(function(d){return'<option value="'+d+'">DN'+d+'</option>'}).join('')+
+    '</select></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Lunghezza (mm)</label><input class="form-control" id="tr-lung" type="number" placeholder="es. 500"></div>'+
+    '<div class="form-group"><label>Pressione max (bar)</label><input class="form-control" id="tr-press" placeholder="es. 250"></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Raccordo Lato A</label><input class="form-control" id="tr-ra" placeholder="es. BSP 1/2 M dritto"></div>'+
+    '<div class="form-group"><label>Raccordo Lato B</label><input class="form-control" id="tr-rb" placeholder="es. BSP 1/2 M 90deg"></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Costo stimato (€)</label><input class="form-control" id="tr-costo" type="number" step="0.01" value="0" oninput="calcNettoTR()"></div>'+
+    '<div class="form-group"><label>Markup</label><input class="form-control" id="tr-markup" type="number" step="0.05" value="'+defMk3+'" oninput="calcNettoTR()"></div></div>'+
+    '<div id="tr-preview" style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:8px 12px;font-size:12px;color:var(--text3);margin-bottom:14px">Vendita: €0.00</div>'+
+    '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
+    '<button class="btn btn-primary" onclick="saveTuboRacc(''+esc(num)+'')">Aggiungi a distinta</button></div>'}}
+
   if(type==='forn-det'){var f=FORNITORI.find(function(x){return x.id===extra});if(!f)return null;
     return{title:f.nome,body:
     '<div style="font-size:13px;color:var(--text2)">'+
@@ -1148,6 +1265,61 @@ function getModalHTML(type,extra){
 }
 
 // SAVES
+function saveDoc(numero){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var nome=G('f-nome').trim();if(!nome)return;
+  var det=lgo('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:'',documenti:[]};
+  if(!det[numero].documenti)det[numero].documenti=[];
+  var doc={id:uid(),nome:nome,tipo:G('f-tipo'),data:G('f-data'),url:G('f-url').trim(),note:G('f-note')};
+  det[numero].documenti.push(doc);ls('det',det);
+  if(CC&&CC.numero===numero)CC._det=det[numero];
+  closeM();renderDetTab('documenti',document.getElementById('det-content'));syncDetBg();
+  showToast('Documento aggiunto');
+}
+
+function saveSezione(numero){
+  var el=document.getElementById('f-sez-nome');var nome=(el?el.value||'':'').trim();if(!nome)return;
+  var det=lgo('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
+  det[numero].distinta.push({id:uid(),_intestazione:true,descrizione:nome,sezione:nome});
+  ls('det',det);CC._det=det[numero];
+  closeM();renderDetTab('distinta',document.getElementById('det-content'));syncDetBg();
+}
+
+function calcNettoPU(){var c=parseFloat((document.getElementById('pu-costo')||{}).value||0);var mk=parseFloat((document.getElementById('pu-markup')||{}).value||2.25);var pre=document.getElementById('pu-preview');if(pre)pre.textContent='Vendita: \u20ac'+fmt(c*mk)}
+function calcNettoTR(){var c=parseFloat((document.getElementById('tr-costo')||{}).value||0);var mk=parseFloat((document.getElementById('tr-markup')||{}).value||2.25);var pre=document.getElementById('tr-preview');if(pre)pre.textContent='Vendita: \u20ac'+fmt(c*mk)}
+
+function savePU(numero,modello){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var cil=G('pu-cil');var press=G('pu-press');var motore=G('pu-motore');var serb=G('pu-serb');var note=G('pu-note');
+  var costo=parseFloat(G('pu-costo')||0);var markup=parseFloat(G('pu-markup')||2.25);
+  var desc=modello+(cil?' cil.'+cil+'cc/g':'')+(press?' '+press+'bar':'')+(motore?' mot.'+motore:'')+(serb?' serb.'+serb+'L':'')+(note?' — '+note:'');
+  var row={id:uid(),sezione:'Centralina',descrizione:desc,qty:1,
+    fornitore:'Ares / Tecfluid',codice:'',
+    costo_cad:costo,sconto:0,netto_cad:costo,markup:markup,
+    prezzo_vendita:parseFloat((costo*markup).toFixed(4)),
+    stato_approv:'daordinare',data_attesa:''};
+  var det=lgo('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
+  det[numero].distinta.push(row);ls('det',det);CC._det=det[numero];
+  closeM();renderDetTab('distinta',document.getElementById('det-content'));renderMargine();syncDetBg();
+  showToast(modello+' aggiunto alla distinta');
+}
+
+function saveTuboRacc(numero){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var norma=G('tr-norma');var dn=G('tr-dn');var lung=G('tr-lung');var press=G('tr-press');
+  var ra=G('tr-ra');var rb=G('tr-rb');
+  var costo=parseFloat(G('tr-costo')||0);var markup=parseFloat(G('tr-markup')||2.25);
+  var desc='Tubo raccordato '+norma+' DN'+dn+(lung?' L='+lung+'mm':'')+(press?' '+press+'bar':'')+' — A:'+ra+' / B:'+rb;
+  var row={id:uid(),sezione:'Tubi raccordati',descrizione:desc,qty:1,
+    fornitore:'Pa.Co Fluid & Air Group',codice:'',
+    costo_cad:costo,sconto:0,netto_cad:costo,markup:markup,
+    prezzo_vendita:parseFloat((costo*markup).toFixed(4)),
+    stato_approv:'daordinare',data_attesa:''};
+  var det=lgo('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
+  det[numero].distinta.push(row);ls('det',det);CC._det=det[numero];
+  closeM();renderDetTab('distinta',document.getElementById('det-content'));renderMargine();syncDetBg();
+  showToast('Tubo raccordato aggiunto alla distinta');
+}
 function saveCfg(){var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};var mk={};Object.keys(CMAP).forEach(function(cod){var el=document.getElementById('cfg-mk-'+cod);if(el&&el.value)mk[cod]=parseFloat(el.value)||2.25});sCfg({nc_url:G('cfg-url').trim().replace(/\/$/,''),nc_user:G('cfg-user').trim(),nc_pass:G('cfg-pass').trim(),markup_clienti:mk});closeM();showToast('Configurazione salvata');syncNow()}
 function saveConto(){var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};var conti=lg('conti');var nome=G('f-conto').trim();if(!nome)return;var idx=conti.findIndex(function(c){return c.conto===nome});var row={id:idx>=0?conti[idx].id:uid(),conto:nome,saldo:G('f-saldo'),data_rilevazione:G('f-data'),note:''};if(idx>=0)conti[idx]=row;else conti.push(row);ls('conti',conti);closeM();renderCassa();wPut('cassa.csv',conti,['conto','saldo','data_rilevazione','note']);showToast('Saldo aggiornato')}
 function saveScad(){var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};var scad=lg('scad');var row={id:uid(),data:G('f-data'),importo:G('f-importo'),descrizione:G('f-desc'),tipo:G('f-tipo'),stato:G('f-stato')};if(!row.data)return;scad.push(row);ls('scad',scad);closeM();wPut('scadenze.csv',scad,['id','data','importo','descrizione','tipo','stato']);showToast('Scadenza aggiunta');renderScad()}
@@ -1180,6 +1352,13 @@ function exportPNpdf(){var data=lg('pn');var filtConto=(document.getElementById(
   '<tbody>'+rows.map(function(r){return'<tr><td style="font-family:monospace">'+fmtD(r.data_pag)+'</td><td>'+esc(r.tipo||'')+'</td><td style="font-family:monospace">'+esc(r.num_doc||'')+'</td><td style="font-family:monospace">'+fmtD(r.data_doc)+'</td><td>'+esc(r.cliente||r.fornitore||'—')+'</td><td style="color:#666">'+esc(r.nota||'')+'</td><td>'+esc(r.conto||'')+'</td><td class="num" style="color:green">'+(r.entrata>0?'€'+fmt(r.entrata):'')+'</td><td class="num" style="color:red">'+(r.uscita>0?'€'+fmt(r.uscita):'')+'</td></tr>'}).join('')+'</tbody>'+
   '<tfoot><tr><td colspan="7">TOTALE</td><td class="num" style="color:green">€'+fmt(totEn)+'</td><td class="num" style="color:red">€'+fmt(totUs)+'</td></tr></tfoot>'+
   '</table><p style="margin-top:10px">Saldo: <strong>€'+fmt(totEn-totUs)+'</strong></p></body></html>');w.document.close()}
+
+function delDoc(id,numero){
+  var det=lgo('det');if(!det[numero])return;
+  det[numero].documenti=(det[numero].documenti||[]).filter(function(d){return d.id!==id});
+  ls('det',det);if(CC&&CC.numero===numero)CC._det=det[numero];
+  renderDetTab('documenti',document.getElementById('det-content'));syncDetBg();
+}
 
 function exportAll(){var data={comm:lg('comm'),fatt:lg('fatt'),scad:lg('scad'),conti:lg('conti'),det:lgo('det'),mag:lg('mag'),pn:lg('pn')};var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='asglab-backup-'+today()+'.json';a.click()}
 
