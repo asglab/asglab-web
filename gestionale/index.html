@@ -254,16 +254,39 @@ tbody tr:hover td{background:var(--surface2)}
         </div>
         <div class="tab-panel" id="tab-primanota">
           <div class="filter-bar">
-            <select id="pn-conto" onchange="renderPN()" style="min-width:160px"><option value="">Tutti i conti</option></select>
-            <input type="month" id="pn-da" onchange="renderPN()" class="search-input" style="width:140px">
-            <input type="month" id="pn-a" onchange="renderPN()" class="search-input" style="width:140px">
-            <button class="btn btn-ghost btn-sm" onclick="resetPNFiltri()">Reset</button>
+            <select id="pn-conto" onchange="renderPN()"><option value="">Tutti i conti</option></select>
+            <div style="display:flex;align-items:center;gap:4px">
+              <span style="font-size:12px;color:var(--text3)">Da</span>
+              <input type="month" id="pn-da" onchange="renderPN()" class="search-input" style="width:130px">
+              <span style="font-size:12px;color:var(--text3)">a</span>
+              <input type="month" id="pn-a" onchange="renderPN()" class="search-input" style="width:130px">
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="resetPNFiltri()">&#10005; Reset</button>
             <div style="flex:1"></div>
             <button class="btn btn-secondary btn-sm" onclick="exportPNpdf()">PDF</button>
-            <button class="btn btn-primary btn-sm" onclick="openModal(&quot;import-primanota&quot;)">Import</button>
+            <button class="btn btn-primary btn-sm" onclick="openModal(&quot;import-primanota&quot;)">&#128229; Import</button>
           </div>
-          <div class="conti-grid" id="pn-saldi"></div>
-          <div class="card"><div class="table-wrap"><table><thead><tr><th>Data pag.</th><th>Tipo</th><th>N. Doc.</th><th>Data doc.</th><th>Soggetto</th><th>Nota</th><th>Conto</th><th style="text-align:right">Entrata</th><th style="text-align:right">Uscita</th><th style="text-align:right">Saldo</th></tr></thead><tbody id="pn-tbody"><tr><td colspan="10" class="empty">Nessun movimento</td></tr></tbody><tfoot id="pn-tfoot"></tfoot></table></div></div>
+          <div id="pn-saldi" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px"></div>
+          <div class="card">
+            <div class="table-wrap">
+              <table style="font-size:12px">
+                <thead><tr>
+                  <th style="white-space:nowrap">Data pag.</th>
+                  <th>Tipo</th>
+                  <th style="white-space:nowrap">N. Doc.</th>
+                  <th style="white-space:nowrap">Data doc.</th>
+                  <th>Soggetto</th>
+                  <th>Nota</th>
+                  <th>Conto</th>
+                  <th style="text-align:right;color:var(--green)">Entrata</th>
+                  <th style="text-align:right;color:var(--red)">Uscita</th>
+                  <th style="text-align:right">Saldo prog.</th>
+                </tr></thead>
+                <tbody id="pn-tbody"><tr><td colspan="10" class="empty">Nessun movimento</td></tr></tbody>
+                <tfoot id="pn-tfoot"></tfoot>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
       <!-- IMPORT FATTURE -->
@@ -631,32 +654,58 @@ function renderDetTab(tab,el){
   else if(tab==='offerta'){
     var off=cd.offerta||{};
     var offerteStorico=cd.offerte_storico||[];
-    var cNum=c.numero;
-    var html='<div class="card" style="margin-bottom:12px"><div class="card-head"><div class="card-title">Offerta attiva</div>'+
-      '<div style="display:flex;gap:6px">'+
-      '<button class="btn btn-secondary btn-sm" data-num="'+esc(c.numero)+'" onclick="openModal(&quot;edit-offerta&quot;,this.dataset.num)">&#9998; Modifica</button>'+
-      '<button class="btn btn-primary btn-sm" data-num="'+esc(c.numero)+'" onclick="generaOffertaPDF(this.dataset.num)">&#128196; Genera PDF</button>'+
+    var STATI_OFF={bozza:'Bozza',pronta:'Pronta',inviata:'Inviata',approvata:'Approvata',rifiutata:'Rifiutata',scaduta:'Scaduta'};
+    var COL_OFF={bozza:'badge-gray',pronta:'badge-blue',inviata:'badge-amber',approvata:'badge-green',rifiutata:'badge-red',scaduta:'badge-gray'};
+    var statoOff=off.stato_offerta||'bozza';
+    var html='<div class="card" style="margin-bottom:12px"><div class="card-head">'+
+      '<div style="display:flex;align-items:center;gap:8px;flex:1">'+
+        '<div class="card-title">Offerta</div>'+
+        (off.importo_offerto||off.testo?'<span class="badge '+COL_OFF[statoOff]+'">'+STATI_OFF[statoOff]+'</span>':'')+
+      '</div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+        '<button class="btn btn-ghost btn-sm" data-num="'+esc(c.numero)+'" onclick="openModal(&quot;edit-offerta&quot;,this.dataset.num)">&#9998; Modifica</button>'+
+        '<button class="btn btn-secondary btn-sm" data-num="'+esc(c.numero)+'" onclick="generaOffertaPDF(this.dataset.num)">&#128196; PDF</button>'+
       '</div></div>'+
       '<div class="card-body">';
     if(off.importo_offerto||off.testo){
-      html+='<div style="font-size:28px;font-weight:800;color:var(--green);margin-bottom:8px">&#8364;'+fmt(off.importo_offerto||0)+'</div>';
-      if(off.data_offerta)html+='<div style="font-size:12px;color:var(--text3);margin-bottom:8px">Data: '+fmtD(off.data_offerta)+'</div>';
-      if(off.oggetto_offerta)html+='<div style="font-size:13px;font-weight:600;margin-bottom:8px">'+esc(off.oggetto_offerta)+'</div>';
-      if(off.testo)html+='<div style="font-size:12px;white-space:pre-wrap;color:var(--text2);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;max-height:200px;overflow-y:auto">'+esc(off.testo)+'</div>';
+      html+='<div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">';
+      html+='<div style="flex:1;min-width:200px">';
+      html+='<div style="font-size:28px;font-weight:800;color:var(--green);margin-bottom:6px">\u20ac'+fmt(off.importo_offerto||0)+'</div>';
+      if(off.oggetto_offerta)html+='<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">'+esc(off.oggetto_offerta)+'</div>';
+      html+='<div style="font-size:12px;color:var(--text3)">'+
+        (off.data_offerta?'Redatta: '+fmtD(off.data_offerta):'')+'</div>';
+      html+='</div>';
+      // Tracking stato offerta
+      html+='<div style="min-width:180px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px">';
+      html+='<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Stato offerta</div>';
+      html+='<div style="display:flex;flex-direction:column;gap:4px">';
+      Object.entries(STATI_OFF).forEach(function(e){
+        var s=e[0],label=e[1];
+        var active=s===statoOff;
+        html+='<button class="btn btn-sm" style="justify-content:flex-start;font-size:11px;'+(active?'background:var(--blue);color:#fff':'background:var(--surface);border:1px solid var(--border);color:var(--text3)')+'" '+
+          'data-stato="'+esc(s)+'" data-num="'+esc(c.numero)+'" onclick="setStatoOfferta(this.dataset.num,this.dataset.stato)">'+
+          (active?'&#9679; ':'')+label+'</button>';
+      });
+      html+='</div></div>';
+      html+='</div>';
+      if(off.testo)html+='<div style="font-size:12px;white-space:pre-wrap;color:var(--text2);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;max-height:180px;overflow-y:auto;margin-top:12px">'+esc(off.testo)+'</div>';
+      if(off.data_risposta)html+='<div style="font-size:12px;color:var(--text3);margin-top:8px">Risposta ricevuta: '+fmtD(off.data_risposta)+(off.note_risposta?' — '+esc(off.note_risposta):'')+'</div>';
     }else{
-      html+='<div style="color:var(--text3)">Nessuna offerta — usa Modifica per aggiungerne una, o importa da file esistente.</div>';
+      html+='<div style="color:var(--text3);font-size:13px">Nessuna offerta ancora. Usa <strong>Modifica</strong> per crearla.</div>';
     }
     html+='</div></div>';
-    // Storico offerte precedenti
+    // Storico
     if(offerteStorico.length){
-      html+='<div class="card"><div class="card-head"><div class="card-title">Storico offerte</div></div><div>';
+      html+='<div class="card"><div class="card-head"><div class="card-title">Versioni precedenti</div></div><div>';
       offerteStorico.slice().reverse().forEach(function(o){
-        html+='<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px">'+
-          '<span style="font-size:18px">&#128196;</span>'+
-          '<div style="flex:1"><div style="font-weight:600">'+esc(o.oggetto_offerta||'Offerta')+'</div>'+
-          '<div style="font-size:11px;color:var(--text3)">'+fmtD(o.data_offerta)+(o.importo_offerto?' · &#8364;'+fmt(o.importo_offerto):'')+'</div></div>'+
-          (o.url?'<a href="'+esc(o.url)+'" target="_blank" class="btn btn-ghost btn-sm">&#8599; apri</a>':'')+
-          '</div>';
+        html+='<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px">'+
+          '<span style="font-size:16px">&#128196;</span>'+
+          '<div style="flex:1">'+
+            '<div style="font-weight:600">'+esc(o.oggetto_offerta||'Offerta precedente')+'</div>'+
+            '<div style="font-size:11px;color:var(--text3)">'+fmtD(o.data_offerta)+(o.importo_offerto?' \u00b7 \u20ac'+fmt(o.importo_offerto):'')+'</div>'+
+          '</div>'+
+          (o.url?'<a href="'+esc(o.url)+'" target="_blank" class="btn btn-ghost btn-sm">\u2197 apri</a>':'')+
+        '</div>';
       });
       html+='</div></div>';
     }
@@ -984,11 +1033,13 @@ function renderPN(){
     var en=mv.reduce(function(s,r){return s+(r.entrata||0)},0);
     var us=mv.reduce(function(s,r){return s+(r.uscita||0)},0);
     var sal=en-us;
-    return '<div class="pn-saldo-card"><div class="pn-saldo-conto">'+esc(c)+'</div>'+
-      '<div class="pn-saldo-nums">'+
-        '<span style="color:var(--green)">€'+fmt(en)+'</span>'+
-        '<span style="color:var(--red)">€'+fmt(us)+'</span>'+
-        '<span style="font-weight:700;color:'+(sal>=0?'var(--blue)':'var(--red)')+'">= €'+fmt(sal)+'</span>'+
+    var isActive=(!filtConto||filtConto===c);
+    return '<div style="background:var(--surface);border:1.5px solid '+(isActive&&filtConto?'var(--blue)':'var(--border)')+';border-radius:var(--r);padding:10px 14px;min-width:160px;max-width:240px;cursor:pointer" data-conto="'+esc(c)+'" onclick="var s=document.getElementById(&quot;pn-conto&quot;);if(s){s.value=(s.value===this.dataset.conto?&quot;&quot;:this.dataset.conto);renderPN()}">'+
+      '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">'+esc(c)+'</div>'+
+      '<div style="font-size:18px;font-weight:800;color:'+(sal>=0?'var(--blue)':'var(--red)')+'">\u20ac'+fmt(sal)+'</div>'+
+      '<div style="display:flex;gap:10px;margin-top:4px;font-size:11px">'+
+        '<span style="color:var(--green)">&#8593; \u20ac'+fmt(en)+'</span>'+
+        '<span style="color:var(--red)">&#8595; \u20ac'+fmt(us)+'</span>'+
       '</div></div>';
   }).join('');
   var tb=document.getElementById('pn-tbody'),tf=document.getElementById('pn-tfoot');
@@ -1119,36 +1170,40 @@ var FORNITORI=getFornitori();
 function renderFornitori(){
   FORNITORI=getFornitori();
   var q=(document.getElementById('forn-search')||{}).value||'';
-  var rows=FORNITORI;if(q)rows=rows.filter(function(f){return f.nome.toLowerCase().includes(q.toLowerCase())});
-  var grid=document.getElementById('forn-grid');
+  var rows=FORNITORI;
+  if(q)rows=rows.filter(function(f){return f.nome.toLowerCase().includes(q.toLowerCase())});
   var html=rows.map(function(f){
     var hasTel=f.contatti&&f.contatti.tel;
     var hasEmail=f.contatti&&f.contatti.email;
+    var nListino=getListino(f.id).length;
     return '<div class="forn-card">'+
-      '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">'+
-        '<span style="font-size:24px">'+f.emoji+'</span>'+
-        '<div style="flex:1">'+
-          '<div style="font-size:14px;font-weight:700;color:var(--text)">'+esc(f.nome)+'</div>'+
-          (f.contatti&&f.contatti.referente?'<div style="font-size:11px;color:var(--text3)">ref: '+esc(f.contatti.referente)+'</div>':'')+
-        '<button class="btn-icon" data-id="'+esc(f.id)+'" onclick="openModal(&quot;edit-forn&quot;,this.dataset.id)" title="Modifica">&#9998;</button>'+
-        '<button class="btn-icon" data-id="'+esc(f.id)+'" onclick="openModal(&quot;edit-forn&quot;,this.dataset.id)" title="Modifica">&#9998;</button>'+
+      '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">'+
+        '<span style="font-size:22px;flex-shrink:0">'+f.emoji+'</span>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(f.nome)+'</div>'+
+          (f.contatti&&f.contatti.referente?'<div style="font-size:11px;color:var(--text3)">ref. '+esc(f.contatti.referente)+'</div>':'')+
+        '</div>'+
+        '<button class="btn-icon" data-id="'+esc(f.id)+'" onclick="openModal(&quot;edit-forn&quot;,this.dataset.id)" title="Modifica" style="flex-shrink:0">&#9998;</button>'+
       '</div>'+
       '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">'+
         f.categorie.map(function(c){return'<span class="forn-tag">'+esc(c)+'</span>'}).join('')+
       '</div>'+
-      (f.note?'<div style="font-size:11px;color:var(--text3);margin-bottom:8px;font-style:italic">'+esc(f.note)+'</div>':'')+
-      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
-        (hasTel?'<a href="tel:'+esc(f.contatti.tel)+'" class="btn btn-ghost btn-sm" style="font-size:11px">&#128222; '+esc(f.contatti.tel)+'</a>':'')+
-        '<button class="btn btn-secondary btn-sm" style="font-size:11px" data-id="'+esc(f.id)+'" onclick="openModal(&quot;forn-listino&quot;,this.dataset.id)">&#128203; Listino</button>'+
-        '<button class="btn btn-secondary btn-sm" style="font-size:11px" data-id="'+esc(f.id)+'" onclick="openModal(&quot;forn-rdo-template&quot;,this.dataset.id)">&#9993; Template RDO</button>'+
-        '<button class="btn btn-secondary btn-sm" style="font-size:11px" data-id="'+esc(f.id)+'" onclick="openModal(&quot;forn-rdo-template&quot;,this.dataset.id)">&#9993; Template RDO</button>'+
+      (f.note?'<div style="font-size:11px;color:var(--text3);margin-bottom:8px;font-style:italic;border-left:2px solid var(--border);padding-left:6px">'+esc(f.note)+'</div>':'')+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:8px;margin-top:4px">'+
+        (hasTel?'<a href="tel:'+esc(f.contatti.tel)+'" class="btn btn-ghost btn-sm" style="font-size:11px">&#128222;</a>':'')+
+        (hasEmail?'<a href="mailto:'+esc(f.contatti.email)+'" class="btn btn-ghost btn-sm" style="font-size:11px">&#9993;</a>':'')+
+        '<button class="btn btn-secondary btn-sm" style="font-size:11px" data-id="'+esc(f.id)+'" onclick="openModal(&quot;forn-listino&quot;,this.dataset.id)">Listino'+(nListino?' ('+nListino+')':"&nbsp;&#43;")+'</button>'+
+        '<button class="btn btn-secondary btn-sm" style="font-size:11px" data-id="'+esc(f.id)+'" onclick="openModal(&quot;forn-rdo-template&quot;,this.dataset.id)">Testo RDO</button>'+
       '</div>'+
     '</div>';
   }).join('');
-  html+='<div class="forn-card" style="border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;min-height:120px" onclick="openModal(&quot;add-forn&quot;)">'+
-    '<div style="text-align:center;color:var(--text3)"><div style="font-size:28px;margin-bottom:6px">+</div><div style="font-size:13px;font-weight:600">Aggiungi fornitore</div></div>'+
+  html+='<div class="forn-card" style="border:2px dashed var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;min-height:100px" onclick="openModal(&quot;add-forn&quot;)">'+
+    '<div style="text-align:center;color:var(--text3)">'+
+      '<div style="font-size:24px;margin-bottom:4px">+</div>'+
+      '<div style="font-size:12px;font-weight:600">Aggiungi fornitore</div>'+
+    '</div>'+
   '</div>';
-  grid.innerHTML=html;
+  document.getElementById('forn-grid').innerHTML=html;
 }
 
 // IMPORT FATTURE
@@ -1396,6 +1451,11 @@ function getModalHTML(type,extra){
     '<div class="form-row"><div class="form-group"><label>Data offerta</label><input class="form-control" id="off-data" type="date" value="'+esc(off.data_offerta||today())+'"></div>'+
     '<div class="form-group"><label>Validita (giorni)</label><input class="form-control" id="off-valid" type="number" value="'+esc(String(off.validita||30))+'"></div></div>'+
     '<div class="form-group"><label>Testo / note offerta</label><textarea class="form-control" id="off-testo" rows="5" placeholder="Descrizione lavori, condizioni, tempi di consegna...">'+esc(off.testo||'')+'</textarea></div>'+
+    '<div class="form-row"><div class="form-group"><label>Stato offerta</label><select class="form-control" id="off-stato">'+
+    ['bozza','pronta','inviata','approvata','rifiutata','scaduta'].map(function(s){return'<option value="'+s+'"'+(( off.stato_offerta||'bozza')===s?' selected':'')+'>'+{bozza:'Bozza',pronta:'Pronta',inviata:'Inviata',approvata:'Approvata',rifiutata:'Rifiutata',scaduta:'Scaduta'}[s]+'</option>'}).join('')+
+    '</select></div>'+
+    '<div class="form-group"><label>Data risposta cliente</label><input class="form-control" id="off-drisposta" type="date" value="'+esc(off.data_risposta||'')+'"></div></div>'+
+    '<div class="form-group"><label>Note risposta</label><input class="form-control" id="off-nrisposta" value="'+esc(off.note_risposta||'')+'"></div>'+
     '<div class="form-group"><label>URL file esistente (opzionale)</label><input class="form-control" id="off-url" type="url" value="'+esc(off.url||'')+'" placeholder="Link a file su Nextcloud o Drive"></div>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
     '<button class="btn btn-primary" data-num="'+esc(num)+'" onclick="saveOfferta(this.dataset.num)">Salva offerta</button></div>'}}
@@ -1563,6 +1623,8 @@ function saveOfferta(numero){
     oggetto_offerta:G('off-ogg'),importo_offerto:parseFloat(G('off-imp')||0),
     data_offerta:G('off-data'),validita:parseInt(G('off-valid')||30),
     testo:G('off-testo'),url:G('off-url').trim(),
+    stato_offerta:G('off-stato')||'bozza',
+    data_risposta:G('off-drisposta'),note_risposta:G('off-nrisposta'),
     ts:new Date().toISOString()
   };
   // Archivia versione precedente se esiste
@@ -1577,6 +1639,26 @@ function saveOfferta(numero){
   ls('det',det);if(CC&&CC.numero===numero)CC._det=det[numero];
   closeM();renderDetTab('offerta',document.getElementById('det-content'));
   renderMargine();syncDetBg();showToast('Offerta salvata');
+}
+
+function setStatoOfferta(numero, stato){
+  var det=lgo('det');if(!det[numero])return;
+  if(!det[numero].offerta)det[numero].offerta={};
+  det[numero].offerta.stato_offerta=stato;
+  if(stato==='inviata'&&!det[numero].offerta.data_invio)
+    det[numero].offerta.data_invio=today();
+  ls('det',det);if(CC&&CC.numero===numero)CC._det=det[numero];
+  // Aggiorna stato commessa se offerta approvata
+  if(stato==='approvata'){
+    var comm=lg('comm');var idx=comm.findIndex(function(x){return x.numero===numero});
+    if(idx>=0&&comm[idx].stato==='offerta'){
+      comm[idx].stato='confermata';ls('comm',comm);
+      showToast('Offerta approvata — commessa passata a Confermata');
+    }
+  } else showToast('Stato offerta: '+(
+    {bozza:'Bozza',pronta:'Pronta',inviata:'Inviata',approvata:'Approvata',rifiutata:'Rifiutata',scaduta:'Scaduta'}[stato]||stato));
+  renderDetTab('offerta',document.getElementById('det-content'));
+  renderDetail();syncDetBg();
 }
 
 function generaOffertaPDF(numero){
