@@ -3529,8 +3529,8 @@ function aggTuboPreview(){
 
   const raShort=ra.std+ra.mis.replace(/[^0-9/]/g,'').replace('/','');
   const rbShort=rb.std+rb.mis.replace(/[^0-9/]/g,'').replace('/','');
-  const orientSuffix=doubleCurva?`-OR${orient}`:'';
-  const codice=`TF-${codT}-DN${dn}-${lung}mm-${raShort}-${ra.curva!=='dritto'?ra.curva.replace('°','d'):''}-${rbShort}-${rb.curva!=='dritto'?rb.curva.replace('°','d'):''}${orientSuffix}`;
+  const orientSuffix=doubleCurva?'-OR'+orient:'';
+  const codice='TF-'+codT+'-DN'+dn+'-'+lung+'mm-'+raShort+'-'+(ra.curva!=='dritto'?ra.curva.replace('°','d'):'')+'-'+rbShort+'-'+(rb.curva!=='dritto'?rb.curva.replace('°','d'):'')+orientSuffix;
 
   const costoTubo=lung/1000*3.8;
   const costoRa=ra.curva!=='dritto'?6.2:4.5;
