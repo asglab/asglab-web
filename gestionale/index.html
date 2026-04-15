@@ -641,7 +641,7 @@ function renderDetTab(tab,el){
       '</table></div></div>'+
       '<div class="card"><div class="card-head"><div class="card-title">Riepilogo economico</div></div>'+
       '<div class="card-body"><table style="width:100%">'+
-      [['Offerta','€'+fmt(c.importo)],['Costi materiali','€'+fmt(cM)],['Costi ore','€'+fmt(cO)],['Valore vendita','€'+fmt(vM)]]
+      [['Offerta','€'+fmt(c.importo)],['Costi materiali','€'+fmt(cM)],['Ore fatturate','€'+fmt(ricavoOre)],['Valore vendita mat.','€'+fmt(vM)]]
       .map(function(r){return'<tr><td style="padding:5px 0;font-size:12px;color:var(--text3);width:160px">'+esc(r[0])+'</td><td style="padding:5px 0;font-size:13px;font-weight:700">'+esc(r[1])+'</td></tr>'}).join('')+
       '</table></div></div></div>';
   }
@@ -682,32 +682,126 @@ function renderDetTab(tab,el){
   }
   else if(tab==='ore'){
     var cNum=c.numero;
-    var html2='<div class="dist-toolbar"><button class="btn btn-primary btn-sm" onclick="openModal(&quot;add-ora&quot;,&quot;'+cNum+'&quot;)">+ Ore</button></div>';
-    if(!ore.length){html2+='<div class="empty">Nessuna ora registrata</div>';}
+    // Tariffe da documento ASG LAB Oneri Manodopera 2026 (Milano, Gennaio 2026)
+    var TARIFFE={
+      'diurna_ord':  {ms:60,ts:80,te:100,label:'Ore diurne ordinarie (8h/gg)'},
+      'diurna_str':  {ms:69,ts:92,te:115,label:'Ore diurne straordinarie (fino 20:00)'},
+      'notturna_str':{ms:78,ts:104,te:130,label:'Ore notturne straordinarie (20-6)'},
+      'festiva':     {ms:78,ts:104,te:130,label:'Giorni festivi (€/ora)'},
+      'inoperoso':   {ms:260,ts:330,te:370,label:'Giorno inoperoso a disposizione (€/gg)'},
+      'viaggio':     {ms:130,ts:130,te:130,label:'Ore viaggio e attesa inoperosa (€/ora)'},
+      'trasferta':   {ms:130,ts:130,te:130,label:'Trasferta diaria giornaliera (€/gg)'},
+    };
+    // Trasferta diaria = 4 parti: 2 pernottamento + 1 pranzo + 1 cena
+    var DIARIA_PARTI={pernottamento:65,pranzo:32.5,cena:32.5};
+    // Tariffe ACI 2026 indicative per categoria (€/km) - base per rimborso
+    var ACI_KM={benzina:0.4774,diesel:0.4521,ibrida:0.4650,elettrica:0.3890};
+
+    var trasferte=(cd.trasferte||[]);
+    var totH=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)},0);
+    var totOre=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);
+    var totTrasf=trasferte.reduce(function(s,t){return s+parseFloat(t.totale||0)},0);
+
+    // ── TOOLBAR ──
+    var h='<div class="dist-toolbar" style="gap:6px;flex-wrap:wrap">'+
+      '<button class="btn btn-primary btn-sm" onclick="openModal(&quot;add-ora&quot;,&quot;'+cNum+'&quot;)">+ Ore prestazione</button>'+
+      '<button class="btn btn-secondary btn-sm" onclick="openModal(&quot;add-trasferta&quot;,&quot;'+cNum+'&quot;)">&#9992; + Trasferta</button>'+
+      '<button class="btn btn-ghost btn-sm" data-num="'+esc(cNum)+'" onclick="stampaNoteSpese(this.dataset.num)">&#128196; Nota spese PDF</button>'+
+    '</div>';
+
+    // ── RIEPILOGO CARDS ──
+    h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px">'+
+      '<div class="card" style="padding:12px;text-align:center">'+
+        '<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Ore fatturate</div>'+
+        '<div style="font-size:22px;font-weight:800;color:var(--blue);margin:4px 0">'+totH+'h</div>'+
+        '<div style="font-size:13px;font-weight:700;color:var(--green)">€'+fmt(totOre)+'</div>'+
+      '</div>'+
+      '<div class="card" style="padding:12px;text-align:center">'+
+        '<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Spese trasferta</div>'+
+        '<div style="font-size:22px;font-weight:800;color:var(--amber);margin:4px 0">'+trasferte.length+'</div>'+
+        '<div style="font-size:13px;font-weight:700;color:var(--green)">€'+fmt(totTrasf)+'</div>'+
+      '</div>'+
+      '<div class="card" style="padding:12px;text-align:center">'+
+        '<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Totale ricavo</div>'+
+        '<div style="font-size:22px;font-weight:800;color:var(--green);margin:4px 0">€'+fmt(totOre+totTrasf)+'</div>'+
+        '<div style="font-size:11px;color:var(--text3)">ore + trasferte</div>'+
+      '</div>'+
+    '</div>';
+
+    // ── TABELLA TARIFFE RIFERIMENTO ──
+    h+='<div class="card" style="margin-bottom:12px"><div class="card-head" style="cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'\':\' none\'">'+
+      '<span class="card-title">📋 Tariffe di riferimento — ASG LAB Oneri Manodopera 2026</span>'+
+      '<span style="font-size:11px;color:var(--text3);margin-left:auto">(Milano, Gennaio 2026) — clicca per espandere</span></div>'+
+      '<div style="display:none"><div class="table-wrap"><table>'+
+      '<thead><tr><th>Tipologia</th><th class="num">Mont. Spec. €</th><th class="num">Tecn. Spec. €</th><th class="num">Tecn. Elett. €</th></tr></thead><tbody>';
+    var ordTar=['diurna_ord','diurna_str','notturna_str','festiva','inoperoso','viaggio','trasferta'];
+    ordTar.forEach(function(k){var t=TARIFFE[k];
+      h+='<tr><td>'+t.label+'</td><td class="num">€'+t.ms+'</td><td class="num">€'+t.ts+'</td><td class="num">€'+t.te+'</td></tr>';
+    });
+    h+='<tr style="font-size:11px;color:var(--text3)"><td colspan="4" style="padding:8px">'+
+      '* Trasferta diaria (€130/gg) suddivisa: 2×€65 pernottamento + €32.50 pranzo + €32.50 cena. '+
+      '** Spese viaggio: Trenitalia (tariffe effettive), IATA (tariffe effettive), Automezzo (tabelle ACI).</td></tr>'+
+    '</tbody></table></div></div></div>';
+
+    // ── TABELLA ORE ──
+    h+='<div class="card" style="margin-bottom:12px"><div class="card-head"><span class="card-title">Ore di prestazione</span></div>';
+    if(!ore.length){h+='<div class="empty">Nessuna ora registrata — usa "+ Ore prestazione"</div>';}
     else{
-      var totH=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)},0);
-      var totE=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);
       var oreRows='';
-      for(var oi=0;oi<ore.length;oi++){
-        var o=ore[oi];
+      ore.forEach(function(o){
+        var cat=o.categoria||'diurna_ord';
+        var catLabel=(TARIFFE[cat]||{label:cat}).label;
+        var unita=o.unita||'h';
         oreRows+='<tr>'+
           '<td style="font-family:monospace;font-size:12px">'+fmtD(o.data)+'</td>'+
           '<td>'+esc(o.descrizione||'—')+'</td>'+
-          '<td style="font-size:12px;color:var(--text3)">'+esc(o.operatore||'—')+'</td>'+
-          '<td style="text-align:right;font-weight:700">'+esc(String(o.ore||0))+'h</td>'+
+          '<td style="font-size:11px;color:var(--text3)">'+esc(o.operatore||'—')+'</td>'+
+          '<td style="font-size:11px;color:var(--text3)">'+esc(catLabel)+'</td>'+
+          '<td style="text-align:right;font-weight:700">'+esc(String(o.ore||0))+unita+'</td>'+
           '<td style="text-align:right;font-weight:700;color:var(--blue)">€'+fmt(parseFloat(o.ore||0)*parseFloat(o.tariffa||0))+'</td>'+
           '<td><button class="btn-icon" style="color:var(--red)" data-id="'+esc(o.id)+'" data-num="'+esc(cNum)+'" onclick="delOra(this.dataset.id,this.dataset.num)">✕</button></td>'+
-          '</tr>';
-      }
-      html2+='<div class="card"><div class="table-wrap"><table>'+
-        '<thead><tr><th>Data</th><th>Descrizione</th><th>Operatore</th><th style="text-align:right">Ore</th><th style="text-align:right">Totale</th><th></th></tr></thead>'+
-        '<tbody>'+oreRows+
-        '<tr style="font-weight:700;background:var(--surface2)"><td colspan="3">TOTALE</td>'+
-        '<td style="text-align:right">'+totH+'h</td>'+
-        '<td style="text-align:right;color:var(--blue)">€'+fmt(totE)+'</td><td></td></tr>'+
-        '</tbody></table></div></div>';
+        '</tr>';
+      });
+      h+='<div class="table-wrap"><table><thead><tr><th>Data</th><th>Descrizione</th><th>Operatore</th><th>Categoria</th><th class="num">Q.tà</th><th class="num">Totale</th><th></th></tr></thead><tbody>'+
+        oreRows+
+        '<tr style="font-weight:700;background:var(--surface2)"><td colspan="4">TOTALE ORE</td>'+
+        '<td class="num">'+totH+'h</td>'+
+        '<td class="num" style="color:var(--blue)">€'+fmt(totOre)+'</td><td></td></tr>'+
+      '</tbody></table></div>';
     }
-    el.innerHTML=html2;
+    h+='</div>';
+
+    // ── TABELLA TRASFERTE ──
+    h+='<div class="card"><div class="card-head"><span class="card-title">Trasferte e rimborsi spese</span></div>';
+    if(!trasferte.length){h+='<div class="empty">Nessuna trasferta registrata — usa "+ Trasferta"</div>';}
+    else{
+      var trRows='';
+      trasferte.forEach(function(t){
+        trRows+='<tr>'+
+          '<td style="font-family:monospace;font-size:12px">'+fmtD(t.data)+'</td>'+
+          '<td>'+esc(t.destinazione||'—')+'</td>'+
+          '<td style="font-size:11px;color:var(--text3)">'+esc(t.operatore||'—')+'</td>'+
+          '<td style="font-size:11px">'+
+            (t.km>0?'<span style="color:var(--text2)">🚗 '+t.km+'km ('+esc(t.veicolo||'—')+') €'+fmt(t.rimb_km||0)+'</span><br>':'')+
+            (t.diaria>0?'<span style="color:var(--text2)">🏨 Diaria €'+fmt(t.diaria)+'</span><br>':'')+
+            (t.trasporto>0?'<span style="color:var(--text2)">🚆 Trasporto €'+fmt(t.trasporto)+'</span><br>':'')+
+            (t.vitto>0?'<span style="color:var(--text2)">🍽 Vitto €'+fmt(t.vitto)+'</span><br>':'')+
+            (t.altro>0?'<span style="color:var(--text2)">+ Altro €'+fmt(t.altro)+'</span>':'')+
+          '</td>'+
+          '<td style="text-align:right;font-weight:700;color:var(--blue)">€'+fmt(t.totale||0)+'</td>'+
+          '<td>'+esc(t.note||'')+'</td>'+
+          '<td><button class="btn-icon" style="color:var(--red)" data-id="'+esc(t.id)+'" data-num="'+esc(cNum)+'" onclick="delTrasferta(this.dataset.id,this.dataset.num)">✕</button></td>'+
+        '</tr>';
+      });
+      h+='<div class="table-wrap"><table><thead><tr><th>Data</th><th>Destinazione</th><th>Operatore</th><th>Dettaglio spese</th><th class="num">Totale</th><th>Note</th><th></th></tr></thead><tbody>'+
+        trRows+
+        '<tr style="font-weight:700;background:var(--surface2)"><td colspan="4">TOTALE TRASFERTE</td>'+
+        '<td class="num" style="color:var(--blue)">€'+fmt(totTrasf)+'</td><td></td><td></td></tr>'+
+      '</tbody></table></div>';
+    }
+    h+='</div>';
+
+    el.innerHTML=h;
   }
   else if(tab==='note'){
     el.innerHTML='<div class="card"><div class="card-body">'+
@@ -828,10 +922,12 @@ function renderMargine(){
   var cd=CC._det||{distinta:[],ore:[]};
   var cM=cd.distinta.reduce(function(s,r){return s+parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)},0);
   var vM=cd.distinta.reduce(function(s,r){return s+parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)},0);
-  var cO=cd.ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);
+  var ricavoOre=cd.ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);
   var totH=cd.ore.reduce(function(s,o){return s+parseFloat(o.ore||0)},0);
-  var imp=parseFloat((cd.offerta&&cd.offerta.importo_offerto)||CC.importo||0)||vM;
-  var tot=cM+cO;
+  // Ricavo totale = valore vendita materiali + ore fatturate al cliente
+  // Costo = solo costo netto materiali (le ore sono già margine puro)
+  var imp=parseFloat((cd.offerta&&cd.offerta.importo_offerto)||CC.importo||0)||(vM+ricavoOre);
+  var tot=cM; // solo costi materiali
   var pct=imp>0?((imp-tot)/imp*100):null;
   var col=pct===null?'var(--text3)':pct>=30?'var(--green)':pct>=15?'var(--amber)':'var(--red)';
   el.innerHTML=
@@ -840,7 +936,7 @@ function renderMargine(){
     '<div class="margine-bar"><div class="margine-fill'+(pct&&pct<15?' low':pct&&pct<30?' mid':'')+'" style="width:'+Math.min(100,Math.max(0,pct||0))+'%"></div></div>'+
     '<div style="font-size:11px;color:var(--text3)">Offerta: €'+fmt(imp)+'</div>'+
     '<div style="font-size:11px;color:var(--text3)">Costi: €'+fmt(tot)+'</div>'+
-    (cO>0?'<div style="font-size:11px;color:var(--text3)">Ore: '+totH+'h (€'+fmt(cO)+')</div>':'')+
+    (ricavoOre>0?'<div style="font-size:11px;color:var(--text3)">Ore: '+totH+'h (€'+fmt(ricavoOre)+' fatturati)</div>':'')+
     '<button class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;font-size:11px" onclick="exportDistintaPDF(\''+esc(CC.numero)+'\')">PDF Distinta</button>';
 }
 
@@ -1058,12 +1154,147 @@ function delRiga(id,numero){
 function saveOra(numero){
   var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
   var row={id:uid(),data:G('f-data')||today(),descrizione:G('f-desc'),operatore:G('f-oper'),
-    ore:parseFloat(G('f-ore')||0),tariffa:parseFloat(G('f-tariffa')||65)};
+    categoria:G('f-cat')||'diurna_ord',figura:G('f-figura')||'ms',
+    unita:(G('f-cat')==='inoperoso'?'gg':'h'),
+    ore:parseFloat(G('f-ore')||0),tariffa:parseFloat(G('f-tariffa')||60)};
   var det=lgo('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
   if(!det[numero].ore)det[numero].ore=[];
   det[numero].ore.push(row);ls('det',det);CC._det=det[numero];
   closeM();renderDetTab('ore',document.getElementById('det-content'));renderMargine();syncDetBg();
 }
+// ── TARIFFE RIFERIMENTO ──────────────────────────────────────────────────
+var TARIFFE_ORE={
+  diurna_ord:  {ms:60,ts:80,te:100,label:'Diurne ordinarie',unita:'h'},
+  diurna_str:  {ms:69,ts:92,te:115,label:'Diurne straordinarie',unita:'h'},
+  notturna_str:{ms:78,ts:104,te:130,label:'Notturne straordinarie',unita:'h'},
+  festiva:     {ms:78,ts:104,te:130,label:'Festive',unita:'h'},
+  inoperoso:   {ms:260,ts:330,te:370,label:'Giorno inoperoso',unita:'gg'},
+  viaggio:     {ms:130,ts:130,te:130,label:'Viaggio/attesa',unita:'h'},
+};
+var ACI_KM={benzina:0.4774,diesel:0.4521,ibrida:0.4650,elettrica:0.3890};
+
+function aggiornaOreModal(){
+  var cat=document.getElementById('f-cat');
+  var fig=document.getElementById('f-figura');
+  var orEl=document.getElementById('f-ore');
+  var tarEl=document.getElementById('f-tariffa');
+  var totEl=document.getElementById('f-ore-tot');
+  if(!cat||!fig||!tarEl||!totEl)return;
+  var t=TARIFFE_ORE[cat.value]||{ms:60,ts:60,te:60};
+  var tariffa=t[fig.value]||60;
+  tarEl.value=tariffa;
+  var q=parseFloat(orEl&&orEl.value||0);
+  if(totEl)totEl.textContent='€ '+(q*tariffa).toFixed(2);
+}
+
+function aggiornaKmModal(){
+  var kmEl=document.getElementById('f-km');
+  var tarEl=document.getElementById('f-aci-km');
+  var totEl=document.getElementById('f-km-tot');
+  if(!kmEl||!tarEl||!totEl)return;
+  var km=parseFloat(kmEl.value||0);
+  var tar=parseFloat(tarEl.value||0.4774);
+  totEl.textContent='€ '+(km*tar).toFixed(2);
+  // aggiorna totale trasferta
+  aggiornaTotTrasferta();
+}
+
+function aggiornaTotTrasferta(){
+  var km=parseFloat((document.getElementById('f-km')||{value:0}).value||0);
+  var aciKm=parseFloat((document.getElementById('f-aci-km')||{value:0.4774}).value||0.4774);
+  var diaria=parseFloat((document.getElementById('f-diaria')||{value:0}).value||0);
+  var trasporto=parseFloat((document.getElementById('f-trasporto')||{value:0}).value||0);
+  var vitto=parseFloat((document.getElementById('f-vitto')||{value:0}).value||0);
+  var altro=parseFloat((document.getElementById('f-altro')||{value:0}).value||0);
+  var rimbKm=km*aciKm;
+  var tot=rimbKm+diaria+trasporto+vitto+altro;
+  var el=document.getElementById('f-trasf-tot');
+  if(el)el.textContent='€ '+tot.toFixed(2);
+}
+
+function saveTrasferta(numero){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var km=parseFloat(G('f-km')||0);
+  var aciKm=parseFloat(G('f-aci-km')||0.4774);
+  var rimbKm=parseFloat((km*aciKm).toFixed(2));
+  var diaria=parseFloat(G('f-diaria')||0);
+  var trasporto=parseFloat(G('f-trasporto')||0);
+  var vitto=parseFloat(G('f-vitto')||0);
+  var altro=parseFloat(G('f-altro')||0);
+  var tot=parseFloat((rimbKm+diaria+trasporto+vitto+altro).toFixed(2));
+  var row={id:uid(),data:G('f-data')||today(),
+    destinazione:G('f-dest'),operatore:G('f-oper'),
+    km:km,veicolo:G('f-veicolo'),aci_km:aciKm,rimb_km:rimbKm,
+    diaria:diaria,trasporto:trasporto,vitto:vitto,altro:altro,
+    totale:tot,note:G('f-note')};
+  var det=lgo('det');
+  if(!det[numero])det[numero]={distinta:[],ore:[],trasferte:[]};
+  if(!det[numero].trasferte)det[numero].trasferte=[];
+  det[numero].trasferte.push(row);
+  ls('det',det);if(CC&&CC.numero===numero)CC._det=det[numero];
+  closeM();renderDetTab('ore',document.getElementById('det-content'));renderMargine();syncDetBg();
+  showToast('Trasferta aggiunta');
+}
+
+function delTrasferta(id,numero){
+  var det=lgo('det');if(!det[numero])return;
+  det[numero].trasferte=(det[numero].trasferte||[]).filter(function(t){return t.id!==id;});
+  ls('det',det);if(CC&&CC.numero===numero)CC._det=det[numero];
+  renderDetTab('ore',document.getElementById('det-content'));renderMargine();syncDetBg();
+  showToast('Trasferta rimossa');
+}
+
+function stampaNoteSpese(numero){
+  var c=(lg('comm')||[]).find(function(x){return x.numero===numero;})||{numero:numero,cliente:'—'};
+  var det=lgo('det');var cd=det[numero]||{distinta:[],ore:[],trasferte:[]};
+  var ore=cd.ore||[];var trasferte=cd.trasferte||[];
+  var TARIFFE_L={diurna_ord:'Diurne ordinarie',diurna_str:'Diurne straord.',notturna_str:'Notturne straord.',festiva:'Festive',inoperoso:'Giorno inoperoso',viaggio:'Viaggio/attesa'};
+  var totOre=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0);},0);
+  var totTrasf=trasferte.reduce(function(s,t){return s+parseFloat(t.totale||0);},0);
+  var w=window.open('','_blank');
+  var css='body{font-family:Arial,sans-serif;font-size:10px;margin:20px;color:#111}h1{font-size:14px;margin:0 0 2px}h2{font-size:11px;margin:14px 0 4px;color:#333;border-bottom:1px solid #ccc;padding-bottom:2px}table{width:100%;border-collapse:collapse;margin-bottom:6px}th{background:#f0f4f8;padding:4px 6px;border-bottom:2px solid #ccc;font-size:9px;text-align:left}td{padding:3px 6px;border-bottom:1px solid #eee}.num{text-align:right}.tot{font-weight:700;background:#f7f9fb;border-top:2px solid #999}.sub{font-size:9px;color:#666}.firma{margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:40px}.firma-box{border-top:1px solid #999;padding-top:6px;font-size:9px;color:#666}@media print{button{display:none}}';
+  var oreHtml='';
+  if(ore.length){
+    var totH=ore.reduce(function(s,o){return s+parseFloat(o.ore||0);},0);
+    oreHtml='<h2>Ore di prestazione</h2><table><thead><tr><th>Data</th><th>Operatore</th><th>Descrizione</th><th>Categoria</th><th class=num>Qta</th><th class=num>Tariffa</th><th class=num>Totale</th></tr></thead><tbody>'+
+      ore.map(function(o){return'<tr><td>'+fmtD(o.data)+'</td><td>'+esc(o.operatore||'—')+'</td><td>'+esc(o.descrizione||'—')+'</td><td class=sub>'+esc((TARIFFE_L[o.categoria]||o.categoria||'—'))+'</td><td class=num>'+o.ore+(o.unita||'h')+'</td><td class=num>€'+fmt(o.tariffa||0)+'</td><td class=num>€'+fmt(parseFloat(o.ore||0)*parseFloat(o.tariffa||0))+'</td></tr>';}).join('')+
+      '<tr class=tot><td colspan=6 class=num>Totale ore</td><td class=num>€'+fmt(totOre)+'</td></tr></tbody></table>';
+  }
+  var trasfHtml='';
+  if(trasferte.length){
+    trasfHtml='<h2>Trasferte e rimborsi spese</h2><table><thead><tr><th>Data</th><th>Operatore</th><th>Destinazione</th><th class=num>Km (€/km)</th><th class=num>Diaria</th><th class=num>Trasporto</th><th class=num>Vitto</th><th class=num>Altro</th><th class=num>Totale</th><th>Note</th></tr></thead><tbody>'+
+      trasferte.map(function(t){return'<tr><td>'+fmtD(t.data)+'</td><td>'+esc(t.operatore||'—')+'</td><td>'+esc(t.destinazione||'—')+'</td><td class=num>'+(t.km>0?t.km+'km<br><span class=sub>€'+fmt(t.aci_km||0)+'/km = €'+fmt(t.rimb_km||0)+'</span>':'—')+'</td><td class=num>'+(t.diaria>0?'€'+fmt(t.diaria):'—')+'</td><td class=num>'+(t.trasporto>0?'€'+fmt(t.trasporto):'—')+'</td><td class=num>'+(t.vitto>0?'€'+fmt(t.vitto):'—')+'</td><td class=num>'+(t.altro>0?'€'+fmt(t.altro):'—')+'</td><td class=num>€'+fmt(t.totale||0)+'</td><td class=sub>'+esc(t.note||'')+'</td></tr>';}).join('')+
+      '<tr class=tot><td colspan=8 class=num>Totale trasferte</td><td class=num>€'+fmt(totTrasf)+'</td><td></td></tr></tbody></table>';
+  }
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Nota Spese — '+esc(numero)+'</title><style>'+css+'</style></head><body>'+
+    '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">'+
+      '<div><h1>NOTA SPESE PERSONALE FUORI SEDE</h1>'+
+        '<div style="font-size:11px;color:#555">ASG LAB S.r.l. a socio unico — P.IVA 10122150963</div>'+
+      '</div>'+
+      '<div style="text-align:right;font-size:10px;color:#555">'+
+        'Commessa: <strong>'+esc(numero)+'</strong><br>'+
+        'Cliente: <strong>'+esc(c.cliente||'—')+'</strong><br>'+
+        'Stampato: '+new Date().toLocaleDateString('it-IT')+
+      '</div>'+
+    '</div>'+
+    '<div style="background:#f0f4f8;padding:8px 12px;border-radius:4px;margin-bottom:12px;font-size:11px">'+
+      'Tariffe secondo: <strong>Oneri per prestazioni di personale fuori sede — Aggiornamento 01-2026, Milano</strong><br>'+
+      'Rimborso km secondo tabelle ACI vigenti per il tipo di veicolo utilizzato.'+
+    '</div>'+
+    oreHtml+trasfHtml+
+    '<div style="margin-top:12px;background:#f7f9fb;border:1px solid #ddd;padding:10px;border-radius:4px">'+
+      '<strong>TOTALE COMPLESSIVO: €'+fmt(totOre+totTrasf)+'</strong>'+
+      '<span style="font-size:9px;color:#666;margin-left:16px">(Ore: €'+fmt(totOre)+' + Trasferte: €'+fmt(totTrasf)+')</span>'+
+    '</div>'+
+    '<div class=firma>'+
+      '<div class=firma-box>Data e firma del dipendente / operatore</div>'+
+      '<div class=firma-box>Data e firma del responsabile ASG LAB</div>'+
+    '</div>'+
+    '<div style="margin-top:16px"><button onclick="window.print()">🖨 Stampa / Salva PDF</button></div>'+
+  '</body></html>';
+  w.document.write(html);w.document.close();
+}
+
 function delOra(id,numero){
   var det=lgo('det');if(!det[numero])return;
   det[numero].ore=(det[numero].ore||[]).filter(function(o){return o.id!==id});
@@ -2189,7 +2420,7 @@ function saveMag(){var G=function(id){var el=document.getElementById(id);return 
 function calcNetto(){var costo=parseFloat((document.getElementById('f-costo')||{}).value||0);var sc=parseFloat((document.getElementById('f-sconto')||{}).value||0);var mk=parseFloat((document.getElementById('f-markup')||{}).value||2.25);var netto=costo*(1-sc/100);var pre=document.getElementById('calc-preview');if(pre)pre.textContent='Netto: €'+fmt(netto)+' → Vendita: €'+fmt(netto*mk)}
 
 // EXPORT PDF
-function exportReportCommesse(){var comms=lg('comm');var det=lgo('det');var w=window.open('','_blank');var rows=comms.map(function(c){var cd=det[c.numero]||{distinta:[],ore:[]};var cM=cd.distinta.reduce(function(s,r){return s+parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)},0);var cO=cd.ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);var imp=parseFloat(c.importo||0);var tot=cM+cO;var pct=imp>0?((imp-tot)/imp*100):null;return Object.assign({},c,{cM:cM,cO:cO,tot:tot,imp:imp,pct:pct})});w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title><style>body{font-family:sans-serif;font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th{background:#f0f0f0;padding:5px 6px;border-bottom:2px solid #ccc;text-align:left;font-size:10px}td{padding:4px 6px;border-bottom:1px solid #eee}.num{text-align:right}.g{color:green;font-weight:700}.r{color:red;font-weight:700}@media print{button{display:none}}</style></head><body>'+
+function exportReportCommesse(){var comms=lg('comm');var det=lgo('det');var w=window.open('','_blank');var rows=comms.map(function(c){var cd=det[c.numero]||{distinta:[],ore:[]};var cM=cd.distinta.reduce(function(s,r){return s+parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)},0);var ricavoOre=cd.ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);var imp=parseFloat(c.importo||0)||(vM+ricavoOre);var tot=cM;var pct=imp>0?((imp-tot)/imp*100):null;return Object.assign({},c,{cM:cM,cO:cO,tot:tot,imp:imp,pct:pct})});w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title><style>body{font-family:sans-serif;font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th{background:#f0f0f0;padding:5px 6px;border-bottom:2px solid #ccc;text-align:left;font-size:10px}td{padding:4px 6px;border-bottom:1px solid #eee}.num{text-align:right}.g{color:green;font-weight:700}.r{color:red;font-weight:700}@media print{button{display:none}}</style></head><body>'+
   '<button onclick="window.print()" style="margin-bottom:12px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer">Stampa</button>'+
   '<h2 style="margin-bottom:4px">Report Commesse — ASG LAB</h2><p style="color:#666;margin-bottom:12px">'+comms.length+' commesse · '+new Date().toLocaleDateString('it-IT')+'</p>'+
   '<table><thead><tr><th>N.</th><th>Cliente</th><th>Oggetto</th><th>Stato</th><th class="num">Offerta</th><th class="num">Costi</th><th class="num">Margine %</th></tr></thead><tbody>'+
