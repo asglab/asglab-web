@@ -869,7 +869,7 @@ function renderApprov(){
         <span class="approv-group-nome">${forn}</span>
         <span class="approv-group-count">${items.length} componenti${nDaOrd>0?' · '+nDaOrd+' da ordinare':''}</span>
         <span style="flex:1"></span>
-        ${nDaOrd>0?'<button class="btn btn-primary btn-sm" onclick="apriRDO(\'${forn.replace(/\'/g,"\\'")}\')">✉ RDO</button>':''}
+        ${nDaOrd>0?'<button class="btn btn-primary btn-sm" data-forn="'+encodeURIComponent(forn)+'" onclick="apriRDO(decodeURIComponent(this.dataset.forn))">✉ RDO</button>':''}
       </div>
       ${items.map(r=>`<div class="approv-row">
         <div class="approv-desc">
