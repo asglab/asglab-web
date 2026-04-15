@@ -1198,17 +1198,20 @@ function esc2(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
 function aggiornaKmModal(){
   var g=function(id){var e=document.getElementById(id);return e?parseFloat(e.value||0):0;};
   var km=g('f-km');
-  var tar=parseFloat((document.getElementById('f-aci-km')||{value:0.4774}).value||0.4774);
+  var aciEl=document.getElementById('f-aci-km');
+  var tar=aciEl?parseFloat(aciEl.value||0.4774):0.4774;
+  if(isNaN(tar)||tar<=0)tar=0;
   var rimb=km*tar;
   var dispEl=document.getElementById('f-rimb-km-disp');
-  if(dispEl)dispEl.value='€ '+rimb.toFixed(2);
+  if(dispEl)dispEl.value=tar>0?('€ '+rimb.toFixed(2)):'—';
   aggiornaTotTrasferta();
 }
 
 function aggiornaTotTrasferta(){
   var g=function(id){var e=document.getElementById(id);return e?parseFloat(e.value||0):0;};
   var km=g('f-km');
-  var aciKm=parseFloat((document.getElementById('f-aci-km')||{value:0.4774}).value||0.4774);
+  var aciEl2=document.getElementById('f-aci-km');
+  var aciKm=aciEl2?parseFloat(aciEl2.value||0):0;
   var rimbKm=km*aciKm;
   var diaria=g('f-diaria')*Math.max(1,g('f-ngg'));
   var treno=g('f-treno');
@@ -1226,7 +1229,7 @@ function saveTrasferta(numero){
   var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
   var gN=function(id){return parseFloat(G(id)||0);};
   var km=gN('f-km');
-  var aciKm=parseFloat(G('f-aci-km')||0.4774);
+  var aciKm=parseFloat(G('f-aci-km')||0);
   var rimbKm=parseFloat((km*aciKm).toFixed(2));
   var ngg=Math.max(1,gN('f-ngg'));
   var diaria=parseFloat((gN('f-diaria')*ngg).toFixed(2));
@@ -1934,23 +1937,29 @@ function getModalHTML(type,extra){
     '</div>'+
     '<div class="form-group"><label>Destinazione / luogo intervento</label><input class="form-control" id="f-dest" placeholder="es. Milano, Via Roma 5 — cliente XYZ"></div>'+
 
-    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:14px 0 8px;border-bottom:1px solid var(--border);padding-bottom:4px">🚗 Rimborso chilometrico ACI</div>'+
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:14px 0 8px;border-bottom:1px solid var(--border);padding-bottom:4px">🚗 Rimborso chilometrico</div>'+
+    '<div style="background:var(--surface2);border-radius:5px;padding:8px 10px;font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.6">'+
+      '<strong>Come trovare la tariffa ACI del tuo veicolo:</strong> vai su '+
+      '<a href=\"https://costikm.aci.it\" target=\"_blank\" style=\"color:var(--blue)\">costikm.aci.it</a>'+
+      ', cerca il tuo modello esatto (marca+modello+cilindrata) e leggi la colonna <em>€/km</em>. '+
+      'Il valore cambia ogni anno e varia molto tra modelli (es. Panda €0.48, Giulia €0.74). '+
+      'In alternativa usa un valore concordato internamente con l\'azienda.'+
+    '</div>'+
     '<div class="form-row">'+
       '<div class="form-group"><label>Km percorsi (andata+ritorno)</label>'+
         '<input class="form-control" id="f-km" type="number" step="1" value="0" oninput="aggiornaKmModal()">'+
       '</div>'+
-      '<div class="form-group"><label>Veicolo (per documentazione)</label>'+
+      '<div class="form-group"><label>Veicolo (marca, modello, alimentazione)</label>'+
         '<input class="form-control" id="f-veicolo" placeholder="es. Fiat Panda 1.2 benzina">'+
       '</div>'+
     '</div>'+
     '<div class="form-row">'+
-      '<div class="form-group"><label>Tariffa ACI 2026 (€/km)</label>'+
-        '<select class="form-control" id="f-aci-km" onchange="aggiornaKmModal()">'+
-          '<option value="0.4774">Benzina — €0.4774/km</option>'+
-          '<option value="0.4521">Diesel — €0.4521/km</option>'+
-          '<option value="0.4650">Ibrida (non plug-in) — €0.4650/km</option>'+
-          '<option value="0.3890">Elettrica / Plug-in — €0.3890/km</option>'+
-        '</select>'+
+      '<div class="form-group">'+
+        '<label>Tariffa €/km <span style=\"font-weight:400;color:var(--text3)\">(da tabella ACI 2026 per il tuo modello)</span></label>'+
+        '<input class="form-control" id="f-aci-km" type="number" step="0.0001" value="0.4774" oninput="aggiornaKmModal()" placeholder="es. 0.4774">'+
+        '<div style=\"font-size:10px;color:var(--text3);margin-top:3px\">'+
+          'Benzina tipica: 0.45–0.75 · Diesel: 0.43–0.65 · Ibrida: 0.46–0.70 · Elettrica: 0.35–0.55'+
+        '</div>'+
       '</div>'+
       '<div class="form-group"><label>Rimborso km calcolato</label>'+
         '<input class="form-control" id="f-rimb-km-disp" readonly value="€ 0.00" style="background:var(--surface2);color:var(--blue);font-weight:700;cursor:not-allowed">'+
