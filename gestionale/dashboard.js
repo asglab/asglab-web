@@ -3537,12 +3537,12 @@ function aggTuboPreview(){
   const costoRb=rb.curva!=='dritto'?6.2:4.5;
   const prezzoStimato=costoTubo+costoRa+costoRb;
 
-  prev.innerHTML=`
-    <div style="font-weight:700;color:var(--text);white-space:pre-line;margin-bottom:6px;">${desc}</div>
-    <div style="font-size:12px;color:var(--text3)">Norma: ${normaT} · Pressione max: ${pressT} bar · Fornitore: Pa.Co Fluid</div>
-    <div style="font-size:12px;color:var(--text3);margin-top:3px;font-family:monospace">${codice}</div>
-    <div style="font-size:12px;color:var(--text2);margin-top:4px">Prezzo stimato: <strong>€${fmt2(prezzoStimato)}</strong> cad — <em>da confermare con Pa.Co Fluid</em></div>
-    ${doubleCurva?'<div style="font-size:11px;background:#fef3c7;border:1px solid #f59e0b;border-radius:5px;padding:4px 8px;margin-top:6px;color:#78350f;">⚠ Doppia curva orientamento ${orient}° — comunicare esplicitamente a Pa.Co nell\'ordine.</div>':''}`;
+  prev.innerHTML=
+    '<div style="font-weight:700;color:var(--text);white-space:pre-line;margin-bottom:6px;">'+desc+'</div>'+
+    '<div style="font-size:12px;color:var(--text3)">Norma: '+normaT+' · Pressione max: '+pressT+' bar · Fornitore: Pa.Co Fluid</div>'+
+    '<div style="font-size:12px;color:var(--text3);margin-top:3px;font-family:monospace">'+codice+'</div>'+
+    '<div style="font-size:12px;color:var(--text2);margin-top:4px">Prezzo stimato: <strong>\u20ac'+fmt2(prezzoStimato)+'</strong> cad \u2014 <em>da confermare con Pa.Co Fluid</em></div>'+
+    (doubleCurva?'<div style="font-size:11px;background:#fef3c7;border:1px solid #f59e0b;border-radius:5px;padding:4px 8px;margin-top:6px;color:#78350f;">\u26a0 Doppia curva orientamento '+orient+'\u00b0 \u2014 comunicare esplicitamente a Pa.Co nell\'ordine.</div>':'');
 
   prev.dataset.desc=desc.replace(/\n/g,' | ');
   prev.dataset.cod=codice;prev.dataset.prezzo=prezzoStimato;prev.dataset.qty=qty;
