@@ -39,7 +39,7 @@
     <button onclick="syncNow()" title="Sync Nextcloud" style="background:none;border:none;cursor:pointer;color:inherit;font-family:inherit;font-size:inherit;padding:0;width:100%;text-align:inherit;display:block;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:1px"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg><span> Sync Nextcloud</span></button>
     <button onclick="openModal('config')" title="Configurazione" style="background:none;border:none;cursor:pointer;color:inherit;font-family:inherit;font-size:inherit;padding:0;width:100%;text-align:inherit;display:block;">⚙<span> Configurazione</span></button>
     <button onclick="exportAll()" title="Backup JSON" style="background:none;border:none;cursor:pointer;color:inherit;font-family:inherit;font-size:inherit;padding:0;width:100%;text-align:inherit;display:block;">↓<span> Backup JSON</span></button>
-    <span style="font-size:9px;color:var(--text4);padding:0 14px;text-align:center">v15 · <span id="build-ts">15/04 07:20</span></span>
+    <span style="font-size:9px;color:var(--text4);padding:0 14px;text-align:center">v15 · <span id="build-ts">15/04 07:23</span></span>
     <span id="footer-ts" class="text-sm text-muted" style="font-size:10px;padding:0 14px"></span>
   </div>
 </aside>
@@ -809,7 +809,7 @@ function updatePNContoFilter(){
   if(!sel) return;
   const cur = sel.value;
   sel.innerHTML = '<option value="">Tutti i conti</option>' +
-    conti.map(c=>`<option value="${c}"${c===cur?' selected':''}>${c}</option>`).join('');
+    conti.map(c=>('<option value="'+(c)+'"'+(c===cur?' selected':'')+'>'+(c)+'</option>').join('');
 }
 
 // Render tabella Prima Nota
@@ -837,14 +837,7 @@ function renderPrimaNota(){
       const ent = mov.reduce((s,r)=>s+r.entrata,0);
       const usc = mov.reduce((s,r)=>s+r.uscita,0);
       const sal = ent - usc;
-      return `<div style="background:var(--bg1);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;">
-        <div style="font-weight:700;color:var(--text2);margin-bottom:2px">${c}</div>
-        <div style="display:flex;gap:10px;">
-          <span style="color:var(--green)">↑ €${fmt(ent)}</span>
-          <span style="color:var(--red)">↓ €${fmt(usc)}</span>
-          <span style="font-weight:700;color:${sal>=0?'var(--blue)':'var(--red)'}">= €${fmt(sal)}</span>
-        </div>
-      </div>`;
+      return ('<div style="background:var(--bg1);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;">\n        <div style="font-weight:700;color:var(--text2);margin-bottom:2px">'+(c)+'</div>\n        <div style="display:flex;gap:10px;">\n          <span style="color:var(--green)">↑ €'+(fmt(ent))+'</span>\n          <span style="color:var(--red)">↓ €'+(fmt(usc))+'</span>\n          <span style="font-weight:700;color:'+(sal>=0?'var(--blue)':'var(--red)')+'">= €'+(fmt(sal))+'</span>\n        </div>\n      </div>';
     }).join('');
   }
 
@@ -864,26 +857,11 @@ function renderPrimaNota(){
 
   tbody.innerHTML = rows.map(r=>{
     saldoRun += r.entrata - r.uscita;
-    return `<tr style="border-bottom:1px solid var(--border);">
-      <td style="padding:6px 10px;font-family:monospace;font-size:11px">${fmtD(r.data_pag)}</td>
-      <td style="padding:6px 8px;font-size:11px"><span class="bdg" style="font-size:10px">${r.tipo||'—'}</span></td>
-      <td style="padding:6px 8px;font-size:11px;font-family:monospace">${r.num_doc||'—'}</td>
-      <td style="padding:6px 8px;font-size:11px;font-family:monospace">${fmtD(r.data_doc)}</td>
-      <td style="padding:6px 8px;font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.cliente||r.fornitore||'').replace(/"/g,'')}">${r.cliente||r.fornitore||'—'}</td>
-      <td style="padding:6px 8px;font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.nota||'').replace(/"/g,'')}">${r.nota||''}</td>
-      <td style="padding:6px 8px;font-size:11px"><span style="background:var(--blue-lt);color:var(--blue);padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600">${r.conto||'—'}</span></td>
-      <td style="padding:6px 8px;text-align:right;font-weight:600;color:var(--green)">${r.entrata>0?'€'+fmt2(r.entrata):''}</td>
-      <td style="padding:6px 8px;text-align:right;font-weight:600;color:var(--red)">${r.uscita>0?'€'+fmt2(r.uscita):''}</td>
-      <td style="padding:6px 8px;text-align:right;font-family:monospace;font-size:11px;color:${saldoRun>=0?'var(--text2)':'var(--red)'}">€${fmt2(saldoRun)}</td>
-    </tr>`;
+    return ('<tr style="border-bottom:1px solid var(--border);">\n      <td style="padding:6px 10px;font-family:monospace;font-size:11px">'+(fmtD(r.data_pag))+'</td>\n      <td style="padding:6px 8px;font-size:11px"><span class="bdg" style="font-size:10px">'+(r.tipo||'—')+'</span></td>\n      <td style="padding:6px 8px;font-size:11px;font-family:monospace">'+(r.num_doc||'—')+'</td>\n      <td style="padding:6px 8px;font-size:11px;font-family:monospace">'+(fmtD(r.data_doc))+'</td>\n      <td style="padding:6px 8px;font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+((r.cliente||r.fornitore||'').replace(/"/g,'')}">${r.cliente||r.fornitore||'—'}</td>
+      <td style="padding:6px 8px;font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.nota||'').replace(/"/g,''))+'">'+(r.nota||'')+'</td>\n      <td style="padding:6px 8px;font-size:11px"><span style="background:var(--blue-lt);color:var(--blue);padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600">'+(r.conto||'—')+'</span></td>\n      <td style="padding:6px 8px;text-align:right;font-weight:600;color:var(--green)">'+(r.entrata>0?'€'+fmt2(r.entrata):'')+'</td>\n      <td style="padding:6px 8px;text-align:right;font-weight:600;color:var(--red)">'+(r.uscita>0?'€'+fmt2(r.uscita):'')+'</td>\n      <td style="padding:6px 8px;text-align:right;font-family:monospace;font-size:11px;color:'+(saldoRun>=0?'var(--text2)':'var(--red)')+'">€'+(fmt2(saldoRun))+'</td>\n    </tr>';
   }).join('');
 
-  if(tfoot) tfoot.innerHTML = `<tr style="background:var(--bg2);font-weight:700;border-top:2px solid var(--border);">
-    <td colspan="7" style="padding:7px 10px;font-size:12px;color:var(--text3)">TOTALE — ${rows.length} movimenti</td>
-    <td style="padding:7px 8px;text-align:right;color:var(--green)">€${fmt2(totEnt)}</td>
-    <td style="padding:7px 8px;text-align:right;color:var(--red)">€${fmt2(totUsc)}</td>
-    <td style="padding:7px 8px;text-align:right;font-weight:800">€${fmt2(totEnt-totUsc)}</td>
-  </tr>`;
+  if(tfoot) tfoot.innerHTML = ('<tr style="background:var(--bg2);font-weight:700;border-top:2px solid var(--border);">\n    <td colspan="7" style="padding:7px 10px;font-size:12px;color:var(--text3)">TOTALE — '+(rows.length)+' movimenti</td>\n    <td style="padding:7px 8px;text-align:right;color:var(--green)">€'+(fmt2(totEnt))+'</td>\n    <td style="padding:7px 8px;text-align:right;color:var(--red)">€'+(fmt2(totUsc))+'</td>\n    <td style="padding:7px 8px;text-align:right;font-weight:800">€'+(fmt2(totEnt-totUsc))+'</td>\n  </tr>';
 }
 
 // Handler drag & drop
@@ -904,15 +882,12 @@ async function handlePNFiles(files){
       const rows = await parsePrimaNotaFile(file);
       _pnImportRows.push(...rows);
     } catch(err){
-      if(preview) preview.innerHTML += `<div style="color:var(--red);font-size:12px;padding:4px">✗ ${file.name}: ${err.message}</div>`;
+      if(preview) preview.innerHTML += ('<div style="color:var(--red);font-size:12px;padding:4px">✗ '+(file.name)+': '+(err.message)+'</div>';
     }
   }
 
   if(_pnImportRows.length){
-    if(preview) preview.innerHTML = `<div style="background:var(--green-lt);border:1px solid var(--green-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--green)">
-      ✓ Trovati <strong>${_pnImportRows.length}</strong> movimenti da importare<br>
-      Conti: ${[...new Set(_pnImportRows.map(r=>r.conto))].filter(Boolean).join(', ')}
-    </div>`;
+    if(preview) preview.innerHTML = ('<div style="background:var(--green-lt);border:1px solid var(--green-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--green)">\n      ✓ Trovati <strong>'+(_pnImportRows.length)+'</strong> movimenti da importare<br>\n      Conti: '+([...new Set(_pnImportRows.map(r=>r.conto))].filter(Boolean).join(', '))+'\n    </div>';
     if(btn) btn.style.display='';
   }
 }
@@ -1007,7 +982,7 @@ function confirmImportPN(){
   const merged = [...existing, ...nuovi];
   sPN(merged);
   closeM();
-  showToast(`✓ Importati ${nuovi.length} movimenti (${_pnImportRows.length-nuovi.length} duplicati saltati)`);
+  showToast(('✓ Importati '+(nuovi.length)+' movimenti ('+(_pnImportRows.length-nuovi.length)+' duplicati saltati)');
   // Sincronizza su Nextcloud
   wPutJSON('primanota.json', merged).catch(()=>{});
   contTab('primanota');
@@ -1027,55 +1002,8 @@ function exportPrimaNotaPDF(){
 
   const totEnt = rows.reduce((s,r)=>s+r.entrata,0);
   const totUsc = rows.reduce((s,r)=>s+r.uscita,0);
-  const periodo = filtDa||filtA ? `${filtDa||'…'} / ${filtA||'…'}` : 'Tutto il periodo';
+  const periodo = filtDa||filtA ? (''+(filtDa||'…')+' / '+(filtA||'…')+'' : 'Tutto il periodo';
   const contoLbl = filtConto||'Tutti i conti';
 
   const win = window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-  <title>Prima Nota — ASG LAB</title>
-  <style>
-    body{font-family:sans-serif;font-size:11px;color:#111;margin:20px;}
-    h1{font-size:16px;margin-bottom:4px}
-    .sub{color:#666;font-size:11px;margin-bottom:16px}
-    table{width:100%;border-collapse:collapse;font-size:10px;}
-    th{background:#f0f0f0;padding:5px 6px;text-align:left;border-bottom:2px solid #ccc;font-size:10px;}
-    td{padding:4px 6px;border-bottom:1px solid #eee;}
-    .num{text-align:right;}
-    .green{color:#166534;font-weight:600}
-    .red{color:#991b1b;font-weight:600}
-    tfoot td{font-weight:700;background:#f7f7f7;border-top:2px solid #ccc;}
-    @media print{body{margin:0}button{display:none}}
-  </style></head><body>
-  <button onclick="window.print()" style="margin-bottom:12px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer">🖨 Stampa / Salva PDF</button>
-  <h1>Prima Nota — ASG LAB</h1>
-  <div class="sub">Conto: <strong>${contoLbl}</strong> · Periodo: <strong>${periodo}</strong> · ${rows.length} movimenti</div>
-  <table>
-    <thead><tr>
-      <th>Data pag.</th><th>Tipo</th><th>N° Doc.</th><th>Data doc.</th>
-      <th>Cliente/Fornitore</th><th>Nota</th><th>Conto</th>
-      <th class="num" style="color:green">Entrata</th>
-      <th class="num" style="color:red">Uscita</th>
-    </tr></thead>
-    <tbody>
-    ${rows.map(r=>`<tr>
-      <td>${fmtD(r.data_pag)}</td>
-      <td>${r.tipo||'—'}</td>
-      <td>${r.num_doc||'—'}</td>
-      <td>${fmtD(r.data_doc)}</td>
-      <td>${r.cliente||r.fornitore||'—'}</td>
-      <td style="color:#666">${r.nota||''}</td>
-      <td>${r.conto||'—'}</td>
-      <td class="num green">${r.entrata>0?'€'+fmt2(r.entrata):''}</td>
-      <td class="num red">${r.uscita>0?'€'+fmt2(r.uscita):''}</td>
-    </tr>`).join('')}
-    </tbody>
-    <tfoot><tr>
-      <td colspan="7">TOTALE</td>
-      <td class="num" style="color:green">€${fmt2(totEnt)}</td>
-      <td class="num" style="color:red">€${fmt2(totUsc)}</td>
-    </tr></tfoot>
-  </table>
-  <div style="margin-top:12px;font-size:10px;color:#666">
-    Saldo periodo: <strong style="color:${totEnt-totUsc>=0?'#166534':'#991b1b'}">€${fmt2(totEnt-totUsc)}</strong>
-    · Estratto il ${new Date().toLocaleDateString('it-IT')}
-  </div>
+  win.document.write(('<!DOCTYPE html><html><head><meta charset="utf-8">\n  <title>Prima Nota — ASG LAB</title>\n  <style>\n    body{font-family:sans-serif;font-size:11px;color:#111;margin:20px;}\n    h1{font-size:16px;margin-bottom:4px}\n    .sub{color:#666;font-size:11px;margin-bottom:16px}\n    table{width:100%;border-collapse:collapse;font-size:10px;}\n    th{background:#f0f0f0;padding:5px 6px;text-align:left;border-bottom:2px solid #ccc;font-size:10px;}\n    td{padding:4px 6px;border-bottom:1px solid #eee;}\n    .num{text-align:right;}\n    .green{color:#166534;font-weight:600}\n    .red{color:#991b1b;font-weight:600}\n    tfoot td{font-weight:700;background:#f7f7f7;border-top:2px solid #ccc;}\n    @media print{body{margin:0}button{display:none}}\n  </style></head><body>\n  <button onclick="window.print()" style="margin-bottom:12px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer">🖨 Stampa / Salva PDF</button>\n  <h1>Prima Nota — ASG LAB</h1>\n  <div class="sub">Conto: <strong>'+(contoLbl)+'</strong> · Periodo: <strong>'+(periodo)+'</strong> · '+(rows.length)+' movimenti</div>\n  <table>\n    <thead><tr>\n      <th>Data pag.</th><th>Tipo</th><th>N° Doc.</th><th>Data doc.</th>\n      <th>Cliente/Fornitore</th><th>Nota</th><th>Conto</th>\n      <th class="num" style="color:green">Entrata</th>\n      <th class="num" style="color:red">Uscita</th>\n    </tr></thead>\n    <tbody>\n    '+(rows.map(r=>'+('<tr>\n      <td>'+(fmtD(r.data_pag))+'</td>\n      <td>'+(r.tipo||'—')+'</td>\n      <td>'+(r.num_doc||'—')+'</td>\n      <td>'+(fmtD(r.data_doc))+'</td>\n      <td>'+(r.cliente||r.fornitore||'—')+'</td>\n      <td style="color:#666">'+(r.nota||'')+'</td>\n      <td>'+(r.conto||'—')+'</td>\n      <td class="num green">'+(r.entrata>0?'€'+fmt2(r.entrata):'')+'</td>\n      <td class="num red">'+(r.uscita>0?'€'+fmt2(r.uscita):'')+'</td>\n    </tr>').join(''))+'\n    </tbody>\n    <tfoot><tr>\n      <td colspan="7">TOTALE</td>\n      <td class="num" style="color:green">€'+(fmt2(totEnt))+'</td>\n      <td class="num" style="color:red">€'+(fmt2(totUsc))+'</td>\n    </tr></tfoot>\n  </table>\n  <div style="margin-top:12px;font-size:10px;color:#666">\n    Saldo periodo: <strong style="color:'+(totEnt-totUsc>=0?'#166534':'#991b1b')+'">€'+(fmt2(totEnt-totUsc))+'</strong>\n    · Estratto il '+(new Date().toLocaleDateString('it-IT'))+'\n  </div>\n

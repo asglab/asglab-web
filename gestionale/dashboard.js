@@ -411,7 +411,7 @@ function updatePNContoFilter(){
   if(!sel) return;
   const cur = sel.value;
   sel.innerHTML = '<option value="">Tutti i conti</option>' +
-    conti.map(c=>`<option value="${c}"${c===cur?' selected':''}>${c}</option>`).join('');
+    conti.map(c=>('<option value="'+(c)+'"'+(c===cur?' selected':'')+'>'+(c)+'</option>').join('');
 }
 
 // Render tabella Prima Nota
@@ -439,14 +439,7 @@ function renderPrimaNota(){
       const ent = mov.reduce((s,r)=>s+r.entrata,0);
       const usc = mov.reduce((s,r)=>s+r.uscita,0);
       const sal = ent - usc;
-      return `<div style="background:var(--bg1);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;">
-        <div style="font-weight:700;color:var(--text2);margin-bottom:2px">${c}</div>
-        <div style="display:flex;gap:10px;">
-          <span style="color:var(--green)">↑ €${fmt(ent)}</span>
-          <span style="color:var(--red)">↓ €${fmt(usc)}</span>
-          <span style="font-weight:700;color:${sal>=0?'var(--blue)':'var(--red)'}">= €${fmt(sal)}</span>
-        </div>
-      </div>`;
+      return ('<div style="background:var(--bg1);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;">\n        <div style="font-weight:700;color:var(--text2);margin-bottom:2px">'+(c)+'</div>\n        <div style="display:flex;gap:10px;">\n          <span style="color:var(--green)">↑ €'+(fmt(ent))+'</span>\n          <span style="color:var(--red)">↓ €'+(fmt(usc))+'</span>\n          <span style="font-weight:700;color:'+(sal>=0?'var(--blue)':'var(--red)')+'">= €'+(fmt(sal))+'</span>\n        </div>\n      </div>';
     }).join('');
   }
 
@@ -466,26 +459,11 @@ function renderPrimaNota(){
 
   tbody.innerHTML = rows.map(r=>{
     saldoRun += r.entrata - r.uscita;
-    return `<tr style="border-bottom:1px solid var(--border);">
-      <td style="padding:6px 10px;font-family:monospace;font-size:11px">${fmtD(r.data_pag)}</td>
-      <td style="padding:6px 8px;font-size:11px"><span class="bdg" style="font-size:10px">${r.tipo||'—'}</span></td>
-      <td style="padding:6px 8px;font-size:11px;font-family:monospace">${r.num_doc||'—'}</td>
-      <td style="padding:6px 8px;font-size:11px;font-family:monospace">${fmtD(r.data_doc)}</td>
-      <td style="padding:6px 8px;font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.cliente||r.fornitore||'').replace(/"/g,'')}">${r.cliente||r.fornitore||'—'}</td>
-      <td style="padding:6px 8px;font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.nota||'').replace(/"/g,'')}">${r.nota||''}</td>
-      <td style="padding:6px 8px;font-size:11px"><span style="background:var(--blue-lt);color:var(--blue);padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600">${r.conto||'—'}</span></td>
-      <td style="padding:6px 8px;text-align:right;font-weight:600;color:var(--green)">${r.entrata>0?'€'+fmt2(r.entrata):''}</td>
-      <td style="padding:6px 8px;text-align:right;font-weight:600;color:var(--red)">${r.uscita>0?'€'+fmt2(r.uscita):''}</td>
-      <td style="padding:6px 8px;text-align:right;font-family:monospace;font-size:11px;color:${saldoRun>=0?'var(--text2)':'var(--red)'}">€${fmt2(saldoRun)}</td>
-    </tr>`;
+    return ('<tr style="border-bottom:1px solid var(--border);">\n      <td style="padding:6px 10px;font-family:monospace;font-size:11px">'+(fmtD(r.data_pag))+'</td>\n      <td style="padding:6px 8px;font-size:11px"><span class="bdg" style="font-size:10px">'+(r.tipo||'—')+'</span></td>\n      <td style="padding:6px 8px;font-size:11px;font-family:monospace">'+(r.num_doc||'—')+'</td>\n      <td style="padding:6px 8px;font-size:11px;font-family:monospace">'+(fmtD(r.data_doc))+'</td>\n      <td style="padding:6px 8px;font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+((r.cliente||r.fornitore||'').replace(/"/g,'')}">${r.cliente||r.fornitore||'—'}</td>
+      <td style="padding:6px 8px;font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.nota||'').replace(/"/g,''))+'">'+(r.nota||'')+'</td>\n      <td style="padding:6px 8px;font-size:11px"><span style="background:var(--blue-lt);color:var(--blue);padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600">'+(r.conto||'—')+'</span></td>\n      <td style="padding:6px 8px;text-align:right;font-weight:600;color:var(--green)">'+(r.entrata>0?'€'+fmt2(r.entrata):'')+'</td>\n      <td style="padding:6px 8px;text-align:right;font-weight:600;color:var(--red)">'+(r.uscita>0?'€'+fmt2(r.uscita):'')+'</td>\n      <td style="padding:6px 8px;text-align:right;font-family:monospace;font-size:11px;color:'+(saldoRun>=0?'var(--text2)':'var(--red)')+'">€'+(fmt2(saldoRun))+'</td>\n    </tr>';
   }).join('');
 
-  if(tfoot) tfoot.innerHTML = `<tr style="background:var(--bg2);font-weight:700;border-top:2px solid var(--border);">
-    <td colspan="7" style="padding:7px 10px;font-size:12px;color:var(--text3)">TOTALE — ${rows.length} movimenti</td>
-    <td style="padding:7px 8px;text-align:right;color:var(--green)">€${fmt2(totEnt)}</td>
-    <td style="padding:7px 8px;text-align:right;color:var(--red)">€${fmt2(totUsc)}</td>
-    <td style="padding:7px 8px;text-align:right;font-weight:800">€${fmt2(totEnt-totUsc)}</td>
-  </tr>`;
+  if(tfoot) tfoot.innerHTML = ('<tr style="background:var(--bg2);font-weight:700;border-top:2px solid var(--border);">\n    <td colspan="7" style="padding:7px 10px;font-size:12px;color:var(--text3)">TOTALE — '+(rows.length)+' movimenti</td>\n    <td style="padding:7px 8px;text-align:right;color:var(--green)">€'+(fmt2(totEnt))+'</td>\n    <td style="padding:7px 8px;text-align:right;color:var(--red)">€'+(fmt2(totUsc))+'</td>\n    <td style="padding:7px 8px;text-align:right;font-weight:800">€'+(fmt2(totEnt-totUsc))+'</td>\n  </tr>';
 }
 
 // Handler drag & drop
@@ -506,15 +484,12 @@ async function handlePNFiles(files){
       const rows = await parsePrimaNotaFile(file);
       _pnImportRows.push(...rows);
     } catch(err){
-      if(preview) preview.innerHTML += `<div style="color:var(--red);font-size:12px;padding:4px">✗ ${file.name}: ${err.message}</div>`;
+      if(preview) preview.innerHTML += ('<div style="color:var(--red);font-size:12px;padding:4px">✗ '+(file.name)+': '+(err.message)+'</div>';
     }
   }
 
   if(_pnImportRows.length){
-    if(preview) preview.innerHTML = `<div style="background:var(--green-lt);border:1px solid var(--green-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--green)">
-      ✓ Trovati <strong>${_pnImportRows.length}</strong> movimenti da importare<br>
-      Conti: ${[...new Set(_pnImportRows.map(r=>r.conto))].filter(Boolean).join(', ')}
-    </div>`;
+    if(preview) preview.innerHTML = ('<div style="background:var(--green-lt);border:1px solid var(--green-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--green)">\n      ✓ Trovati <strong>'+(_pnImportRows.length)+'</strong> movimenti da importare<br>\n      Conti: '+([...new Set(_pnImportRows.map(r=>r.conto))].filter(Boolean).join(', '))+'\n    </div>';
     if(btn) btn.style.display='';
   }
 }
@@ -609,7 +584,7 @@ function confirmImportPN(){
   const merged = [...existing, ...nuovi];
   sPN(merged);
   closeM();
-  showToast(`✓ Importati ${nuovi.length} movimenti (${_pnImportRows.length-nuovi.length} duplicati saltati)`);
+  showToast(('✓ Importati '+(nuovi.length)+' movimenti ('+(_pnImportRows.length-nuovi.length)+' duplicati saltati)');
   // Sincronizza su Nextcloud
   wPutJSON('primanota.json', merged).catch(()=>{});
   contTab('primanota');
@@ -629,59 +604,11 @@ function exportPrimaNotaPDF(){
 
   const totEnt = rows.reduce((s,r)=>s+r.entrata,0);
   const totUsc = rows.reduce((s,r)=>s+r.uscita,0);
-  const periodo = filtDa||filtA ? `${filtDa||'…'} / ${filtA||'…'}` : 'Tutto il periodo';
+  const periodo = filtDa||filtA ? (''+(filtDa||'…')+' / '+(filtA||'…')+'' : 'Tutto il periodo';
   const contoLbl = filtConto||'Tutti i conti';
 
   const win = window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-  <title>Prima Nota — ASG LAB</title>
-  <style>
-    body{font-family:sans-serif;font-size:11px;color:#111;margin:20px;}
-    h1{font-size:16px;margin-bottom:4px}
-    .sub{color:#666;font-size:11px;margin-bottom:16px}
-    table{width:100%;border-collapse:collapse;font-size:10px;}
-    th{background:#f0f0f0;padding:5px 6px;text-align:left;border-bottom:2px solid #ccc;font-size:10px;}
-    td{padding:4px 6px;border-bottom:1px solid #eee;}
-    .num{text-align:right;}
-    .green{color:#166534;font-weight:600}
-    .red{color:#991b1b;font-weight:600}
-    tfoot td{font-weight:700;background:#f7f7f7;border-top:2px solid #ccc;}
-    @media print{body{margin:0}button{display:none}}
-  </style></head><body>
-  <button onclick="window.print()" style="margin-bottom:12px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer">🖨 Stampa / Salva PDF</button>
-  <h1>Prima Nota — ASG LAB</h1>
-  <div class="sub">Conto: <strong>${contoLbl}</strong> · Periodo: <strong>${periodo}</strong> · ${rows.length} movimenti</div>
-  <table>
-    <thead><tr>
-      <th>Data pag.</th><th>Tipo</th><th>N° Doc.</th><th>Data doc.</th>
-      <th>Cliente/Fornitore</th><th>Nota</th><th>Conto</th>
-      <th class="num" style="color:green">Entrata</th>
-      <th class="num" style="color:red">Uscita</th>
-    </tr></thead>
-    <tbody>
-    ${rows.map(r=>`<tr>
-      <td>${fmtD(r.data_pag)}</td>
-      <td>${r.tipo||'—'}</td>
-      <td>${r.num_doc||'—'}</td>
-      <td>${fmtD(r.data_doc)}</td>
-      <td>${r.cliente||r.fornitore||'—'}</td>
-      <td style="color:#666">${r.nota||''}</td>
-      <td>${r.conto||'—'}</td>
-      <td class="num green">${r.entrata>0?'€'+fmt2(r.entrata):''}</td>
-      <td class="num red">${r.uscita>0?'€'+fmt2(r.uscita):''}</td>
-    </tr>`).join('')}
-    </tbody>
-    <tfoot><tr>
-      <td colspan="7">TOTALE</td>
-      <td class="num" style="color:green">€${fmt2(totEnt)}</td>
-      <td class="num" style="color:red">€${fmt2(totUsc)}</td>
-    </tr></tfoot>
-  </table>
-  <div style="margin-top:12px;font-size:10px;color:#666">
-    Saldo periodo: <strong style="color:${totEnt-totUsc>=0?'#166534':'#991b1b'}">€${fmt2(totEnt-totUsc)}</strong>
-    · Estratto il ${new Date().toLocaleDateString('it-IT')}
-  </div>
-  </body></html>`);
+  win.document.write(('<!DOCTYPE html><html><head><meta charset="utf-8">\n  <title>Prima Nota — ASG LAB</title>\n  <style>\n    body{font-family:sans-serif;font-size:11px;color:#111;margin:20px;}\n    h1{font-size:16px;margin-bottom:4px}\n    .sub{color:#666;font-size:11px;margin-bottom:16px}\n    table{width:100%;border-collapse:collapse;font-size:10px;}\n    th{background:#f0f0f0;padding:5px 6px;text-align:left;border-bottom:2px solid #ccc;font-size:10px;}\n    td{padding:4px 6px;border-bottom:1px solid #eee;}\n    .num{text-align:right;}\n    .green{color:#166534;font-weight:600}\n    .red{color:#991b1b;font-weight:600}\n    tfoot td{font-weight:700;background:#f7f7f7;border-top:2px solid #ccc;}\n    @media print{body{margin:0}button{display:none}}\n  </style></head><body>\n  <button onclick="window.print()" style="margin-bottom:12px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer">🖨 Stampa / Salva PDF</button>\n  <h1>Prima Nota — ASG LAB</h1>\n  <div class="sub">Conto: <strong>'+(contoLbl)+'</strong> · Periodo: <strong>'+(periodo)+'</strong> · '+(rows.length)+' movimenti</div>\n  <table>\n    <thead><tr>\n      <th>Data pag.</th><th>Tipo</th><th>N° Doc.</th><th>Data doc.</th>\n      <th>Cliente/Fornitore</th><th>Nota</th><th>Conto</th>\n      <th class="num" style="color:green">Entrata</th>\n      <th class="num" style="color:red">Uscita</th>\n    </tr></thead>\n    <tbody>\n    '+(rows.map(r=>'+('<tr>\n      <td>'+(fmtD(r.data_pag))+'</td>\n      <td>'+(r.tipo||'—')+'</td>\n      <td>'+(r.num_doc||'—')+'</td>\n      <td>'+(fmtD(r.data_doc))+'</td>\n      <td>'+(r.cliente||r.fornitore||'—')+'</td>\n      <td style="color:#666">'+(r.nota||'')+'</td>\n      <td>'+(r.conto||'—')+'</td>\n      <td class="num green">'+(r.entrata>0?'€'+fmt2(r.entrata):'')+'</td>\n      <td class="num red">'+(r.uscita>0?'€'+fmt2(r.uscita):'')+'</td>\n    </tr>').join(''))+'\n    </tbody>\n    <tfoot><tr>\n      <td colspan="7">TOTALE</td>\n      <td class="num" style="color:green">€'+(fmt2(totEnt))+'</td>\n      <td class="num" style="color:red">€'+(fmt2(totUsc))+'</td>\n    </tr></tfoot>\n  </table>\n  <div style="margin-top:12px;font-size:10px;color:#666">\n    Saldo periodo: <strong style="color:'+(totEnt-totUsc>=0?'#166534':'#991b1b')+'">€'+(fmt2(totEnt-totUsc))+'</strong>\n    · Estratto il '+(new Date().toLocaleDateString('it-IT'))+'\n  </div>\n  </body></html>');
   win.document.close();
 }
 
@@ -735,11 +662,7 @@ function renderHome(){
       cl.innerHTML=inCorso.map(c=>{
         const st=c.stato||'';
         const badge=STATI_COMM[st]||'badge-gray';
-        return`<div class="list-row" onclick="openDetail('${c.numero}')">
-          <div class="sdot ${st==='confermata'||st==='in-corso'?'sdot-green':st==='offerta'?'sdot-amber':'sdot-gray'}"></div>
-          <div class="list-row-main"><div class="list-row-title">${c.numero}</div><div class="list-row-sub">${CMAP[getCod(c.numero)]||c.cliente||''} · ${c.oggetto||'—'}</div></div>
-          <span class="badge ${badge}">${st}</span>
-        </div>`;
+        return('<div class="list-row" onclick="openDetail(\''+(c.numero)+'\')">\n          <div class="sdot '+(st==='confermata'||st==='in-corso'?'sdot-green':st==='offerta'?'sdot-amber':'sdot-gray')+'"></div>\n          <div class="list-row-main"><div class="list-row-title">'+(c.numero)+'</div><div class="list-row-sub">'+(CMAP[getCod(c.numero)]||c.cliente||'')+' · '+(c.oggetto||'—')+'</div></div>\n          <span class="badge '+(badge)+'">'+(st)+'</span>\n        </div>';
       }).join('');
     }
   }
@@ -758,11 +681,7 @@ function renderHome(){
         const d=dTo(s.data);
         const imp=parseFloat(s.importo||0);
         const isInc=s.categoria==='incasso';
-        return`<div class="list-row" onclick="navTo('contabilita');setTimeout(()=>{contTab('scadenze');openModal('edit-scad','${s.id}')},80)">
-          <div class="sdot ${d<=3?'sdot-red':d<=7?'sdot-amber':'sdot-gray'}"></div>
-          <div class="list-row-main"><div class="list-row-title" style="font-size:12px">${s.descrizione||'—'}</div><div class="list-row-sub">${fmtD(s.data)}</div></div>
-          ${imp>0?'<div class="list-row-val '+(isInc?'green':'red')+'">'+( isInc?'+':'−')+'€'+fmt(imp)+'</div>':'<div class="list-row-val" style="color:var(--text4);font-size:11px">da def.</div>'}
-        </div>`;
+        return('<div class="list-row" onclick="navTo(\'contabilita\');setTimeout(()=>{contTab(\'scadenze\');openModal(\'edit-scad\',\''+(s.id)+'\')},80)">\n          <div class="sdot '+(d<=3?'sdot-red':d<=7?'sdot-amber':'sdot-gray')+'"></div>\n          <div class="list-row-main"><div class="list-row-title" style="font-size:12px">'+(s.descrizione||'—')+'</div><div class="list-row-sub">'+(fmtD(s.data))+'</div></div>\n          '+(imp>0?'<div class="list-row-val '+(isInc?'green':'red')+'">'+( isInc?'+':'−')+'€'+fmt(imp)+'</div>':'<div class="list-row-val" style="color:var(--text4);font-size:11px">da def.</div>')+'\n        </div>';
       }).join('');
     }
   }
@@ -778,11 +697,7 @@ function renderHome(){
       const fornitori=Object.keys(approvPend).slice(0,4);
       al.innerHTML=fornitori.map(f=>{
         const items=approvPend[f];
-        return`<div class="list-row" onclick="navTo('approv')">
-          <div class="sdot sdot-amber"></div>
-          <div class="list-row-main"><div class="list-row-title">${f}</div><div class="list-row-sub">${items.length} componenti da ${[...new Set(items.map(i=>i.numero))].join(', ')}</div></div>
-          <span class="badge badge-amber">${items.length} pz</span>
-        </div>`;
+        return('<div class="list-row" onclick="navTo(\'approv\')">\n          <div class="sdot sdot-amber"></div>\n          <div class="list-row-main"><div class="list-row-title">'+(f)+'</div><div class="list-row-sub">'+(items.length)+' componenti da '+([...new Set(items.map(i=>i.numero))].join(', '))+'</div></div>\n          <span class="badge badge-amber">'+(items.length)+' pz</span>\n        </div>';
       }).join('');
     }
   }
@@ -799,22 +714,13 @@ function renderHome(){
   if(ma){
     let html='';
     if(sottoScorta.length){
-      html+=sottoScorta.slice(0,3).map(m=>`<div class="list-row" onclick="navTo('magazzino')">
-        <div class="sdot sdot-red"></div>
-        <div class="list-row-main"><div class="list-row-title" style="font-size:12px">⚠ ${m.descrizione||m.codice||'—'}</div><div class="list-row-sub">${m.qty||0} pz · scorta min. ${m.qty_min}</div></div>
-      </div>`).join('');
+      html+=sottoScorta.slice(0,3).map(m=>('<div class="list-row" onclick="navTo(\'magazzino\')">\n        <div class="sdot sdot-red"></div>\n        <div class="list-row-main"><div class="list-row-title" style="font-size:12px">⚠ '+(m.descrizione||m.codice||'—')+'</div><div class="list-row-sub">'+(m.qty||0)+' pz · scorta min. '+(m.qty_min)+'</div></div>\n      </div>').join('');
     }
     todo.slice(0,3).forEach(t=>{
-      html+=`<div class="list-row"><div class="sdot sdot-${t.pri==='alta'?'red':t.pri==='media'?'amber':'gray'}"></div>
-        <div class="list-row-main"><div class="list-row-title" style="font-size:12px">${t.testo}</div></div>
-        <button class="xbtn" onclick="togTodo('${t.id}');renderHome();event.stopPropagation()">✓</button>
-      </div>`;
+      html+=('<div class="list-row"><div class="sdot sdot-'+(t.pri==='alta'?'red':t.pri==='media'?'amber':'gray')+'"></div>\n        <div class="list-row-main"><div class="list-row-title" style="font-size:12px">'+(t.testo)+'</div></div>\n        <button class="xbtn" onclick="togTodo(\''+(t.id)+'\');renderHome();event.stopPropagation()">✓</button>\n      </div>';
     });
     if(!html)html='<div class="list-row"><div class="sdot sdot-green"></div><div class="list-row-main"><div class="list-row-title" style="font-size:12px">Tutto in ordine</div></div></div>';
-    ma.innerHTML=html+`<div style="padding:8px 14px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn btn-ghost btn-sm" onclick="openModal('todo')">+ Azione</button>
-      <button class="btn btn-ghost btn-sm" onclick="openModal('conto')">+ Saldo banca</button>
-    </div>`;
+    ma.innerHTML=html+('<div style="padding:8px 14px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;">\n      <button class="btn btn-ghost btn-sm" onclick="openModal(\'todo\')">+ Azione</button>\n      <button class="btn btn-ghost btn-sm" onclick="openModal(\'conto\')">+ Saldo banca</button>\n    </div>';
   }
 }
 
@@ -864,22 +770,7 @@ function renderApprov(){
     if(!items.length)return;
     totale+=items.length;
     const nDaOrd=items.filter(i=>(!i.stato_approv||i.stato_approv==='daordinare')).length;
-    html+=`<div class="approv-group">
-      <div class="approv-group-head">
-        <span class="approv-group-nome">${forn}</span>
-        <span class="approv-group-count">${items.length} componenti${nDaOrd>0?' · '+nDaOrd+' da ordinare':''}</span>
-        <span style="flex:1"></span>
-        ${nDaOrd>0?'<button class="btn btn-primary btn-sm" data-forn="'+encodeURIComponent(forn)+'" onclick="apriRDO(decodeURIComponent(this.dataset.forn))">✉ RDO</button>':''}
-      </div>
-      ${items.map(r=>`<div class="approv-row">
-        <div class="approv-desc">
-          <div class="approv-title">${r.descrizione||r.codice||'—'}</div>
-          <div class="approv-commesse">${r._commessa} · ${r.codice||'—'}</div>
-        </div>
-        <span class="badge ${SAP_BADGE[r.stato_approv||'daordinare']}">${SAP_LABEL[r.stato_approv||'daordinare']}</span>
-        <select class="stato-approv-select" onchange="aggiornaStatoApprov('${r._commessa}','${r.id}',this.value)">${Object.entries(SAP_LABEL).map(([k,v])=>`<option value="${k}"${(r.stato_approv||'daordinare')===k?' selected':''}>${v}</option>`).join('')}</select>
-      </div>`).join('')}
-    </div>`;
+    html+=('<div class="approv-group">\n      <div class="approv-group-head">\n        <span class="approv-group-nome">'+(forn)+'</span>\n        <span class="approv-group-count">'+(items.length)+' componenti'+(nDaOrd>0?' · '+nDaOrd+' da ordinare':'')+'</span>\n        <span style="flex:1"></span>\n        '+(nDaOrd>0?'<button class="btn btn-primary btn-sm" data-forn="'+encodeURIComponent(forn)+'" onclick="apriRDO(decodeURIComponent(this.dataset.forn))">✉ RDO</button>':'')+'\n      </div>\n      '+(items.map(r=>'+('<div class="approv-row">\n        <div class="approv-desc">\n          <div class="approv-title">'+(r.descrizione||r.codice||'—')+'</div>\n          <div class="approv-commesse">'+(r._commessa)+' · '+(r.codice||'—')+'</div>\n        </div>\n        <span class="badge '+(SAP_BADGE[r.stato_approv||'daordinare'])+'">'+(SAP_LABEL[r.stato_approv||'daordinare'])+'</span>\n        <select class="stato-approv-select" onchange="aggiornaStatoApprov(\''+(r._commessa)+'\',\''+(r.id)+'\',this.value)">'+(Object.entries(SAP_LABEL).map(([k,v])=>'+('<option value="'+(k)+'"'+((r.stato_approv||'daordinare')===k?' selected':'')+'>'+(v)+'</option>').join(''))+'</select>\n      </div>').join(''))+'\n    </div>';
   });
 
   if(!html){el.innerHTML='<div class="empty"><div class="empty-icon">✓</div>Nessun componente per il filtro selezionato</div>';return;}
@@ -997,49 +888,9 @@ function renderFlussoCassa(){
   const barCol=p=>p.saldo<0?'var(--red)':p.saldo<saldoAttuale*0.3?'var(--amber)':'var(--green)';
 
   const mesi=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
-  const fmtW=d=>`${d.getDate()} ${mesi[d.getMonth()]}`;
+  const fmtW=d=>(''+(d.getDate())+' '+(mesi[d.getMonth()])+'';
 
-  el.innerHTML=`
-  <div style="background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-      <div style="font-size:13px;font-weight:600;color:var(--text)">Flusso di cassa — proiezione 90 giorni</div>
-      <div style="font-size:12px;color:var(--text3)">Saldo attuale: <strong style="color:${saldoAttuale>=0?'var(--green)':'var(--red)'}">€${fmt(saldoAttuale)}</strong></div>
-    </div>
-
-    <!-- Grafico a barre -->
-    <div style="position:relative;height:100px;display:flex;align-items:flex-end;gap:2px;margin-bottom:6px;border-bottom:1px solid var(--border);">
-      ${punti.map((p,i)=>`
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;" title="${fmtW(p.inizio)}–${fmtW(p.fine)}: saldo €${fmt(p.saldo)}${p.inc?' +€'+fmt(p.inc):''}${p.pag?' −€'+fmt(p.pag):''}${p.fis?' fisco −€'+fmt(p.fis):''}">
-          <div style="font-size:9px;color:${barCol(p)};font-weight:700;margin-bottom:1px">${p.saldo<0?'−':''}€${Math.abs(p.saldo)>=1000?(Math.abs(p.saldo)/1000).toFixed(0)+'k':Math.abs(p.saldo).toFixed(0)}</div>
-          <div style="width:100%;background:${barCol(p)};border-radius:2px 2px 0 0;opacity:.85;height:${barH(p)}px;min-height:3px;transition:height .2s;"></div>
-        </div>`).join('')}
-    </div>
-    <div style="display:flex;gap:2px;margin-bottom:12px;">
-      ${punti.map((p,i)=>`<div style="flex:1;text-align:center;font-size:9px;color:${i%2===0?'var(--text3)':'var(--text4)'};">${i%3===0?fmtW(p.inizio):''}</div>`).join('')}
-    </div>
-
-    <!-- Legenda e movimenti rilevanti -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
-      <div style="font-size:11px;padding:6px 10px;background:var(--green-lt);border-radius:var(--r-sm);color:var(--green);">
-        <div style="font-weight:700">Attesi in entrata</div>
-        <div style="font-size:14px;font-weight:800">+€${fmt(punti.reduce((s,p)=>s+p.inc,0))}</div>
-        <div style="opacity:.7">${pendenti.filter(s=>s.categoria==='incasso').length} fatture</div>
-      </div>
-      <div style="font-size:11px;padding:6px 10px;background:var(--red-lt);border-radius:var(--r-sm);color:var(--red);">
-        <div style="font-weight:700">Uscite previste</div>
-        <div style="font-size:14px;font-weight:800">−€${fmt(punti.reduce((s,p)=>s+p.pag+p.fis,0))}</div>
-        <div style="opacity:.7">fornitori + fisco</div>
-      </div>
-      <div style="font-size:11px;padding:6px 10px;background:${minSaldo<0?'var(--red-lt)':minSaldo<saldoAttuale*0.2?'var(--amber-lt)':'var(--green-lt)'};border-radius:var(--r-sm);color:${minSaldo<0?'var(--red)':minSaldo<saldoAttuale*0.2?'var(--amber)':'var(--green)'};">
-        <div style="font-weight:700">Saldo minimo</div>
-        <div style="font-size:14px;font-weight:800">${minSaldo<0?'−':''}€${fmt(Math.abs(minSaldo))}</div>
-        <div style="opacity:.7">${minSaldo<0?'⚠ attenzione deficit':'proiettato 90gg'}</div>
-      </div>
-    </div>
-
-    ${minSaldo<0?'<div style="background:var(--red-lt);border:1px solid var(--red-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--red);font-weight:600;">⚠ Attenzione: la proiezione mostra un possibile deficit di cassa. Considera di anticipare incassi o posticipare pagamenti.</div>':''}
-    ${minSaldo>=0&&minSaldo<saldoAttuale*0.2?'<div style="background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--amber);font-weight:600;">⚡ Il saldo scenderà significativamente — tieni monitorati gli incassi.</div>':''}
-  </div>`;
+  el.innerHTML=('\n  <div style="background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px;">\n    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">\n      <div style="font-size:13px;font-weight:600;color:var(--text)">Flusso di cassa — proiezione 90 giorni</div>\n      <div style="font-size:12px;color:var(--text3)">Saldo attuale: <strong style="color:'+(saldoAttuale>=0?'var(--green)':'var(--red)')+'">€'+(fmt(saldoAttuale))+'</strong></div>\n    </div>\n\n    <!-- Grafico a barre -->\n    <div style="position:relative;height:100px;display:flex;align-items:flex-end;gap:2px;margin-bottom:6px;border-bottom:1px solid var(--border);">\n      '+(punti.map((p,i)=>'+('\n        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;" title="'+(fmtW(p.inizio))+'–'+(fmtW(p.fine))+': saldo €'+(fmt(p.saldo))+''+(p.inc?' +€'+fmt(p.inc):'')+''+(p.pag?' −€'+fmt(p.pag):'')+''+(p.fis?' fisco −€'+fmt(p.fis):'')+'">\n          <div style="font-size:9px;color:'+(barCol(p))+';font-weight:700;margin-bottom:1px">'+(p.saldo<0?'−':'')+'€'+(Math.abs(p.saldo)>=1000?(Math.abs(p.saldo)/1000).toFixed(0)+'k':Math.abs(p.saldo).toFixed(0))+'</div>\n          <div style="width:100%;background:'+(barCol(p))+';border-radius:2px 2px 0 0;opacity:.85;height:'+(barH(p))+'px;min-height:3px;transition:height .2s;"></div>\n        </div>').join(''))+'\n    </div>\n    <div style="display:flex;gap:2px;margin-bottom:12px;">\n      '+(punti.map((p,i)=>'+('<div style="flex:1;text-align:center;font-size:9px;color:'+(i%2===0?'var(--text3)':'var(--text4)')+';">'+(i%3===0?fmtW(p.inizio):'')+'</div>').join(''))+'\n    </div>\n\n    <!-- Legenda e movimenti rilevanti -->\n    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">\n      <div style="font-size:11px;padding:6px 10px;background:var(--green-lt);border-radius:var(--r-sm);color:var(--green);">\n        <div style="font-weight:700">Attesi in entrata</div>\n        <div style="font-size:14px;font-weight:800">+€'+(fmt(punti.reduce((s,p)=>s+p.inc,0)))+'</div>\n        <div style="opacity:.7">'+(pendenti.filter(s=>s.categoria==='incasso').length)+' fatture</div>\n      </div>\n      <div style="font-size:11px;padding:6px 10px;background:var(--red-lt);border-radius:var(--r-sm);color:var(--red);">\n        <div style="font-weight:700">Uscite previste</div>\n        <div style="font-size:14px;font-weight:800">−€'+(fmt(punti.reduce((s,p)=>s+p.pag+p.fis,0)))+'</div>\n        <div style="opacity:.7">fornitori + fisco</div>\n      </div>\n      <div style="font-size:11px;padding:6px 10px;background:'+(minSaldo<0?'var(--red-lt)':minSaldo<saldoAttuale*0.2?'var(--amber-lt)':'var(--green-lt)')+';border-radius:var(--r-sm);color:'+(minSaldo<0?'var(--red)':minSaldo<saldoAttuale*0.2?'var(--amber)':'var(--green)')+';">\n        <div style="font-weight:700">Saldo minimo</div>\n        <div style="font-size:14px;font-weight:800">'+(minSaldo<0?'−':'')+'€'+(fmt(Math.abs(minSaldo)))+'</div>\n        <div style="opacity:.7">'+(minSaldo<0?'⚠ attenzione deficit':'proiettato 90gg')+'</div>\n      </div>\n    </div>\n\n    '+(minSaldo<0?'<div style="background:var(--red-lt);border:1px solid var(--red-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--red);font-weight:600;">⚠ Attenzione: la proiezione mostra un possibile deficit di cassa. Considera di anticipare incassi o posticipare pagamenti.</div>':'')+'\n    '+(minSaldo>=0&&minSaldo<saldoAttuale*0.2?'<div style="background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--amber);font-weight:600;">⚡ Il saldo scenderà significativamente — tieni monitorati gli incassi.</div>':'')+'\n  </div>';
 }
 
 function renderScadContabilita(){
@@ -1075,28 +926,16 @@ function renderScadContabilita(){
   const riga=s=>{
     const d=dTo(s.data);
     const st=catBadge[s.categoria]||'background:#f3f4f6;color:#374151';
-    const catLabel=s.categoria?`<span class="scad-cat" style="${st}">${s.categoria}</span>`:'';
+    const catLabel=s.categoria?('<span class="scad-cat" style="'+(st)+'">'+(s.categoria)+'</span>':'';
     const imp=parseImporto(s.importo);
     const isInc=s.categoria==='incasso';
     const scadAlert=d<0?'border-left:3px solid var(--red);':d<=3?'border-left:3px solid var(--red);':d<=7?'border-left:3px solid var(--amber);':'';
-    return`<div class="scad-item" style="${scadAlert}cursor:pointer" onclick="openModal('edit-scad','${s.id||''}')">
-      <div class="scad-date ${d<0?'red':d<=7?'amber':''}">${fmtD(s.data)}<div style="font-size:9px;color:inherit;opacity:.7">${d<0?'scaduta'+(Math.abs(d)>1?' '+Math.abs(d)+'gg':''):d===0?'oggi':d===1?'domani':d+'gg'}</div></div>
-      <div class="scad-body">${catLabel}<span class="scad-desc">${s.descrizione||'—'}</span></div>
-      <div class="scad-amount" style="color:${imp>0?(isInc?'var(--green)':'var(--red)'):'var(--text4)'}">
-        ${imp>0?(isInc?'+':'−')+'€'+fmt(imp):'<em style="font-size:11px;font-weight:400">da definire</em>'}
-      </div>
-      <button class="xbtn" onclick="delLoc('scad','${s.id||''}');renderScadContabilita();event.stopPropagation()">✕</button>
-    </div>`;
+    return('<div class="scad-item" style="'+(scadAlert)+'cursor:pointer" onclick="openModal(\'edit-scad\',\''+(s.id||'')+'\')">\n      <div class="scad-date '+(d<0?'red':d<=7?'amber':'')+'">'+(fmtD(s.data))+'<div style="font-size:9px;color:inherit;opacity:.7">'+(d<0?'scaduta'+(Math.abs(d)>1?' '+Math.abs(d)+'gg':''):d===0?'oggi':d===1?'domani':d+'gg')+'</div></div>\n      <div class="scad-body">'+(catLabel)+'<span class="scad-desc">'+(s.descrizione||'—')+'</span></div>\n      <div class="scad-amount" style="color:'+(imp>0?(isInc?'var(--green)':'var(--red)'):'var(--text4)')+'">\n        '+(imp>0?(isInc?'+':'−')+'€'+fmt(imp):'<em style="font-size:11px;font-weight:400">da definire</em>')+'\n      </div>\n      <button class="xbtn" onclick="delLoc(\'scad\',\''+(s.id||'')+'\');renderScadContabilita();event.stopPropagation()">✕</button>\n    </div>';
   };
 
   const sez=(titolo,items,sottotitolo='')=>{
     if(!items.length)return'';
-    return`<div style="margin-bottom:14px">
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:6px 0 4px;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;">
-        <span>${titolo}</span><span style="font-weight:400;font-size:10px;color:var(--text4)">${sottotitolo}</span>
-      </div>
-      ${items.map(riga).join('')}
-    </div>`;
+    return('<div style="margin-bottom:14px">\n      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:6px 0 4px;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;">\n        <span>'+(titolo)+'</span><span style="font-weight:400;font-size:10px;color:var(--text4)">'+(sottotitolo)+'</span>\n      </div>\n      '+(items.map(riga).join(''))+'\n    </div>';
   };
 
   const summary=document.getElementById('scad-summary-cont');
@@ -1111,56 +950,12 @@ function renderScadContabilita(){
   const totIncassi30=somma(incassi30);
   const saldoProiettato30=saldoAtt+totIncassi30-totUscite30;
 
-  const cashPanel=saldoAtt>0||totUscite30>0?`
-  <div style="background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;">
-    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Liquidità — prossimi 30 giorni</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-      <div style="flex:1;min-width:100px;">
-        <div style="font-size:10px;color:var(--text3)">Saldo attuale</div>
-        <div style="font-size:18px;font-weight:800;color:${saldoAtt>=0?'var(--green)':'var(--red)'}">€${fmt(saldoAtt)}</div>
-      </div>
-      <div style="color:var(--text3);font-size:18px">+</div>
-      <div style="flex:1;min-width:100px;">
-        <div style="font-size:10px;color:var(--text3)">Incassi attesi 30gg</div>
-        <div style="font-size:18px;font-weight:800;color:var(--green)">+€${fmt(totIncassi30)}</div>
-        <div style="font-size:10px;color:var(--text3)">${incassi30.length} fatture</div>
-      </div>
-      <div style="color:var(--text3);font-size:18px">−</div>
-      <div style="flex:1;min-width:100px;">
-        <div style="font-size:10px;color:var(--text3)">Uscite previste 30gg</div>
-        <div style="font-size:18px;font-weight:800;color:var(--red)">−€${fmt(totUscite30)}</div>
-        <div style="font-size:10px;color:var(--text3)">${uscite30.length} pagamenti</div>
-      </div>
-      <div style="color:var(--text3);font-size:18px">=</div>
-      <div style="flex:1;min-width:120px;padding:8px 12px;background:${saldoProiettato30<0?'var(--red-lt)':saldoProiettato30<saldoAtt*0.2?'var(--amber-lt)':'var(--green-lt)'};border-radius:var(--r-sm);">
-        <div style="font-size:10px;font-weight:700;color:${saldoProiettato30<0?'var(--red)':saldoProiettato30<saldoAtt*0.2?'var(--amber)':'var(--green)'}">Saldo proiettato</div>
-        <div style="font-size:20px;font-weight:800;color:${saldoProiettato30<0?'var(--red)':saldoProiettato30<saldoAtt*0.2?'var(--amber)':'var(--green)'}">€${fmt(saldoProiettato30)}</div>
-        <div style="font-size:10px;color:${saldoProiettato30<0?'var(--red)':saldoProiettato30<saldoAtt*0.2?'var(--amber)':'var(--green)'}">${saldoProiettato30<0?'⚠ deficit atteso':saldoProiettato30<totUscite30*0.5?'⚡ tieni monitorato':'✓ ok'}</div>
-      </div>
-    </div>
-    ${totUscite30>0?'<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;">'+
+  const cashPanel=saldoAtt>0||totUscite30>0?('\n  <div style="background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;">\n    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Liquidità — prossimi 30 giorni</div>\n    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">\n      <div style="flex:1;min-width:100px;">\n        <div style="font-size:10px;color:var(--text3)">Saldo attuale</div>\n        <div style="font-size:18px;font-weight:800;color:'+(saldoAtt>=0?'var(--green)':'var(--red)')+'">€'+(fmt(saldoAtt))+'</div>\n      </div>\n      <div style="color:var(--text3);font-size:18px">+</div>\n      <div style="flex:1;min-width:100px;">\n        <div style="font-size:10px;color:var(--text3)">Incassi attesi 30gg</div>\n        <div style="font-size:18px;font-weight:800;color:var(--green)">+€'+(fmt(totIncassi30))+'</div>\n        <div style="font-size:10px;color:var(--text3)">'+(incassi30.length)+' fatture</div>\n      </div>\n      <div style="color:var(--text3);font-size:18px">−</div>\n      <div style="flex:1;min-width:100px;">\n        <div style="font-size:10px;color:var(--text3)">Uscite previste 30gg</div>\n        <div style="font-size:18px;font-weight:800;color:var(--red)">−€'+(fmt(totUscite30))+'</div>\n        <div style="font-size:10px;color:var(--text3)">'+(uscite30.length)+' pagamenti</div>\n      </div>\n      <div style="color:var(--text3);font-size:18px">=</div>\n      <div style="flex:1;min-width:120px;padding:8px 12px;background:'+(saldoProiettato30<0?'var(--red-lt)':saldoProiettato30<saldoAtt*0.2?'var(--amber-lt)':'var(--green-lt)')+';border-radius:var(--r-sm);">\n        <div style="font-size:10px;font-weight:700;color:'+(saldoProiettato30<0?'var(--red)':saldoProiettato30<saldoAtt*0.2?'var(--amber)':'var(--green)')+'">Saldo proiettato</div>\n        <div style="font-size:20px;font-weight:800;color:'+(saldoProiettato30<0?'var(--red)':saldoProiettato30<saldoAtt*0.2?'var(--amber)':'var(--green)')+'">€'+(fmt(saldoProiettato30))+'</div>\n        <div style="font-size:10px;color:'+(saldoProiettato30<0?'var(--red)':saldoProiettato30<saldoAtt*0.2?'var(--amber)':'var(--green)')+'">'+(saldoProiettato30<0?'⚠ deficit atteso':saldoProiettato30<totUscite30*0.5?'⚡ tieni monitorato':'✓ ok')+'</div>\n      </div>\n    </div>\n    '+(totUscite30>0?'<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;">'+
       '<button class="filter-chip" onclick="setFiltroScad(this,\'pagamento\')" style="font-size:11px">\u2193 Vedi pagamenti da fare</button>'+
       '<button class="filter-chip" onclick="setFiltroScad(this,\'incasso\')" style="font-size:11px">\u2191 Vedi incassi attesi</button>'+
-    '</div>':''}
-  </div>`:'';
+    '</div>':'')+'\n  </div>':'';
 
-  if(summary)summary.innerHTML=(cashPanel||'')+`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
-    <div class="scad-box inc" style="cursor:pointer" onclick="setFiltroScad(document.querySelector('[data-sf=incasso]'),'incasso')">
-      <div class="scad-box-label">Da incassare</div>
-      <div class="scad-box-val">+€${fmt(totInc)}</div>
-      <div class="scad-box-sub">${incassi.length} fatture aperte</div>
-    </div>
-    <div class="scad-box pag" style="cursor:pointer" onclick="setFiltroScad(document.querySelector('[data-sf=pagamento]'),'pagamento')">
-      <div class="scad-box-label">Da pagare</div>
-      <div class="scad-box-val">−€${fmt(totPag)}</div>
-      <div class="scad-box-sub">${pagamenti.length} fatture passive</div>
-    </div>
-    <div class="scad-box fis" style="cursor:pointer" onclick="setFiltroScad(document.querySelector('[data-sf=fiscale]'),'fiscale')">
-      <div class="scad-box-label">Fiscali 30gg</div>
-      <div class="scad-box-val">${totFis30>0?'−€'+fmt(totFis30):'—'}</div>
-      <div class="scad-box-sub">${nFisNota>0?nFisNota+' da definire':fiscali.filter(s=>new Date(s.data)<=fine30).length+' scadenze'}</div>
-    </div>
-  </div>`;
+  if(summary)summary.innerHTML=(cashPanel||'')+('<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">\n    <div class="scad-box inc" style="cursor:pointer" onclick="setFiltroScad(document.querySelector(\'[data-sf=incasso]\'),\'incasso\')">\n      <div class="scad-box-label">Da incassare</div>\n      <div class="scad-box-val">+€'+(fmt(totInc))+'</div>\n      <div class="scad-box-sub">'+(incassi.length)+' fatture aperte</div>\n    </div>\n    <div class="scad-box pag" style="cursor:pointer" onclick="setFiltroScad(document.querySelector(\'[data-sf=pagamento]\'),\'pagamento\')">\n      <div class="scad-box-label">Da pagare</div>\n      <div class="scad-box-val">−€'+(fmt(totPag))+'</div>\n      <div class="scad-box-sub">'+(pagamenti.length)+' fatture passive</div>\n    </div>\n    <div class="scad-box fis" style="cursor:pointer" onclick="setFiltroScad(document.querySelector(\'[data-sf=fiscale]\'),\'fiscale\')">\n      <div class="scad-box-label">Fiscali 30gg</div>\n      <div class="scad-box-val">'+(totFis30>0?'−€'+fmt(totFis30):'—')+'</div>\n      <div class="scad-box-sub">'+(nFisNota>0?nFisNota+' da definire':fiscali.filter(s=>new Date(s.data)<=fine30).length+' scadenze')+'</div>\n    </div>\n  </div>';
 
   if(list){
     if(filtro!=='tutti'){
@@ -1288,7 +1083,7 @@ function folderUrl(n,url){
   const seqNum=parseInt((n||'').split('-')[1]||'0');
   const comm=lll('comm').find(x=>x.numero===n);
   if(comm?.oggetto){
-    const nomeCartella=`${c}-${seqNum}-${a} (${comm.oggetto})`;
+    const nomeCartella=(''+(c)+'-'+(seqNum)+'-'+(a)+' ('+(comm.oggetto)+')';
     return ncBase+'/apps/files/?dir='+encodeURIComponent('/Clienti/'+k+'/'+a+'/'+nomeCartella);
   }
   return ncBase+'/apps/files/?dir='+encodeURIComponent('/Clienti/'+k+'/'+a);
@@ -1297,7 +1092,7 @@ function folderUrl(n,url){
 // ═══════════════════════════════════════════════
 // WEBDAV
 // ═══════════════════════════════════════════════
-async function wGet(f){const c=getCfg();if(!c.ok)return null;try{const r=await fetch(`${c.nc_url}/remote.php/dav/files/${c.nc_user}/Dashboard/${f}`,{headers:{'Authorization':'Basic '+btoa(c.nc_user+':'+c.nc_pass)}});if(!r.ok)return null;return parseCSV(await r.text());}catch{return null;}}
+async function wGet(f){const c=getCfg();if(!c.ok)return null;try{const r=await fetch((''+(c.nc_url)+'/remote.php/dav/files/'+(c.nc_user)+'/Dashboard/'+(f)+'',{headers:{'Authorization':'Basic '+btoa(c.nc_user+':'+c.nc_pass)}});if(!r.ok)return null;return parseCSV(await r.text());}catch{return null;}}
 
 async function wListNCDirs(path){
   // Lista solo le sottocartelle in un percorso Nextcloud
@@ -1307,7 +1102,7 @@ async function wListNCDirs(path){
     const r=await fetch(url,{method:'PROPFIND',headers:{
       'Authorization':'Basic '+btoa(c.nc_user+':'+c.nc_pass),
       'Depth':'1','Content-Type':'application/xml'
-    },body:`<?xml version="1.0"?><d:propfind xmlns:d="DAV:"><d:prop><d:displayname/><d:resourcetype/></d:prop></d:propfind>`});
+    },body:('<?xml version="1.0"?><d:propfind xmlns:d="DAV:"><d:prop><d:displayname/><d:resourcetype/></d:prop></d:propfind>'});
     if(!r.ok)return[];
     const xml=await r.text();
     const doc=new DOMParser().parseFromString(xml,'text/xml');
@@ -1333,7 +1128,7 @@ async function wListNC(path){
         'Depth':'1',
         'Content-Type':'application/xml'
       },
-      body:`<?xml version="1.0"?><d:propfind xmlns:d="DAV:"><d:prop><d:displayname/><d:getcontenttype/><d:getlastmodified/><d:getcontentlength/></d:prop></d:propfind>`
+      body:('<?xml version="1.0"?><d:propfind xmlns:d="DAV:"><d:prop><d:displayname/><d:getcontenttype/><d:getlastmodified/><d:getcontentlength/></d:prop></d:propfind>'
     });
     if(!r.ok)return[];
     const xml=await r.text();
@@ -1497,7 +1292,7 @@ async function importDaNextcloud(){
     ls('comm',merged);SD.comm=merged;
     renderAll();
     setSyncUI('ok','importato');
-    showToast(`✓ ${nuove.length} nuove + ${aggiornate.length} aggiornate da Nextcloud`);
+    showToast(('✓ '+(nuove.length)+' nuove + '+(aggiornate.length)+' aggiornate da Nextcloud'));
   }catch(e){setSyncUI('err','errore');showToast('Errore importazione: '+e.message);}
 }
 
@@ -1577,7 +1372,7 @@ function renderMag(){
   const vv=document.getElementById('mag-m-val');if(vv)vv.textContent='€'+fmt2(totValore);
   const vl=document.getElementById('mag-m-low');if(vl)vl.textContent=sottoScorta.length;
   const el=document.getElementById('mag-tbody');if(!el)return;
-  if(!filt.length){el.innerHTML=`<tr><td colspan="10" class="empty">${all.length?'Nessuna voce corrisponde al filtro':'Magazzino vuoto — aggiungi le prime voci con il bottone + in alto'}</td></tr>`;return;}
+  if(!filt.length){el.innerHTML=('<tr><td colspan="10" class="empty">'+(all.length?\'Nessuna voce corrisponde al filtro\':\'Magazzino vuoto — aggiungi le prime voci con il bottone + in alto\')+'</td></tr>');return;}
   const catColor={valvola:'#ede9fe',pompa:'#ccfbf1',motore:'#fee2e2',serbatoio:'#f3f4f6',blocco:'#f0f9ff',giunto:'#fef3c7',raccorderia:'#dbeafe',elettrica:'#fef9c3',vario:'#f9fafb'};
   el.innerHTML=filt.map(r=>{
     const low=parseFloat(r.qty_min||0)>0&&parseFloat(r.qty||0)<parseFloat(r.qty_min||0);
@@ -1631,14 +1426,14 @@ function renderFatt(){
   // Aggiorna header con frecce ordinamento
   const thead=el.closest('table')?.querySelector('thead tr');
   if(thead)thead.innerHTML=
-    `<th style="padding:7px 14px;text-align:left;font-size:11px;color:var(--text3);font-weight:600">Tipo</th>`+
+    ('<th style="padding:7px 14px;text-align:left;font-size:11px;color:var(--text3);font-weight:600">Tipo</th>')+
     _thSort('fatt','numero','N°')+
     _thSort('fatt','cliente','Cliente/Fornitore')+
     _thSort('fatt','importo','€')+
     _thSort('fatt','data','Data')+
     _thSort('fatt','data_scad','Scadenza')+
     _thSort('fatt','stato','Stato')+
-    `<th style="padding:7px 8px;text-align:center;font-size:11px;color:var(--text3);font-weight:600">📁</th>`;
+    ('<th style="padding:7px 8px;text-align:center;font-size:11px;color:var(--text3);font-weight:600">📁</th>');
   if(!data.length){el.innerHTML='<tr><td colspan="8" class="empty">Nessuna fattura — importa da Fattura24</td></tr>';return;}
   el.innerHTML=data.slice(0,100).map(f=>{
     const isFE=f.tipo==='FE';
@@ -1667,11 +1462,11 @@ function fattUrl(f){
   const base='https://cloud.asglab.it/apps/files/?dir=';
   if(f.tipo==='FE'){
     // /Amministrazione/Contabilità/Fatture attive/Fatture attive ANNO/ANNO-MM/
-    const dir=`/Amministrazione/Contabilità/Fatture attive/Fatture attive ${anno}/${anno}-${mese}`;
+    const dir=('/Amministrazione/Contabilità/Fatture attive/Fatture attive '+(anno)+'/'+(anno)+'-'+(mese}');
     return base+encodeURIComponent(dir);
   } else if(f.tipo==='FA'){
     // /Amministrazione/Contabilità/Fatture passive/Fatture passive ANNO/ANNO-MM/
-    const dir=`/Amministrazione/Contabilità/Fatture passive/Fatture passive ${anno}/${anno}-${mese}`;
+    const dir=('/Amministrazione/Contabilità/Fatture passive/Fatture passive '+(anno)+'/'+(anno)+'-'+(mese}');
     return base+encodeURIComponent(dir);
   }
   return null;
@@ -1687,14 +1482,14 @@ function aggiungiScadenzeDaFatture(fatture){
   fatture.forEach(f=>{
     if(!f.data_scad||f.data_scad==='')return;
     if(f.stato==='pagata')return;
-    const key=`${f.tipo}_${f.data_scad}_${f.id_f24}`; // senza importo
+    const key=(''+(f.tipo)+'_'+(f.data_scad)+'_'+(f.id_f24}'); // senza importo
     const isFE=f.tipo==='FE';
     const nuovaScad={
       id:esistentiMap.has(key)?(esistentiMap.get(key).id):uid(),
       data:f.data_scad,
       descrizione:isFE
-        ?`Incasso fattura ${f.numero||''} — ${f.cliente||''}`
-        :`Pagamento fattura ${f.numero||''} — ${f.cliente||''}`,
+        ?('Incasso fattura '+(f.numero||\'\')+' — '+(f.cliente||\'\'}')
+        :('Pagamento fattura '+(f.numero||\'\')+' — '+(f.cliente||\'\'}'),
       importo:f.importo||'',
       categoria:isFE?'incasso':'pagamento',
       pagato:'no',
@@ -1749,7 +1544,7 @@ function renderCassa(){
 
   if(!g)return;
   if(!data.length){
-    g.innerHTML=`<div style="grid-column:1/-1;padding:14px;text-align:center;font-size:13px;color:var(--text3)">Nessun conto — <a onclick="openModal('conto')" style="color:var(--blue);cursor:pointer;font-weight:600">aggiungi saldo</a></div>`;
+    g.innerHTML=('<div style="grid-column:1/-1;padding:14px;text-align:center;font-size:13px;color:var(--text3)">Nessun conto — <a onclick="openModal(\'conto\')" style="color:var(--blue);cursor:pointer;font-weight:600">aggiungi saldo</a></div>');
     if(pEl)pEl.innerHTML='';
     return;
   }
@@ -1760,7 +1555,7 @@ function renderCassa(){
     <div class="ccv" style="color:${parseFloat(c.saldo)<0?'var(--red)':'var(--text)'}">€${fmt(c.saldo)}</div>
     <div class="ccd">${c.data_rilevazione?'agg. '+fmtD(c.data_rilevazione):''}</div>
   </div>`).join('')
-  +`<div class="cassa-tot"><span style="font-size:12px;font-weight:700;color:var(--blue)">Liquidità totale</span><span style="font-size:20px;font-weight:800;color:var(--blue)">€${fmt(tot)}</span></div>`;
+  +('<div class="cassa-tot"><span style="font-size:12px;font-weight:700;color:var(--blue)">Liquidità totale</span><span style="font-size:20px;font-weight:800;color:var(--blue)">€'+(fmt(tot))+'</span></div>');
 
   // Proiezione separata
   if(pEl){
@@ -1777,7 +1572,7 @@ function renderCassa(){
         <span style="font-size:18px;font-weight:800;color:${(tot+totIncasso-totUscite-totFiscali)>=0?'var(--green)':'var(--red)'}">€${fmt(tot+totIncasso-totUscite-totFiscali)}</span>
       </div>
     </div>`:
-    `<div style="padding:8px 0;font-size:12px;color:var(--text4)">Importa le fatture per vedere la proiezione liquidità</div>`;
+    ('<div style="padding:8px 0;font-size:12px;color:var(--text4)">Importa le fatture per vedere la proiezione liquidità</div>');
   }
 }
 
@@ -1786,7 +1581,7 @@ function renderTodo(){
   const sorted=[...data].sort((a,b)=>(a.done?1:0)-(b.done?1:0)||({'alta':0,'media':1,'bassa':2}[a.pri]||1)-({'alta':0,'media':1,'bassa':2}[b.pri]||1));
   const list=document.getElementById('todo-list');
   if(!sorted.length){list.innerHTML='<div class="empty">Nessuna azione pendente</div>';return;}
-  list.innerHTML=sorted.map(t=>`<div class="item"><input type="checkbox" class="tcb" ${t.done?'checked':''} onchange="togTodo('${t.id}')"><div class="ttx ${t.done?'done':''}">${t.testo}</div>${t.pri&&t.pri!=='bassa'?'<span class="tpr pr-${t.pri}">${t.pri}</span>':''}<button class="xbtn" onclick="delLoc('todo','${t.id}')">✕</button></div>`).join('');
+  list.innerHTML=sorted.map(t=>('<div class="item"><input type="checkbox" class="tcb" '+(t.done?\'checked\':\'\')+' onchange="togTodo(\''+(t.id)+'\')"><div class="ttx '+(t.done?\'done\':\'\')+'">'+(t.testo)+'</div>'+(t.pri&&t.pri!==\'bassa\'?\'<span class="tpr pr-'+(t.pri)+'">'+(t.pri)+'</span>\':\'\')+'<button class="xbtn" onclick="delLoc(\'todo\',\''+(t.id)+'\')">✕</button></div>')).join('');
 }
 
 
@@ -1880,8 +1675,8 @@ function buildTabs(tipo,c,cd){
     {id:'note',label:'Note',always:true},
   ];
   const vis=allTabs.filter(t=>t.always||(t.types&&(t.types.includes(tipo)||tipo==='')));
-  tabsEl.innerHTML=vis.map((t,i)=>`<div class="tab${i===0?' active':''}" onclick="switchTab('${t.id}')" id="tab-${t.id}">${t.label}</div>`).join('');
-  contEl.innerHTML=vis.map((t,i)=>`<div class="tab-content${i===0?' active':''}" id="tc-${t.id}"></div>`).join('');
+  tabsEl.innerHTML=vis.map((t,i)=>('<div class="tab'+(i===0?\' active\':\'\')+'" onclick="switchTab(\''+(t.id)+'\')" id="tab-'+(t.id)+'">'+(t.label)+'</div>')).join('');
+  contEl.innerHTML=vis.map((t,i)=>('<div class="tab-content'+(i===0?\' active\':\'\')+'" id="tc-'+(t.id)+'"></div>')).join('');
   vis.forEach(t=>renderTabContent(t.id,c,cd));
 }
 
@@ -1916,7 +1711,7 @@ function tabRiepilogo(c,cd){
     <div class="rc" style="border-left:3px solid var(--blue)"><div class="rcl">Margine lordo</div><div class="rcv" style="color:${marg>=0?'var(--green)':'var(--red)'}">€${fmt2(marg)}</div><div class="rcs">${totOre>0?totOre+' ore lavoro':''}</div></div>
   </div>
   <div class="panel"><div class="info-grid">
-    ${[['Numero',c.numero],['Tipo',TIPI[c.tipo_commessa]||'—'],['Stato',SL[c.stato]||'—'],['Cliente',CNAMES[getCod(c.numero)]||c.cliente||'—'],['Apertura',fmtD(c.data_apertura)],['Consegna prev.',fmtD(c.data_consegna)]].map(([l,v])=>`<div><div class="ir-l">${l}</div><div class="ir-v">${v}</div></div>`).join('')}
+    ${[['Numero',c.numero],['Tipo',TIPI[c.tipo_commessa]||'—'],['Stato',SL[c.stato]||'—'],['Cliente',CNAMES[getCod(c.numero)]||c.cliente||'—'],['Apertura',fmtD(c.data_apertura)],['Consegna prev.',fmtD(c.data_consegna)]].map(([l,v])=>('<div><div class="ir-l">'+(l)+'</div><div class="ir-v">'+(v)+'</div></div>')).join('')}
     ${c.note?'<div style="grid-column:1/-1"><div class="ir-l">Note</div><div class="ir-v">${c.note}</div></div>':''}
   </div></div>`;
 }
@@ -1928,16 +1723,16 @@ function tabOfferta(c,cd){
   const dist=(cd&&cd.distinta)||[];
   const totV=dist.reduce((s,r)=>s+(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)),0);
   const cliente=CNAMES[getCod(c.numero)]||c.cliente||'Spettabile Cliente';
-  const testoAuto=`Spettabile ${cliente},\n\nIn riferimento alla Vs. richiesta, siamo lieti di sottoporVi la nostra migliore offerta per:\n\n${c.oggetto||'— oggetto —'}\n\n`+
-    (dist.filter(r=>!r._intestazione).length?dist.filter(r=>!r._intestazione).map(r=>`• ${r.descrizione||r.codice} (qty ${r.qty||1}) — € ${fmt2(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1))} IVA esclusa`).join('\n')+'\n\n':'')+
-    `TOTALE OFFERTA: € ${fmt2(totV||parseFloat(off.importo_offerto||c.importo||0))} IVA esclusa\n\nLa presente offerta è valida 30 giorni dalla data odierna.\nTempi di consegna: da concordare.\nCondizioni di pagamento: 30 giorni d.f.f.m.\n\nPer qualsiasi informazione restiamo a Vostra disposizione.\n\nCordiali saluti,`;
+  const testoAuto=('Spettabile '+(cliente)+',\n\nIn riferimento alla Vs. richiesta, siamo lieti di sottoporVi la nostra migliore offerta per:\n\n'+(c.oggetto||\'— oggetto —\')+'\n\n')+
+    (dist.filter(r=>!r._intestazione).length?dist.filter(r=>!r._intestazione).map(r=>('• '+(r.descrizione||r.codice)+' (qty '+(r.qty||1)+') — € '+(fmt2(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)))+' IVA esclusa')).join('\n')+'\n\n':'')+
+    ('TOTALE OFFERTA: € '+(fmt2(totV||parseFloat(off.importo_offerto||c.importo||0)))+' IVA esclusa\n\nLa presente offerta è valida 30 giorni dalla data odierna.\nTempi di consegna: da concordare.\nCondizioni di pagamento: 30 giorni d.f.f.m.\n\nPer qualsiasi informazione restiamo a Vostra disposizione.\n\nCordiali saluti,');
   const statoColor=colori[off.stato]||'#57606a';
   return`
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
     <div style="flex:1;">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Stato offerta</div>
       <select id="off-stato" style="border:2px solid ${statoColor};border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;color:${statoColor};background:#fff;cursor:pointer;outline:none;" onchange="aggiornaColoreBordoOfferta(this)">
-        ${Object.entries(stati).map(([k,v])=>`<option value="${k}"${off.stato===k?' selected':''}>${v}</option>`).join('')}
+        ${Object.entries(stati).map(([k,v])=>('<option value="'+(k)+'"'+(off.stato===k?\' selected\':\'\')+'>'+(v)+'</option>')).join('')}
       </select>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -1979,9 +1774,9 @@ function generaTestoOfferta(numero){
   const dist=(cd.distinta||[]).filter(r=>!r._intestazione);
   const totV=dist.reduce((s,r)=>s+(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)),0);
   const cliente=CNAMES[getCod(c.numero)]||c.cliente||'Spettabile Cliente';
-  const testo=`Spettabile ${cliente},\n\nIn riferimento alla Vs. richiesta, siamo lieti di sottoporVi la nostra migliore offerta per:\n\n${c.oggetto||'— oggetto —'}\n\n`+
-    (dist.length?dist.map(r=>`• ${r.descrizione||r.codice} (qty ${r.qty||1}) — € ${fmt2(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1))} IVA esclusa`).join('\n')+'\n\n':'')+
-    `TOTALE OFFERTA: € ${fmt2(totV||parseFloat(c.importo||0))} IVA esclusa\n\nLa presente offerta è valida 30 giorni dalla data odierna.\nTempi di consegna: da concordare.\nCondizioni di pagamento: 30 giorni d.f.f.m.\n\nPer qualsiasi informazione restiamo a Vostra disposizione.\n\nCordiali saluti,`;
+  const testo=('Spettabile '+(cliente)+',\n\nIn riferimento alla Vs. richiesta, siamo lieti di sottoporVi la nostra migliore offerta per:\n\n'+(c.oggetto||\'— oggetto —\')+'\n\n')+
+    (dist.length?dist.map(r=>('• '+(r.descrizione||r.codice)+' (qty '+(r.qty||1)+') — € '+(fmt2(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)))+' IVA esclusa')).join('\n')+'\n\n':'')+
+    ('TOTALE OFFERTA: € '+(fmt2(totV||parseFloat(c.importo||0)))+' IVA esclusa\n\nLa presente offerta è valida 30 giorni dalla data odierna.\nTempi di consegna: da concordare.\nCondizioni di pagamento: 30 giorni d.f.f.m.\n\nPer qualsiasi informazione restiamo a Vostra disposizione.\n\nCordiali saluti,');
   const ta=document.getElementById('off-testo');if(ta)ta.value=testo;
   showToast('Testo rigenerato dalla distinta');
 }
@@ -2001,12 +1796,12 @@ function salvaOfferta(numero){
 function inviaOffertaMail(numero){
   const c=CC;if(!c)return;
   const testo=(document.getElementById('off-testo')||{}).value||'';
-  const oggetto=`Offerta ${numero} — ${c.oggetto||''}`;
+  const oggetto=('Offerta '+(numero)+' — '+(c.oggetto||\'\'}');
   const statoEl=document.getElementById('off-stato');
   if(statoEl&&statoEl.value==='bozza'){statoEl.value='inviata';aggiornaColoreBordoOfferta(statoEl);}
   const dataEl=document.getElementById('off-data-invio');if(dataEl&&!dataEl.value)dataEl.value=new Date().toISOString().slice(0,10);
   salvaOfferta(numero);
-  window.open(`mailto:?subject=${encodeURIComponent(oggetto)}&body=${encodeURIComponent(testo)}`);
+  window.open(('mailto:?subject='+(encodeURIComponent(oggetto))+'&body='+(encodeURIComponent(testo)}'));
 }
 
 function tabDistinta(c,cd){
@@ -2015,7 +1810,7 @@ function tabDistinta(c,cd){
   const rows=sezioni.map(s=>{
     const items=dist.filter(r=>(r.sezione||'Generale')===s);
     const tot=items.reduce((sum,r)=>sum+(parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)),0);
-    return`<tr><td colspan="11" class="sez-head">${s}<span style="color:var(--blue);font-size:11px;font-weight:700">€${fmt2(tot)}</span></td></tr>`
+    return('<tr><td colspan="11" class="sez-head">'+(s)+'<span style="color:var(--blue);font-size:11px;font-weight:700">€'+(fmt2(tot))+'</span></td></tr>')
       +items.map(r=>`<tr>
         <td style="max-width:170px;font-size:12px">${r.descrizione||'—'}</td>
         <td class="mono" style="text-align:center">${r.qty||1}</td>
@@ -2025,7 +1820,7 @@ function tabDistinta(c,cd){
         <td class="mono">${r.sconto?r.sconto+'%':'—'}</td>
         <td class="mono" style="font-weight:700">€${fmt2(r.netto_cad||r.costo_cad||0)}</td>
         <td class="mono" style="color:var(--green);font-weight:700">€${fmt2(r.prezzo_vendita||0)}</td>
-        <td><span class="bdg a-${r.stato_approv||'daordinare'}"><select class="stato-sel" onchange="updStatoApprov('${r.id}','${c.numero}',this.value)">${Object.entries(SAP).map(([k,v])=>`<option value="${k}"${r.stato_approv===k?' selected':''}>${v}</option>`).join('')}</select></span></td>
+        <td><span class="bdg a-${r.stato_approv||'daordinare'}"><select class="stato-sel" onchange="updStatoApprov('${r.id}','${c.numero}',this.value)">${Object.entries(SAP).map(([k,v])=>('<option value="'+(k)+'"'+(r.stato_approv===k?\' selected\':\'\')+'>'+(v)+'</option>')).join('')}</select></span></td>
         <td><span onclick="this.nextSibling.style.display='inline';this.style.display='none'" style="font-size:11px;color:var(--text3);cursor:pointer;padding:2px 4px;border-radius:4px;border:1px solid transparent;" onmouseover="this.style.borderColor='var(--border)'" onmouseout="this.style.borderColor='transparent'">${r.data_attesa?fmtD(r.data_attesa):'—'}</span><input type="date" value="${r.data_attesa||''}" onchange="updDataAttesa('${r.id}','${c.numero}',this.value);this.previousSibling.textContent=fmtD(this.value)||'—';this.style.display='none';this.previousSibling.style.display=''" style="display:none;border:1px solid var(--border);border-radius:5px;font-size:11px;padding:2px 5px;width:120px;" onblur="this.style.display='none';this.previousSibling.style.display=''"></td>
         <td style="white-space:nowrap;">
           <button class="xbtn" style="color:var(--blue)" title="Modifica" onclick="openModal('edit-riga','${c.numero}|${r.id}');event.stopPropagation()">✎</button>
@@ -2034,7 +1829,7 @@ function tabDistinta(c,cd){
       </tr>`).join('');
   }).join('');
   // Suggerimento leggero solo se distinta vuota
-  const emptyHint=!dist.length?`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text3);display:flex;align-items:center;gap:8px;"><span>💡</span><span>Usa <strong>+ aggiungi componente</strong> per cercare nel listino Ares, nel magazzino o configurare un tubo flessibile.</span></div>`:'';
+  const emptyHint=!dist.length?('<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text3);display:flex;align-items:center;gap:8px;"><span>💡</span><span>Usa <strong>+ aggiungi componente</strong> per cercare nel listino Ares, nel magazzino o configurare un tubo flessibile.</span></div>'):'';
   return`${emptyHint}<div class="dist-toolbar"><button class="btn btn-sm" onclick="openModal('add-riga','${c.numero}')">+ aggiungi componente</button><button class="btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="openModal('add-sezione','${c.numero}')">+ sezione</button><button class="btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="exportDistintaPDF('${c.numero}')">📄 Stampa distinta</button></div>
   <div style="overflow-x:auto"><table>
     <thead><tr><th>Descrizione</th><th>Q.</th><th>Fornitore</th><th>Codice</th><th>Costo/cad</th><th>Sc.</th><th>Netto/cad</th><th>Vendita/cad</th><th>Stato</th><th>Data attesa</th><th></th></tr></thead>
@@ -2054,7 +1849,7 @@ function useAres(a,numero){
 
 function tabApprov(c,cd){
   const dist=cd.distinta||[];
-  if(!dist.length)return`<div class="empty">Aggiungi componenti nella distinta</div>`;
+  if(!dist.length)return('<div class="empty">Aggiungi componenti nella distinta</div>');
   const fornitori={};
   dist.forEach(r=>{const f=r.fornitore||'Non assegnato';if(!fornitori[f])fornitori[f]=[];fornitori[f].push(r);});
   const cardsForn=Object.entries(fornitori).map(([forn,items])=>{
@@ -2080,9 +1875,9 @@ function tabApprov(c,cd){
       <td class="mono" style="text-align:center">${r.qty||1}</td>
       <td class="mono">${r.codice||'—'}</td>
       <td class="mono" style="font-weight:700">€${fmt2(parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1))}</td>
-      <td><span class="bdg a-${r.stato_approv||'daordinare'}"><select class="stato-sel" onchange="updStatoApprov('${r.id}','${c.numero}',this.value)">${Object.entries(SAP).map(([k,v])=>`<option value="${k}"${r.stato_approv===k?' selected':''}>${v}</option>`).join('')}</select></span></td>
+      <td><span class="bdg a-${r.stato_approv||'daordinare'}"><select class="stato-sel" onchange="updStatoApprov('${r.id}','${c.numero}',this.value)">${Object.entries(SAP).map(([k,v])=>('<option value="'+(k)+'"'+(r.stato_approv===k?\' selected\':\'\')+'>'+(v)+'</option>')).join('')}</select></span></td>
       <td><span onclick="this.nextSibling.style.display='inline';this.style.display='none'" style="font-size:11px;color:var(--text3);cursor:pointer;padding:2px 4px;border-radius:4px;border:1px solid transparent;" onmouseover="this.style.borderColor='var(--border)'" onmouseout="this.style.borderColor='transparent'">${r.data_attesa?fmtD(r.data_attesa):'—'}</span><input type="date" value="${r.data_attesa||''}" onchange="updDataAttesa('${r.id}','${c.numero}',this.value);this.previousSibling.textContent=fmtD(this.value)||'—';this.style.display='none';this.previousSibling.style.display=''" style="display:none;border:1px solid var(--border);border-radius:5px;font-size:11px;padding:2px 5px;width:120px;" onblur="this.style.display='none';this.previousSibling.style.display=''"></td>
-    </tr>`).join('')}</tbody></table></div>`;
+    </tr>(').join(\'\'))+'</tbody></table></div>');
   }).join('');
   return cardsForn;
 }
@@ -2096,11 +1891,11 @@ function openRDOApprov(numero,fornNome){
   const templates=JSON.parse(localStorage.getItem('asg_rdo_templates')||'{}');
   const fornObj=FORNITORI.find(f=>f.nome.toLowerCase().includes(fornNome.toLowerCase().split(' ')[0])||fornNome.toLowerCase().includes(f.nome.toLowerCase().split(' ')[0]));
   const fornId=fornObj?fornObj.id:'';
-  const baseTemplate=templates[fornId]||`Spett.le ${fornNome},\n\nin riferimento ai Vs. prodotti, con la presente siamo a richiedere conferma di disponibilità e tempi di consegna per i seguenti articoli, relativi alla commessa ${numero} — ${c.oggetto||''}:\n\n`;
-  const righe=items.map((r,i)=>`${i+1}. ${r.codice?'['+r.codice+'] ':''}${r.descrizione||'—'} — qty ${r.qty||1}`).join('\n');
+  const baseTemplate=templates[fornId]||('Spett.le '+(fornNome)+',\n\nin riferimento ai Vs. prodotti, con la presente siamo a richiedere conferma di disponibilità e tempi di consegna per i seguenti articoli, relativi alla commessa '+(numero)+' — '+(c.oggetto||\'\')+':\n\n');
+  const righe=items.map((r,i)=>(''+(i+1)+'. '+(r.codice?\'[\'+r.codice+\'] \':\'\')+(r.descrizione||\'—\')+' — qty '+(r.qty||1}')).join('\n');
   const totNetto=items.reduce((s,r)=>s+(parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)),0);
-  const testo=baseTemplate+righe+`\n\nSi prega di indicare:\n- Prezzi unitari IVA esclusa\n- Disponibilità a magazzino\n- Tempi di consegna\n- Condizioni di resa\n\nValore indicativo ordine: € ${fmt2(totNetto)} IVA esclusa\n\nRingraziamo e restiamo in attesa di riscontro.\n\nCordiali saluti,`;
-  const subj=`RDO commessa ${numero} — ${c.oggetto||''}`;
+  const testo=baseTemplate+righe+('\n\nSi prega di indicare:\n- Prezzi unitari IVA esclusa\n- Disponibilità a magazzino\n- Tempi di consegna\n- Condizioni di resa\n\nValore indicativo ordine: € '+(fmt2(totNetto))+' IVA esclusa\n\nRingraziamo e restiamo in attesa di riscontro.\n\nCordiali saluti,');
+  const subj=('RDO commessa '+(numero)+' — '+(c.oggetto||\'\'}');
   // Mostra modal
   const email=fornObj?.contatti?.email||'';
   document.getElementById('modal-body').innerHTML=`
@@ -2166,37 +1961,18 @@ function tabDocumenti(c,cd){
       const ext=n=>{const p=n.lastIndexOf('.');return p>=0?n.slice(p+1).toLowerCase():'';};
       const icon=n=>{const e=ext(n);const m={pdf:'📄',xlsx:'📊',xls:'📊',docx:'📝',doc:'📝',jpg:'🖼',jpeg:'🖼',png:'🖼',dxf:'📐',dwg:'📐',zip:'🗜',rar:'🗜',eml:'📧',msg:'📧'};return m[e]||'📎';};
       const fmtSz=b=>{if(b>1048576)return(b/1048576).toFixed(1)+' MB';if(b>1024)return(b/1024).toFixed(0)+' KB';return b+' B';};
-      el.innerHTML=`<div style="display:grid;gap:6px;">${files.map(f=>{
+      el.innerHTML=('<div style="display:grid;gap:6px;">'+(files.map(f=>{
         const ncUrl=cfg.nc_url+'/apps/files/?dir='+encodeURIComponent(ncPath)+'&scrollto='+encodeURIComponent(f.name);
         const dlUrl=cfg.nc_url+'/remote.php/dav/files/'+cfg.nc_user+encodeURI(ncPath+'/'+f.name);
-        return`<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);">
-          <span style="font-size:18px">${icon(f.name)}</span>
-          <div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</div>
-          <div style="font-size:10px;color:var(--text4)">${fmtSz(f.size)} · ${f.mod?new Date(f.mod).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'2-digit'}):''}</div></div>
-          <a href="${dlUrl}" target="_blank" style="font-size:11px;color:var(--blue);font-weight:600;text-decoration:none;padding:3px 8px;border:1px solid var(--blue-bd);border-radius:20px;">↓</a>
-        </div>`;
-      }).join('')}</div>`;
+        return'+('<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);">\n          <span style="font-size:18px">'+(icon(f.name))+'</span>\n          <div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(f.name)+'</div>\n          <div style="font-size:10px;color:var(--text4)">'+(fmtSz(f.size))+' · '+(f.mod?new Date(f.mod).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'2-digit'}):'')+'</div></div>\n          <a href="'+(dlUrl)+'" target="_blank" style="font-size:11px;color:var(--blue);font-weight:600;text-decoration:none;padding:3px 8px;border:1px solid var(--blue-bd);border-radius:20px;">↓</a>\n        </div>';
+      }).join(''))+'</div>';
     },100);
   }
 
-  return`
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-    ${ncFolder?'<a id="nc-folder-link-${c.numero}" href="${ncFolder}" target="_blank" class="btn btn-primary btn-sm">📂 Apri cartella NC</a>':''}
-    <button class="btn btn-ghost btn-sm" onclick="openModal('add-doc','${c.numero}')">+ Aggiungi riferimento</button>
-    ${ncPath&&cfg.ok?'<button class="btn btn-ghost btn-sm" onclick="(async()=>{document.getElementById(\'${fileListId}\').innerHTML=\'<span style=\'font-size:12px;color:var(--text4)\'>Aggiornamento…</span>\';const files=await wListNC(\'${ncPath}\');document.getElementById(\'${fileListId}\').innerHTML=files.length?files.map(f=>\'<div>\'+f.name+\'</div>\').join(\'\'):\'Nessun file\';})()">↻ Aggiorna</button>':''}
-  </div>
-
-  ${ncPath&&cfg.ok?'<div style="margin-bottom:12px;">'+
+  return('\n  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">\n    '+(ncFolder?'<a id="nc-folder-link-${c.numero}" href="${ncFolder}" target="_blank" class="btn btn-primary btn-sm">📂 Apri cartella NC</a>':'')+'\n    <button class="btn btn-ghost btn-sm" onclick="openModal(\'add-doc\',\''+(c.numero)+'\')">+ Aggiungi riferimento</button>\n    '+(ncPath&&cfg.ok?'<button class="btn btn-ghost btn-sm" onclick="(async()=>{document.getElementById(\'${fileListId}\').innerHTML=\'<span style=\'font-size:12px;color:var(--text4)\'>Aggiornamento…</span>\';const files=await wListNC(\'${ncPath}\');document.getElementById(\'${fileListId}\').innerHTML=files.length?files.map(f=>\'<div>\'+f.name+\'</div>\').join(\'\'):\'Nessun file\';})()">↻ Aggiorna</button>':'')+'\n  </div>\n\n  '+(ncPath&&cfg.ok?'<div style="margin-bottom:12px;">'+
     '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">File su Nextcloud \u2014 '+ncPath+'</div>'+
     '<div id="'+fileListId+'"><span style="color:var(--text4);font-size:12px">In caricamento\u2026</span></div>'+
-  '</div>':'<div style="background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;color:var(--amber);margin-bottom:12px;">Configura Nextcloud per vedere i file della commessa</div>'}
-
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-    <div style="font-size:13px;font-weight:700;color:var(--text)">Riferimenti documenti</div>
-    <button class="btn btn-sm" onclick="openModal('add-doc','${c.numero}')">+ aggiungi riferimento</button>
-  </div>
-
-  ${docs.length?'<div style="display:grid;gap:8px;">'+
+  '</div>':'<div style="background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;color:var(--amber);margin-bottom:12px;">Configura Nextcloud per vedere i file della commessa</div>')+'\n\n  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">\n    <div style="font-size:13px;font-weight:700;color:var(--text)">Riferimenti documenti</div>\n    <button class="btn btn-sm" onclick="openModal(\'add-doc\',\''+(c.numero)+'\')">+ aggiungi riferimento</button>\n  </div>\n\n  '+(docs.length?'<div style="display:grid;gap:8px;">'+
     docs.map(d=>'<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:flex-start;gap:12px;">'+
       '<span style="font-size:20px;flex-shrink:0">'+tipoDocEmoji(d.tipo)+'</span>'+
       '<div style="flex:1;">'+
@@ -2206,7 +1982,7 @@ function tabDocumenti(c,cd){
       '</div>'+
       '<button class="xbtn" onclick="delDoc(\''+d.id+'\',\''+c.numero+'\')">&times;</button>'+
     '</div>').join('')+
-  '</div>':'<div class="empty">Nessun documento collegato. Usa il bottone sopra per aggiungere un riferimento (link Nextcloud, numero schema, nota).</div>'}`;  
+  '</div>':'<div class="empty">Nessun documento collegato. Usa il bottone sopra per aggiungere un riferimento (link Nextcloud, numero schema, nota).</div>')+'';  
 }
 
 function tipoDocEmoji(t){const m={schema:'📐',foto:'📷',email:'📧',offerta:'📄',ordine:'🧾',certificato:'📋',disegno:'✏️',altro:'📎'};return m[t]||'📎';}
@@ -2229,8 +2005,7 @@ function saveDoc(numero){
 }
 
 function tabNote(c,cd){
-  return`<div class="fr"><label>Note interne</label><textarea id="note-area" style="min-height:200px;">${cd.note||''}</textarea></div>
-  <div style="margin-top:10px;"><button class="btn btn-sm" onclick="saveNote('${c.numero}')">Salva note</button></div>`;
+  return('<div class="fr"><label>Note interne</label><textarea id="note-area" style="min-height:200px;">'+(cd.note||'')+'</textarea></div>\n  <div style="margin-top:10px;"><button class="btn btn-sm" onclick="saveNote(\''+(c.numero)+'\')">Salva note</button></div>';
 }
 
 // ═══════════════════════════════════════════════
@@ -2260,7 +2035,7 @@ async function eliminaCommessa(){
   }
   navTo('dashboard');
   renderAll();
-  showToast(`✓ Commessa ${c.numero} eliminata`);
+  showToast(('✓ Commessa '+(c.numero)+' eliminata');
 }
 
 // ═══════════════════════════════════════════════
@@ -2279,79 +2054,17 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM();});
 function getModalHTML(type,extra){
   const today=new Date().toISOString().slice(0,10);
   const SC=['bozza','offerta','inviata','confermata','in-corso','chiusa'];
-  const act=(ok,cancel='Annulla')=>`<div class="modal-actions"><button class="btn-ghost" onclick="closeM()">${cancel}</button><button class="btn" onclick="${ok}">Salva</button></div>`;
+  const act=(ok,cancel='Annulla')=>('<div class="modal-actions"><button class="btn-ghost" onclick="closeM()">'+(cancel)+'</button><button class="btn" onclick="'+(ok)+'">Salva</button></div>';
 
-  if(type==='commessa')return`<h3>Nuova commessa</h3><div class="form-inline">
-    <div class="fg2"><div class="fr"><label>Numero</label><input id="f-num" placeholder="es. KFG-16-2026"></div><div class="fr"><label>Tipo commessa</label><select id="f-tipo"><option value="">— seleziona —</option>${Object.entries(TIPI).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div></div>
-    <div class="fr"><label>Oggetto</label><input id="f-ogg"></div>
-    <div class="fg3"><div class="fr"><label>Importo (€)</label><input id="f-imp" type="number"></div><div class="fr"><label>Apertura</label><input id="f-dat" type="date" value="${today}"></div><div class="fr"><label>Consegna prev.</label><input id="f-cons" type="date"></div></div>
-    <div class="fr"><label>Stato</label><select id="f-stato">${SC.map(s=>`<option value="${s}">${SLC[s]}</option>`).join('')}</select></div>
-    <div class="fr"><label>Note</label><textarea id="f-note"></textarea></div>
-  </div>${act('saveComm()')}`;
+  if(type==='commessa')return('<h3>Nuova commessa</h3><div class="form-inline">\n    <div class="fg2"><div class="fr"><label>Numero</label><input id="f-num" placeholder="es. KFG-16-2026"></div><div class="fr"><label>Tipo commessa</label><select id="f-tipo"><option value="">— seleziona —</option>'+(Object.entries(TIPI).map(([k,v])=>'+('<option value="'+(k)+'">'+(v)+'</option>').join(''))+'</select></div></div>\n    <div class="fr"><label>Oggetto</label><input id="f-ogg"></div>\n    <div class="fg3"><div class="fr"><label>Importo (€)</label><input id="f-imp" type="number"></div><div class="fr"><label>Apertura</label><input id="f-dat" type="date" value="'+(today)+'"></div><div class="fr"><label>Consegna prev.</label><input id="f-cons" type="date"></div></div>\n    <div class="fr"><label>Stato</label><select id="f-stato">'+(SC.map(s=>'+('<option value="'+(s)+'">'+(SLC[s])+'</option>').join(''))+'</select></div>\n    <div class="fr"><label>Note</label><textarea id="f-note"></textarea></div>\n  </div>'+(act('saveComm()'))+'';
 
-  if(type==='edit-commessa'){const c=CC||{};return`<h3>Modifica commessa</h3><div class="form-inline">
-    <div class="fg2"><div class="fr"><label>Numero</label><input id="f-num" value="${c.numero||''}" readonly style="opacity:.6;cursor:not-allowed"></div><div class="fr"><label>Tipo commessa</label><select id="f-tipo"><option value="">— seleziona —</option>${Object.entries(TIPI).map(([k,v])=>`<option value="${k}"${c.tipo_commessa===k?' selected':''}>${v}</option>`).join('')}</select></div></div>
-    <div class="fr"><label>Oggetto</label><input id="f-ogg" value="${c.oggetto||''}"></div>
-    <div class="fg3"><div class="fr"><label>Importo (€)</label><input id="f-imp" type="number" value="${c.importo||''}"></div><div class="fr"><label>Apertura</label><input id="f-dat" type="date" value="${c.data_apertura||''}"></div><div class="fr"><label>Consegna prev.</label><input id="f-cons" type="date" value="${c.data_consegna||''}"></div></div>
-    <div class="fr"><label>Stato</label><select id="f-stato">${SC.map(s=>`<option value="${s}"${c.stato===s?' selected':''}>${SLC[s]}</option>`).join('')}</select></div>
-    <div class="fr"><label>Note</label><textarea id="f-note">${c.note||''}</textarea></div>
-  </div>${act('updateComm()')}`;
+  if(type==='edit-commessa'){const c=CC||{};return('<h3>Modifica commessa</h3><div class="form-inline">\n    <div class="fg2"><div class="fr"><label>Numero</label><input id="f-num" value="'+(c.numero||'')+'" readonly style="opacity:.6;cursor:not-allowed"></div><div class="fr"><label>Tipo commessa</label><select id="f-tipo"><option value="">— seleziona —</option>'+(Object.entries(TIPI).map(([k,v])=>'+('<option value="'+(k)+'"'+(c.tipo_commessa===k?' selected':'')+'>'+(v)+'</option>').join(''))+'</select></div></div>\n    <div class="fr"><label>Oggetto</label><input id="f-ogg" value="'+(c.oggetto||'')+'"></div>\n    <div class="fg3"><div class="fr"><label>Importo (€)</label><input id="f-imp" type="number" value="'+(c.importo||'')+'"></div><div class="fr"><label>Apertura</label><input id="f-dat" type="date" value="'+(c.data_apertura||'')+'"></div><div class="fr"><label>Consegna prev.</label><input id="f-cons" type="date" value="'+(c.data_consegna||'')+'"></div></div>\n    <div class="fr"><label>Stato</label><select id="f-stato">'+(SC.map(s=>'+('<option value="'+(s)+'"'+(c.stato===s?' selected':'')+'>'+(SLC[s])+'</option>').join(''))+'</select></div>\n    <div class="fr"><label>Note</label><textarea id="f-note">'+(c.note||'')+'</textarea></div>\n  </div>'+(act('updateComm()'))+'';
   }
 
   if(type==='add-riga'){
   const magItems=lMag();
-  const magOpts=magItems.map(m=>`<option value="${m.id}">[MAG] ${m.codice||''} — ${m.descrizione} (${m.qty||0} pz)`).join('');
-  return`<h3 style="margin-bottom:12px">+ Aggiungi componente</h3>
-
-  <!-- Selettore modalità — grid di bottoni chiari -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-bottom:14px;">
-    <button id="atab-listino" onclick="switchAddTab('listino')" class="add-mode-btn active" title="Cerca nel catalogo Ares/Tecfluid">
-      <span style="font-size:18px">📋</span>
-      <span>Listino Ares</span>
-    </button>
-    <button id="atab-mag" onclick="switchAddTab('mag')" class="add-mode-btn" title="Componenti già in magazzino">
-      <span style="font-size:18px">📦</span>
-      <span>Magazzino</span>
-    </button>
-    <button id="atab-tubo" onclick="switchAddTab('tubo')" class="add-mode-btn" title="Configuratore tubo flessibile raccordato">
-      <span style="font-size:18px">🔧</span>
-      <span>Tubo raccordato</span>
-    </button>
-    <button id="atab-racc" onclick="switchAddTab('racc')" class="add-mode-btn" title="Raccorderia scelta libera">
-      <span style="font-size:18px">🔩</span>
-      <span>Raccorderia</span>
-    </button>
-    <button id="atab-pu10" onclick="switchAddTab('pu10')" class="add-mode-btn" title="Configuratore centralina PU10">
-      <span style="font-size:18px">⚙</span>
-      <span>Centralina PU10</span>
-    </button>
-    <button id="atab-pu20" onclick="switchAddTab('pu20')" class="add-mode-btn" title="Configuratore centralina PU20 (pompe Gr.2)">
-      <span style="font-size:18px">⚙</span>
-      <span>Centralina PU20</span>
-    </button>
-    <button id="atab-manuale" onclick="switchAddTab('manuale')" class="add-mode-btn" title="Inserimento manuale componente">
-      <span style="font-size:18px">✏️</span>
-      <span>Manuale</span>
-    </button>
-  </div>
-
-  <!-- Contenuto pannello attivo -->
-  <div id="apanel-listino" style="border-top:1px solid var(--border);padding-top:12px;margin-top:2px;">
-    <div style="display:flex;gap:8px;margin-bottom:8px;">
-      <input id="ares-q" style="flex:1;border:1.5px solid var(--border);border-radius:7px;padding:7px 10px;font-size:14px;outline:none;" placeholder="Cerca sigla o descrizione… (es. B09, NCE, collettore)" oninput="aresFilter()">
-      <select id="ares-serie" class="keep-native" style="border:1.5px solid var(--border);border-radius:7px;padding:7px 9px;font-size:13px;outline:none;" onchange="aresFilter()">
-        <option value="">Tutte le serie</option>
-        <option value="PU05">PU05</option>
-        <option value="PU10">PU10</option>
-        <option value="PU20">PU20</option>
-      </select>
-    </div>
-    <div id="ares-results" style="max-height:260px;overflow-y:auto;font-size:13px;"></div>
-  </div>
-
-  <!-- Panel: Magazzino -->
-  <div id="apanel-mag" style="display:none;border-top:1px solid var(--border);padding-top:12px;margin-top:2px;">
-    ${magItems.length?
+  const magOpts=magItems.map(m=>('<option value="'+(m.id)+'">[MAG] '+(m.codice||'')+' — '+(m.descrizione)+' ('+(m.qty||0)+' pz)').join('');
+  return('<h3 style="margin-bottom:12px">+ Aggiungi componente</h3>\n\n  <!-- Selettore modalità — grid di bottoni chiari -->\n  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-bottom:14px;">\n    <button id="atab-listino" onclick="switchAddTab(\'listino\')" class="add-mode-btn active" title="Cerca nel catalogo Ares/Tecfluid">\n      <span style="font-size:18px">📋</span>\n      <span>Listino Ares</span>\n    </button>\n    <button id="atab-mag" onclick="switchAddTab(\'mag\')" class="add-mode-btn" title="Componenti già in magazzino">\n      <span style="font-size:18px">📦</span>\n      <span>Magazzino</span>\n    </button>\n    <button id="atab-tubo" onclick="switchAddTab(\'tubo\')" class="add-mode-btn" title="Configuratore tubo flessibile raccordato">\n      <span style="font-size:18px">🔧</span>\n      <span>Tubo raccordato</span>\n    </button>\n    <button id="atab-racc" onclick="switchAddTab(\'racc\')" class="add-mode-btn" title="Raccorderia scelta libera">\n      <span style="font-size:18px">🔩</span>\n      <span>Raccorderia</span>\n    </button>\n    <button id="atab-pu10" onclick="switchAddTab(\'pu10\')" class="add-mode-btn" title="Configuratore centralina PU10">\n      <span style="font-size:18px">⚙</span>\n      <span>Centralina PU10</span>\n    </button>\n    <button id="atab-pu20" onclick="switchAddTab(\'pu20\')" class="add-mode-btn" title="Configuratore centralina PU20 (pompe Gr.2)">\n      <span style="font-size:18px">⚙</span>\n      <span>Centralina PU20</span>\n    </button>\n    <button id="atab-manuale" onclick="switchAddTab(\'manuale\')" class="add-mode-btn" title="Inserimento manuale componente">\n      <span style="font-size:18px">✏️</span>\n      <span>Manuale</span>\n    </button>\n  </div>\n\n  <!-- Contenuto pannello attivo -->\n  <div id="apanel-listino" style="border-top:1px solid var(--border);padding-top:12px;margin-top:2px;">\n    <div style="display:flex;gap:8px;margin-bottom:8px;">\n      <input id="ares-q" style="flex:1;border:1.5px solid var(--border);border-radius:7px;padding:7px 10px;font-size:14px;outline:none;" placeholder="Cerca sigla o descrizione… (es. B09, NCE, collettore)" oninput="aresFilter()">\n      <select id="ares-serie" class="keep-native" style="border:1.5px solid var(--border);border-radius:7px;padding:7px 9px;font-size:13px;outline:none;" onchange="aresFilter()">\n        <option value="">Tutte le serie</option>\n        <option value="PU05">PU05</option>\n        <option value="PU10">PU10</option>\n        <option value="PU20">PU20</option>\n      </select>\n    </div>\n    <div id="ares-results" style="max-height:260px;overflow-y:auto;font-size:13px;"></div>\n  </div>\n\n  <!-- Panel: Magazzino -->\n  <div id="apanel-mag" style="display:none;border-top:1px solid var(--border);padding-top:12px;margin-top:2px;">\n    '+(magItems.length?
     '<input id="mag-q" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px 10px;font-size:14px;outline:none;margin-bottom:8px;" placeholder="\ud83d\udd0d cerca nel magazzino\u2026" oninput="magFilter()">'+
     '<div id="mag-results" style="max-height:280px;overflow-y:auto;">'+
       magItems.map(m=>'<div style="display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border);font-size:13px;">'+
@@ -2468,7 +2181,7 @@ function getModalHTML(type,extra){
   <div id="apanel-racc" style="display:none;border-top:1px solid var(--border);padding-top:12px;margin-top:2px;">
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center;">
       <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Standard:</span>
-      ${['Tutti','BSP','DIN','JIC','ORFS','Bonded','Stucchi'].map((s,i)=>`<button onclick="setRaccScioltoFiltro('${s==='Tutti'?'':s}',this)" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1.5px solid ${i===0?'var(--blue)':'var(--border)'};background:${i===0?'var(--blue-lt)':'#fff'};color:${i===0?'var(--blue)':'var(--text3)'};cursor:pointer;">${s}</button>`).join('')}
+      ${['Tutti','BSP','DIN','JIC','ORFS','Bonded','Stucchi'].map((s,i)=>('<button onclick="setRaccScioltoFiltro(\''+(s===\'Tutti\'?\'\':s)+'\',this)" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1.5px solid '+(i===0?\'var(--blue)\':\'var(--border)\')+';background:'+(i===0?\'var(--blue-lt)\':\'#fff\')+';color:'+(i===0?\'var(--blue)\':\'var(--text3)\')+';cursor:pointer;">'+(s)+'</button>')).join('')}
       <input id="racc-q" placeholder="🔍 cerca…" style="flex:1;min-width:100px;border:1.5px solid var(--border);border-radius:7px;padding:5px 9px;font-size:13px;outline:none;" oninput="renderRaccSciolto()">
     </div>
     <div id="racc-results" style="max-height:310px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;background:#fff;"></div>
@@ -2686,9 +2399,9 @@ function getModalHTML(type,extra){
     <div class="form-inline">
       <div class="fr"><label>Sezione</label><input id="f-sez" placeholder="es. Centralina, Raccorderia" list="sez-opt"><datalist id="sez-opt"><option value="Centralina"><option value="Cilindri"><option value="Raccorderia"><option value="Tubi flessibili"><option value="Elettrica"><option value="Generale"></datalist></div>
       <div class="fr"><label>Descrizione</label><textarea id="f-desc" style="min-height:50px"></textarea></div>
-      <div class="fg3"><div class="fr"><label>Q.tà</label><input id="f-qty" type="number" value="1" min="1"></div><div class="fr"><label>Fornitore</label><input id="f-forn" placeholder="es. Pa.Co, GTA…" list="forn-list"><datalist id="forn-list">${FORNITORI.map(f=>`<option value="${f.nome}">`).join('')}</datalist></div><div class="fr"><label>Codice</label><input id="f-cod"></div></div>
+      <div class="fg3"><div class="fr"><label>Q.tà</label><input id="f-qty" type="number" value="1" min="1"></div><div class="fr"><label>Fornitore</label><input id="f-forn" placeholder="es. Pa.Co, GTA…" list="forn-list"><datalist id="forn-list">${FORNITORI.map(f=>('<option value="'+(f.nome)+'">')).join('')}</datalist></div><div class="fr"><label>Codice</label><input id="f-cod"></div></div>
       <div class="fg3"><div class="fr"><label>Costo/cad (€)</label><input id="f-costo" type="number" step="0.01"></div><div class="fr"><label>Sconto (%)</label><input id="f-sconto" type="number" min="0" max="100" placeholder="0"></div><div class="fr"><label>Mark-up</label><input id="f-markup" type="number" step="0.01" value=""></div></div>
-      <div class="fg2"><div class="fr"><label>Stato approvv.</label><select id="f-stato-a">${Object.entries(SAP).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div><div class="fr"><label>Data attesa</label><input id="f-datta" type="date"></div></div>
+      <div class="fg2"><div class="fr"><label>Stato approvv.</label><select id="f-stato-a">${Object.entries(SAP).map(([k,v])=>('<option value="'+(k)+'">'+(v)+'</option>')).join('')}</select></div><div class="fr"><label>Data attesa</label><input id="f-datta" type="date"></div></div>
     </div>
     ${act("saveRiga('"+extra+"')")}
   </div>
@@ -2708,9 +2421,9 @@ function getModalHTML(type,extra){
     <div class="form-inline">
       <div class="fr"><label>Sezione</label><input id="f-sez" value="${r.sezione||''}" placeholder="es. Centralina, Raccorderia" list="sez-opt2"><datalist id="sez-opt2"><option value="Centralina"><option value="Cilindri"><option value="Raccorderia"><option value="Tubi flessibili"><option value="Elettrica"><option value="Generale"></datalist></div>
       <div class="fr"><label>Descrizione</label><textarea id="f-desc" style="min-height:50px">${r.descrizione||''}</textarea></div>
-      <div class="fg3"><div class="fr"><label>Q.tà</label><input id="f-qty" type="number" value="${r.qty||1}" min="1"></div><div class="fr"><label>Fornitore</label><input id="f-forn" value="${r.fornitore||''}" list="forn-list2"><datalist id="forn-list2">${FORNITORI.map(f=>`<option value="${f.nome}">`).join('')}</datalist></div><div class="fr"><label>Codice</label><input id="f-cod" value="${r.codice||''}"></div></div>
+      <div class="fg3"><div class="fr"><label>Q.tà</label><input id="f-qty" type="number" value="${r.qty||1}" min="1"></div><div class="fr"><label>Fornitore</label><input id="f-forn" value="${r.fornitore||''}" list="forn-list2"><datalist id="forn-list2">${FORNITORI.map(f=>('<option value="'+(f.nome)+'">')).join('')}</datalist></div><div class="fr"><label>Codice</label><input id="f-cod" value="${r.codice||''}"></div></div>
       <div class="fg3"><div class="fr"><label>Costo/cad (€)</label><input id="f-costo" type="number" step="0.01" value="${r.costo_cad||''}"></div><div class="fr"><label>Sconto (%)</label><input id="f-sconto" type="number" min="0" max="100" value="${r.sconto||0}"></div><div class="fr"><label>Mark-up</label><input id="f-markup" type="number" step="0.01" value="${r.markup||2.25}"></div></div>
-      <div class="fg2"><div class="fr"><label>Stato approvv.</label><select id="f-stato-a">${Object.entries(SAP).map(([k,v])=>`<option value="${k}"${r.stato_approv===k?' selected':''}>${v}</option>`).join('')}</select></div><div class="fr"><label>Data attesa</label><input id="f-datta" type="date" value="${r.data_attesa||''}"></div></div>
+      <div class="fg2"><div class="fr"><label>Stato approvv.</label><select id="f-stato-a">${Object.entries(SAP).map(([k,v])=>('<option value="'+(k)+'"'+(r.stato_approv===k?\' selected\':\'\')+'>'+(v)+'</option>')).join('')}</select></div><div class="fr"><label>Data attesa</label><input id="f-datta" type="date" value="${r.data_attesa||''}"></div></div>
     </div>
     ${act("updateRiga('"+numero+"','"+rid+"')")}`;
   }
@@ -2729,7 +2442,7 @@ function getModalHTML(type,extra){
         <div class="fr"><label>Codice / sigla</label><input id="mg-cod" value="${m.codice||''}" placeholder="es. NC, B09, VR38…"></div>
         <div class="fr"><label>Categoria</label>
           <select id="mg-cat">
-            ${['valvola','pompa','motore','serbatoio','blocco','giunto','raccorderia','elettrica','vario'].map(c=>`<option value="${c}"${m.categoria===c?' selected':''}>${c.charAt(0).toUpperCase()+c.slice(1)}</option>`).join('')}
+            ${['valvola','pompa','motore','serbatoio','blocco','giunto','raccorderia','elettrica','vario'].map(c=>('<option value="'+(c)+'"'+(m.categoria===c?\' selected\':\'\')+'>'+(c.charAt(0).toUpperCase()+c.slice(1))+'</option>')).join('')}
           </select>
         </div>
       </div>
@@ -2740,7 +2453,7 @@ function getModalHTML(type,extra){
         <div class="fr"><label>Costo/cad (€)</label><input id="mg-costo" type="number" step="0.01" value="${m.costo_cad||''}"></div>
       </div>
       <div class="fg2">
-        <div class="fr"><label>Fornitore abituale</label><input id="mg-forn" value="${m.fornitore||''}" list="mg-forn-list"><datalist id="mg-forn-list">${FORNITORI.map(f=>`<option value="${f.nome}">`).join('')}</datalist></div>
+        <div class="fr"><label>Fornitore abituale</label><input id="mg-forn" value="${m.fornitore||''}" list="mg-forn-list"><datalist id="mg-forn-list">${FORNITORI.map(f=>('<option value="'+(f.nome)+'">')).join('')}</datalist></div>
         <div class="fr"><label>Ubicazione fisica</label><input id="mg-ubic" value="${m.ubicazione||''}" placeholder="es. Scaffale A2, Cassetto 3…"></div>
       </div>
       <div class="fr"><label>Note</label><input id="mg-note" value="${m.note||''}"></div>
@@ -2789,9 +2502,7 @@ ERS-05-2025,ERS,Ricerca pompe reversibili,ricerca,0,2025-11-01,,chiusa,</div>
     <div class="fr"><label>Note</label><input id="d-note" placeholder="es. rev.3 approvata, da verificare…"></div>
   </div>
   <p style="font-size:12px;color:var(--text3);margin-top:4px;line-height:1.5">💡 Per ottenere il link diretto a un file su Nextcloud: tasto destro sul file → <strong>Copia link diretto</strong>. Da mobile usa l'app Nextcloud per caricare e poi incolla qui il link.</p>
-  ${act("saveDoc('"+extra+"')")}`;
-  }
-  if(type==='import-movimenti')return`<h3>📥 Import movimenti bancari</h3>
+  ${act("saveDoc('"+extra+"')")}'+(';\n  }\n  if(type===\'import-movimenti\')return'<h3>📥 Import movimenti bancari</h3>
   <p style="font-size:13px;color:var(--text3);margin-bottom:12px;line-height:1.5">
     Trascina o seleziona il file esportato dalla tua banca. Il saldo viene aggiornato automaticamente.
   </p>
@@ -2892,1394 +2603,38 @@ ERS-05-2025,ERS,Ricerca pompe reversibili,ricerca,0,2025-11-01,,chiusa,</div>
         <option value="incasso">Incasso fattura</option><option value="pagamento">Pagamento fattura</option>
       </select>
     </div>
-  </div>${act('saveScad()')}`;
-
-  if(type==='edit-scad'){
-    const sid=extra||'';
-    const all=lll('scad');
-    const s=all.find(x=>x.id===sid)||{};
-    return`<h3>✎ Modifica scadenza</h3>
+  </div>${act('saveScad()')}'+(';\n\n  if(type===\'edit-scad\'){\n    const sid=extra||\'\';\n    const all=lll(\'scad\');\n    const s=all.find(x=>x.id===sid)||{};\n    return'<h3>✎ Modifica scadenza</h3>
     <div class="form-inline">
-      <div class="fr"><label>Descrizione</label><input id="f-desc" value="${(s.descrizione||'').replace(/"/g,'&quot;')}"></div>
-      <div class="fg2">
-        <div class="fr"><label>Data</label><input id="f-dat" type="date" value="${s.data||''}"></div>
-        <div class="fr"><label>Importo (€)</label><input id="f-imp" type="number" step="0.01" value="${parseFloat(s.importo||0)||''}"></div>
-      </div>
-      <div class="fr"><label>Categoria</label>
-        <select id="f-cat" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;">
-          <option value="">— nessuna —</option>
-          ${['iva','ires','inps','ritenuta','sostituto','dichiarazione','societario','incasso','pagamento'].map(c=>`<option value="${c}"${s.categoria===c?' selected':''}>${c.charAt(0).toUpperCase()+c.slice(1)}</option>`).join('')}
-        </select>
-      </div>
-      <div class="fr"><label>Stato</label>
-        <select id="f-pagata" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;">
-          <option value="no"${(!s.pagato||s.pagato==='no')?' selected':''}>⏳ Da pagare/completare</option>
-          <option value="si"${s.pagato==='si'?' selected':''}>✓ Completata/pagata</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeM()">Annulla</button>
-      <button class="btn" onclick="saveScadEdit('${sid}')">Salva</button>
-    </div>`;
+      <div class="fr"><label>Descrizione</label><input id="f-desc" value="${(s.descrizione||'').replace(/"/g,'&quot;'))+'"></div>\n      <div class="fg2">\n        <div class="fr"><label>Data</label><input id="f-dat" type="date" value="'+(s.data||'')+'"></div>\n        <div class="fr"><label>Importo (€)</label><input id="f-imp" type="number" step="0.01" value="'+(parseFloat(s.importo||0)||'')+'"></div>\n      </div>\n      <div class="fr"><label>Categoria</label>\n        <select id="f-cat" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;">\n          <option value="">— nessuna —</option>\n          '+(['iva','ires','inps','ritenuta','sostituto','dichiarazione','societario','incasso','pagamento'].map(c=>'+('<option value="'+(c)+'"'+(s.categoria===c?' selected':'')+'>'+(c.charAt(0).toUpperCase()+c.slice(1))+'</option>').join(''))+'\n        </select>\n      </div>\n      <div class="fr"><label>Stato</label>\n        <select id="f-pagata" style="width:100%;border:1.5px solid var(--border);border-radius:7px;padding:7px;font-size:13px;outline:none;">\n          <option value="no"'+((!s.pagato||s.pagato==='no')?' selected':'')+'>⏳ Da pagare/completare</option>\n          <option value="si"'+(s.pagato==='si'?' selected':'')+'>✓ Completata/pagata</option>\n        </select>\n      </div>\n    </div>\n    <div class="modal-actions">\n      <button class="btn-ghost" onclick="closeM()">Annulla</button>\n      <button class="btn" onclick="saveScadEdit(\''+(sid)+'\')">Salva</button>\n    </div>';
   }
 
-  if(type==='todo')return`<h3>Nuova azione</h3><div class="form-inline">
-    <div class="fr"><label>Azione</label><textarea id="f-desc" style="min-height:70px"></textarea></div>
-    <div class="fr"><label>Priorità</label><select id="f-pri"><option value="alta">Alta</option><option value="media" selected>Media</option><option value="bassa">Bassa</option></select></div>
-  </div>${act('saveTodo()')}`;
+  if(type==='todo')return('<h3>Nuova azione</h3><div class="form-inline">\n    <div class="fr"><label>Azione</label><textarea id="f-desc" style="min-height:70px"></textarea></div>\n    <div class="fr"><label>Priorità</label><select id="f-pri"><option value="alta">Alta</option><option value="media" selected>Media</option><option value="bassa">Bassa</option></select></div>\n  </div>'+(act('saveTodo()'))+'';
 
   if(type==='rdo'){
     const f=FORNITORI.find(x=>x.id===extra)||{nome:'Fornitore',categorie:[],contatti:{}};
     const oggi=new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'});
     // Recupera template salvato per questo fornitore
     const templates=JSON.parse(localStorage.getItem('asg_rdo_templates')||'{}');
-    const defaultTpl=`Spett.le {FORNITORE},\n\nin riferimento ai Vs. prodotti/servizi, con la presente siamo a richiedere un'offerta per i seguenti articoli:\n\n1. [CODICE/DESCRIZIONE] — qty ___\n2. \n\nSi prega di indicare:\n- Prezzo unitario IVA esclusa\n- Disponibilità a magazzino\n- Tempi di consegna\n- Condizioni di resa\n\nRingraziamo anticipatamente e restiamo in attesa di un Vostro riscontro.\n\nCordiali saluti,`;
+    const defaultTpl=('Spett.le {FORNITORE},\n\nin riferimento ai Vs. prodotti/servizi, con la presente siamo a richiedere un\'offerta per i seguenti articoli:\n\n1. [CODICE/DESCRIZIONE] — qty ___\n2. \n\nSi prega di indicare:\n- Prezzo unitario IVA esclusa\n- Disponibilità a magazzino\n- Tempi di consegna\n- Condizioni di resa\n\nRingraziamo anticipatamente e restiamo in attesa di un Vostro riscontro.\n\nCordiali saluti,';
     const tpl=templates[extra]||defaultTpl;
     const testo=tpl.replace('{FORNITORE}',f.nome).replace('{DATA}',oggi);
-    return`<h3>✉ Richiesta di offerta — ${f.nome}</h3>
-    <div style="display:flex;gap:8px;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:12px;">
-      <button class="btn-ghost" style="font-size:12px;padding:4px 10px;" onclick="document.getElementById('rdo-panel-send').style.display='';document.getElementById('rdo-panel-tpl').style.display='none';this.style.background='var(--blue)';this.style.color='#fff';document.getElementById('rdo-tab-tpl').style.background='';document.getElementById('rdo-tab-tpl').style.color='';" id="rdo-tab-send">✉ Componi</button>
-      <button class="btn-ghost" style="font-size:12px;padding:4px 10px;" onclick="document.getElementById('rdo-panel-tpl').style.display='';document.getElementById('rdo-panel-send').style.display='none';this.style.background='var(--blue)';this.style.color='#fff';document.getElementById('rdo-tab-send').style.background='';document.getElementById('rdo-tab-send').style.color='';" id="rdo-tab-tpl">⚙ Modello testo</button>
-    </div>
-    <div id="rdo-panel-send">
-      <div class="form-row"><label>A (email fornitore)</label><input id="rdo-to" value="${f.contatti?.email||''}" placeholder="email@fornitore.it"></div>
-      <div class="form-row"><label>Oggetto</label><input id="rdo-subj" value="Richiesta di offerta — ${oggi}"></div>
-      <div class="form-row"><label>Testo</label><textarea id="rdo-body" style="min-height:220px;font-family:var(--font);font-size:13px;line-height:1.7">${testo}</textarea></div>
-      <div class="modal-actions">
-        <button class="btn-ghost" onclick="closeM()">Annulla</button>
-        <button class="btn-ghost" onclick="copyRDO()">📋 Copia testo</button>
-        ${f.contatti?.email?'<a class="btn" href="mailto:'+f.contatti.email+'?subject='+encodeURIComponent('Richiesta di offerta \u2014 '+oggi)+'&body='+encodeURIComponent(testo)+'" onclick="closeM()">📧 Apri email</a>':'<button class="btn" onclick="copyRDO()">📋 Copia tutto</button>'}
-      </div>
-    </div>
-    <div id="rdo-panel-tpl" style="display:none;">
-      <p style="font-size:13px;color:var(--text3);margin-bottom:10px;line-height:1.5">Personalizza il testo predefinito per <strong>${f.nome}</strong>. Variabili disponibili: <code style="background:var(--bg3);padding:1px 5px;border-radius:3px">{FORNITORE}</code> <code style="background:var(--bg3);padding:1px 5px;border-radius:3px">{DATA}</code></p>
-      <div class="form-row"><label>Modello testo per ${f.nome}</label><textarea id="rdo-tpl-body" style="min-height:240px;font-family:var(--font);font-size:13px;line-height:1.7">${templates[extra]||defaultTpl}</textarea></div>
-      <div class="modal-actions">
-        <button class="btn-ghost" onclick="closeM()">Annulla</button>
-        <button class="btn-ghost" onclick="ripristinaTemplatePredefinito('${extra}')">↺ Ripristina predefinito</button>
-        <button class="btn" onclick="salvaTemplate('${extra}')">💾 Salva modello</button>
-      </div>
-    </div>`;
+    return('<h3>✉ Richiesta di offerta — '+(f.nome)+'</h3>\n    <div style="display:flex;gap:8px;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:12px;">\n      <button class="btn-ghost" style="font-size:12px;padding:4px 10px;" onclick="document.getElementById(\'rdo-panel-send\').style.display=\'\';document.getElementById(\'rdo-panel-tpl\').style.display=\'none\';this.style.background=\'var(--blue)\';this.style.color=\'#fff\';document.getElementById(\'rdo-tab-tpl\').style.background=\'\';document.getElementById(\'rdo-tab-tpl\').style.color=\'\';" id="rdo-tab-send">✉ Componi</button>\n      <button class="btn-ghost" style="font-size:12px;padding:4px 10px;" onclick="document.getElementById(\'rdo-panel-tpl\').style.display=\'\';document.getElementById(\'rdo-panel-send\').style.display=\'none\';this.style.background=\'var(--blue)\';this.style.color=\'#fff\';document.getElementById(\'rdo-tab-send\').style.background=\'\';document.getElementById(\'rdo-tab-send\').style.color=\'\';" id="rdo-tab-tpl">⚙ Modello testo</button>\n    </div>\n    <div id="rdo-panel-send">\n      <div class="form-row"><label>A (email fornitore)</label><input id="rdo-to" value="'+(f.contatti?.email||'')+'" placeholder="email@fornitore.it"></div>\n      <div class="form-row"><label>Oggetto</label><input id="rdo-subj" value="Richiesta di offerta — '+(oggi)+'"></div>\n      <div class="form-row"><label>Testo</label><textarea id="rdo-body" style="min-height:220px;font-family:var(--font);font-size:13px;line-height:1.7">'+(testo)+'</textarea></div>\n      <div class="modal-actions">\n        <button class="btn-ghost" onclick="closeM()">Annulla</button>\n        <button class="btn-ghost" onclick="copyRDO()">📋 Copia testo</button>\n        '+(f.contatti?.email?'<a class="btn" href="mailto:'+f.contatti.email+'?subject='+encodeURIComponent('Richiesta di offerta \u2014 '+oggi)+'&body='+encodeURIComponent(testo)+'" onclick="closeM()">📧 Apri email</a>':'<button class="btn" onclick="copyRDO()">📋 Copia tutto</button>')+'\n      </div>\n    </div>\n    <div id="rdo-panel-tpl" style="display:none;">\n      <p style="font-size:13px;color:var(--text3);margin-bottom:10px;line-height:1.5">Personalizza il testo predefinito per <strong>'+(f.nome)+'</strong>. Variabili disponibili: <code style="background:var(--bg3);padding:1px 5px;border-radius:3px">{FORNITORE}</code> <code style="background:var(--bg3);padding:1px 5px;border-radius:3px">{DATA}</code></p>\n      <div class="form-row"><label>Modello testo per '+(f.nome)+'</label><textarea id="rdo-tpl-body" style="min-height:240px;font-family:var(--font);font-size:13px;line-height:1.7">'+(templates[extra]||defaultTpl)+'</textarea></div>\n      <div class="modal-actions">\n        <button class="btn-ghost" onclick="closeM()">Annulla</button>\n        <button class="btn-ghost" onclick="ripristinaTemplatePredefinito(\''+(extra)+'\')">↺ Ripristina predefinito</button>\n        <button class="btn" onclick="salvaTemplate(\''+(extra)+'\')">💾 Salva modello</button>\n      </div>\n    </div>';
   }
 
   if(type==='rdo-new'){
-    return`<h3>✉ Nuova richiesta di offerta</h3>
-    <div class="form-row"><label>Fornitore</label>
-      <select id="rdo-forn">${FORNITORI.map(f=>`<option value="${f.id}">${f.nome}</option>`).join('')}</select>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeM()">Annulla</button>
-      <button class="btn" onclick="const v=document.getElementById('rdo-forn').value;closeM();openModal('rdo',v)">Continua →</button>
-    </div>`;
+    return('<h3>✉ Nuova richiesta di offerta</h3>\n    <div class="form-row"><label>Fornitore</label>\n      <select id="rdo-forn">'+(FORNITORI.map(f=>'+('<option value="'+(f.id)+'">'+(f.nome)+'</option>').join(''))+'</select>\n    </div>\n    <div class="modal-actions">\n      <button class="btn-ghost" onclick="closeM()">Annulla</button>\n      <button class="btn" onclick="const v=document.getElementById(\'rdo-forn\').value;closeM();openModal(\'rdo\',v)">Continua →</button>\n    </div>';
   }
 
-  if(type==='import-primanota'){return`<h3>📥 Import Prima Nota Fattura24</h3>
-  <p style="font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:14px;">
-    Esporta la <strong>Prima Nota</strong> da Fattura24 → Contabilità → Prima Nota → filtra per conto → Esporta XLS.<br>
-    Puoi importare più file (uno per conto) — i movimenti vengono uniti e deduplicati.
-  </p>
-  <div style="border:2px dashed var(--border);border-radius:var(--r);padding:24px;text-align:center;margin-bottom:12px;"
-    ondragover="event.preventDefault()" ondrop="handlePNDrop(event)">
-    <div style="font-size:32px;margin-bottom:8px">📂</div>
-    <div style="font-size:13px;color:var(--text3);margin-bottom:10px">Trascina i file XLS qui oppure</div>
-    <input type="file" id="pn-file-input" accept=".xls,.xlsx" multiple style="display:none" onchange="handlePNFiles(this.files)">
-    <button class="btn btn-primary" onclick="document.getElementById('pn-file-input').click()">Seleziona file</button>
-  </div>
-  <div id="pn-import-preview" style="max-height:200px;overflow-y:auto;"></div>
-  <div class="modal-actions">
-    <button class="btn-ghost" onclick="closeM()">Annulla</button>
-    <button class="btn" id="pn-import-btn" onclick="confirmImportPN()" style="display:none">✓ Importa movimenti</button>
-  </div>`;}
+  if(type==='import-primanota'){return('<h3>📥 Import Prima Nota Fattura24</h3>\n  <p style="font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:14px;">\n    Esporta la <strong>Prima Nota</strong> da Fattura24 → Contabilità → Prima Nota → filtra per conto → Esporta XLS.<br>\n    Puoi importare più file (uno per conto) — i movimenti vengono uniti e deduplicati.\n  </p>\n  <div style="border:2px dashed var(--border);border-radius:var(--r);padding:24px;text-align:center;margin-bottom:12px;"\n    ondragover="event.preventDefault()" ondrop="handlePNDrop(event)">\n    <div style="font-size:32px;margin-bottom:8px">📂</div>\n    <div style="font-size:13px;color:var(--text3);margin-bottom:10px">Trascina i file XLS qui oppure</div>\n    <input type="file" id="pn-file-input" accept=".xls,.xlsx" multiple style="display:none" onchange="handlePNFiles(this.files)">\n    <button class="btn btn-primary" onclick="document.getElementById(\'pn-file-input\').click()">Seleziona file</button>\n  </div>\n  <div id="pn-import-preview" style="max-height:200px;overflow-y:auto;"></div>\n  <div class="modal-actions">\n    <button class="btn-ghost" onclick="closeM()">Annulla</button>\n    <button class="btn" id="pn-import-btn" onclick="confirmImportPN()" style="display:none">✓ Importa movimenti</button>\n  </div>';}
 
-  if(type==='config'){const c=lCfg();return`<h3>⚙ Configurazione</h3>
-
-  <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">☁ Nextcloud</div>
-  <p style="font-size:13px;color:var(--text3);margin-bottom:12px;line-height:1.5">Usa una <strong>App Password</strong> da Nextcloud → Impostazioni → Sicurezza.</p>
-  <div class="form-inline" style="margin-bottom:18px;">
-    <div class="fr"><label>URL proxy</label><input id="cfg-url" value="${c.nc_url||'https://dash.asglab.it:8766'}"></div>
-    <div class="fg2">
-      <div class="fr"><label>Utente</label><input id="cfg-user" value="${c.nc_user||'andrea'}"></div>
-      <div class="fr"><label>App Password</label><input id="cfg-pass" type="password" value="${c.nc_pass||''}" placeholder="xxxx-xxxx-xxxx-xxxx"></div>
-    </div>
-  </div>
-
-  <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">🧾 Fattura24</div>
-  <p style="font-size:13px;color:var(--text3);margin-bottom:12px;line-height:1.5">
-    Trova la tua API key in <strong>Fattura24 → Impostazioni → API</strong>.<br>
-    La chiave viene salvata localmente e usata per aggiornare <code style="background:var(--bg3);padding:1px 5px;border-radius:4px;font-size:12px">/opt/asg-dashboard/config.env</code> sul server tramite sync.<br>
-    <span style="color:var(--amber)">⚠ Richiede account Fattura24 con piano a pagamento (API attiva).</span>
-  </p>
-  <div class="form-inline" style="margin-bottom:6px;">
-    <div class="fr">
-      <label>API Key Fattura24</label>
-      <input id="cfg-f24key" type="password" value="${c.f24_key||''}" placeholder="es. abc123def456…" autocomplete="off">
-    </div>
-    <div class="fg2">
-      <div class="fr">
-        <label>Tipo documento da importare</label>
-        <select id="cfg-f24tipo">
-          <option value="all" ${(c.f24_tipo||'all')==='all'?'selected':''}>Tutte (fatture + NDC)</option>
-          <option value="fattura" ${c.f24_tipo==='fattura'?'selected':''}>Solo fatture emesse</option>
-          <option value="ricevuta" ${c.f24_tipo==='ricevuta'?'selected':''}>Solo ricevute</option>
-        </select>
-      </div>
-      <div class="fr">
-        <label>Sync automatico ogni</label>
-        <select id="cfg-f24sync">
-          <option value="60" ${(c.f24_sync||'60')==='60'?'selected':''}>1 ora</option>
-          <option value="30" ${c.f24_sync==='30'?'selected':''}>30 min</option>
-          <option value="240" ${c.f24_sync==='240'?'selected':''}>4 ore</option>
-          <option value="0" ${c.f24_sync==='0'?'selected':''}>Manuale</option>
-        </select>
-      </div>
-    </div>
-    <div id="cfg-f24status" style="font-size:12px;color:var(--text3);margin-top:4px">${c.f24_key?'✓ API key presente — stato: '+(c.f24_ok?'<span style="color:var(--green);font-weight:700">connessa</span>':'<span style="color:var(--amber);font-weight:700">da verificare</span>'):'API key non inserita'}</div>
-  </div>
-
-  <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)">💰 Markup per cliente</div>
-  <p style="font-size:12px;color:var(--text3);margin-bottom:10px">Ricarico predefinito sui costi materiali per ogni cliente. Viene precompilato nel form "aggiungi componente".</p>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;" id="cfg-markup-grid">
-    ${Object.entries(CMAP).map(([cod,nome])=>'<div style="display:flex;align-items:center;gap:8px;"><label style="font-size:12px;color:var(--text2);flex:1;white-space:nowrap">'+nome.split('(')[0].trim()+' <span style="color:var(--text4);font-size:10px">('+cod+')</span></label><input id="cfg-mk-'+cod+'" type="number" step="0.05" min="1" max="10" value="'+(c.markup_clienti?.[cod]||2.25)+'" style="width:70px;border:1.5px solid var(--border);border-radius:6px;padding:4px 6px;font-size:12px;text-align:right;"></div>').join('')}
-  </div>
-
-  ${act('saveCfg2()')}\`;
-  }
-  return'';
-}
-
-// Ricerca Ares nel modal
-// ── Tab switcher modal add-riga ──
-// Precompila markup con valore per cliente corrente
-function precompilaMarkup(){
-  const el=document.getElementById('f-markup');
-  if(!el||el.value)return; // già compilato
-  const cfg=lCfg();
-  const cod=getCod(CC?.numero||'');
-  const val=cfg.markup_clienti?.[cod]||2.25;
-  el.value=val;
-}
-
-function switchAddTab(tab){
-  ['listino','mag','tubo','racc','pu10','pu20','manuale'].forEach(t=>{
-    const btn=document.getElementById('atab-'+t);
-    const panel=document.getElementById('apanel-'+t);
-    if(btn)btn.classList.toggle('active',t===tab);
-    if(panel)panel.style.display=t===tab?'':'none';
-  });
-  if(tab==='racc')renderRaccSciolto();
-  if(tab==='pu10'){_pu10Blocchi=[];pu10Update();const el=document.getElementById('pu10-blocchi-list');if(el)el.innerHTML='';}
-  if(tab==='pu20'){_pu20Blocchi=[];pu20Update();const el=document.getElementById('pu20-blocchi-list');if(el)el.innerHTML='';}
-  // Upgrade select nel pannello appena reso visibile
-  setTimeout(()=>{
-    const panel=document.getElementById('apanel-'+tab);
-    if(panel) upgradeSelects(panel);
-    upgradeSelects(); // anche il resto del modal
-  },0);
-}
-
-function magFilter(){
-  const q=(document.getElementById('mag-q')||{}).value?.toLowerCase()||'';
-  const items=lMag();
-  const el=document.getElementById('mag-results');if(!el)return;
-  const filt=q?items.filter(m=>(m.codice||'').toLowerCase().includes(q)||(m.descrizione||'').toLowerCase().includes(q)||(m.fornitore||'').toLowerCase().includes(q)):items;
-  if(!filt.length){el.innerHTML='<div class="empty" style="padding:12px">Nessun risultato</div>';return;}
-  el.innerHTML=filt.map(m=>'<div style="display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border);font-size:13px;">'+'<div style="flex:1;"><div style="font-weight:600">'+(m.codice?'<span style="font-family:monospace;color:var(--green);font-weight:700">'+m.codice+'</span> \u2014 ':'')+(m.descrizione||'\u2014')+'</div>'+'<div style="font-size:11px;color:var(--text3)">'+(m.fornitore||'')+' \u00b7 giacenza: <strong style="color:'+(parseFloat(m.qty||0)>0?'var(--green)':'var(--red)')+'">'+( m.qty||0)+'</strong></div></div>'+'<span style="font-weight:700;white-space:nowrap">\u20ac'+fmt2(m.costo_cad||0)+'</span>'+'<button style="background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;" onclick="usaMagazzino('+JSON.stringify(m).replace(/"/g,'&quot;')+',currentAddRigaNumero)">+ usa</button></div>').join('');
-}
-
-let currentAddRigaNumero='';
-
-function usaMagazzino(m,numero){
-  const netto=parseFloat(m.costo_cad||0);const markup=2.25;
-  const row={id:uid(),sezione:'Magazzino',descrizione:m.descrizione,qty:1,fornitore:m.fornitore||'Magazzino interno',codice:m.codice||'',costo_cad:netto,sconto:0,netto_cad:netto,markup,prezzo_vendita:parseFloat((netto*markup).toFixed(4)),stato_approv:'arrivato',data_attesa:''};
-  const det=ll('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
-  det[numero].distinta.push(row);ls('det',det);syncDetBackground();CC._det=det[numero];
-  closeM();['distinta','approv','riepilogo'].forEach(id=>renderTabContent(id,CC,det[numero]));
-  showToast('✓ '+m.descrizione+' aggiunto dalla magazzino');
-}
-
-// ── Configuratore tubo flessibile ──
-// ════════════════════════════════════════════
-// CONFIGURATORE TUBO FLESSIBILE
-// ════════════════════════════════════════════
-
-// Database raccordi: {std, misura, dn_compatibili, varianti}
-// dn_compatibili: array di DN (mm) su cui il raccordo è montabile nativamente
-// Le misure maggiori sono disponibili come riduzione, ma non le elenchiamo per default
-const RACCORDI_DB=[
-  // BSP (gas)
-  {std:'BSP', mis:'1/8"',  dn:[6],        label:'BSP 1/8"'},
-  {std:'BSP', mis:'1/4"',  dn:[6,10],     label:'BSP 1/4"'},
-  {std:'BSP', mis:'3/8"',  dn:[10,12],    label:'BSP 3/8"'},
-  {std:'BSP', mis:'1/2"',  dn:[12,16],    label:'BSP 1/2"'},
-  {std:'BSP', mis:'3/4"',  dn:[16,19,20], label:'BSP 3/4"'},
-  {std:'BSP', mis:'1"',    dn:[20,25],    label:'BSP 1"'},
-  {std:'BSP', mis:'1¼"',   dn:[25,32],    label:'BSP 1¼"'},
-  {std:'BSP', mis:'1½"',   dn:[32,38],    label:'BSP 1½"'},
-  // ORFS
-  {std:'ORFS', mis:'1/4"', dn:[6,10],     label:'ORFS 1/4"'},
-  {std:'ORFS', mis:'3/8"', dn:[10,12],    label:'ORFS 3/8"'},
-  {std:'ORFS', mis:'1/2"', dn:[12,16],    label:'ORFS 1/2"'},
-  {std:'ORFS', mis:'3/4"', dn:[16,19,20], label:'ORFS 3/4"'},
-  {std:'ORFS', mis:'1"',   dn:[20,25],    label:'ORFS 1"'},
-  // JIC 37°
-  {std:'JIC',  mis:'1/4"', dn:[6,10],     label:'JIC 37° 1/4"'},
-  {std:'JIC',  mis:'3/8"', dn:[10,12],    label:'JIC 37° 3/8"'},
-  {std:'JIC',  mis:'1/2"', dn:[12,16],    label:'JIC 37° 1/2"'},
-  {std:'JIC',  mis:'3/4"', dn:[16,19,20], label:'JIC 37° 3/4"'},
-  {std:'JIC',  mis:'1"',   dn:[20,25],    label:'JIC 37° 1"'},
-  // DIN — metrico
-  {std:'DIN',  mis:'M12×1.5', dn:[6],     label:'M12×1.5'},
-  {std:'DIN',  mis:'M14×1.5', dn:[6,10],  label:'M14×1.5'},
-  {std:'DIN',  mis:'M16×1.5', dn:[10],    label:'M16×1.5'},
-  {std:'DIN',  mis:'M18×1.5', dn:[10,12], label:'M18×1.5'},
-  {std:'DIN',  mis:'M20×1.5', dn:[12],    label:'M20×1.5'},
-  {std:'DIN',  mis:'M22×1.5', dn:[12,16], label:'M22×1.5'},
-  {std:'DIN',  mis:'M24×1.5', dn:[16],    label:'M24×1.5'},
-  {std:'DIN',  mis:'M26×1.5', dn:[16,20], label:'M26×1.5'},
-  {std:'DIN',  mis:'M30×2',   dn:[20,25], label:'M30×2'},
-  {std:'DIN',  mis:'M36×2',   dn:[25],    label:'M36×2'},
-  // Flangia SAE (solo dritto, no curve)
-  {std:'SAE',  mis:'SAE 6000psi 1/2"', dn:[12,16], label:'Flangia SAE 6000psi 1/2"', noCurva:true},
-  {std:'SAE',  mis:'SAE 3000psi 3/4"', dn:[16,20], label:'Flangia SAE 3000psi 3/4"', noCurva:true},
-  {std:'SAE',  mis:'SAE 3000psi 1"',   dn:[20,25], label:'Flangia SAE 3000psi 1"',   noCurva:true},
-  // Nippli / capezzoli
-  {std:'NIPPLO', mis:'Capezzolo 1/4" BSP', dn:[6,10], label:'Capezzolo 1/4" BSP', noCurva:true},
-  {std:'NIPPLO', mis:'Capezzolo 3/8" BSP', dn:[10,12], label:'Capezzolo 3/8" BSP', noCurva:true},
-  {std:'NIPPLO', mis:'Capezzolo 1/2" BSP', dn:[12,16], label:'Capezzolo 1/2" BSP', noCurva:true},
-  {std:'NIPPLO', mis:'Capezzolo 3/4" BSP', dn:[16,20], label:'Capezzolo 3/4" BSP', noCurva:true},
-  {std:'NIPPLO', mis:'Capezzolo 1" BSP',   dn:[20,25], label:'Capezzolo 1" BSP', noCurva:true},
-  {std:'NIPPLO', mis:'Capezzolo inox 1/4"',dn:[6,10],  label:'Capezzolo inox 1/4"', noCurva:true},
-  {std:'NIPPLO', mis:'Capezzolo inox 3/8"',dn:[10,12], label:'Capezzolo inox 3/8"', noCurva:true},
-  {std:'NIPPLO', mis:'Capezzolo inox 1/2"',dn:[12,16], label:'Capezzolo inox 1/2"', noCurva:true},
-  // Terminali ad occhio (swaged) — per tubi raccordati
-  {std:'OCCHIO', mis:'Occhio 3/8" Ø11 BSP',    dn:[6,10],     label:'Term. occhio 3/8" Ø11', noCurva:true},
-  {std:'OCCHIO', mis:'Occhio 1/2" Ø11 BSP',    dn:[10,12],    label:'Term. occhio 1/2" Ø11', noCurva:true},
-  {std:'OCCHIO', mis:'Occhio 1/2" Ø14 BSP',    dn:[10,12],    label:'Term. occhio 1/2" Ø14', noCurva:true},
-  {std:'OCCHIO', mis:'Occhio 3/4" Ø14 BSP',    dn:[12,16],    label:'Term. occhio 3/4" Ø14', noCurva:true},
-  {std:'OCCHIO', mis:'Occhio 3/4" Ø18 BSP',    dn:[16,20],    label:'Term. occhio 3/4" Ø18', noCurva:true},
-  {std:'OCCHIO', mis:'Occhio 1" Ø18 BSP',      dn:[16,20,25], label:'Term. occhio 1" Ø18',   noCurva:true},
-  {std:'OCCHIO', mis:'Occhio 1" Ø22 BSP',      dn:[20,25],    label:'Term. occhio 1" Ø22',   noCurva:true},
-  {std:'OCCHIO', mis:'Occhio inox 3/8" Ø11',   dn:[6,10],     label:'Occhio inox 3/8" Ø11',  noCurva:true},
-  {std:'OCCHIO', mis:'Occhio inox 1/2" Ø14',   dn:[10,12],    label:'Occhio inox 1/2" Ø14',  noCurva:true},
-  {std:'OCCHIO', mis:'Occhio inox 3/4" Ø18',   dn:[16,20],    label:'Occhio inox 3/4" Ø18',  noCurva:true},
-];
-
-// ════════════════════════════════════════════
-// RACCORDERIA SCIOLTA — selettore con filtri
-// ════════════════════════════════════════════
-
-// Database raccorderia sciolta per alta pressione oleodinamica
-// figura: 'adattatore' | 'gomito' | 'T' | 'nipplo' | 'bonded' | 'stucchi' | 'riduzione'
-const RACC_SCIOLTI=[
-  // ── BSP maschio/femmina — adattatori ──
-  {std:'BSP', fig:'adattatore', mis:'BSP 1/4"M × 1/4"F',   cod:'A-BSP14M-14F', desc:'Adattatore BSP 1/4"M → 1/4"F',   forn:'Pa.Co', p:1.8},
-  {std:'BSP', fig:'adattatore', mis:'BSP 3/8"M × 3/8"F',   cod:'A-BSP38M-38F', desc:'Adattatore BSP 3/8"M → 3/8"F',   forn:'Pa.Co', p:2.2},
-  {std:'BSP', fig:'adattatore', mis:'BSP 1/2"M × 1/2"F',   cod:'A-BSP12M-12F', desc:'Adattatore BSP 1/2"M → 1/2"F',   forn:'Pa.Co', p:2.8},
-  {std:'BSP', fig:'adattatore', mis:'BSP 3/4"M × 3/4"F',   cod:'A-BSP34M-34F', desc:'Adattatore BSP 3/4"M → 3/4"F',   forn:'Pa.Co', p:3.5},
-  {std:'BSP', fig:'adattatore', mis:'BSP 1"M × 1"F',        cod:'A-BSP1M-1F',   desc:'Adattatore BSP 1"M → 1"F',       forn:'Pa.Co', p:4.2},
-  // BSP riduzioni
-  {std:'BSP', fig:'riduzione', mis:'BSP 3/8"M × 1/4"F',    cod:'R-BSP38-14',   desc:'Riduzione BSP 3/8"M × 1/4"F',    forn:'Pa.Co', p:2.0},
-  {std:'BSP', fig:'riduzione', mis:'BSP 1/2"M × 3/8"F',    cod:'R-BSP12-38',   desc:'Riduzione BSP 1/2"M × 3/8"F',    forn:'Pa.Co', p:2.4},
-  {std:'BSP', fig:'riduzione', mis:'BSP 3/4"M × 1/2"F',    cod:'R-BSP34-12',   desc:'Riduzione BSP 3/4"M × 1/2"F',    forn:'Pa.Co', p:3.0},
-  {std:'BSP', fig:'riduzione', mis:'BSP 1"M × 3/4"F',      cod:'R-BSP1-34',    desc:'Riduzione BSP 1"M × 3/4"F',      forn:'Pa.Co', p:3.8},
-  // BSP gomiti 90°
-  {std:'BSP', fig:'gomito',    mis:'BSP 1/4"M × 90°',      cod:'G90-BSP14',    desc:'Gomito BSP 1/4"M 90°',            forn:'Pa.Co', p:3.5},
-  {std:'BSP', fig:'gomito',    mis:'BSP 3/8"M × 90°',      cod:'G90-BSP38',    desc:'Gomito BSP 3/8"M 90°',            forn:'Pa.Co', p:4.0},
-  {std:'BSP', fig:'gomito',    mis:'BSP 1/2"M × 90°',      cod:'G90-BSP12',    desc:'Gomito BSP 1/2"M 90°',            forn:'Pa.Co', p:5.0},
-  {std:'BSP', fig:'gomito',    mis:'BSP 3/4"M × 90°',      cod:'G90-BSP34',    desc:'Gomito BSP 3/4"M 90°',            forn:'Pa.Co', p:6.2},
-  // BSP nippli doppi
-  {std:'BSP', fig:'nipplo',    mis:'Nipplo BSP 1/4"M × 1/4"M', cod:'N-BSP14', desc:'Nipplo doppio BSP 1/4"M × 1/4"M', forn:'Pa.Co', p:1.5},
-  {std:'BSP', fig:'nipplo',    mis:'Nipplo BSP 3/8"M × 3/8"M', cod:'N-BSP38', desc:'Nipplo doppio BSP 3/8"M × 3/8"M', forn:'Pa.Co', p:1.8},
-  {std:'BSP', fig:'nipplo',    mis:'Nipplo BSP 1/2"M × 1/2"M', cod:'N-BSP12', desc:'Nipplo doppio BSP 1/2"M × 1/2"M', forn:'Pa.Co', p:2.2},
-  {std:'BSP', fig:'nipplo',    mis:'Nipplo BSP 3/4"M × 3/4"M', cod:'N-BSP34', desc:'Nipplo doppio BSP 3/4"M × 3/4"M', forn:'Pa.Co', p:2.8},
-  // ── DIN — metrico ──
-  {std:'DIN', fig:'adattatore', mis:'M14×1.5M × BSP 1/4"F', cod:'A-M14-BSP14', desc:'Adatt. M14×1.5M → BSP 1/4"F',   forn:'Pa.Co', p:3.2},
-  {std:'DIN', fig:'adattatore', mis:'M16×1.5M × BSP 3/8"F', cod:'A-M16-BSP38', desc:'Adatt. M16×1.5M → BSP 3/8"F',   forn:'Pa.Co', p:3.4},
-  {std:'DIN', fig:'adattatore', mis:'M18×1.5M × BSP 3/8"F', cod:'A-M18-BSP38', desc:'Adatt. M18×1.5M → BSP 3/8"F',   forn:'Pa.Co', p:3.6},
-  {std:'DIN', fig:'adattatore', mis:'M22×1.5M × BSP 1/2"F', cod:'A-M22-BSP12', desc:'Adatt. M22×1.5M → BSP 1/2"F',   forn:'Pa.Co', p:4.0},
-  {std:'DIN', fig:'adattatore', mis:'M26×1.5M × BSP 3/4"F', cod:'A-M26-BSP34', desc:'Adatt. M26×1.5M → BSP 3/4"F',   forn:'Pa.Co', p:4.5},
-  {std:'DIN', fig:'nipplo',     mis:'Nipplo M14×1.5 doppio', cod:'N-M14',       desc:'Nipplo doppio M14×1.5M × M14×1.5M', forn:'Pa.Co', p:2.8},
-  {std:'DIN', fig:'nipplo',     mis:'Nipplo M16×1.5 doppio', cod:'N-M16',       desc:'Nipplo doppio M16×1.5M × M16×1.5M', forn:'Pa.Co', p:3.0},
-  {std:'DIN', fig:'nipplo',     mis:'Nipplo M18×1.5 doppio', cod:'N-M18',       desc:'Nipplo doppio M18×1.5M × M18×1.5M', forn:'Pa.Co', p:3.2},
-  {std:'DIN', fig:'nipplo',     mis:'Nipplo M22×1.5 doppio', cod:'N-M22',       desc:'Nipplo doppio M22×1.5M × M22×1.5M', forn:'Pa.Co', p:3.8},
-  // ── JIC ──
-  {std:'JIC', fig:'adattatore', mis:'JIC 1/4"M × BSP 1/4"F', cod:'A-JIC14-BSP14', desc:'Adatt. JIC 1/4"M → BSP 1/4"F', forn:'Pa.Co', p:3.5},
-  {std:'JIC', fig:'adattatore', mis:'JIC 3/8"M × BSP 3/8"F', cod:'A-JIC38-BSP38', desc:'Adatt. JIC 3/8"M → BSP 3/8"F', forn:'Pa.Co', p:3.8},
-  {std:'JIC', fig:'adattatore', mis:'JIC 1/2"M × BSP 1/2"F', cod:'A-JIC12-BSP12', desc:'Adatt. JIC 1/2"M → BSP 1/2"F', forn:'Pa.Co', p:4.2},
-  {std:'JIC', fig:'adattatore', mis:'JIC 3/4"M × BSP 3/4"F', cod:'A-JIC34-BSP34', desc:'Adatt. JIC 3/4"M → BSP 3/4"F', forn:'Pa.Co', p:4.8},
-  // ── Rondelle bonded ──
-  {std:'Bonded', fig:'bonded', mis:'Bonded 1/4" BSP',  cod:'BD-14', desc:'Rondella bonded BSP 1/4" (alluminio+NBR)', forn:'Pa.Co', p:0.5},
-  {std:'Bonded', fig:'bonded', mis:'Bonded 3/8" BSP',  cod:'BD-38', desc:'Rondella bonded BSP 3/8"',               forn:'Pa.Co', p:0.6},
-  {std:'Bonded', fig:'bonded', mis:'Bonded 1/2" BSP',  cod:'BD-12', desc:'Rondella bonded BSP 1/2"',               forn:'Pa.Co', p:0.7},
-  {std:'Bonded', fig:'bonded', mis:'Bonded 3/4" BSP',  cod:'BD-34', desc:'Rondella bonded BSP 3/4"',               forn:'Pa.Co', p:0.9},
-  {std:'Bonded', fig:'bonded', mis:'Bonded 1" BSP',    cod:'BD-1',  desc:'Rondella bonded BSP 1"',                 forn:'Pa.Co', p:1.1},
-  {std:'Bonded', fig:'bonded', mis:'Bonded M14×1.5',   cod:'BD-M14',desc:'Rondella bonded M14×1.5 DIN',            forn:'Pa.Co', p:0.6},
-  {std:'Bonded', fig:'bonded', mis:'Bonded M16×1.5',   cod:'BD-M16',desc:'Rondella bonded M16×1.5 DIN',            forn:'Pa.Co', p:0.7},
-  {std:'Bonded', fig:'bonded', mis:'Bonded M22×1.5',   cod:'BD-M22',desc:'Rondella bonded M22×1.5 DIN',            forn:'Pa.Co', p:0.9},
-  // ── Innesti rapidi Stucchi ── (fornitore: Tecnical/FIZ)
-  {std:'Stucchi', fig:'stucchi', mis:'Stucchi ISO-B 3/8"M FF', cod:'S-ISO-B-38FF', desc:'Innesto rapido Stucchi ISO-B DN10 3/8"M flat-face', forn:'FIZ/Tecnical', p:18.0},
-  {std:'Stucchi', fig:'stucchi', mis:'Stucchi ISO-B 1/2"M FF', cod:'S-ISO-B-12FF', desc:'Innesto rapido Stucchi ISO-B DN12 1/2"M flat-face', forn:'FIZ/Tecnical', p:22.0},
-  {std:'Stucchi', fig:'stucchi', mis:'Stucchi ISO-B 3/4"M FF', cod:'S-ISO-B-34FF', desc:'Innesto rapido Stucchi ISO-B DN20 3/4"M flat-face', forn:'FIZ/Tecnical', p:28.0},
-  {std:'Stucchi', fig:'stucchi', mis:'Stucchi ISO-B 3/8"F FF', cod:'S-ISO-B-38FFF',desc:'Innesto rapido Stucchi ISO-B DN10 3/8"F flat-face', forn:'FIZ/Tecnical', p:18.0},
-  {std:'Stucchi', fig:'stucchi', mis:'Stucchi ISO-B 1/2"F FF', cod:'S-ISO-B-12FFF',desc:'Innesto rapido Stucchi ISO-B DN12 1/2"F flat-face', forn:'FIZ/Tecnical', p:22.0},
-  {std:'Stucchi', fig:'stucchi', mis:'Stucchi poppet DN10 3/8"M', cod:'S-POP-38', desc:'Innesto rapido Stucchi poppet DN10 3/8"M',         forn:'FIZ/Tecnical', p:15.0},
-  {std:'Stucchi', fig:'stucchi', mis:'Stucchi poppet DN12 1/2"M', cod:'S-POP-12', desc:'Innesto rapido Stucchi poppet DN12 1/2"M',         forn:'FIZ/Tecnical', p:18.0},
-];
-
-let _raccScioltoFiltro='';
-
-function setRaccScioltoFiltro(std,btn){
-  _raccScioltoFiltro=std;
-  // aggiorna bottoni stile
-  document.querySelectorAll('#apanel-racc button[onclick^="setRaccScioltoFiltro"]').forEach(b=>{
-    const active=b===btn;
-    b.style.borderColor=active?'var(--blue)':'var(--border)';
-    b.style.background=active?'var(--blue-lt)':'#fff';
-    b.style.color=active?'var(--blue)':'var(--text3)';
-  });
-  renderRaccSciolto();
-}
-
-function renderRaccSciolto(){
-  const q=(document.getElementById('racc-q')||{}).value?.toLowerCase()||'';
-  const el=document.getElementById('racc-results');if(!el)return;
-  const filt=RACC_SCIOLTI.filter(r=>{
-    if(_raccScioltoFiltro&&r.std!==_raccScioltoFiltro)return false;
-    if(q&&!r.mis.toLowerCase().includes(q)&&!r.desc.toLowerCase().includes(q)&&!r.cod.toLowerCase().includes(q))return false;
-    return true;
-  });
-  if(!filt.length){el.innerHTML='<div class="empty" style="padding:14px">Nessun raccordo trovato</div>';return;}
-  const figEmoji={adattatore:'🔗',riduzione:'↕',gomito:'↩',nipplo:'⇔',bonded:'⭕',stucchi:'⚡',default:'🔩'};
-  // Raggruppa per standard
-  const groups={};
-  filt.forEach(r=>{if(!groups[r.std])groups[r.std]=[];groups[r.std].push(r);});
-  el.innerHTML=Object.entries(groups).map(([std,items])=>'<div style="background:var(--bg2);padding:5px 10px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);position:sticky;top:0;">'+std+'</div>'+
-    items.map(r=>'<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--border);font-size:12px;">'+
-      '<span style="font-size:14px;flex-shrink:0">'+(figEmoji[r.fig]||figEmoji.default)+'</span>'+
-      '<div style="flex:1;"><div style="font-weight:600;color:var(--text)">'+r.mis+'</div>'+
-        '<div style="font-size:11px;color:var(--text3)">'+r.cod+' · '+r.forn+'</div></div>'+
-      '<span style="font-weight:700;white-space:nowrap;color:var(--text)">€'+fmt2(r.p)+'</span>'+
-      '<button style="background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;flex-shrink:0;" onclick="usaRaccordoSciolto('+JSON.stringify(r).replace(/"/g,'&quot;')+')">+ usa</button>'+
-    '</div>').join('')
-  ).join('');
-}
-
-function usaRaccordoSciolto(r){
-  const netto=r.p;const markup=2.0;
-  const row={id:uid(),sezione:'Raccorderia',descrizione:r.desc,qty:1,fornitore:r.forn==='Pa.Co'?'Pa.Co Fluid':'FIZ / Tecnical Impianti',codice:r.cod,costo_cad:netto,sconto:0,netto_cad:netto,markup,prezzo_vendita:parseFloat((netto*markup).toFixed(4)),stato_approv:'daordinare',data_attesa:''};
-  const numero=currentAddRigaNumero;if(!numero){showToast('Apri una commessa per aggiungere componenti');return;}
-  const det=ll('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
-  det[numero].distinta.push(row);ls('det',det);syncDetBackground();CC._det=det[numero];
-  closeM();['distinta','approv','riepilogo'].forEach(id=>renderTabContent(id,CC,det[numero]));
-  showToast('✓ '+r.mis+' aggiunto alla distinta');
-}
-
-// ════════════════════════════════════════════
-// CONFIGURATORE PU10 (Ares / Tecfluid)
-// ════════════════════════════════════════════
-let _pu10Blocchi=[];
-
-function pu10AddBlocco(sel){
-  if(!sel.value)return;
-  const parts=sel.value.split('|');
-  _pu10Blocchi.push({cod:parts[0],prezzo:parseFloat(parts[1]||0),desc:parts[2]||''});
-  sel.value='';
-  // Render lista blocchi
-  const el=document.getElementById('pu10-blocchi-list');if(!el)return;
-  el.innerHTML=_pu10Blocchi.map((b,i)=>'<div style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:12px;">'+
-    '<span style="font-family:monospace;font-weight:700;color:var(--green);min-width:50px">'+b.cod+'</span>'+
-    '<span style="flex:1;color:var(--text2)">'+b.desc+'</span>'+
-    '<span style="font-weight:700">€'+fmt2(b.prezzo)+'</span>'+
-    '<button onclick="_pu10Blocchi.splice('+i+',1);document.getElementById(\'pu10-blocchi-list\').innerHTML=\'\';_pu10Blocchi.forEach((_,j)=>_);pu10AddBlocco({value:\'\'});pu10Update();" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 3px;">✕</button>'+
-    '</div>').join('');
-  pu10Update();
-}
-
-function pu10Update(){
-  const getVal=id=>{const el=document.getElementById(id);if(!el)return'';if(el.classList&&el.classList.contains('csel'))return window._cselData?.[id]?.val||el.dataset.value||'';return el.value||'';};
-  const collV=getVal('pu10-coll');const pompaV=getVal('pu10-pompa');
-  const motV=getVal('pu10-mot-tipo');const giunto=getVal('pu10-giunto');
-  const serbV=getVal('pu10-serb');
-  const prev=document.getElementById('pu10-preview');if(!prev)return;
-  if(!collV||!pompaV||!motV){prev.innerHTML='<span style="color:var(--text4)">Seleziona almeno collettore, pompa e motore per vedere il riepilogo…</span>';return;}
-  const pC=collV.split('|');const pP=pompaV.split('|');const pM=motV.split('|');
-  const pG=giunto.split('|');const pS=serbV.split('|');
-  const prColl=parseFloat(pC[1]||0),prPompa=parseFloat(pP[1]||0),prMot=parseFloat(pM[1]||0);
-  const prGiunto=giunto?parseFloat(pG[1]||0):0,prSerb=serbV?parseFloat(pS[1]||0):0;
-  const prBlocchi=_pu10Blocchi.reduce((s,b)=>s+b.prezzo,0);
-  const totale=prColl+prPompa+prMot+prGiunto+prSerb+prBlocchi;
-  // Codice ordinazione semplificato
-  const cod='PU10-'+(pC[0]||'?')+'-'+(pP[0]||'?')+'-'+(pM[0]||'?')+(giunto?'-'+pG[0]:'')+(serbV?'-'+pS[0]:'')+_pu10Blocchi.map(b=>'-'+b.cod).join('');
-  prev.innerHTML=
-    '<div style="font-weight:700;color:var(--green);font-size:13px;margin-bottom:6px">Centralina PU10 — '+(pC[2]||'')+'</div>'+
-    '<div style="display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;font-size:12px;margin-bottom:8px;">'+
-    '<span style="color:var(--text3)">Collettore</span><span>'+(pC[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prColl)+'</span>'+
-    '<span style="color:var(--text3)">Pompa</span><span>'+(pP[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prPompa)+'</span>'+
-    '<span style="color:var(--text3)">Motore</span><span>'+(pM[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prMot)+'</span>'+
-    (giunto?'<span style="color:var(--text3)">Giunto</span><span>'+(pG[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prGiunto)+'</span>':'')+
-    (serbV?'<span style="color:var(--text3)">Serbatoio</span><span>'+(pS[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prSerb)+'</span>':'')+
-    _pu10Blocchi.map(b=>'<span style="color:var(--text3)">'+b.cod+'</span><span>'+b.desc+'</span><span style="text-align:right">€'+fmt2(b.prezzo)+'</span>').join('')+
-    '</div>'+
-    '<div style="border-top:1px solid #6ee7a0;padding-top:6px;display:flex;justify-content:space-between;align-items:center;">'+
-    '<span style="font-size:11px;font-family:monospace;color:var(--text3)">'+cod+'</span>'+
-    '<span style="font-weight:800;font-size:15px;color:var(--green)">TOT. €'+fmt2(totale)+'</span>'+
-    '</div>'+
-    '<div style="font-size:10px;color:var(--text4);margin-top:3px;">Fornitore: Ares / Tecfluid · Prezzi listino 2022 — da confermare</div>';
-  prev.dataset.cod=cod;prev.dataset.tot=totale;
-  prev.dataset.desc='Centralina PU10: '+(pC[2]||'')+' · Pompa '+pP[0]+' · Motore '+pM[0]+(giunto?' · '+pG[0]:'')+(serbV?' · '+pS[0]:'')+(  _pu10Blocchi.length?' · Blocchi: '+_pu10Blocchi.map(b=>b.cod).join('+'):'');
-}
-
-function usaCentralinaPU10(numero){
-  const prev=document.getElementById('pu10-preview');
-  if(!prev||!prev.dataset.cod||!prev.dataset.cod.includes('PU10-')){showToast('Completa la configurazione prima');return;}
-  const totale=parseFloat(prev.dataset.tot||0);const markup=2.0;
-  const row={id:uid(),sezione:'Centralina',descrizione:prev.dataset.desc,qty:1,fornitore:'Ares / Tecfluid',codice:prev.dataset.cod,costo_cad:totale,sconto:0,netto_cad:totale,markup,prezzo_vendita:parseFloat((totale*markup).toFixed(4)),stato_approv:'daordinare',data_attesa:''};
-  const det=ll('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
-  det[numero].distinta.push(row);ls('det',det);syncDetBackground();CC._det=det[numero];
-  closeM();['distinta','approv','riepilogo'].forEach(id=>renderTabContent(id,CC,det[numero]));
-  showToast('✓ Centralina PU10 aggiunta alla distinta');
-}
-let _pu20Blocchi=[];
-
-function pu20AddBlocco(sel){
-  if(!sel.value)return;
-  const p=sel.value.split('|');
-  _pu20Blocchi.push({cod:p[0],prezzo:parseFloat(p[1]||0),desc:p[2]||p[0]});
-  sel.value='';
-  const list=document.getElementById('pu20-blocchi-list');
-  if(list){
-    const div=document.createElement('div');
-    div.style.cssText='display:flex;align-items:center;gap:6px;font-size:12px;background:var(--bg2);padding:4px 8px;border-radius:5px;';
-    const idx=_pu20Blocchi.length-1;
-    div.innerHTML='<span style="flex:1">'+p[0]+' — '+(p[2]||p[0])+'</span><span style="color:var(--text3)">€'+fmt2(parseFloat(p[1]||0))+'</span><button class="xbtn" onclick="this.parentNode.remove();_pu20Blocchi.splice('+idx+',1);pu20Update()">✕</button>';
-    list.appendChild(div);
-  }
-  pu20Update();
-}
-
-function pu20Update(){
-  const getVal=id=>{const el=document.getElementById(id);if(!el)return'';if(el.classList&&el.classList.contains('csel'))return window._cselData?.[id]?.val||el.dataset.value||'';return el.value||'';};
-  const collV=getVal('pu20-coll');const pompaV=getVal('pu20-pompa');
-  const motV=getVal('pu20-mot-tipo');const giunto=getVal('pu20-giunto');
-  const serbV=getVal('pu20-serb');
-  const prev=document.getElementById('pu20-preview');if(!prev)return;
-  if(!collV||!pompaV||!motV){
-    prev.innerHTML='<span style="color:var(--text4)">Seleziona almeno collettore, pompa e motore per vedere il riepilogo…</span>';
-    return;
-  }
-  const pC=collV.split('|');const pP=pompaV.split('|');
-  const pM=motV.split('|');const pG=giunto.split('|');const pS=serbV.split('|');
-  const prColl=parseFloat(pC[1]||0),prPompa=parseFloat(pP[1]||0),prMot=parseFloat(pM[1]||0);
-  const prGiunto=giunto?parseFloat(pG[1]||0):0;
-  const prSerb=serbV?parseFloat(pS[1]||0):0;
-  const prAcc=_pu20Blocchi.reduce((s,b)=>s+b.prezzo,0);
-  const totale=prColl+prPompa+prMot+prGiunto+prSerb+prAcc;
-  const cod='PU20-'+(pC[0]||'?')+'-'+(pP[0]||'?')+'-'+(pM[0]||'?')+(giunto?'-'+pG[0]:'')+(serbV?'-'+pS[0]:'')+_pu20Blocchi.map(b=>'-'+b.cod).join('');
-  prev.innerHTML=
-    '<div style="font-weight:700;color:var(--green);font-size:13px;margin-bottom:6px">Centralina PU20 — '+(pC[2]||'')+'</div>'+
-    '<div style="display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;font-size:12px;margin-bottom:8px;">'+
-    '<span style="color:var(--text3)">Collettore</span><span>'+(pC[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prColl)+'</span>'+
-    '<span style="color:var(--text3)">Pompa</span><span>'+(pP[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prPompa)+'</span>'+
-    '<span style="color:var(--text3)">Motore</span><span>'+(pM[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prMot)+'</span>'+
-    (giunto?'<span style="color:var(--text3)">Giunto</span><span>'+(pG[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prGiunto)+'</span>':'')+
-    (serbV?'<span style="color:var(--text3)">Serbatoio</span><span>'+(pS[2]||'—')+'</span><span style="text-align:right">€'+fmt2(prSerb)+'</span>':'')+
-    _pu20Blocchi.map(b=>'<span style="color:var(--text3)">'+b.cod+'</span><span>'+b.desc+'</span><span style="text-align:right">€'+fmt2(b.prezzo)+'</span>').join('')+
-    '</div>'+
-    '<div style="border-top:1px solid #6ee7a0;padding-top:6px;display:flex;justify-content:space-between;align-items:center;">'+
-    '<span style="font-size:11px;font-family:monospace;color:var(--text3)">'+cod+'</span>'+
-    '<span style="font-weight:800;font-size:15px;color:var(--green)">TOT. €'+fmt2(totale)+'</span>'+
-    '</div>'+
-    '<div style="font-size:10px;color:var(--text4);margin-top:3px;">Fornitore: Ares / Tecfluid · Prezzi listino 2022 — da confermare</div>';
-  prev.dataset.cod=cod;prev.dataset.tot=totale;
-  prev.dataset.desc='Centralina PU20: '+(pC[2]||'')+' · Pompa '+pP[0]+' · Motore '+pM[0]+(giunto?' · '+pG[0]:'')+(serbV?' · '+pS[0]:'')+(  _pu20Blocchi.length?' · Accessori: '+_pu20Blocchi.map(b=>b.cod).join('+'):'');
-}
-
-function usaCentralinaPU20(numero){
-  const prev=document.getElementById('pu20-preview');
-  if(!prev||!prev.dataset.cod||!prev.dataset.cod.includes('PU20-')){showToast('Completa la configurazione prima');return;}
-  const totale=parseFloat(prev.dataset.tot||0);const markup=2.0;
-  const row={id:uid(),sezione:'Centralina',descrizione:prev.dataset.desc,qty:1,
-    fornitore:'Ares / Tecfluid',codice:prev.dataset.cod,costo_cad:totale,
-    sconto:0,netto_cad:totale,markup,prezzo_vendita:parseFloat((totale*markup).toFixed(4)),
-    stato_approv:'daordinare',data_attesa:''};
-  const det=ll('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
-  det[numero].distinta.push(row);ls('det',det);syncDetBackground();CC._det=det[numero];
-  closeM();['distinta','approv','riepilogo'].forEach(id=>renderTabContent(id,CC,det[numero]));
-  showToast('✓ Centralina PU20 aggiunta alla distinta');
-}
-
-let _tfRaSelected={A:null,B:null};
-let _tfStdFiltro='';
-let _tfDnAttuale=0;
-
-function onTuboTipoChange(){
-  const sel=document.getElementById('tf-tipo');
-  if(!sel)return;
-  const val=sel.value;
-  if(!val){_tfDnAttuale=0;renderRaccordiSection();aggTuboPreview();return;}
-  const p=val.split('|');
-  _tfDnAttuale=parseInt(p[3]||0);
-  _tfRaSelected={A:null,B:null};
-  _tfStdFiltro='';
-  renderRaccordiSection();
-  aggTuboPreview();
-}
-
-function syncLung(da){
-  const mmEl=document.getElementById('tf-lung-mm');
-  const inEl=document.getElementById('tf-lung-in');
-  const hint=document.getElementById('tf-lung-hint');
-  if(da==='mm'&&mmEl){
-    const mm=parseFloat(mmEl.value||0);
-    if(inEl&&mm)inEl.value=(mm/25.4).toFixed(1);
-    if(hint&&mm)hint.textContent=mm+' mm = '+(mm/25.4).toFixed(1)+'" = '+(mm/10).toFixed(0)+' cm';
-  } else if(da==='in'&&inEl){
-    const ins=parseFloat(inEl.value||0);
-    if(mmEl&&ins)mmEl.value=Math.round(ins*25.4);
-    if(hint&&ins)hint.textContent=(ins*25.4).toFixed(0)+' mm = '+ins+'" = '+(ins*2.54).toFixed(1)+' cm';
-  }
-  aggTuboPreview();
-}
-
-function renderRaccordiSection(){
-  const el=document.getElementById('tf-racc-section');if(!el)return;
-  if(!_tfDnAttuale){
-    el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:10px;text-align:center;background:var(--bg2);border-radius:7px;">Seleziona prima il tipo di tubo per filtrare i raccordi compatibili</div>';
-    return;
-  }
-  const compatibili=RACCORDI_DB.filter(r=>r.dn.includes(_tfDnAttuale));
-  const lista=_tfStdFiltro?compatibili.filter(r=>r.std===_tfStdFiltro):compatibili;
-  const stds=[...new Set(compatibili.map(r=>r.std))];
-
-  // Bottoni filtro standard
-  const btnTutti='<button onclick="setRaccFiltro('')" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1.5px solid '+(!_tfStdFiltro?'var(--blue)':'var(--border)')+'";background:'+(!_tfStdFiltro?'var(--blue-lt)':'#fff')+'";color:'+(!_tfStdFiltro?'var(--blue)':'var(--text3)')+';cursor:pointer;">Tutti</button>';
-  const btnStds=stds.map(s=>'<button onclick="setRaccFiltro(''+s+'')" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1.5px solid '+(_tfStdFiltro===s?'var(--blue)':'var(--border)')+'";background:'+(_tfStdFiltro===s?'var(--blue-lt)':'#fff')+'";color:'+(_tfStdFiltro===s?'var(--blue)':'var(--text3)')+';cursor:pointer;">'+s+'</button>').join('');
-
-  // Colonne A e B
-  const colHtml=['A','B'].map(lato=>{
-    const selInfo=_tfRaSelected[lato];
-    const selBadge=selInfo?'<span style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd);padding:1px 7px;border-radius:20px;font-size:10px;margin-left:4px;">✓ '+selInfo.label.split(' ').slice(0,2).join(' ')+' '+( selInfo.curva||'')+'</span>':'';
-    const rows=lista.map(r=>{
-      const varianti=[{k:'dritto',label:'↔ dritto'},...(!r.noCurva?[{k:'45°',label:'↗ curva 45°'},{k:'90°',label:'↕ curva 90°'}]:[])];
-      return varianti.map(v=>{
-        const isSel=selInfo&&selInfo.raccId===r.std+'_'+r.mis&&selInfo.curva===v.k;
-        const bg=isSel?'var(--blue-lt)':'transparent';
-        const col=isSel?'var(--blue)':'var(--text2)';
-        const colCode=isSel?'var(--blue)':'var(--text3)';
-        const colV=isSel?'var(--blue)':'var(--text4)';
-        return '<div onclick="selRacc(''+lato+'',''+r.std+'',''+r.mis.replace(/"/g,'&quot;')+'',''+r.label.replace(/"/g,'&quot;')+'',''+v.k+'')" style="padding:6px 10px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12px;display:flex;align-items:center;justify-content:space-between;background:'+bg+';color:'+col+';transition:background .1s;">'+
-          '<span><span style="font-family:monospace;font-weight:700;font-size:11px;color:'+colCode+'">'+r.std+'</span> '+r.mis+' <span style="font-size:11px;color:'+colV+'">'+v.label+'</span></span>'+
-          (isSel?'<span style="font-size:14px;">✓</span>':'')+
-          '</div>';
-      }).join('');
-    }).join('');
-    return '<div>'+
-      '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">Raccordo lato '+lato+selBadge+'</div>'+
-      '<div style="max-height:190px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;background:#fff;">'+rows+'</div>'+
-      '</div>';
-  }).join('');
-
-  el.innerHTML=
-    '<div style="margin-bottom:8px;">'+
-      '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">Raccordi compatibili con DN'+_tfDnAttuale+' — filtra per standard:</div>'+
-      '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">'+btnTutti+btnStds+'</div>'+
-    '</div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'+colHtml+'</div>';
-}
-
-function setRaccFiltro(std){
-  _tfStdFiltro=std;
-  renderRaccordiSection();
-}
-
-function selRacc(lato,std,mis,label,curva){
-  _tfRaSelected[lato]={raccId:std+'_'+mis,std,mis,label,curva};
-  renderRaccordiSection();
-  aggTuboPreview();
-}
-
-function aggTuboPreview(){
-  const tipo=(document.getElementById('tf-tipo')||{}).value||'';
-  const lung=parseInt((document.getElementById('tf-lung-mm')||{}).value||0);
-  const ra=_tfRaSelected.A;
-  const rb=_tfRaSelected.B;
-  const qty=parseInt((document.getElementById('tf-qty')||{}).value||1);
-  const prev=document.getElementById('tf-preview');if(!prev)return;
-
-  const doubleCurva=ra&&rb&&ra.curva!=='dritto'&&rb.curva!=='dritto';
-  const orientRow=document.getElementById('tf-orient-row');
-  if(orientRow)orientRow.style.display=doubleCurva?'':'none';
-  const orient=doubleCurva?(document.getElementById('tf-orient')||{}).value||'0':'';
-
-  if(!tipo||!lung||!ra||!rb){
-    prev.innerHTML='<span style="color:var(--text4)">Compila tutti i campi e seleziona entrambi i raccordi per vedere la descrizione…</span>';
-    return;
-  }
-
-  const p=tipo.split('|');
-  const codT=p[0]||'';const normaT=p[1]||'';const pressT=p[2]||'';const dn=parseInt(p[3]||0);const pollici=p[4]||'';
-
-  const lungIn=(lung/25.4).toFixed(1);
-  const raStr=ra.label+' '+(ra.curva==='dritto'?'↔':'curva '+ra.curva);
-  const rbStr=rb.label+' '+(rb.curva==='dritto'?'↔':'curva '+rb.curva);
-
-  let desc='Tubo flessibile raccordato \u2014 '+normaT+' DN'+dn+' ('+pollici+') \u00b7 '+lung+' mm ('+lungIn+'")\n  Lato A: '+raStr+'\n  Lato B: '+rbStr;
-  if(doubleCurva)desc+='\n  Orientamento doppia curva: '+orient+'°';
-
-  const raShort=ra.std+ra.mis.replace(/[^0-9/]/g,'').replace('/','');
-  const rbShort=rb.std+rb.mis.replace(/[^0-9/]/g,'').replace('/','');
-  const orientSuffix=doubleCurva?'-OR'+orient:'';
-  const codice='TF-'+codT+'-DN'+dn+'-'+lung+'mm-'+raShort+'-'+(ra.curva!=='dritto'?ra.curva.replace('°','d'):'')+'-'+rbShort+'-'+(rb.curva!=='dritto'?rb.curva.replace('°','d'):'')+orientSuffix;
-
-  const costoTubo=lung/1000*3.8;
-  const costoRa=ra.curva!=='dritto'?6.2:4.5;
-  const costoRb=rb.curva!=='dritto'?6.2:4.5;
-  const prezzoStimato=costoTubo+costoRa+costoRb;
-
-  prev.innerHTML=
-    '<div style="font-weight:700;color:var(--text);white-space:pre-line;margin-bottom:6px;">'+desc+'</div>'+
-    '<div style="font-size:12px;color:var(--text3)">Norma: '+normaT+' · Pressione max: '+pressT+' bar · Fornitore: Pa.Co Fluid</div>'+
-    '<div style="font-size:12px;color:var(--text3);margin-top:3px;font-family:monospace">'+codice+'</div>'+
-    '<div style="font-size:12px;color:var(--text2);margin-top:4px">Prezzo stimato: <strong>\u20ac'+fmt2(prezzoStimato)+'</strong> cad \u2014 <em>da confermare con Pa.Co Fluid</em></div>'+
-    (doubleCurva?'<div style="font-size:11px;background:#fef3c7;border:1px solid #f59e0b;border-radius:5px;padding:4px 8px;margin-top:6px;color:#78350f;">\u26a0 Doppia curva orientamento '+orient+'\u00b0 \u2014 comunicare esplicitamente a Pa.Co nell\'ordine.</div>':'');
-
-  prev.dataset.desc=desc.replace(/\n/g,' | ');
-  prev.dataset.cod=codice;prev.dataset.prezzo=prezzoStimato;prev.dataset.qty=qty;
-}
-
-function usaTuboFlessibile(numero){
-  const prev=document.getElementById('tf-preview');if(!prev||!prev.dataset.desc){showToast('Completa prima il configuratore');return;}
-  const netto=parseFloat(prev.dataset.prezzo||8);const markup=2.0;
-  const row={id:uid(),sezione:'Raccorderia',descrizione:prev.dataset.desc,qty:parseInt(prev.dataset.qty||1),fornitore:'Pa.Co Fluid',codice:prev.dataset.cod,costo_cad:netto,sconto:0,netto_cad:netto,markup,prezzo_vendita:parseFloat((netto*markup).toFixed(4)),stato_approv:'daordinare',data_attesa:''};
-  const det=ll('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
-  det[numero].distinta.push(row);ls('det',det);syncDetBackground();CC._det=det[numero];
-  closeM();['distinta','approv','riepilogo'].forEach(id=>renderTabContent(id,CC,det[numero]));
-  showToast('✓ Tubo flessibile aggiunto alla distinta');
-}
-
-function aresFilter(){
-  const q=(document.getElementById('ares-q')||{}).value||'';
-  const serie=(document.getElementById('ares-serie')||{}).value||'';
-  const res=aresSearch(q,serie);
-  const el=document.getElementById('ares-results');
-  if(!el)return;
-  if(!res.length){el.innerHTML=q.length>1?'<div style="padding:6px;font-size:13px;color:var(--text3)">Nessun risultato</div>':'';return;}
-  el.innerHTML=res.map(a=>{
-    const st=TIPO_BADGE[a.t]||'background:#f3f4f6;color:#374151';
-    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid var(--border);font-size:13px;flex-wrap:wrap;">'+
-      '<span style="font-family:monospace;font-weight:700;color:var(--green);min-width:68px;font-size:12px">'+a.s+'</span>'+
-      '<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;'+st+';white-space:nowrap">'+(a.serie||a.t)+'</span>'+
-      '<span style="flex:1;color:var(--text2);min-width:120px">'+a.d+'</span>'+
-      '<span style="font-weight:700;white-space:nowrap">€'+fmt2(a.p)+'</span>'+
-      '<button style="background:var(--green);border:none;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;cursor:pointer;" onclick="fillAres('+JSON.stringify(a).replace(/"/g,'&quot;')+')">usa</button>'+
-    '</div>';
-  }).join('');
-}
-function fillAres(a){
-  document.getElementById('f-desc').value=a.d;
-  document.getElementById('f-forn').value='Ares / Tecfluid';
-  document.getElementById('f-cod').value=a.s;
-  document.getElementById('f-costo').value=a.p;
-  document.getElementById('ares-results').innerHTML='';
-  document.getElementById('ares-q').value='';
-}
-
-// ═══════════════════════════════════════════════
-// SAVE
-// ═══════════════════════════════════════════════
-async function saveComm(){
-  const numero=(document.getElementById('f-num')||{}).value?.trim();if(!numero)return;
-  const getF=id=>{const el=document.getElementById(id);if(!el)return'';if(el.classList?.contains('csel'))return window._cselData?.[id]?.val||'';return el.value||'';};
-  const row={id:uid(),numero,cliente:getCod(numero),oggetto:getF('f-ogg'),tipo_commessa:getF('f-tipo'),importo:getF('f-imp'),data_apertura:getF('f-dat'),data_consegna:getF('f-cons'),stato:getF('f-stato'),note:getF('f-note')};
-  const data=lll('comm');data.unshift(row);ls('comm',data);
-  const det=ll('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};ls('det',det);
-  await wPut('commesse.csv',[row,...(SD.comm||[])],['numero','cliente','oggetto','tipo_commessa','importo','data_apertura','data_consegna','stato','note']);
-  // Crea cartella Nextcloud in background
-  const cfg=getCfg();
-  if(cfg.ok){
-    createCommFolder(numero, row.oggetto).then(path=>{
-      if(path) showToast('✓ Commessa salvata · Cartella NC creata');
-      else showToast('✓ Commessa salvata (cartella NC non creata)');
-    });
-  } else {
-    showToast('✓ Commessa salvata');
-  }
-  closeM();await syncNow();
-}
-
-async function updateComm(){
-  const c=CC;if(!c)return;
-  const updated={...c,oggetto:document.getElementById('f-ogg').value.trim(),tipo_commessa:document.getElementById('f-tipo').value,importo:document.getElementById('f-imp').value,data_apertura:document.getElementById('f-dat').value,data_consegna:document.getElementById('f-cons').value,stato:document.getElementById('f-stato').value,note:document.getElementById('f-note').value.trim()};
-  const all=lll('comm');const idx=all.findIndex(x=>x.numero===c.numero);
-  if(idx>=0)all[idx]=updated;else all.unshift(updated);ls('comm',all);
-  if(SD.comm){const i=SD.comm.findIndex(x=>x.numero===c.numero);if(i>=0)SD.comm[i]=updated;}
-  CC={...updated,_det:c._det};
-  await wPut('commesse.csv',all,['numero','cliente','oggetto','tipo_commessa','importo','data_apertura','data_consegna','stato','note']);
-  closeM();
-  // aggiorna header senza ricaricare tutto
-  document.getElementById('det-title').textContent=updated.oggetto||'—';
-  const tipo=updated.tipo_commessa||'';
-  document.getElementById('det-meta').innerHTML='<span class="bdg s-'+(updated.stato||'offerta').replace(' ','-')+'">'+(SL[updated.stato]||'\u2014')+'</span>'+(tipo?'<span class="bdg '+(TIPO_C[tipo]||'')+'">'+(TIPI[tipo]||tipo)+'</span>':'')+'<span style="font-size:12px;color:var(--text2)">'+(CNAMES[getCod(c.numero)]||c.cliente||'\u2014')+'</span>';
-  buildTabs(tipo,updated,CC._det);
-}
-
-function saveRiga(numero){
-  const costo=parseFloat(document.getElementById('f-costo').value||0);
-  const sconto=parseFloat(document.getElementById('f-sconto').value||0);
-  const markup=parseFloat(document.getElementById('f-markup').value||2.25);
-  const netto=costo*(1-sconto/100);
-  const row={id:uid(),sezione:document.getElementById('f-sez').value.trim()||'Generale',descrizione:document.getElementById('f-desc').value.trim(),qty:parseInt(document.getElementById('f-qty').value||1),fornitore:document.getElementById('f-forn').value.trim(),codice:document.getElementById('f-cod').value.trim(),costo_cad:costo,sconto,netto_cad:parseFloat(netto.toFixed(4)),markup,prezzo_vendita:parseFloat((netto*markup).toFixed(4)),stato_approv:document.getElementById('f-stato-a').value,data_attesa:document.getElementById('f-datta').value};
-  const det=ll('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
-  det[numero].distinta.push(row);ls('det',det);syncDetBackground();CC._det=det[numero];
-  closeM();['distinta','approv','riepilogo'].forEach(id=>renderTabContent(id,CC,det[numero]));
-}
-
-function updateRiga(numero,rid){
-  const costo=parseFloat(document.getElementById('f-costo').value||0);
-  const sconto=parseFloat(document.getElementById('f-sconto').value||0);
-  const markup=parseFloat(document.getElementById('f-markup').value||2.25);
-  const netto=costo*(1-sconto/100);
-  const det=ll('det');if(!det[numero])return;
-  const idx=det[numero].distinta.findIndex(r=>r.id===rid);if(idx<0)return;
-  det[numero].distinta[idx]={
-    ...det[numero].distinta[idx],
-    sezione:document.getElementById('f-sez').value.trim()||det[numero].distinta[idx].sezione,
-    descrizione:document.getElementById('f-desc').value.trim(),
-    qty:parseInt(document.getElementById('f-qty').value||1),
-    fornitore:document.getElementById('f-forn').value.trim(),
-    codice:document.getElementById('f-cod').value.trim(),
-    costo_cad:costo,sconto,
-    netto_cad:parseFloat(netto.toFixed(4)),
-    markup,
-    prezzo_vendita:parseFloat((netto*markup).toFixed(4)),
-    stato_approv:document.getElementById('f-stato-a').value,
-    data_attesa:document.getElementById('f-datta').value
-  };
-  ls('det',det);syncDetBackground();CC._det=det[numero];
-  closeM();['distinta','approv','riepilogo'].forEach(id=>renderTabContent(id,CC,det[numero]));
-  showToast('✓ Componente aggiornato');
-}
-
-function saveSezione(numero){
-  const nome=(document.getElementById('f-sez-nome').value||'').trim();
-  if(!nome){alert('Inserisci un nome per la sezione');return;}
-  // Aggiunge una riga-intestazione sezione nella distinta
-  const row={id:uid(),sezione:nome,_intestazione:true,descrizione:'',qty:0,fornitore:'',codice:'',costo_cad:0,sconto:0,netto_cad:0,markup:1,prezzo_vendita:0,stato_approv:'',data_attesa:''};
-  const det=ll('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
-  det[numero].distinta.push(row);ls('det',det);syncDetBackground();CC._det=det[numero];
-  closeM();['distinta','approv','riepilogo'].forEach(id=>renderTabContent(id,CC,det[numero]));
-}
-
-function saveOre(numero){
-  const row={id:uid(),data:document.getElementById('f-dat').value,operatore:document.getElementById('f-op').value.trim(),descrizione:document.getElementById('f-desc').value.trim(),ore:parseFloat(document.getElementById('f-ore').value||0),tariffa:parseFloat(document.getElementById('f-tar').value||0)};
-  const det=ll('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
-  (det[numero].ore=det[numero].ore||[]).push(row);ls('det',det);syncDetBackground();CC._det=det[numero];
-  closeM();renderTabContent('ore',CC,det[numero]);renderTabContent('riepilogo',CC,det[numero]);
-}
-
-// ════════════════════════════════════════════
-// IMPORT MOVIMENTI BANCARI
-// ════════════════════════════════════════════
-
-function dropMovimenti(ev, banca){
-  ev.preventDefault();
-  const file=ev.dataTransfer.files[0];
-  if(file)parseMovimenti(file,banca);
-}
-function fileMovimenti(input,banca){
-  if(input.files[0])parseMovimenti(input.files[0],banca);
-}
-
-async function parseMovimenti(file, banca){
-  const resEl=document.getElementById('res-'+banca);
-  if(resEl)resEl.innerHTML='<span style="color:var(--text3)">⏳ Lettura in corso…</span>';
-  try{
-    let movimenti=[];
-    let nomeConto='';
-    let saldoFinale=null;
-    let dataUltimo=null;
-
-    if(banca==='fineco'){
-      ({movimenti,nomeConto,saldoFinale,dataUltimo}=await parseFinecoXLSX(file));
-    } else if(banca==='sella'){
-      ({movimenti,nomeConto,saldoFinale,dataUltimo}=await parseSellaCSV(file));
-    }
-
-    if(!movimenti.length){
-      if(resEl)resEl.innerHTML='<span style="color:var(--amber)">⚠ Nessun movimento trovato nel file.</span>';
-      return;
-    }
-
-    // Salva movimenti con anti-duplicati
-    const existing=lll('movimenti_'+banca);
-    const keys=new Set(existing.map(m=>m._key||''));
-    const nuovi=movimenti.filter(m=>!keys.has(m._key));
-    const merged=[...nuovi,...existing].sort((a,b)=>b.data.localeCompare(a.data));
-    ls('movimenti_'+banca, merged);
-
-    // Aggiorna saldo conto automaticamente
-    if(saldoFinale!==null && dataUltimo){
-      const contiAll=lll('conti');
-      const nomeContoNorm=nomeConto||({fineco:'Banca Fineco',sella:'Banca Sella'}[banca]||banca);
-      const idx=contiAll.findIndex(c=>(c.conto||'').toLowerCase().includes(banca.toLowerCase()));
-      const row={id:idx>=0?contiAll[idx].id:uid(),conto:nomeContoNorm,saldo:saldoFinale.toFixed(2),data_rilevazione:dataUltimo,note:'Import automatico da '+file.name};
-      if(idx>=0)contiAll[idx]=row; else contiAll.push(row);
-      ls('conti',contiAll);
-      await wPut('cassa.csv',contiAll,['conto','saldo','data_rilevazione','note']);
-      renderCassa();
-    }
-
-    const msg='✓ '+nuovi.length+' nuovi mov. su '+movimenti.length+' totali'+(saldoFinale!==null?' · saldo aggiornato: €'+fmt(saldoFinale):'');
-    if(resEl)resEl.innerHTML='<span style="color:var(--green);font-weight:600">'+msg+'</span>';
-    showToast(msg);
-
-  }catch(err){
-    if(resEl)resEl.innerHTML='<span style="color:var(--red)">✗ '+err.message+'</span>';
-    console.error('Import movimenti error:',err);
-  }
-}
-
-async function parseFinecoXLSX(file){
-  return new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=async e=>{
-      try{
-        if(typeof XLSX==='undefined'){
-          await new Promise((res,rej)=>{
-            const s=document.createElement('script');
-            s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-            s.onload=res;s.onerror=()=>rej(new Error('Impossibile caricare SheetJS'));
-            document.head.appendChild(s);
-          });
-        }
-        const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
-        const ws=wb.Sheets[wb.SheetNames[0]];
-        const aoa=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null});
-
-        // Estrai intestazione: R0=conto, R2=periodo, R4=saldo
-        let nomeConto='Banca Fineco';
-        let saldoFinale=null;
-        for(let i=0;i<10;i++){
-          const r=aoa[i];if(!r)continue;
-          const v=String(r[0]||'');
-          if(v.includes('Conto Corrente:'))nomeConto='Banca Fineco ('+v.split(':')[1].trim()+')';
-          if(v.includes('Saldo Finale:')){
-            const m=v.match(/Saldo Finale:\s*([\d.,]+)/);
-            if(m)saldoFinale=parseFloat(m[1].replace(/\./g,'').replace(',','.'));
-          }
-        }
-
-        // Trova riga header (Data_Operazione)
-        let hdrIdx=-1;
-        for(let i=0;i<aoa.length;i++){
-          if(aoa[i]&&String(aoa[i][0]||'').includes('Data_Operazione')){hdrIdx=i;break;}
-        }
-        if(hdrIdx<0)throw new Error('Header "Data_Operazione" non trovato — controlla il file Fineco.');
-
-        const movimenti=[];
-        let dataUltimo=null;
-
-        for(let i=hdrIdx+1;i<aoa.length;i++){
-          const r=aoa[i];if(!r||!r[0])continue;
-          // Data: può essere Date object o stringa
-          let data='';
-          if(r[0] instanceof Date){
-            data=r[0].toISOString().slice(0,10);
-          } else if(typeof r[0]==='number'){
-            // Excel serial date
-            const d=XLSX.SSF.parse_date_code(r[0]);
-            data=d.y+'-'+String(d.m).padStart(2,'0')+'-'+String(d.d).padStart(2,'0');
-          } else {
-            const s=String(r[0]);
-            const m=s.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-            if(m)data=`${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
-          }
-          if(!data)continue;
-
-          const entrate=parseFloat(r[2])||0;
-          const uscite=parseFloat(r[3])||0; // già negativo
-          const importo=entrate>0?entrate:uscite; // uscite < 0
-          const desc=String(r[4]||'').trim();
-          const descCompl=String(r[5]||'').trim();
-          const key=`fineco_${data}_${importo}_${desc.slice(0,20)}`;
-
-          movimenti.push({
-            banca:'fineco',data,
-            entrata:entrate>0?entrate:0,
-            uscita:uscite<0?Math.abs(uscite):0,
-            importo,
-            descrizione:desc,
-            dettaglio:descCompl,
-            stato:String(r[6]||''),
-            _key:key
-          });
-          if(!dataUltimo||data>dataUltimo)dataUltimo=data;
-        }
-
-        resolve({movimenti,nomeConto,saldoFinale,dataUltimo});
-      }catch(err){reject(err);}
-    };
-    reader.onerror=()=>reject(new Error('Errore lettura file'));
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-async function parseSellaCSV(file){
-  return new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=e=>{
-      try{
-        const text=e.target.result;
-        const lines=text.split(/\r?\n/).filter(l=>l.trim());
-
-        // Riga 0 = header
-        const headers=lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,''));
-
-        const iData=headers.findIndex(h=>h.toLowerCase().includes('data operazione'));
-        const iDesc=headers.findIndex(h=>h.toLowerCase()==='descrizione');
-        const iContr=headers.findIndex(h=>h.toLowerCase()==='controparte');
-        const iDeb=headers.findIndex(h=>h.toLowerCase()==='debito');
-        const iCred=headers.findIndex(h=>h.toLowerCase()==='credito');
-        const iImp=headers.findIndex(h=>h.toLowerCase().includes('importo'));
-
-        // Cerca righe saldo (Descrizione="Saldo al...") per estrarre saldo finale
-        let saldoFinale=null;
-        let dataUltimo=null;
-        const movimenti=[];
-
-        for(let i=1;i<lines.length;i++){
-          const cols=lines[i].split(',').map(c=>c.trim().replace(/^"|"$/g,''));
-          const desc=cols[iDesc]||'';
-
-          // Riga saldo — usa parseIta (formato italiano con punto migliaia)
-          if(desc.startsWith('Saldo al')){
-            const raw=(cols[iImp]||'').trim();
-            const s=parseFloat(raw.replace(/\./g,'').replace(',','.'));
-            if(!isNaN(s))saldoFinale=s;
-            continue;
-          }
-
-          const dataRaw=cols[iData]||'';
-          if(!dataRaw||!dataRaw.match(/\d{2}\/\d{2}\/\d{4}/))continue;
-          const dm=dataRaw.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-          const data=dm?dm[3]+'-'+dm[2].padStart(2,'0')+'-'+dm[1].padStart(2,'0'):'';
-          if(!data)continue;
-
-          // parseIta: converte numero formato italiano (1.234,56) in float
-          const parseIta=v=>{
-            if(v===null||v===undefined||v==='')return 0;
-            const s=String(v).trim();
-            if(!s)return 0;
-            // Se già numero JS valido (es. da SheetJS) restituisce direttamente
-            if(!isNaN(Number(s))&&!s.includes(','))return parseFloat(s)||0;
-            // Formato italiano: rimuovi punti migliaia, converti virgola decimale
-            return parseFloat(s.replace(/\./g,'').replace(',','.'))||0;
-          };
-
-          const deb=parseIta(cols[iDeb]);
-          const cred=parseIta(cols[iCred]);
-          const imp=parseIta(cols[iImp]);
-          const controparte=cols[iContr]||'';
-          const key=`sella_${data}_${imp}_${desc.slice(0,20)}`;
-
-          movimenti.push({
-            banca:'sella',data,
-            entrata:cred>0?cred:0,
-            uscita:deb>0?deb:0,
-            importo:imp,
-            descrizione:desc+(controparte?' — '+controparte:''),
-            dettaglio:controparte,
-            stato:'',_key:key
-          });
-          if(!dataUltimo||data>dataUltimo)dataUltimo=data;
-        }
-
-        resolve({movimenti,nomeConto:'Banca Sella',saldoFinale,dataUltimo});
-      }catch(err){reject(err);}
-    };
-    reader.onerror=()=>reject(new Error('Errore lettura file'));
-    reader.readAsText(file,'utf-8');
-  });
-}
-
-async function salvaRevolut(){
-  const saldo=parseFloat(document.getElementById('rev-saldo')?.value||'');
-  const data=document.getElementById('rev-data')?.value||'';
-  if(isNaN(saldo)||!data){showToast('Inserisci saldo e data');return;}
-  const conti=lll('conti');
-  const idx=conti.findIndex(c=>(c.conto||'').toLowerCase().includes('revolut'));
-  const row={id:idx>=0?conti[idx].id:uid(),conto:'Revolut',saldo:saldo.toFixed(2),data_rilevazione:data,note:'Aggiornato da estratto conto PDF'};
-  if(idx>=0)conti[idx]=row; else conti.push(row);
-  ls('conti',conti);
-  await wPut('cassa.csv',conti,['conto','saldo','data_rilevazione','note']);
-  renderCassa();
-  const el=document.getElementById('res-revolut');
-  if(el)el.innerHTML=`<span style="color:var(--green);font-weight:600">✓ Saldo Revolut aggiornato: €${fmt(saldo)}</span>`;
-  showToast('✓ Saldo Revolut aggiornato');
-}
-
-async function saveConto(){
-  const nome=(document.getElementById('f-nome')||{}).value?.trim()||'';
-  const saldo=(document.getElementById('f-saldo')||{}).value||'0';
-  const data_rilevazione=(document.getElementById('f-dat')||{}).value||'';
-  const note=(document.getElementById('f-note')||{}).value?.trim()||'';
-  if(!nome){showToast('Inserisci il nome del conto');return;}
-  const all=lll('conti');
-  // Upsert: aggiorna se esiste già un conto con lo stesso nome
-  const idx=all.findIndex(c=>(c.conto||c.nome||'').toLowerCase()===nome.toLowerCase());
-  const row={id:idx>=0?all[idx].id:uid(),conto:nome,saldo,data_rilevazione,note};
-  if(idx>=0)all[idx]=row;else all.push(row);
-  ls('conti',all);
-  await wPut('cassa.csv',all,['conto','saldo','data_rilevazione','note']);
-  closeM();renderCassa();
-  showToast('✓ Saldo aggiornato: '+nome);
-}
-
-async function saveScad(){
-  const row={
-    id:uid(),
-    data:document.getElementById('f-dat').value,
-    descrizione:(document.getElementById('f-desc')||{}).value?.trim()||'',
-    importo:document.getElementById('f-imp').value||'0',
-    categoria:(document.getElementById('f-cat')||{}).value||'',
-    pagato:'no',
-    _fiscale:false
-  };
-  if(!row.data){showToast('Inserisci la data');return;}
-  const data=lll('scad');data.push(row);ls('scad',data);
-  await wPut('scadenze.csv',[row,...(SD.scad||[])],['data','descrizione','importo','categoria','pagato']);
-  closeM();renderScad();
-}
-
-function rigeneraScadenzeFatture(){
-  const scadenze=lll('scad');
-  const nonFatt=scadenze.filter(s=>!s._fatt_key);
-  ls('scad',nonFatt);
-  const fatture=SD.fatt||lll('fatt');
-  if(!fatture.length){showToast('Nessuna fattura importata');return;}
-  const n=aggiungiScadenzeDaFatture(fatture);
-  showToast(`✓ Rigenerate ${n} scadenze da ${fatture.length} fatture`);
-}
-
-function saveScadEdit(sid){
-  const all=lll('scad');
-  const idx=all.findIndex(x=>x.id===sid);
-  if(idx<0){showToast('Scadenza non trovata');return;}
-  all[idx]={
-    ...all[idx],
-    descrizione:(document.getElementById('f-desc')||{}).value?.trim()||all[idx].descrizione,
-    data:document.getElementById('f-dat').value||all[idx].data,
-    importo:document.getElementById('f-imp').value||'0',
-    categoria:(document.getElementById('f-cat')||{}).value||all[idx].categoria||'',
-    pagato:(document.getElementById('f-pagata')||{}).value||'no',
-  };
-  ls('scad',all);
-  closeM();renderScad();
-  showToast('✓ Scadenza aggiornata');
-}
-
-function saveTodo(){
-  const data=lll('todo');data.push({id:uid(),testo:document.getElementById('f-desc').value.trim(),pri:document.getElementById('f-pri').value,done:false});
-  ls('todo',data);closeM();renderTodo();
-}
-
-function saveCfg2(){
-  const f24key=(document.getElementById('cfg-f24key')||{}).value||'';
-  const f24tipo=(document.getElementById('cfg-f24tipo')||{}).value||'all';
-  const f24sync=(document.getElementById('cfg-f24sync')||{}).value||'60';
-  const oldCfg=lCfg();
-  // Salva markup per cliente
-  const markup_clienti={};
-  Object.keys(CMAP).forEach(cod=>{
-    const el=document.getElementById('cfg-mk-'+cod);
-    if(el&&el.value)markup_clienti[cod]=parseFloat(el.value)||2.25;
-  });
-  sCfg({
-    nc_url:document.getElementById('cfg-url').value.trim().replace(/\/$/,''),
-    nc_user:document.getElementById('cfg-user').value.trim(),
-    nc_pass:document.getElementById('cfg-pass').value.trim(),
-    f24_key:f24key||oldCfg.f24_key||'',
-    f24_tipo:f24tipo,
-    f24_sync:f24sync,
-    f24_ok:oldCfg.f24_ok||false,
-    markup_clienti
-  });
-  closeM();
-  if(f24key&&f24key!==oldCfg.f24_key){
-    testF24Key(f24key,f24tipo,f24sync);
-  } else {
-    syncNow();
-  }
-}
-
-async function testF24Key(key,tipo,syncMin){
-  const cfg=getCfg();
-  if(!cfg.ok){showToast('Configura prima Nextcloud');return;}
-  showToast('Salvataggio API key Fattura24…');
-  // Scrive f24_config.txt in Nextcloud — lo script Python lo legge al prossimo ciclo
-  await pushF24Config(key,tipo,syncMin);
-  // Prova a verificare via proxy (opzionale, non bloccante)
-  try{
-    const r=await fetch(`${cfg.nc_url}/f24test`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:key}),signal:AbortSignal.timeout(5000)});
-    if(r.ok){
-      const d=await r.json().catch(()=>({}));
-      if(d.ok){const c=lCfg();c.f24_ok=true;sCfg(c);showToast('✓ API key Fattura24 attiva e verificata!');}
-      else showToast('API key salvata — verifica su Fattura24 se attiva');
-    } else {
-      showToast('API key salvata in Nextcloud (/Dashboard/f24_config.txt)');
-    }
-  }catch{
-    showToast('API key salvata — lo script la leggerà al prossimo sync');
-  }
-  syncNow();
-}
-
-async function pushF24Config(key,tipo,syncMin){
-  const cfg=getCfg();
-  if(!cfg.ok)return;
-  const content=`F24_API_KEY=${key}\nF24_TIPO=${tipo}\nF24_SYNC_MIN=${syncMin}\n`;
-  try{
-    await fetch(`${cfg.nc_url}/remote.php/dav/files/${cfg.nc_user}/Dashboard/f24_config.txt`,{
-      method:'PUT',
-      headers:{'Authorization':'Basic '+btoa(cfg.nc_user+':'+cfg.nc_pass),'Content-Type':'text/plain'},
-      body:content
-    });
-  }catch{/* silenzioso */}
-}
-
-
-function exportAll(){
-  const blob=new Blob([JSON.stringify({commesse:lll('comm'),conti:lll('conti'),scadenze:lll('scad'),todos:lll('todo'),dettagli:ll('det'),exported:new Date().toISOString()},null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`asg-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();
-}
-
-// ═══════════════════════════════════════════════
-// DATABASE FORNITORI
-// ═══════════════════════════════════════════════
-const FORNITORI=[
-  {
-    id:'ARES',nome:'Ares Elettronica / Tecfluid',zona:'Reggio Emilia (RE)',colore:'#166534',emoji:'⚙',
-    url:'https://www.areselettronica.it',
-    categorie:['Minicentraline PU05/PU10/PU20','Collettori modulari','Valvole integrate','Pompe Gr.1/2','Motori DC/AC','Serbatoi','Blocchi modulari','Distanziali','Bobine','Controllo elettronico'],
-    note:'Fornitore principale per minicentraline modulari ASG. Ottimi prezzi e disponibilità su serie PU. Listino 2022 disponibile. Stesso gruppo di Tecfluid (RE). Tecfluid produce anche sistemi completi per applicazioni industriali (sollevatori, dock leveller, forbici) e mobile (sponde camion, ribaltabili, barche).',
-    accordo:'Listino accordato 2022',
-    contatti:{tel:'+39 0522 926 369',email:'info@tecfluid.it'},
-    applicazioni:[
-      {cat:'Garage & Sollevamento',emoji:'🚗',items:['Ponte sollevatore 2 colonne (max 5.5 kW, 4000 PSI, 5 GPM)','Ponte HD a 2 colonne con livellamento elettronico','Colonna mobile (12/24V DC + AC, Energy Recovery)','Piattaforma sollevatore HD (fino a 13 kW, 6 GPM, serbatoio 25 GAL)','Forbice sollevatore (max 4 kW, livellamento opzionale)','Cambia pneumatici truck (5 assi, pompa silenzio)','Cambia pneumatici HD','Sollevatore moto (telecomando opzionale)']},
-      {cat:'Logistica & Dock',emoji:'🏭',items:['Dock leveller swing lip (max 1.5 kW, 3000 PSI)','Dock leveller telescopic lip','Combi leveller truck & van','Truck immobilizer (soluzione CETOP + cartucce)']},
-      {cat:'Industriale Generale',emoji:'🔧',items:['Compattatore carta (soft-switch CETOP)','Colonnina mobile (IP67 submerged option)','Car parking system (pompa silenzio)','Tavola elevatrice (remote control, versione sommersa)']},
-      {cat:'Mobile — Camion',emoji:'🚚',items:['Sponda idraulica (12/24V DC, 4000 PSI)','Sponda US version','Ribaltabile tipper (wireless remote)','Wing body (wired/wireless)','Snowplow pick-up (wireless)','Wheelchair lift']},
-      {cat:'Mobility',emoji:'🚐',items:['Stabilizzatore caravan (livellamento elettronico)','Platform scissor lift (brushless, energy recovery)','Pick-up tow truck','Pick-up scissor lift','Forklift (brushless, energy recovery)','Sweeper']},
-      {cat:'Marine',emoji:'⛵',items:['Passerella (gangway, wireless)','Tender lift','Boat lift (wired/wireless)','Boat steering system (24V brushless)']},
-    ]
-  },
-  {
-    id:'CPA',nome:'CPA Fluid',zona:'Rivoli (TO)',colore:'#1a56db',emoji:'🔵',
-    url:'https://www.cpafluid.eu',
-    categorie:['Elettrovalvole Atos','Distributori CETOP','Pompe ingranaggi','Pompe palette/vite','Pompe variabili','Valvole di massima','Valvole riduttrici','Valvole di flusso','Valvole di ritegno','Controbilanciamento','Giunti e lanterne','Filtri','Accumulatori'],
-    note:'Vasto magazzino con spedizione rapida DHL. Distributore principale Atos. Ottimo per componenti standard con consegna urgente. E-shop con prezzi visibili.',
-    accordo:'Prezzi concordati — accesso e-shop',
-    contatti:{tel:'+39 011 9591521',email:'info@cpafluid.eu'}
-  },
-  {
-    id:'FIZ',nome:'FIZ Srl / Tecnical Impianti',zona:'Verona + Bergamo',colore:'#5b21b6',emoji:'🟣',
-    url:'https://www.fizsrl.it',
-    categorie:['Bosch Rexroth','Elettrovalvole proporzionali','Distributori DN10/16/25','Pompe pistoni assiali','Pompe palette variabili','Motori idraulici','Cilindri','Centraline su misura','Tubi flessibili','Pneumatica','SKF','Festo','Siemens'],
-    note:'Gruppo ampio con Tecnical Impianti (partner diretto). Accesso a catalogo completo Bosch Rexroth a ottimi prezzi. Molti costruttori alternativi gestiti nel gruppo. Buona disponibilità e tempi.',
-    accordo:'Accordo tramite Tecnical Impianti',
-    contatti:{tel:'',email:''}
-  },
-  {
-    id:'PACO',nome:'Pa.Co Fluid',zona:'Legnano (MI) + Parma (PR)',colore:'#0369a1',emoji:'🔧',
-    url:'https://pacofluid.it',
-    categorie:['Tubi flessibili raccordati','Raccorderia BSP/UNF/JIC/ORFS','Adattatori','Tubi rigidi','Valvole a sfera','Valvole di ritegno','Scambiatori di calore','Pneumatica','Cilindri pneumatici','Accessori serraggio'],
-    note:'Specialista tubi flessibili raccordati e raccorderia. Ampio magazzino ~2000 articoli. Assemblaggio e collaudo in sede. Ottimo per urgenze su tubi e raccordi.',
-    accordo:'Prezzi concordati — consegna rapida',
-    contatti:{tel:'+39 0331 455644',email:'info@pacosrl.it'}
-  },
-  {
-    id:'COLFER',nome:'Colfer Srl',zona:'Monza (MB)',colore:'#78350f',emoji:'🏭',
-    url:'',
-    categorie:['Carpenteria su disegno','Serbatoi oleodinamici speciali','Lamierazione','Verniciatura epossidica','Strutture saldate','Basamenti motori-pompa'],
-    note:'Partner carpenteria e verniciatura. Serbatoi e strutture a disegno in tempi brevi. Verniciatura RAL epossidica/poliuretanica. Ideale per serbatoi speciali fuori standard e basamenti personalizzati.',
-    accordo:'Collaborazione diretta',
-    contatti:{tel:'',email:''}
-  },
-  {
-    id:'MORATTI',nome:'M.B. Moratti',zona:'Rovato (BS)',colore:'#0f766e',emoji:'🔩',
-    url:'',
-    categorie:['Cilindri oleodinamici saldati','Cilindri a disegno','Cilindri grandi dimensioni','Cilindri telescopici','Riparazione cilindri'],
-    note:'Produzione cilindri oleodinamici saldati su misura, anche di grandi dimensioni. Ottimo per cilindri non standard e riparazioni. Tempi di consegna competitivi.',
-    accordo:'Collaborazione diretta',
-    contatti:{tel:'',email:''}
-  },
-  {
-    id:'GTA',nome:'GTA Lombardia',zona:'Lombardia',colore:'#64748b',emoji:'📦',
-    url:'',
-    categorie:['Catalogo ampio generico','Valvole','Pompe','Motori','Cilindri','Raccorderia','Filtri','Serbatoi','Accessori'],
-    note:'Catalogo molto ampio. Prezzi e tempi non sempre ottimali ma utile per componenti difficilmente reperibili altrove o per completare un ordine.',
-    accordo:'Listino standard',
-    contatti:{tel:'',email:''}
-  },
-  {
-    id:'SMEM',nome:'Smem Srl',zona:'Nord Italia',colore:'#b91c1c',emoji:'⚡',
-    url:'',
-    categorie:['Motori elettrici AC trifase','Motori AC monofase','Motori IE3','Motori ATEX','Motori freno','Riduttori'],
-    note:'Ottima disponibilità e prezzi competitivi su motori elettrici AC. Riferimento principale per motori standard da catalogo con consegna rapida.',
-    accordo:'Prezzi concordati',
-    contatti:{tel:'',email:''}
-  },
-  {
-    id:'XF',nome:'XF Srl (Fox Group)',zona:'Italia',colore:'#92400e',emoji:'📊',
-    url:'',
-    categorie:['Pressostati','Accumulatori a vescica','Accumulatori a membrana','Accumulatori a pistone','Trasduttori di pressione','Manometri digitali'],
-    note:'Società del gruppo Fox Srl. Riferimento per pressostati e accumulatori. Buona disponibilità su gamma standard.',
-    accordo:'Listino concordato',
-    contatti:{tel:'',email:''}
-  },
-  {
-    id:'PIOTTI',nome:'Piotti Oleodinamica',zona:'Italia',colore:'#4338ca',emoji:'🛢',
-    url:'',
-    categorie:['Componenti oleodinamica generici','Valvole','Pompe','Filtri','Raccorderia'],
-    note:'Distributore oleodinamica generale.',
-    accordo:'Da definire',
-    contatti:{tel:'',email:''}
-  },
-  {
-    id:'BART',nome:'Bart Srl',zona:'Milano (MI)',colore:'#0891b2',emoji:'🔬',
-    url:'https://www.bart-e.com',
-    categorie:['Manometri a secco','Manometri a glicerina','Manometri ATEX','Manometri isometrici','Salvamanometri / esclusori','Termometri','Valvole a sfera inox','Raccordi strumentazione'],
-    note:'Specialista manometri e strumentazione. Gamma completa da 0 a 1000 bar. Prodotti certificati CE/Accredia. Versioni ATEX disponibili. Salvamanometri esclusori di vari tipi.',
-    accordo:'Listino concordato',
-    contatti:{tel:'',email:'info@bart-e.com'}
-  },
-];
-
-// ═══════════════════════════════════════════════
-// TASSONOMIA CATEGORIE OLEODINAMICA
-// ═══════════════════════════════════════════════
-const CAT_TREE=[
-  {id:'valvole',label:'Valvole',emoji:'⚡',colore:'#5b21b6',sub:[
-    {id:'val-direz',label:'Direzionali (Distributori)',fornitori:['CPA','FIZ','GTA'],sub2:['A piastra CETOP3 (DN6)','A piastra CETOP5 (DN10)','A piastra CETOP7 (DN16)','In linea / a cartuccia','Proporzionali','Manuali/meccaniche','Sicurezza monitorate']},
-    {id:'val-press',label:'Pressione',fornitori:['CPA','FIZ','ARES','GTA'],sub2:['Valvole di massima (in linea)','Valvole di massima (a piastra)','Proporzionali di pressione','Riduttrici di pressione','Sequenza','Scarico / unloading']},
-    {id:'val-flusso',label:'Flusso',fornitori:['CPA','ARES','FIZ','GTA'],sub2:['Regolatrici compensate (in linea)','Regolatrici (a piastra)','Proporzionali di flusso','Divisori di flusso 50/50','Prioritarie']},
-    {id:'val-ritegno',label:'Ritegno & Bilanciamento',fornitori:['CPA','ARES','FIZ','PACO','GTA'],sub2:['Ritegni a cartuccia','Ritegni in linea','Ritegni pilotati','Valvole di bilanciamento (controbilanciamento)','Ritegni CETOP']},
-    {id:'val-blocco',label:'Valvole di blocco / tenuta',fornitori:['CPA','ARES','FIZ'],sub2:['A cartuccia singola tenuta NC','A cartuccia doppia tenuta','Elettriche a cartuccia (V42/V43)','Pneumatiche doppia tenuta']},
-  ]},
-  {id:'pompe',label:'Pompe',emoji:'🔄',colore:'#0f766e',sub:[
-    {id:'p-ingr',label:'Ad ingranaggi esterni',fornitori:['ARES','CPA','FIZ','GTA'],sub2:['Gruppo 05 (max 2cc)','Gruppo 1 (max 9.8cc)','Gruppo 2 (max 36cc)','Gruppo 3','Pompe reversibili Gr.1','Pompe doppie Gr.2+Gr.1','Pompe a rotori elicoidali (silenziose)']},
-    {id:'p-pale',label:'A palette',fornitori:['CPA','FIZ'],sub2:['Cilindrata fissa','Cilindrata variabile','Bassa rumorosità']},
-    {id:'p-pist',label:'A pistoni assiali',fornitori:['FIZ','CPA'],sub2:['Cilindrata fissa','Cilindrata variabile','Con regolatore di pressione','Con regolatore Load Sensing']},
-    {id:'p-spec',label:'Speciali',fornitori:['CPA','GTA'],sub2:['Pompe a vite','Pompe a membrana','Hand pump (manuali)']},
-  ]},
-  {id:'motori-el',label:'Motori elettrici',emoji:'⚡',colore:'#b91c1c',sub:[
-    {id:'mot-ac',label:'AC trifase (B14/B5)',fornitori:['SMEM','ARES','FIZ'],sub2:['MEC71 0.25-0.55kW','MEC80 0.75-1.1kW','MEC90 1.5-2.2kW','MEC100-112 3-4kW','MEC132 5.5-9.2kW','IE3 alta efficienza','ATEX','Freno','Flangia quadra (FQ)']},
-    {id:'mot-mono',label:'AC monofase',fornitori:['SMEM','ARES'],sub2:['MEC71 0.25-0.55kW','MEC80 0.75-1.1kW','MEC90 1.5-2.2kW','Condensatore avviamento']},
-    {id:'mot-dc',label:'DC (12/24/48V)',fornitori:['ARES'],sub2:['12V 500W-2400W','24V 500W-3000W','48V','Con ventilazione forzata','Reversibili IP44','Non reversibili IP54']},
-    {id:'mot-rid',label:'Riduttori',fornitori:['FIZ','SMEM'],sub2:['Riduttori coassiali','Riduttori ortogonali']},
-  ]},
-  {id:'mot-idr',label:'Motori idraulici',emoji:'🔁',colore:'#0369a1',sub:[
-    {id:'mi-ingr',label:'Ad ingranaggi',fornitori:['FIZ','CPA','GTA'],sub2:['Gr.1 piccoli','Gr.2 medi','Gr.3 grandi']},
-    {id:'mi-orb',label:'Orbitali (gerotori)',fornitori:['FIZ','CPA'],sub2:['50-800cc/giro','Con freno','Con riduttore']},
-    {id:'mi-pist',label:'A pistoni assiali',fornitori:['FIZ'],sub2:['Cilindrata fissa','Cilindrata variabile']},
-  ]},
-  {id:'cilindri',label:'Cilindri idraulici',emoji:'📐',colore:'#92400e',sub:[
-    {id:'cil-sal',label:'Saldati su misura',fornitori:['MORATTI'],sub2:['Alesaggio 40-500mm','Stelo singolo','Stelo passante','Telescopici','Grandi dimensioni']},
-    {id:'cil-tir',label:'A tiranti (standard)',fornitori:['FIZ','CPA','GTA'],sub2:['ISO 6020/1','ISO 6020/2','ISO 6022','Compatti']},
-    {id:'cil-rep',label:'Riparazione cilindri',fornitori:['MORATTI'],sub2:['Revisione guarnizioni','Rettifica stelo','Rettifica camicia']},
-  ]},
-  {id:'tubi-fless',label:'Tubi flessibili',emoji:'🌀',colore:'#0891b2',sub:[
-    {id:'tf-rac',label:'Raccordati su misura',fornitori:['PACO','FIZ'],sub2:['DN6 (1/4")','DN10 (3/8")','DN12 (1/2")','DN16 (5/8")','DN19 (3/4")','DN25 (1")','DN32 (1"1/4)','Acciaio al carbonio','Acciaio inox','PVC']},
-    {id:'tf-rig',label:'Tubi rigidi',fornitori:['PACO'],sub2:['In barre 6m','Rivestiti','Inox']},
-  ]},
-  {id:'raccord',label:'Raccorderia',emoji:'🔩',colore:'#0891b2',sub:[
-    {id:'rac-bsp',label:'BSP (gas)',fornitori:['PACO','CPA','GTA'],sub2:['Maschio-maschio','Femmina-femmina','Riduzioni','A gomito 90°','A T']},
-    {id:'rac-unf',label:'UNF (SAE)',fornitori:['PACO','ARES','CPA'],sub2:['7/16-20 UNF','9/16-18 UNF','3/4-16 UNF','7/8-14 UNF','1-1/16-12 UNF']},
-    {id:'rac-jic',label:'JIC / 37°',fornitori:['PACO','CPA'],sub2:['Maschio JIC','Femmina JIC']},
-    {id:'rac-orfs',label:'ORFS (O-ring face seal)',fornitori:['PACO','CPA'],sub2:['Maschio ORFS','Femmina ORFS','Perni']},
-    {id:'rac-metr',label:'Metrici',fornitori:['PACO','CPA','GTA'],sub2:['M12×1.5','M14×1.5','M16×1.5','M18×1.5','M22×1.5','M26×1.5','M33×2']},
-    {id:'rac-adatt',label:'Adattatori misti',fornitori:['PACO','CPA','GTA'],sub2:['BSP → UNF','BSP → Metrico','JIC → ORFS','Riduzioni universali']},
-  ]},
-  {id:'serbatoi',label:'Serbatoi & Vasche',emoji:'🛢',colore:'#78350f',sub:[
-    {id:'serb-std',label:'Standard serie ASG',fornitori:['ARES'],sub2:['Lamiera 1-3L (PU05/10)','Lamiera 4-12L (PU10)','Plastica 1-12L','Lamiera Ø175 30-90L (PU20)']},
-    {id:'serb-spec',label:'Speciali a disegno',fornitori:['COLFER'],sub2:['Vasche quadre/rettangolari','Con flange custom','Con divisori interni','Verniciatura epossidica RAL','Con kit filtraggio completo']},
-  ]},
-  {id:'filtri',label:'Filtri',emoji:'🔽',colore:'#166534',sub:[
-    {id:'fil-asp',label:'In aspirazione',fornitori:['ARES','CPA','GTA'],sub2:['G1/4" fino 5 l/min','G3/8" fino 15 l/min','1/2" fino 30+ l/min','Magnetici']},
-    {id:'fil-man',label:'In mandata (alta pressione)',fornitori:['CPA','FIZ','GTA'],sub2:['10 micron','25 micron','Corpo alluminio','Corpo ghisa']},
-    {id:'fil-rit',label:'In ritorno (bassa pressione)',fornitori:['CPA','ARES','GTA'],sub2:['20 micron','10 micron','Con indicatore intasamento']},
-    {id:'fil-line',label:'In linea',fornitori:['CPA','FIZ'],sub2:['Doppi (change-over)','Con bypass termico']},
-  ]},
-  {id:'strument',label:'Strumentazione',emoji:'📏',colore:'#0891b2',sub:[
-    {id:'str-man',label:'Manometri',fornitori:['BART','CPA','GTA'],sub2:['A secco Ø63 fino 400 bar','A glicerina Ø63','Isometrici alta sovrappressione','ATEX','Con contatti elettrici','0-60 / 0-150 / 0-250 / 0-400 bar']},
-    {id:'str-salva',label:'Salvamanometri / esclusori',fornitori:['BART','CPA'],sub2:['1/4" BSP diritti','1/4" BSP a 90°','Con smorzatore']},
-    {id:'str-press',label:'Pressostati',fornitori:['XF','CPA'],sub2:['Regolabili NC/NA','Con isteresi','4-20mA']},
-    {id:'str-trasd',label:'Trasduttori pressione',fornitori:['XF','CPA','FIZ'],sub2:['0-10V','4-20mA','IO-Link','ATEX']},
-    {id:'str-temp',label:'Termometri & sensori T°',fornitori:['BART','CPA'],sub2:['A bimetallo','A espansione gas','Elettronici PT100']},
-    {id:'str-flow',label:'Misuratori di portata',fornitori:['CPA','FIZ'],sub2:['Ad ingranaggi','Elettromagnetici','Ultrasuoni']},
-  ]},
-  {id:'accum',label:'Accumulatori',emoji:'🔋',colore:'#4338ca',sub:[
-    {id:'acc-vesg',label:'A vescica',fornitori:['XF','CPA','FIZ'],sub2:['0.75-50L','Alta pressione 350-500 bar','Bassa pressione']},
-    {id:'acc-memb',label:'A membrana',fornitori:['XF','CPA'],sub2:['Piccoli 0.075-1L','Compatti']},
-    {id:'acc-pist',label:'A pistone',fornitori:['XF','FIZ'],sub2:['Grandi volumi','Alta pressione']},
-    {id:'acc-acc',label:'Accessori accumulatori',fornitori:['XF','CPA'],sub2:['Blocchi di sicurezza','Valvole di isolamento','Caricatori gas N2']},
-  ]},
-  {id:'scamb',label:'Scambiatori di calore',emoji:'🌡',colore:'#0891b2',sub:[
-    {id:'sc-olio-aria',label:'Olio-aria',fornitori:['CPA','GTA'],sub2:['A ventilazione naturale','A ventilazione forzata 12/24V DC','Trifase 230/400V']},
-    {id:'sc-olio-acq',label:'Olio-acqua',fornitori:['CPA','PACO','GTA'],sub2:['A fascio tubiero','A piastre']},
-  ]},
-  {id:'carpent',label:'Carpenteria speciale',emoji:'🏭',colore:'#78350f',sub:[
-    {id:'carp-serb',label:'Serbatoi su disegno',fornitori:['COLFER'],sub2:['Lamiera nera verniciata','Acciaio inox','Con flange SAE/BSP']},
-    {id:'carp-basam',label:'Basamenti e strutture',fornitori:['COLFER'],sub2:['Basamento motore-pompa','Supporti centralina','Quadri di controllo']},
-  ]},
-];
-
-// ═══════════════════════════════════════════════
-// STATO RICERCA FORNITORI
-// ═══════════════════════════════════════════════
-let _catSel=''; // categoria selezionata
-let _fornSel=''; // fornitore chip selezionato
-
-function showView(v){
-  // Mappa vecchi ID view ai nuovi
-  const map={'dashboard':'home','magazzino':'magazzino','fornitori':'fornitori','import':'import-fatture'};
-  navTo(map[v]||v);
-}
-
-function copyRDO(){
-  const txt=(document.getElementById('rdo-body')||{}).value||'';
-  const subj=(document.getElementById('rdo-subj')||{}).value||'';
-  const full=subj+'\n\n'+txt;
-  navigator.clipboard.writeText(full).then(()=>showToast('Testo copiato negli appunti!'));
-}
-
-function salvaTemplate(fornId){
-  const tpl=(document.getElementById('rdo-tpl-body')||{}).value||'';
-  const templates=JSON.parse(localStorage.getItem('asg_rdo_templates')||'{}');
-  templates[fornId]=tpl;
-  localStorage.setItem('asg_rdo_templates',JSON.stringify(templates));
-  showToast('✓ Modello salvato per questo fornitore');
-  // Aggiorna il testo nel pannello componi se è visibile
-  const f=FORNITORI.find(x=>x.id===fornId)||{nome:'Fornitore'};
-  const oggi=new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'});
-  const bodyEl=document.getElementById('rdo-body');
-  if(bodyEl)bodyEl.value=tpl.replace('{FORNITORE}',f.nome).replace('{DATA}',oggi);
-}
-
-function ripristinaTemplatePredefinito(fornId){
-  const templates=JSON.parse(localStorage.getItem('asg_rdo_templates')||'{}');
-  delete templates[fornId];
-  localStorage.setItem('asg_rdo_templates',JSON.stringify(templates));
-  const el=document.getElementById('rdo-tpl-body');
-  if(el)el.value=`Spett.le {FORNITORE},\n\nin riferimento ai Vs. prodotti/servizi, con la presente siamo a richiedere un'offerta per i seguenti articoli:\n\n1. [CODICE/DESCRIZIONE] — qty ___\n2. \n\nSi prega di indicare:\n- Prezzo unitario IVA esclusa\n- Disponibilità a magazzino\n- Tempi di consegna\n- Condizioni di resa\n\nRingraziamo anticipatamente e restiamo in attesa di un Vostro riscontro.\n\nCordiali saluti,`;
+  if(type==='config'){const c=lCfg();return('<h3>⚙ Configurazione</h3>\n\n  <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">☁ Nextcloud</div>\n  <p style="font-size:13px;color:var(--text3);margin-bottom:12px;line-height:1.5">Usa una <strong>App Password</strong> da Nextcloud → Impostazioni → Sicurezza.</p>\n  <div class="form-inline" style="margin-bottom:18px;">\n    <div class="fr"><label>URL proxy</label><input id="cfg-url" value="'+(c.nc_url||'https://dash.asglab.it:8766')+'"></div>\n    <div class="fg2">\n      <div class="fr"><label>Utente</label><input id="cfg-user" value="'+(c.nc_user||'andrea')+'"></div>\n      <div class="fr"><label>App Password</label><input id="cfg-pass" type="password" value="'+(c.nc_pass||'')+'" placeholder="xxxx-xxxx-xxxx-xxxx"></div>\n    </div>\n  </div>\n\n  <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">🧾 Fattura24</div>\n  <p style="font-size:13px;color:var(--text3);margin-bottom:12px;line-height:1.5">\n    Trova la tua API key in <strong>Fattura24 → Impostazioni → API</strong>.<br>\n    La chiave viene salvata localmente e usata per aggiornare <code style="background:var(--bg3);padding:1px 5px;border-radius:4px;font-size:12px">/opt/asg-dashboard/config.env</code> sul server tramite sync.<br>\n    <span style="color:var(--amber)">⚠ Richiede account Fattura24 con piano a pagamento (API attiva).</span>\n  </p>\n  <div class="form-inline" style="margin-bottom:6px;">\n    <div class="fr">\n      <label>API Key Fattura24</label>\n      <input id="cfg-f24key" type="password" value="'+(c.f24_key||'')+'" placeholder="es. abc123def456…" autocomplete="off">\n    </div>\n    <div class="fg2">\n      <div class="fr">\n        <label>Tipo documento da importare</label>\n        <select id="cfg-f24tipo">\n          <option value="all" '+((c.f24_tipo||'all')==='all'?'selected':'')+'>Tutte (fatture + NDC)</option>\n          <option value="fattura" '+(c.f24_tipo==='fattura'?'selected':'')+'>Solo fatture emesse</option>\n          <option value="ricevuta" '+(c.f24_tipo==='ricevuta'?'selected':'')+'>Solo ricevute</option>\n        </select>\n      </div>\n      <div class="fr">\n        <label>Sync automatico ogni</label>\n        <select id="cfg-f24sync">\n          <option value="60" '+((c.f24_sync||'60')==='60'?'selected':'')+'>1 ora</option>\n          <option value="30" '+(c.f24_sync==='30'?'selected':'')+'>30 min</option>\n          <option value="240" '+(c.f24_sync==='240'?'selected':'')+'>4 ore</option>\n          <option value="0" '+(c.f24_sync==='0'?'selected':'')+'>Manuale</option>\n        </select>\n      </div>\n    </div>\n    <div id="cfg-f24status" style="font-size:12px;color:var(--text3);margin-top:4px">'+(c.f24_key?'✓ API key presente — stato: '+(c.f24_ok?'<span style="color:var(--green);font-weight:700">connessa</span>':'<span style="color:var(--amber);font-weight:700">da verificare</span>'):'API key non inserita')+'</div>\n  </div>\n\n  <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)">💰 Markup per cliente</div>\n  <p style="font-size:12px;color:var(--text3);margin-bottom:10px">Ricarico predefinito sui costi materiali per ogni cliente. Viene precompilato nel form "aggiungi componente".</p>\n  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;" id="cfg-markup-grid">\n    '+(Object.entries(CMAP).map(([cod,nome])=>'<div style="display:flex;align-items:center;gap:8px;"><label style="font-size:12px;color:var(--text2);flex:1;white-space:nowrap">'+nome.split('(')[0].trim()+' <span style="color:var(--text4);font-size:10px">('+cod+')</span></label><input id="cfg-mk-'+cod+'" type="number" step="0.05" min="1" max="10" value="'+(c.markup_clienti?.[cod]||2.25)+'" style="width:70px;border:1.5px solid var(--border);border-radius:6px;padding:4px 6px;font-size:12px;text-align:right;"></div>').join(''))+'\n  </div>\n\n  '+(act('saveCfg2()'))+'(';\n  )+'\n  return\\'\\';\n)+'\n\n// Ricerca Ares nel modal\n// ── Tab switcher modal add-riga ──\n// Precompila markup con valore per cliente corrente\nfunction precompilaMarkup(){\n  const el=document.getElementById(\\'f-markup\\');\n  if(!el||el.value)return; // già compilato\n  const cfg=lCfg();\n  const cod=getCod(CC?.numero||\\'\\');\n  const val=cfg.markup_clienti?.[cod]||2.25;\n  el.value=val;\n)+'\n\nfunction switchAddTab(tab){\n  [\\'listino\\',\\'mag\\',\\'tubo\\',\\'racc\\',\\'pu10\\',\\'pu20\\',\\'manuale\\'].forEach(t=>{\n    const btn=document.getElementById(\\'atab-\\'+t);\n    const panel=document.getElementById(\\'apanel-\\'+t);\n    if(btn)btn.classList.toggle(\\'active\\',t===tab);\n    if(panel)panel.style.display=t===tab?\\'\\':\\'none\\';\n  )+');\n  if(tab===\\'racc\\')renderRaccSciolto();\n  if(tab===\\'pu10\\'){_pu10Blocchi=[];pu10Update();const el=document.getElementById(\\'pu10-blocchi-list\\');if(el)el.innerHTML=\\'\\';)+'\n  if(tab===\\'pu20\\'){_pu20Blocchi=[];pu20Update();const el=document.getElementById(\\'pu20-blocchi-list\\');if(el)el.innerHTML=\\'\\';)+'\n  // Upgrade select nel pannello appena reso visibile\n  setTimeout(()=>{\n    const panel=document.getElementById(\\'apanel-\\'+tab);\n    if(panel) upgradeSelects(panel);\n    upgradeSelects(); // anche il resto del modal\n  )+',0);\n)+'\n\nfunction magFilter(){\n  const q=(document.getElementById(\\'mag-q\\')||{)+').value?.toLowerCase()||\\'\\';\n  const items=lMag();\n  const el=document.getElementById(\\'mag-results\\');if(!el)return;\n  const filt=q?items.filter(m=>(m.codice||\\'\\').toLowerCase().includes(q)||(m.descrizione||\\'\\').toLowerCase().includes(q)||(m.fornitore||\\'\\').toLowerCase().includes(q)):items;\n  if(!filt.length){el.innerHTML=\\'<div class="empty" style="padding:12px">Nessun risultato</div>\\';return;)+'\n  el.innerHTML=filt.map(m=>\\'<div style="display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border);font-size:13px;">\\'+\\'<div style="flex:1;"><div style="font-weight:600">\\'+(m.codice?\\'<span style="font-family:monospace;color:var(--green);font-weight:700">\\'+m.codice+\\'</span> \u2014 \\':\\'\\')+(m.descrizione||\\'\u2014\\')+\\'</div>\\'+\\'<div style="font-size:11px;color:var(--text3)">\\'+(m.fornitore||\\'\\')+\\' \u00b7 giacenza: <strong style="color:\\'+(parseFloat(m.qty||0)>0?\\'var(--green)\\':\\'var(--red)\\')+\\'">\\'+( m.qty||0)+\\'</strong></div></div>\\'+\\'<span style="font-weight:700;white-space:nowrap">\u20ac\\'+fmt2(m.costo_cad||0)+\\'</span>\\'+\\'<button style="background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;" onclick="usaMagazzino(\\'+JSON.stringify(m).replace(/"/g,\\'&quot;\\')+\\',currentAddRigaNumero)">+ usa</button></div>\\').join(\\'\\');\n)+'\n\nlet currentAddRigaNumero=\\'\\';\n\nfunction usaMagazzino(m,numero){\n  const netto=parseFloat(m.costo_cad||0);const markup=2.25;\n  const row={id:uid(),sezione:\\'Magazzino\\',descrizione:m.descrizione,qty:1,fornitore:m.fornitore||\\'Magazzino interno\\',codice:m.codice||\\'\\',costo_cad:netto,sconto:0,netto_cad:netto,markup,prezzo_vendita:parseFloat((netto*markup).toFixed(4)),stato_approv:\\'arrivato\\',data_attesa:\\'\\')+';\n  const det=ll(\\'det\\');if(!det[numero])det[numero]={distinta:[],ore:[],note:\\'\\')+';\n  det[numero].distinta.push(row);ls(\\'det\\',det);syncDetBackground();CC._det=det[numero];\n  closeM();[\\'distinta\\',\\'approv\\',\\'riepilogo\\'].forEach(id=>renderTabContent(id,CC,det[numero]));\n  showToast(\\'✓ \\'+m.descrizione+\\' aggiunto dalla magazzino\\');\n)+'\n\n// ── Configuratore tubo flessibile ──\n// ════════════════════════════════════════════\n// CONFIGURATORE TUBO FLESSIBILE\n// ════════════════════════════════════════════\n\n// Database raccordi: {std, misura, dn_compatibili, varianti)+'\n// dn_compatibili: array di DN (mm) su cui il raccordo è montabile nativamente\n// Le misure maggiori sono disponibili come riduzione, ma non le elenchiamo per default\nconst RACCORDI_DB=[\n  // BSP (gas)\n  {std:\\'BSP\\', mis:\\'1/8"\\',  dn:[6],        label:\\'BSP 1/8"\\')+',\n  {std:\\'BSP\\', mis:\\'1/4"\\',  dn:[6,10],     label:\\'BSP 1/4"\\')+',\n  {std:\\'BSP\\', mis:\\'3/8"\\',  dn:[10,12],    label:\\'BSP 3/8"\\')+',\n  {std:\\'BSP\\', mis:\\'1/2"\\',  dn:[12,16],    label:\\'BSP 1/2"\\')+',\n  {std:\\'BSP\\', mis:\\'3/4"\\',  dn:[16,19,20], label:\\'BSP 3/4"\\')+',\n  {std:\\'BSP\\', mis:\\'1"\\',    dn:[20,25],    label:\\'BSP 1"\\')+',\n  {std:\\'BSP\\', mis:\\'1¼"\\',   dn:[25,32],    label:\\'BSP 1¼"\\')+',\n  {std:\\'BSP\\', mis:\\'1½"\\',   dn:[32,38],    label:\\'BSP 1½"\\')+',\n  // ORFS\n  {std:\\'ORFS\\', mis:\\'1/4"\\', dn:[6,10],     label:\\'ORFS 1/4"\\')+',\n  {std:\\'ORFS\\', mis:\\'3/8"\\', dn:[10,12],    label:\\'ORFS 3/8"\\')+',\n  {std:\\'ORFS\\', mis:\\'1/2"\\', dn:[12,16],    label:\\'ORFS 1/2"\\')+',\n  {std:\\'ORFS\\', mis:\\'3/4"\\', dn:[16,19,20], label:\\'ORFS 3/4"\\')+',\n  {std:\\'ORFS\\', mis:\\'1"\\',   dn:[20,25],    label:\\'ORFS 1"\\')+',\n  // JIC 37°\n  {std:\\'JIC\\',  mis:\\'1/4"\\', dn:[6,10],     label:\\'JIC 37° 1/4"\\')+',\n  {std:\\'JIC\\',  mis:\\'3/8"\\', dn:[10,12],    label:\\'JIC 37° 3/8"\\')+',\n  {std:\\'JIC\\',  mis:\\'1/2"\\', dn:[12,16],    label:\\'JIC 37° 1/2"\\')+',\n  {std:\\'JIC\\',  mis:\\'3/4"\\', dn:[16,19,20], label:\\'JIC 37° 3/4"\\')+',\n  {std:\\'JIC\\',  mis:\\'1"\\',   dn:[20,25],    label:\\'JIC 37° 1"\\')+',\n  // DIN — metrico\n  {std:\\'DIN\\',  mis:\\'M12×1.5\\', dn:[6],     label:\\'M12×1.5\\')+',\n  {std:\\'DIN\\',  mis:\\'M14×1.5\\', dn:[6,10],  label:\\'M14×1.5\\')+',\n  {std:\\'DIN\\',  mis:\\'M16×1.5\\', dn:[10],    label:\\'M16×1.5\\')+',\n  {std:\\'DIN\\',  mis:\\'M18×1.5\\', dn:[10,12], label:\\'M18×1.5\\')+',\n  {std:\\'DIN\\',  mis:\\'M20×1.5\\', dn:[12],    label:\\'M20×1.5\\')+',\n  {std:\\'DIN\\',  mis:\\'M22×1.5\\', dn:[12,16], label:\\'M22×1.5\\')+',\n  {std:\\'DIN\\',  mis:\\'M24×1.5\\', dn:[16],    label:\\'M24×1.5\\')+',\n  {std:\\'DIN\\',  mis:\\'M26×1.5\\', dn:[16,20], label:\\'M26×1.5\\')+',\n  {std:\\'DIN\\',  mis:\\'M30×2\\',   dn:[20,25], label:\\'M30×2\\')+',\n  {std:\\'DIN\\',  mis:\\'M36×2\\',   dn:[25],    label:\\'M36×2\\')+',\n  // Flangia SAE (solo dritto, no curve)\n  {std:\\'SAE\\',  mis:\\'SAE 6000psi 1/2"\\', dn:[12,16], label:\\'Flangia SAE 6000psi 1/2"\\', noCurva:true)+',\n  {std:\\'SAE\\',  mis:\\'SAE 3000psi 3/4"\\', dn:[16,20], label:\\'Flangia SAE 3000psi 3/4"\\', noCurva:true)+',\n  {std:\\'SAE\\',  mis:\\'SAE 3000psi 1"\\',   dn:[20,25], label:\\'Flangia SAE 3000psi 1"\\',   noCurva:true)+',\n  // Nippli / capezzoli\n  {std:\\'NIPPLO\\', mis:\\'Capezzolo 1/4" BSP\\', dn:[6,10], label:\\'Capezzolo 1/4" BSP\\', noCurva:true)+',\n  {std:\\'NIPPLO\\', mis:\\'Capezzolo 3/8" BSP\\', dn:[10,12], label:\\'Capezzolo 3/8" BSP\\', noCurva:true)+',\n  {std:\\'NIPPLO\\', mis:\\'Capezzolo 1/2" BSP\\', dn:[12,16], label:\\'Capezzolo 1/2" BSP\\', noCurva:true)+',\n  {std:\\'NIPPLO\\', mis:\\'Capezzolo 3/4" BSP\\', dn:[16,20], label:\\'Capezzolo 3/4" BSP\\', noCurva:true)+',\n  {std:\\'NIPPLO\\', mis:\\'Capezzolo 1" BSP\\',   dn:[20,25], label:\\'Capezzolo 1" BSP\\', noCurva:true)+',\n  {std:\\'NIPPLO\\', mis:\\'Capezzolo inox 1/4"\\',dn:[6,10],  label:\\'Capezzolo inox 1/4"\\', noCurva:true)+',\n  {std:\\'NIPPLO\\', mis:\\'Capezzolo inox 3/8"\\',dn:[10,12], label:\\'Capezzolo inox 3/8"\\', noCurva:true)+',\n  {std:\\'NIPPLO\\', mis:\\'Capezzolo inox 1/2"\\',dn:[12,16], label:\\'Capezzolo inox 1/2"\\', noCurva:true)+',\n  // Terminali ad occhio (swaged) — per tubi raccordati\n  {std:\\'OCCHIO\\', mis:\\'Occhio 3/8" Ø11 BSP\\',    dn:[6,10],     label:\\'Term. occhio 3/8" Ø11\\', noCurva:true)+',\n  {std:\\'OCCHIO\\', mis:\\'Occhio 1/2" Ø11 BSP\\',    dn:[10,12],    label:\\'Term. occhio 1/2" Ø11\\', noCurva:true)+',\n  {std:\\'OCCHIO\\', mis:\\'Occhio 1/2" Ø14 BSP\\',    dn:[10,12],    label:\\'Term. occhio 1/2" Ø14\\', noCurva:true)+',\n  {std:\\'OCCHIO\\', mis:\\'Occhio 3/4" Ø14 BSP\\',    dn:[12,16],    label:\\'Term. occhio 3/4" Ø14\\', noCurva:true)+',\n  {std:\\'OCCHIO\\', mis:\\'Occhio 3/4" Ø18 BSP\\',    dn:[16,20],    label:\\'Term. occhio 3/4" Ø18\\', noCurva:true)+',\n  {std:\\'OCCHIO\\', mis:\\'Occhio 1" Ø18 BSP\\',      dn:[16,20,25], label:\\'Term. occhio 1" Ø18\\',   noCurva:true)+',\n  {std:\\'OCCHIO\\', mis:\\'Occhio 1" Ø22 BSP\\',      dn:[20,25],    label:\\'Term. occhio 1" Ø22\\',   noCurva:true)+',\n  {std:\\'OCCHIO\\', mis:\\'Occhio inox 3/8" Ø11\\',   dn:[6,10],     label:\\'Occhio inox 3/8" Ø11\\',  noCurva:true)+',\n  {std:\\'OCCHIO\\', mis:\\'Occhio inox 1/2" Ø14\\',   dn:[10,12],    label:\\'Occhio inox 1/2" Ø14\\',  noCurva:true)+',\n  {std:\\'OCCHIO\\', mis:\\'Occhio inox 3/4" Ø18\\',   dn:[16,20],    label:\\'Occhio inox 3/4" Ø18\\',  noCurva:true)+',\n];\n\n// ════════════════════════════════════════════\n// RACCORDERIA SCIOLTA — selettore con filtri\n// ════════════════════════════════════════════\n\n// Database raccorderia sciolta per alta pressione oleodinamica\n// figura: \\'adattatore\\' | \\'gomito\\' | \\'T\\' | \\'nipplo\\' | \\'bonded\\' | \\'stucchi\\' | \\'riduzione\\'\nconst RACC_SCIOLTI=[\n  // ── BSP maschio/femmina — adattatori ──\n  {std:\\'BSP\\', fig:\\'adattatore\\', mis:\\'BSP 1/4"M × 1/4"F\\',   cod:\\'A-BSP14M-14F\\', desc:\\'Adattatore BSP 1/4"M → 1/4"F\\',   forn:\\'Pa.Co\\', p:1.8)+',\n  {std:\\'BSP\\', fig:\\'adattatore\\', mis:\\'BSP 3/8"M × 3/8"F\\',   cod:\\'A-BSP38M-38F\\', desc:\\'Adattatore BSP 3/8"M → 3/8"F\\',   forn:\\'Pa.Co\\', p:2.2)+',\n  {std:\\'BSP\\', fig:\\'adattatore\\', mis:\\'BSP 1/2"M × 1/2"F\\',   cod:\\'A-BSP12M-12F\\', desc:\\'Adattatore BSP 1/2"M → 1/2"F\\',   forn:\\'Pa.Co\\', p:2.8)+',\n  {std:\\'BSP\\', fig:\\'adattatore\\', mis:\\'BSP 3/4"M × 3/4"F\\',   cod:\\'A-BSP34M-34F\\', desc:\\'Adattatore BSP 3/4"M → 3/4"F\\',   forn:\\'Pa.Co\\', p:3.5)+',\n  {std:\\'BSP\\', fig:\\'adattatore\\', mis:\\'BSP 1"M × 1"F\\',        cod:\\'A-BSP1M-1F\\',   desc:\\'Adattatore BSP 1"M → 1"F\\',       forn:\\'Pa.Co\\', p:4.2)+',\n  // BSP riduzioni\n  {std:\\'BSP\\', fig:\\'riduzione\\', mis:\\'BSP 3/8"M × 1/4"F\\',    cod:\\'R-BSP38-14\\',   desc:\\'Riduzione BSP 3/8"M × 1/4"F\\',    forn:\\'Pa.Co\\', p:2.0)+',\n  {std:\\'BSP\\', fig:\\'riduzione\\', mis:\\'BSP 1/2"M × 3/8"F\\',    cod:\\'R-BSP12-38\\',   desc:\\'Riduzione BSP 1/2"M × 3/8"F\\',    forn:\\'Pa.Co\\', p:2.4)+',\n  {std:\\'BSP\\', fig:\\'riduzione\\', mis:\\'BSP 3/4"M × 1/2"F\\',    cod:\\'R-BSP34-12\\',   desc:\\'Riduzione BSP 3/4"M × 1/2"F\\',    forn:\\'Pa.Co\\', p:3.0)+',\n  {std:\\'BSP\\', fig:\\'riduzione\\', mis:\\'BSP 1"M × 3/4"F\\',      cod:\\'R-BSP1-34\\',    desc:\\'Riduzione BSP 1"M × 3/4"F\\',      forn:\\'Pa.Co\\', p:3.8)+',\n  // BSP gomiti 90°\n  {std:\\'BSP\\', fig:\\'gomito\\',    mis:\\'BSP 1/4"M × 90°\\',      cod:\\'G90-BSP14\\',    desc:\\'Gomito BSP 1/4"M 90°\\',            forn:\\'Pa.Co\\', p:3.5)+',\n  {std:\\'BSP\\', fig:\\'gomito\\',    mis:\\'BSP 3/8"M × 90°\\',      cod:\\'G90-BSP38\\',    desc:\\'Gomito BSP 3/8"M 90°\\',            forn:\\'Pa.Co\\', p:4.0)+',\n  {std:\\'BSP\\', fig:\\'gomito\\',    mis:\\'BSP 1/2"M × 90°\\',      cod:\\'G90-BSP12\\',    desc:\\'Gomito BSP 1/2"M 90°\\',            forn:\\'Pa.Co\\', p:5.0)+',\n  {std:\\'BSP\\', fig:\\'gomito\\',    mis:\\'BSP 3/4"M × 90°\\',      cod:\\'G90-BSP34\\',    desc:\\'Gomito BSP 3/4"M 90°\\',            forn:\\'Pa.Co\\', p:6.2)+',\n  // BSP nippli doppi\n  {std:\\'BSP\\', fig:\\'nipplo\\',    mis:\\'Nipplo BSP 1/4"M × 1/4"M\\', cod:\\'N-BSP14\\', desc:\\'Nipplo doppio BSP 1/4"M × 1/4"M\\', forn:\\'Pa.Co\\', p:1.5)+',\n  {std:\\'BSP\\', fig:\\'nipplo\\',    mis:\\'Nipplo BSP 3/8"M × 3/8"M\\', cod:\\'N-BSP38\\', desc:\\'Nipplo doppio BSP 3/8"M × 3/8"M\\', forn:\\'Pa.Co\\', p:1.8)+',\n  {std:\\'BSP\\', fig:\\'nipplo\\',    mis:\\'Nipplo BSP 1/2"M × 1/2"M\\', cod:\\'N-BSP12\\', desc:\\'Nipplo doppio BSP 1/2"M × 1/2"M\\', forn:\\'Pa.Co\\', p:2.2)+',\n  {std:\\'BSP\\', fig:\\'nipplo\\',    mis:\\'Nipplo BSP 3/4"M × 3/4"M\\', cod:\\'N-BSP34\\', desc:\\'Nipplo doppio BSP 3/4"M × 3/4"M\\', forn:\\'Pa.Co\\', p:2.8)+',\n  // ── DIN — metrico ──\n  {std:\\'DIN\\', fig:\\'adattatore\\', mis:\\'M14×1.5M × BSP 1/4"F\\', cod:\\'A-M14-BSP14\\', desc:\\'Adatt. M14×1.5M → BSP 1/4"F\\',   forn:\\'Pa.Co\\', p:3.2)+',\n  {std:\\'DIN\\', fig:\\'adattatore\\', mis:\\'M16×1.5M × BSP 3/8"F\\', cod:\\'A-M16-BSP38\\', desc:\\'Adatt. M16×1.5M → BSP 3/8"F\\',   forn:\\'Pa.Co\\', p:3.4)+',\n  {std:\\'DIN\\', fig:\\'adattatore\\', mis:\\'M18×1.5M × BSP 3/8"F\\', cod:\\'A-M18-BSP38\\', desc:\\'Adatt. M18×1.5M → BSP 3/8"F\\',   forn:\\'Pa.Co\\', p:3.6)+',\n  {std:\\'DIN\\', fig:\\'adattatore\\', mis:\\'M22×1.5M × BSP 1/2"F\\', cod:\\'A-M22-BSP12\\', desc:\\'Adatt. M22×1.5M → BSP 1/2"F\\',   forn:\\'Pa.Co\\', p:4.0)+',\n  {std:\\'DIN\\', fig:\\'adattatore\\', mis:\\'M26×1.5M × BSP 3/4"F\\', cod:\\'A-M26-BSP34\\', desc:\\'Adatt. M26×1.5M → BSP 3/4"F\\',   forn:\\'Pa.Co\\', p:4.5)+',\n  {std:\\'DIN\\', fig:\\'nipplo\\',     mis:\\'Nipplo M14×1.5 doppio\\', cod:\\'N-M14\\',       desc:\\'Nipplo doppio M14×1.5M × M14×1.5M\\', forn:\\'Pa.Co\\', p:2.8)+',\n  {std:\\'DIN\\', fig:\\'nipplo\\',     mis:\\'Nipplo M16×1.5 doppio\\', cod:\\'N-M16\\',       desc:\\'Nipplo doppio M16×1.5M × M16×1.5M\\', forn:\\'Pa.Co\\', p:3.0)+',\n  {std:\\'DIN\\', fig:\\'nipplo\\',     mis:\\'Nipplo M18×1.5 doppio\\', cod:\\'N-M18\\',       desc:\\'Nipplo doppio M18×1.5M × M18×1.5M\\', forn:\\'Pa.Co\\', p:3.2)+',\n  {std:\\'DIN\\', fig:\\'nipplo\\',     mis:\\'Nipplo M22×1.5 doppio\\', cod:\\'N-M22\\',       desc:\\'Nipplo doppio M22×1.5M × M22×1.5M\\', forn:\\'Pa.Co\\', p:3.8)+',\n  // ── JIC ──\n  {std:\\'JIC\\', fig:\\'adattatore\\', mis:\\'JIC 1/4"M × BSP 1/4"F\\', cod:\\'A-JIC14-BSP14\\', desc:\\'Adatt. JIC 1/4"M → BSP 1/4"F\\', forn:\\'Pa.Co\\', p:3.5)+',\n  {std:\\'JIC\\', fig:\\'adattatore\\', mis:\\'JIC 3/8"M × BSP 3/8"F\\', cod:\\'A-JIC38-BSP38\\', desc:\\'Adatt. JIC 3/8"M → BSP 3/8"F\\', forn:\\'Pa.Co\\', p:3.8)+',\n  {std:\\'JIC\\', fig:\\'adattatore\\', mis:\\'JIC 1/2"M × BSP 1/2"F\\', cod:\\'A-JIC12-BSP12\\', desc:\\'Adatt. JIC 1/2"M → BSP 1/2"F\\', forn:\\'Pa.Co\\', p:4.2)+',\n  {std:\\'JIC\\', fig:\\'adattatore\\', mis:\\'JIC 3/4"M × BSP 3/4"F\\', cod:\\'A-JIC34-BSP34\\', desc:\\'Adatt. JIC 3/4"M → BSP 3/4"F\\', forn:\\'Pa.Co\\', p:4.8)+',\n  // ── Rondelle bonded ──\n  {std:\\'Bonded\\', fig:\\'bonded\\', mis:\\'Bonded 1/4" BSP\\',  cod:\\'BD-14\\', desc:\\'Rondella bonded BSP 1/4" (alluminio+NBR)\\', forn:\\'Pa.Co\\', p:0.5)+',\n  {std:\\'Bonded\\', fig:\\'bonded\\', mis:\\'Bonded 3/8" BSP\\',  cod:\\'BD-38\\', desc:\\'Rondella bonded BSP 3/8"\\',               forn:\\'Pa.Co\\', p:0.6)+',\n  {std:\\'Bonded\\', fig:\\'bonded\\', mis:\\'Bonded 1/2" BSP\\',  cod:\\'BD-12\\', desc:\\'Rondella bonded BSP 1/2"\\',               forn:\\'Pa.Co\\', p:0.7)+',\n  {std:\\'Bonded\\', fig:\\'bonded\\', mis:\\'Bonded 3/4" BSP\\',  cod:\\'BD-34\\', desc:\\'Rondella bonded BSP 3/4"\\',               forn:\\'Pa.Co\\', p:0.9)+',\n  {std:\\'Bonded\\', fig:\\'bonded\\', mis:\\'Bonded 1" BSP\\',    cod:\\'BD-1\\',  desc:\\'Rondella bonded BSP 1"\\',                 forn:\\'Pa.Co\\', p:1.1)+',\n  {std:\\'Bonded\\', fig:\\'bonded\\', mis:\\'Bonded M14×1.5\\',   cod:\\'BD-M14\\',desc:\\'Rondella bonded M14×1.5 DIN\\',            forn:\\'Pa.Co\\', p:0.6)+',\n  {std:\\'Bonded\\', fig:\\'bonded\\', mis:\\'Bonded M16×1.5\\',   cod:\\'BD-M16\\',desc:\\'Rondella bonded M16×1.5 DIN\\',            forn:\\'Pa.Co\\', p:0.7)+',\n  {std:\\'Bonded\\', fig:\\'bonded\\', mis:\\'Bonded M22×1.5\\',   cod:\\'BD-M22\\',desc:\\'Rondella bonded M22×1.5 DIN\\',            forn:\\'Pa.Co\\', p:0.9)+',\n  // ── Innesti rapidi Stucchi ── (fornitore: Tecnical/FIZ)\n  {std:\\'Stucchi\\', fig:\\'stucchi\\', mis:\\'Stucchi ISO-B 3/8"M FF\\', cod:\\'S-ISO-B-38FF\\', desc:\\'Innesto rapido Stucchi ISO-B DN10 3/8"M flat-face\\', forn:\\'FIZ/Tecnical\\', p:18.0)+',\n  {std:\\'Stucchi\\', fig:\\'stucchi\\', mis:\\'Stucchi ISO-B 1/2"M FF\\', cod:\\'S-ISO-B-12FF\\', desc:\\'Innesto rapido Stucchi ISO-B DN12 1/2"M flat-face\\', forn:\\'FIZ/Tecnical\\', p:22.0)+',\n  {std:\\'Stucchi\\', fig:\\'stucchi\\', mis:\\'Stucchi ISO-B 3/4"M FF\\', cod:\\'S-ISO-B-34FF\\', desc:\\'Innesto rapido Stucchi ISO-B DN20 3/4"M flat-face\\', forn:\\'FIZ/Tecnical\\', p:28.0)+',\n  {std:\\'Stucchi\\', fig:\\'stucchi\\', mis:\\'Stucchi ISO-B 3/8"F FF\\', cod:\\'S-ISO-B-38FFF\\',desc:\\'Innesto rapido Stucchi ISO-B DN10 3/8"F flat-face\\', forn:\\'FIZ/Tecnical\\', p:18.0)+',\n  {std:\\'Stucchi\\', fig:\\'stucchi\\', mis:\\'Stucchi ISO-B 1/2"F FF\\', cod:\\'S-ISO-B-12FFF\\',desc:\\'Innesto rapido Stucchi ISO-B DN12 1/2"F flat-face\\', forn:\\'FIZ/Tecnical\\', p:22.0)+',\n  {std:\\'Stucchi\\', fig:\\'stucchi\\', mis:\\'Stucchi poppet DN10 3/8"M\\', cod:\\'S-POP-38\\', desc:\\'Innesto rapido Stucchi poppet DN10 3/8"M\\',         forn:\\'FIZ/Tecnical\\', p:15.0)+',\n  {std:\\'Stucchi\\', fig:\\'stucchi\\', mis:\\'Stucchi poppet DN12 1/2"M\\', cod:\\'S-POP-12\\', desc:\\'Innesto rapido Stucchi poppet DN12 1/2"M\\',         forn:\\'FIZ/Tecnical\\', p:18.0)+',\n];\n\nlet _raccScioltoFiltro=\\'\\';\n\nfunction setRaccScioltoFiltro(std,btn){\n  _raccScioltoFiltro=std;\n  // aggiorna bottoni stile\n  document.querySelectorAll(\\'#apanel-racc button[onclick^="setRaccScioltoFiltro"]\\').forEach(b=>{\n    const active=b===btn;\n    b.style.borderColor=active?\\'var(--blue)\\':\\'var(--border)\\';\n    b.style.background=active?\\'var(--blue-lt)\\':\\'#fff\\';\n    b.style.color=active?\\'var(--blue)\\':\\'var(--text3)\\';\n  )+');\n  renderRaccSciolto();\n)+'\n\nfunction renderRaccSciolto(){\n  const q=(document.getElementById(\\'racc-q\\')||{)+').value?.toLowerCase()||\\'\\';\n  const el=document.getElementById(\\'racc-results\\');if(!el)return;\n  const filt=RACC_SCIOLTI.filter(r=>{\n    if(_raccScioltoFiltro&&r.std!==_raccScioltoFiltro)return false;\n    if(q&&!r.mis.toLowerCase().includes(q)&&!r.desc.toLowerCase().includes(q)&&!r.cod.toLowerCase().includes(q))return false;\n    return true;\n  )+');\n  if(!filt.length){el.innerHTML=\\'<div class="empty" style="padding:14px">Nessun raccordo trovato</div>\\';return;)+'\n  const figEmoji={adattatore:\\'🔗\\',riduzione:\\'↕\\',gomito:\\'↩\\',nipplo:\\'⇔\\',bonded:\\'⭕\\',stucchi:\\'⚡\\',default:\\'🔩\\')+';\n  // Raggruppa per standard\n  const groups={)+';\n  filt.forEach(r=>{if(!groups[r.std])groups[r.std]=[];groups[r.std].push(r);)+');\n  el.innerHTML=Object.entries(groups).map(([std,items])=>\\'<div style="background:var(--bg2);padding:5px 10px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);position:sticky;top:0;">\\'+std+\\'</div>\\'+\n    items.map(r=>\\'<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--border);font-size:12px;">\\'+\n      \\'<span style="font-size:14px;flex-shrink:0">\\'+(figEmoji[r.fig]||figEmoji.default)+\\'</span>\\'+\n      \\'<div style="flex:1;"><div style="font-weight:600;color:var(--text)">\\'+r.mis+\\'</div>\\'+\n        \\'<div style="font-size:11px;color:var(--text3)">\\'+r.cod+\\' · \\'+r.forn+\\'</div></div>\\'+\n      \\'<span style="font-weight:700;white-space:nowrap;color:var(--text)">€\\'+fmt2(r.p)+\\'</span>\\'+\n      \\'<button style="background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;flex-shrink:0;" onclick="usaRaccordoSciolto(\\'+JSON.stringify(r).replace(/"/g,\\'&quot;\\')+\\')">+ usa</button>\\'+\n    \\'</div>\\').join(\\'\\')\n  ).join(\\'\\');\n)+'\n\nfunction usaRaccordoSciolto(r){\n  const netto=r.p;const markup=2.0;\n  const row={id:uid(),sezione:\\'Raccorderia\\',descrizione:r.desc,qty:1,fornitore:r.forn===\\'Pa.Co\\'?\\'Pa.Co Fluid\\':\\'FIZ / Tecnical Impianti\\',codice:r.cod,costo_cad:netto,sconto:0,netto_cad:netto,markup,prezzo_vendita:parseFloat((netto*markup).toFixed(4)),stato_approv:\\'daordinare\\',data_attesa:\\'\\')+';\n  const numero=currentAddRigaNumero;if(!numero){showToast(\\'Apri una commessa per aggiungere componenti\\');return;)+'\n  const det=ll(\\'det\\');if(!det[numero])det[numero]={distinta:[],ore:[],note:\\'\\')+';\n  det[numero].distinta.push(row);ls(\\'det\\',det);syncDetBackground();CC._det=det[numero];\n  closeM();[\\'distinta\\',\\'approv\\',\\'riepilogo\\'].forEach(id=>renderTabContent(id,CC,det[numero]));\n  showToast(\\'✓ \\'+r.mis+\\' aggiunto alla distinta\\');\n)+'\n\n// ════════════════════════════════════════════\n// CONFIGURATORE PU10 (Ares / Tecfluid)\n// ════════════════════════════════════════════\nlet _pu10Blocchi=[];\n\nfunction pu10AddBlocco(sel){\n  if(!sel.value)return;\n  const parts=sel.value.split(\\'|\\');\n  _pu10Blocchi.push({cod:parts[0],prezzo:parseFloat(parts[1]||0),desc:parts[2]||\\'\\')+');\n  sel.value=\\'\\';\n  // Render lista blocchi\n  const el=document.getElementById(\\'pu10-blocchi-list\\');if(!el)return;\n  el.innerHTML=_pu10Blocchi.map((b,i)=>\\'<div style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:12px;">\\'+\n    \\'<span style="font-family:monospace;font-weight:700;color:var(--green);min-width:50px">\\'+b.cod+\\'</span>\\'+\n    \\'<span style="flex:1;color:var(--text2)">\\'+b.desc+\\'</span>\\'+\n    \\'<span style="font-weight:700">€\\'+fmt2(b.prezzo)+\\'</span>\\'+\n    \\'<button onclick="_pu10Blocchi.splice(\\'+i+\\',1);document.getElementById(\\'pu10-blocchi-list\\').innerHTML=\\'\\';_pu10Blocchi.forEach((_,j)=>_);pu10AddBlocco({value:\\'\\')+');pu10Update();" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 3px;">✕</button>\\'+\n    \\'</div>\\').join(\\'\\');\n  pu10Update();\n)+'\n\nfunction pu10Update(){\n  const getVal=id=>{const el=document.getElementById(id);if(!el)return\\'\\';if(el.classList&&el.classList.contains(\\'csel\\'))return window._cselData?.[id]?.val||el.dataset.value||\\'\\';return el.value||\\'\\';)+';\n  const collV=getVal(\\'pu10-coll\\');const pompaV=getVal(\\'pu10-pompa\\');\n  const motV=getVal(\\'pu10-mot-tipo\\');const giunto=getVal(\\'pu10-giunto\\');\n  const serbV=getVal(\\'pu10-serb\\');\n  const prev=document.getElementById(\\'pu10-preview\\');if(!prev)return;\n  if(!collV||!pompaV||!motV){prev.innerHTML=\\'<span style="color:var(--text4)">Seleziona almeno collettore, pompa e motore per vedere il riepilogo…</span>\\';return;)+'\n  const pC=collV.split(\\'|\\');const pP=pompaV.split(\\'|\\');const pM=motV.split(\\'|\\');\n  const pG=giunto.split(\\'|\\');const pS=serbV.split(\\'|\\');\n  const prColl=parseFloat(pC[1]||0),prPompa=parseFloat(pP[1]||0),prMot=parseFloat(pM[1]||0);\n  const prGiunto=giunto?parseFloat(pG[1]||0):0,prSerb=serbV?parseFloat(pS[1]||0):0;\n  const prBlocchi=_pu10Blocchi.reduce((s,b)=>s+b.prezzo,0);\n  const totale=prColl+prPompa+prMot+prGiunto+prSerb+prBlocchi;\n  // Codice ordinazione semplificato\n  const cod=\\'PU10-\\'+(pC[0]||\\'?\\')+\\'-\\'+(pP[0]||\\'?\\')+\\'-\\'+(pM[0]||\\'?\\')+(giunto?\\'-\\'+pG[0]:\\'\\')+(serbV?\\'-\\'+pS[0]:\\'\\')+_pu10Blocchi.map(b=>\\'-\\'+b.cod).join(\\'\\');\n  prev.innerHTML=\n    \\'<div style="font-weight:700;color:var(--green);font-size:13px;margin-bottom:6px">Centralina PU10 — \\'+(pC[2]||\\'\\')+\\'</div>\\'+\n    \\'<div style="display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;font-size:12px;margin-bottom:8px;">\\'+\n    \\'<span style="color:var(--text3)">Collettore</span><span>\\'+(pC[2]||\\'—\\')+\\'</span><span style="text-align:right">€\\'+fmt2(prColl)+\\'</span>\\'+\n    \\'<span style="color:var(--text3)">Pompa</span><span>\\'+(pP[2]||\\'—\\')+\\'</span><span style="text-align:right">€\\'+fmt2(prPompa)+\\'</span>\\'+\n    \\'<span style="color:var(--text3)">Motore</span><span>\\'+(pM[2]||\\'—\\')+\\'</span><span style="text-align:right">€\\'+fmt2(prMot)+\\'</span>\\'+\n    (giunto?\\'<span style="color:var(--text3)">Giunto</span><span>\\'+(pG[2]||\\'—\\')+\\'</span><span style="text-align:right">€\\'+fmt2(prGiunto)+\\'</span>\\':\\'\\')+\n    (serbV?\\'<span style="color:var(--text3)">Serbatoio</span><span>\\'+(pS[2]||\\'—\\')+\\'</span><span style="text-align:right">€\\'+fmt2(prSerb)+\\'</span>\\':\\'\\')+\n    _pu10Blocchi.map(b=>\\'<span style="color:var(--text3)">\\'+b.cod+\\'</span><span>\\'+b.desc+\\'</span><span style="text-align:right">€\\'+fmt2(b.prezzo)+\\'</span>\\').join(\\'\\')+\n    \\'</div>\\'+\n    \\'<div style="border-top:1px solid #6ee7a0;padding-top:6px;display:flex;justify-content:space-between;align-items:center;">\\'+\n    \\'<span style="font-size:11px;font-family:monospace;color:var(--text3)">\\'+cod+\\'</span>\\'+\n    \\'<span style="font-weight:800;font-size:15px;color:var(--green)">TOT. €\\'+fmt2(totale)+\\'</span>\\'+\n    \\'</div>\\'+\n    \\'<div style="font-size:10px;color:var(--text4);margin-top:3px;">Fornitore: Ares / Tecfluid · Prezzi listino 2022 — da confermare</div>\\';\n  prev.dataset.cod=cod;prev.dataset.tot=totale;\n  prev.dataset.desc=\\'Centralina PU10: \\'+(pC[2]||\\'\\')+\\' · Pompa \\'+pP[0]+\\' · Motore \\'+pM[0]+(giunto?\\' · \\'+pG[0]:\\'\\')+(serbV?\\' · \\'+pS[0]:\\'\\')+(  _pu10Blocchi.length?\\' · Blocchi: \\'+_pu10Blocchi.map(b=>b.cod).join(\\'+\\'):\\'\\');\n)+'\n\nfunction usaCentralinaPU10(numero){\n  const prev=document.getElementById(\\'pu10-preview\\');\n  if(!prev||!prev.dataset.cod||!prev.dataset.cod.includes(\\'PU10-\\')){showToast(\\'Completa la configurazione prima\\');return;)+'\n  const totale=parseFloat(prev.dataset.tot||0);const markup=2.0;\n  const row={id:uid(),sezione:\\'Centralina\\',descrizione:prev.dataset.desc,qty:1,fornitore:\\'Ares / Tecfluid\\',codice:prev.dataset.cod,costo_cad:totale,sconto:0,netto_cad:totale,markup,prezzo_vendita:parseFloat((totale*markup).toFixed(4)),stato_approv:\\'daordinare\\',data_attesa:\\'\\')+';\n  const det=ll(\\'det\\');if(!det[numero])det[numero]={distinta:[],ore:[],note:\\'\\')+';\n  det[numero].distinta.push(row);ls(\\'det\\',det);syncDetBackground();CC._det=det[numero];\n  closeM();[\\'distinta\\',\\'approv\\',\\'riepilogo\\'].forEach(id=>renderTabContent(id,CC,det[numero]));\n  showToast(\\'✓ Centralina PU10 aggiunta alla distinta\\');\n)+'\nlet _pu20Blocchi=[];\n\nfunction pu20AddBlocco(sel){\n  if(!sel.value)return;\n  const p=sel.value.split(\\'|\\');\n  _pu20Blocchi.push({cod:p[0],prezzo:parseFloat(p[1]||0),desc:p[2]||p[0])+');\n  sel.value=\\'\\';\n  const list=document.getElementById(\\'pu20-blocchi-list\\');\n  if(list){\n    const div=document.createElement(\\'div\\');\n    div.style.cssText=\\'display:flex;align-items:center;gap:6px;font-size:12px;background:var(--bg2);padding:4px 8px;border-radius:5px;\\';\n    const idx=_pu20Blocchi.length-1;\n    div.innerHTML=\\'<span style="flex:1">\\'+p[0]+\\' — \\'+(p[2]||p[0])+\\'</span><span style="color:var(--text3)">€\\'+fmt2(parseFloat(p[1]||0))+\\'</span><button class="xbtn" onclick="this.parentNode.remove();_pu20Blocchi.splice(\\'+idx+\\',1);pu20Update()">✕</button>\\';\n    list.appendChild(div);\n  )+'\n  pu20Update();\n)+'\n\nfunction pu20Update(){\n  const getVal=id=>{const el=document.getElementById(id);if(!el)return\\'\\';if(el.classList&&el.classList.contains(\\'csel\\'))return window._cselData?.[id]?.val||el.dataset.value||\\'\\';return el.value||\\'\\';)+';\n  const collV=getVal(\\'pu20-coll\\');const pompaV=getVal(\\'pu20-pompa\\');\n  const motV=getVal(\\'pu20-mot-tipo\\');const giunto=getVal(\\'pu20-giunto\\');\n  const serbV=getVal(\\'pu20-serb\\');\n  const prev=document.getElementById(\\'pu20-preview\\');if(!prev)return;\n  if(!collV||!pompaV||!motV){\n    prev.innerHTML=\\'<span style="color:var(--text4)">Seleziona almeno collettore, pompa e motore per vedere il riepilogo…</span>\\';\n    return;\n  )+'\n  const pC=collV.split(\\'|\\');const pP=pompaV.split(\\'|\\');\n  const pM=motV.split(\\'|\\');const pG=giunto.split(\\'|\\');const pS=serbV.split(\\'|\\');\n  const prColl=parseFloat(pC[1]||0),prPompa=parseFloat(pP[1]||0),prMot=parseFloat(pM[1]||0);\n  const prGiunto=giunto?parseFloat(pG[1]||0):0;\n  const prSerb=serbV?parseFloat(pS[1]||0):0;\n  const prAcc=_pu20Blocchi.reduce((s,b)=>s+b.prezzo,0);\n  const totale=prColl+prPompa+prMot+prGiunto+prSerb+prAcc;\n  const cod=\\'PU20-\\'+(pC[0]||\\'?\\')+\\'-\\'+(pP[0]||\\'?\\')+\\'-\\'+(pM[0]||\\'?\\')+(giunto?\\'-\\'+pG[0]:\\'\\')+(serbV?\\'-\\'+pS[0]:\\'\\')+_pu20Blocchi.map(b=>\\'-\\'+b.cod).join(\\'\\');\n  prev.innerHTML=\n    \\'<div style="font-weight:700;color:var(--green);font-size:13px;margin-bottom:6px">Centralina PU20 — \\'+(pC[2]||\\'\\')+\\'</div>\\'+\n    \\'<div style="display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;font-size:12px;margin-bottom:8px;">\\'+\n    \\'<span style="color:var(--text3)">Collettore</span><span>\\'+(pC[2]||\\'—\\')+\\'</span><span style="text-align:right">€\\'+fmt2(prColl)+\\'</span>\\'+\n    \\'<span style="color:var(--text3)">Pompa</span><span>\\'+(pP[2]||\\'—\\')+\\'</span><span style="text-align:right">€\\'+fmt2(prPompa)+\\'</span>\\'+\n    \\'<span style="color:var(--text3)">Motore</span><span>\\'+(pM[2]||\\'—\\')+\\'</span><span style="text-align:right">€\\'+fmt2(prMot)+\\'</span>\\'+\n    (giunto?\\'<span style="color:var(--text3)">Giunto</span><span>\\'+(pG[2]||\\'—\\')+\\'</span><span style="text-align:right">€\\'+fmt2(prGiunto)+\\'</span>\\':\\'\\')+\n    (serbV?\\'<span style="color:var(--text3)">Serbatoio</span><span>\\'+(pS[2]||\\'—\\')+\\'</span><span style="text-align:right">€\\'+fmt2(prSerb)+\\'</span>\\':\\'\\')+\n    _pu20Blocchi.map(b=>\\'<span style="color:var(--text3)">\\'+b.cod+\\'</span><span>\\'+b.desc+\\'</span><span style="text-align:right">€\\'+fmt2(b.prezzo)+\\'</span>\\').join(\\'\\')+\n    \\'</div>\\'+\n    \\'<div style="border-top:1px solid #6ee7a0;padding-top:6px;display:flex;justify-content:space-between;align-items:center;">\\'+\n    \\'<span style="font-size:11px;font-family:monospace;color:var(--text3)">\\'+cod+\\'</span>\\'+\n    \\'<span style="font-weight:800;font-size:15px;color:var(--green)">TOT. €\\'+fmt2(totale)+\\'</span>\\'+\n    \\'</div>\\'+\n    \\'<div style="font-size:10px;color:var(--text4);margin-top:3px;">Fornitore: Ares / Tecfluid · Prezzi listino 2022 — da confermare</div>\\';\n  prev.dataset.cod=cod;prev.dataset.tot=totale;\n  prev.dataset.desc=\\'Centralina PU20: \\'+(pC[2]||\\'\\')+\\' · Pompa \\'+pP[0]+\\' · Motore \\'+pM[0]+(giunto?\\' · \\'+pG[0]:\\'\\')+(serbV?\\' · \\'+pS[0]:\\'\\')+(  _pu20Blocchi.length?\\' · Accessori: \\'+_pu20Blocchi.map(b=>b.cod).join(\\'+\\'):\\'\\');\n)+'\n\nfunction usaCentralinaPU20(numero){\n  const prev=document.getElementById(\\'pu20-preview\\');\n  if(!prev||!prev.dataset.cod||!prev.dataset.cod.includes(\\'PU20-\\')){showToast(\\'Completa la configurazione prima\\');return;)+'\n  const totale=parseFloat(prev.dataset.tot||0);const markup=2.0;\n  const row={id:uid(),sezione:\\'Centralina\\',descrizione:prev.dataset.desc,qty:1,\n    fornitore:\\'Ares / Tecfluid\\',codice:prev.dataset.cod,costo_cad:totale,\n    sconto:0,netto_cad:totale,markup,prezzo_vendita:parseFloat((totale*markup).toFixed(4)),\n    stato_approv:\\'daordinare\\',data_attesa:\\'\\')+';\n  const det=ll(\\'det\\');if(!det[numero])det[numero]={distinta:[],ore:[],note:\\'\\')+';\n  det[numero].distinta.push(row);ls(\\'det\\',det);syncDetBackground();CC._det=det[numero];\n  closeM();[\\'distinta\\',\\'approv\\',\\'riepilogo\\'].forEach(id=>renderTabContent(id,CC,det[numero]));\n  showToast(\\'✓ Centralina PU20 aggiunta alla distinta\\');\n)+'\n\nlet _tfRaSelected={A:null,B:null)+';\nlet _tfStdFiltro=\\'\\';\nlet _tfDnAttuale=0;\n\nfunction onTuboTipoChange(){\n  const sel=document.getElementById(\\'tf-tipo\\');\n  if(!sel)return;\n  const val=sel.value;\n  if(!val){_tfDnAttuale=0;renderRaccordiSection();aggTuboPreview();return;)+'\n  const p=val.split(\\'|\\');\n  _tfDnAttuale=parseInt(p[3]||0);\n  _tfRaSelected={A:null,B:null)+';\n  _tfStdFiltro=\\'\\';\n  renderRaccordiSection();\n  aggTuboPreview();\n)+'\n\nfunction syncLung(da){\n  const mmEl=document.getElementById(\\'tf-lung-mm\\');\n  const inEl=document.getElementById(\\'tf-lung-in\\');\n  const hint=document.getElementById(\\'tf-lung-hint\\');\n  if(da===\\'mm\\'&&mmEl){\n    const mm=parseFloat(mmEl.value||0);\n    if(inEl&&mm)inEl.value=(mm/25.4).toFixed(1);\n    if(hint&&mm)hint.textContent=mm+\\' mm = \\'+(mm/25.4).toFixed(1)+\\'" = \\'+(mm/10).toFixed(0)+\\' cm\\';\n  )+' else if(da===\\'in\\'&&inEl){\n    const ins=parseFloat(inEl.value||0);\n    if(mmEl&&ins)mmEl.value=Math.round(ins*25.4);\n    if(hint&&ins)hint.textContent=(ins*25.4).toFixed(0)+\\' mm = \\'+ins+\\'" = \\'+(ins*2.54).toFixed(1)+\\' cm\\';\n  )+'\n  aggTuboPreview();\n)+'\n\nfunction renderRaccordiSection(){\n  const el=document.getElementById(\\'tf-racc-section\\');if(!el)return;\n  if(!_tfDnAttuale){\n    el.innerHTML=\\'<div style="font-size:12px;color:var(--text3);padding:10px;text-align:center;background:var(--bg2);border-radius:7px;">Seleziona prima il tipo di tubo per filtrare i raccordi compatibili</div>\\';\n    return;\n  )+'\n  const compatibili=RACCORDI_DB.filter(r=>r.dn.includes(_tfDnAttuale));\n  const lista=_tfStdFiltro?compatibili.filter(r=>r.std===_tfStdFiltro):compatibili;\n  const stds=[...new Set(compatibili.map(r=>r.std))];\n\n  // Bottoni filtro standard\n  const btnTutti=\\'<button onclick="setRaccFiltro(\\'\\')" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1.5px solid \\'+(!_tfStdFiltro?\\'var(--blue)\\':\\'var(--border)\\')+\\'";background:\\'+(!_tfStdFiltro?\\'var(--blue-lt)\\':\\'#fff\\')+\\'";color:\\'+(!_tfStdFiltro?\\'var(--blue)\\':\\'var(--text3)\\')+\\';cursor:pointer;">Tutti</button>\\';\n  const btnStds=stds.map(s=>\\'<button onclick="setRaccFiltro(\\'\\'+s+\\'\\')" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1.5px solid \\'+(_tfStdFiltro===s?\\'var(--blue)\\':\\'var(--border)\\')+\\'";background:\\'+(_tfStdFiltro===s?\\'var(--blue-lt)\\':\\'#fff\\')+\\'";color:\\'+(_tfStdFiltro===s?\\'var(--blue)\\':\\'var(--text3)\\')+\\';cursor:pointer;">\\'+s+\\'</button>\\').join(\\'\\');\n\n  // Colonne A e B\n  const colHtml=[\\'A\\',\\'B\\'].map(lato=>{\n    const selInfo=_tfRaSelected[lato];\n    const selBadge=selInfo?\\'<span style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd);padding:1px 7px;border-radius:20px;font-size:10px;margin-left:4px;">✓ \\'+selInfo.label.split(\\' \\').slice(0,2).join(\\' \\')+\\' \\'+( selInfo.curva||\\'\\')+\\'</span>\\':\\'\\';\n    const rows=lista.map(r=>{\n      const varianti=[{k:\\'dritto\\',label:\\'↔ dritto\\')+',...(!r.noCurva?[{k:\\'45°\\',label:\\'↗ curva 45°\\')+',{k:\\'90°\\',label:\\'↕ curva 90°\\')+']:[])];\n      return varianti.map(v=>{\n        const isSel=selInfo&&selInfo.raccId===r.std+\\'_\\'+r.mis&&selInfo.curva===v.k;\n        const bg=isSel?\\'var(--blue-lt)\\':\\'transparent\\';\n        const col=isSel?\\'var(--blue)\\':\\'var(--text2)\\';\n        const colCode=isSel?\\'var(--blue)\\':\\'var(--text3)\\';\n        const colV=isSel?\\'var(--blue)\\':\\'var(--text4)\\';\n        return \\'<div onclick="selRacc(\\'\\'+lato+\\'\\',\\'\\'+r.std+\\'\\',\\'\\'+r.mis.replace(/"/g,\\'&quot;\\')+\\'\\',\\'\\'+r.label.replace(/"/g,\\'&quot;\\')+\\'\\',\\'\\'+v.k+\\'\\')" style="padding:6px 10px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12px;display:flex;align-items:center;justify-content:space-between;background:\\'+bg+\\';color:\\'+col+\\';transition:background .1s;">\\'+\n          \\'<span><span style="font-family:monospace;font-weight:700;font-size:11px;color:\\'+colCode+\\'">\\'+r.std+\\'</span> \\'+r.mis+\\' <span style="font-size:11px;color:\\'+colV+\\'">\\'+v.label+\\'</span></span>\\'+\n          (isSel?\\'<span style="font-size:14px;">✓</span>\\':\\'\\')+\n          \\'</div>\\';\n      )+').join(\\'\\');\n    )+').join(\\'\\');\n    return \\'<div>\\'+\n      \\'<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">Raccordo lato \\'+lato+selBadge+\\'</div>\\'+\n      \\'<div style="max-height:190px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;background:#fff;">\\'+rows+\\'</div>\\'+\n      \\'</div>\\';\n  )+').join(\\'\\');\n\n  el.innerHTML=\n    \\'<div style="margin-bottom:8px;">\\'+\n      \\'<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">Raccordi compatibili con DN\\'+_tfDnAttuale+\\' — filtra per standard:</div>\\'+\n      \\'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">\\'+btnTutti+btnStds+\\'</div>\\'+\n    \\'</div>\\'+\n    \\'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">\\'+colHtml+\\'</div>\\';\n)+'\n\nfunction setRaccFiltro(std){\n  _tfStdFiltro=std;\n  renderRaccordiSection();\n)+'\n\nfunction selRacc(lato,std,mis,label,curva){\n  _tfRaSelected[lato]={raccId:std+\\'_\\'+mis,std,mis,label,curva)+';\n  renderRaccordiSection();\n  aggTuboPreview();\n)+'\n\nfunction aggTuboPreview(){\n  const tipo=(document.getElementById(\\'tf-tipo\\')||{)+').value||\\'\\';\n  const lung=parseInt((document.getElementById(\\'tf-lung-mm\\')||{)+').value||0);\n  const ra=_tfRaSelected.A;\n  const rb=_tfRaSelected.B;\n  const qty=parseInt((document.getElementById(\\'tf-qty\\')||{)+').value||1);\n  const prev=document.getElementById(\\'tf-preview\\');if(!prev)return;\n\n  const doubleCurva=ra&&rb&&ra.curva!==\\'dritto\\'&&rb.curva!==\\'dritto\\';\n  const orientRow=document.getElementById(\\'tf-orient-row\\');\n  if(orientRow)orientRow.style.display=doubleCurva?\\'\\':\\'none\\';\n  const orient=doubleCurva?(document.getElementById(\\'tf-orient\\')||{)+').value||\\'0\\':\\'\\';\n\n  if(!tipo||!lung||!ra||!rb){\n    prev.innerHTML=\\'<span style="color:var(--text4)">Compila tutti i campi e seleziona entrambi i raccordi per vedere la descrizione…</span>\\';\n    return;\n  )+'\n\n  const p=tipo.split(\\'|\\');\n  const codT=p[0]||\\'\\';const normaT=p[1]||\\'\\';const pressT=p[2]||\\'\\';const dn=parseInt(p[3]||0);const pollici=p[4]||\\'\\';\n\n  const lungIn=(lung/25.4).toFixed(1);\n  const raStr=ra.label+\\' \\'+(ra.curva===\\'dritto\\'?\\'↔\\':\\'curva \\'+ra.curva);\n  const rbStr=rb.label+\\' \\'+(rb.curva===\\'dritto\\'?\\'↔\\':\\'curva \\'+rb.curva);\n\n  let desc=\\'Tubo flessibile raccordato \u2014 \\'+normaT+\\' DN\\'+dn+\\' (\\'+pollici+\\') \u00b7 \\'+lung+\\' mm (\\'+lungIn+\\'")\n  Lato A: \\'+raStr+\\'\n  Lato B: \\'+rbStr;\n  if(doubleCurva)desc+=\\'\n  Orientamento doppia curva: \\'+orient+\\'°\\';\n\n  const raShort=ra.std+ra.mis.replace(/[^0-9/]/g,\\'\\').replace(\\'/\\',\\'\\');\n  const rbShort=rb.std+rb.mis.replace(/[^0-9/]/g,\\'\\').replace(\\'/\\',\\'\\');\n  const orientSuffix=doubleCurva?\\'-OR\\'+orient:\\'\\';\n  const codice=\\'TF-\\'+codT+\\'-DN\\'+dn+\\'-\\'+lung+\\'mm-\\'+raShort+\\'-\\'+(ra.curva!==\\'dritto\\'?ra.curva.replace(\\'°\\',\\'d\\'):\\'\\')+\\'-\\'+rbShort+\\'-\\'+(rb.curva!==\\'dritto\\'?rb.curva.replace(\\'°\\',\\'d\\'):\\'\\')+orientSuffix;\n\n  const costoTubo=lung/1000*3.8;\n  const costoRa=ra.curva!==\\'dritto\\'?6.2:4.5;\n  const costoRb=rb.curva!==\\'dritto\\'?6.2:4.5;\n  const prezzoStimato=costoTubo+costoRa+costoRb;\n\n  prev.innerHTML=\n    \\'<div style="font-weight:700;color:var(--text);white-space:pre-line;margin-bottom:6px;">\\'+desc+\\'</div>\\'+\n    \\'<div style="font-size:12px;color:var(--text3)">Norma: \\'+normaT+\\' · Pressione max: \\'+pressT+\\' bar · Fornitore: Pa.Co Fluid</div>\\'+\n    \\'<div style="font-size:12px;color:var(--text3);margin-top:3px;font-family:monospace">\\'+codice+\\'</div>\\'+\n    \\'<div style="font-size:12px;color:var(--text2);margin-top:4px">Prezzo stimato: <strong>\u20ac\\'+fmt2(prezzoStimato)+\\'</strong> cad \u2014 <em>da confermare con Pa.Co Fluid</em></div>\\'+\n    (doubleCurva?\\'<div style="font-size:11px;background:#fef3c7;border:1px solid #f59e0b;border-radius:5px;padding:4px 8px;margin-top:6px;color:#78350f;">\u26a0 Doppia curva orientamento \\'+orient+\\'\u00b0 \u2014 comunicare esplicitamente a Pa.Co nell\\'ordine.</div>\\':\\'\\');\n\n  prev.dataset.desc=desc.replace(/\n/g,\\' | \\');\n  prev.dataset.cod=codice;prev.dataset.prezzo=prezzoStimato;prev.dataset.qty=qty;\n)+'\n\nfunction usaTuboFlessibile(numero){\n  const prev=document.getElementById(\\'tf-preview\\');if(!prev||!prev.dataset.desc){showToast(\\'Completa prima il configuratore\\');return;)+'\n  const netto=parseFloat(prev.dataset.prezzo||8);const markup=2.0;\n  const row={id:uid(),sezione:\\'Raccorderia\\',descrizione:prev.dataset.desc,qty:parseInt(prev.dataset.qty||1),fornitore:\\'Pa.Co Fluid\\',codice:prev.dataset.cod,costo_cad:netto,sconto:0,netto_cad:netto,markup,prezzo_vendita:parseFloat((netto*markup).toFixed(4)),stato_approv:\\'daordinare\\',data_attesa:\\'\\')+';\n  const det=ll(\\'det\\');if(!det[numero])det[numero]={distinta:[],ore:[],note:\\'\\')+';\n  det[numero].distinta.push(row);ls(\\'det\\',det);syncDetBackground();CC._det=det[numero];\n  closeM();[\\'distinta\\',\\'approv\\',\\'riepilogo\\'].forEach(id=>renderTabContent(id,CC,det[numero]));\n  showToast(\\'✓ Tubo flessibile aggiunto alla distinta\\');\n)+'\n\nfunction aresFilter(){\n  const q=(document.getElementById(\\'ares-q\\')||{)+').value||\\'\\';\n  const serie=(document.getElementById(\\'ares-serie\\')||{)+').value||\\'\\';\n  const res=aresSearch(q,serie);\n  const el=document.getElementById(\\'ares-results\\');\n  if(!el)return;\n  if(!res.length){el.innerHTML=q.length>1?\\'<div style="padding:6px;font-size:13px;color:var(--text3)">Nessun risultato</div>\\':\\'\\';return;)+'\n  el.innerHTML=res.map(a=>{\n    const st=TIPO_BADGE[a.t]||\\'background:#f3f4f6;color:#374151\\';\n    return \\'<div style="display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid var(--border);font-size:13px;flex-wrap:wrap;">\\'+\n      \\'<span style="font-family:monospace;font-weight:700;color:var(--green);min-width:68px;font-size:12px">\\'+a.s+\\'</span>\\'+\n      \\'<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;\\'+st+\\';white-space:nowrap">\\'+(a.serie||a.t)+\\'</span>\\'+\n      \\'<span style="flex:1;color:var(--text2);min-width:120px">\\'+a.d+\\'</span>\\'+\n      \\'<span style="font-weight:700;white-space:nowrap">€\\'+fmt2(a.p)+\\'</span>\\'+\n      \\'<button style="background:var(--green);border:none;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;cursor:pointer;" onclick="fillAres(\\'+JSON.stringify(a).replace(/"/g,\\'&quot;\\')+\\')">usa</button>\\'+\n    \\'</div>\\';\n  )+').join(\\'\\');\n)+'\nfunction fillAres(a){\n  document.getElementById(\\'f-desc\\').value=a.d;\n  document.getElementById(\\'f-forn\\').value=\\'Ares / Tecfluid\\';\n  document.getElementById(\\'f-cod\\').value=a.s;\n  document.getElementById(\\'f-costo\\').value=a.p;\n  document.getElementById(\\'ares-results\\').innerHTML=\\'\\';\n  document.getElementById(\\'ares-q\\').value=\\'\\';\n)+'\n\n// ═══════════════════════════════════════════════\n// SAVE\n// ═══════════════════════════════════════════════\nasync function saveComm(){\n  const numero=(document.getElementById(\\'f-num\\')||{)+').value?.trim();if(!numero)return;\n  const getF=id=>{const el=document.getElementById(id);if(!el)return\\'\\';if(el.classList?.contains(\\'csel\\'))return window._cselData?.[id]?.val||\\'\\';return el.value||\\'\\';)+';\n  const row={id:uid(),numero,cliente:getCod(numero),oggetto:getF(\\'f-ogg\\'),tipo_commessa:getF(\\'f-tipo\\'),importo:getF(\\'f-imp\\'),data_apertura:getF(\\'f-dat\\'),data_consegna:getF(\\'f-cons\\'),stato:getF(\\'f-stato\\'),note:getF(\\'f-note\\'))+';\n  const data=lll(\\'comm\\');data.unshift(row);ls(\\'comm\\',data);\n  const det=ll(\\'det\\');if(!det[numero])det[numero]={distinta:[],ore:[],note:\\'\\')+';ls(\\'det\\',det);\n  await wPut(\\'commesse.csv\\',[row,...(SD.comm||[])],[\\'numero\\',\\'cliente\\',\\'oggetto\\',\\'tipo_commessa\\',\\'importo\\',\\'data_apertura\\',\\'data_consegna\\',\\'stato\\',\\'note\\']);\n  // Crea cartella Nextcloud in background\n  const cfg=getCfg();\n  if(cfg.ok){\n    createCommFolder(numero, row.oggetto).then(path=>{\n      if(path) showToast(\\'✓ Commessa salvata · Cartella NC creata\\');\n      else showToast(\\'✓ Commessa salvata (cartella NC non creata)\\');\n    )+');\n  )+' else {\n    showToast(\\'✓ Commessa salvata\\');\n  )+'\n  closeM();await syncNow();\n)+'\n\nasync function updateComm(){\n  const c=CC;if(!c)return;\n  const updated={...c,oggetto:document.getElementById(\\'f-ogg\\').value.trim(),tipo_commessa:document.getElementById(\\'f-tipo\\').value,importo:document.getElementById(\\'f-imp\\').value,data_apertura:document.getElementById(\\'f-dat\\').value,data_consegna:document.getElementById(\\'f-cons\\').value,stato:document.getElementById(\\'f-stato\\').value,note:document.getElementById(\\'f-note\\').value.trim())+';\n  const all=lll(\\'comm\\');const idx=all.findIndex(x=>x.numero===c.numero);\n  if(idx>=0)all[idx]=updated;else all.unshift(updated);ls(\\'comm\\',all);\n  if(SD.comm){const i=SD.comm.findIndex(x=>x.numero===c.numero);if(i>=0)SD.comm[i]=updated;)+'\n  CC={...updated,_det:c._det)+';\n  await wPut(\\'commesse.csv\\',all,[\\'numero\\',\\'cliente\\',\\'oggetto\\',\\'tipo_commessa\\',\\'importo\\',\\'data_apertura\\',\\'data_consegna\\',\\'stato\\',\\'note\\']);\n  closeM();\n  // aggiorna header senza ricaricare tutto\n  document.getElementById(\\'det-title\\').textContent=updated.oggetto||\\'—\\';\n  const tipo=updated.tipo_commessa||\\'\\';\n  document.getElementById(\\'det-meta\\').innerHTML=\\'<span class="bdg s-\\'+(updated.stato||\\'offerta\\').replace(\\' \\',\\'-\\')+\\'">\\'+(SL[updated.stato]||\\'\u2014\\')+\\'</span>\\'+(tipo?\\'<span class="bdg \\'+(TIPO_C[tipo]||\\'\\')+\\'">\\'+(TIPI[tipo]||tipo)+\\'</span>\\':\\'\\')+\\'<span style="font-size:12px;color:var(--text2)">\\'+(CNAMES[getCod(c.numero)]||c.cliente||\\'\u2014\\')+\\'</span>\\';\n  buildTabs(tipo,updated,CC._det);\n)+'\n\nfunction saveRiga(numero){\n  const costo=parseFloat(document.getElementById(\\'f-costo\\').value||0);\n  const sconto=parseFloat(document.getElementById(\\'f-sconto\\').value||0);\n  const markup=parseFloat(document.getElementById(\\'f-markup\\').value||2.25);\n  const netto=costo*(1-sconto/100);\n  const row={id:uid(),sezione:document.getElementById(\\'f-sez\\').value.trim()||\\'Generale\\',descrizione:document.getElementById(\\'f-desc\\').value.trim(),qty:parseInt(document.getElementById(\\'f-qty\\').value||1),fornitore:document.getElementById(\\'f-forn\\').value.trim(),codice:document.getElementById(\\'f-cod\\').value.trim(),costo_cad:costo,sconto,netto_cad:parseFloat(netto.toFixed(4)),markup,prezzo_vendita:parseFloat((netto*markup).toFixed(4)),stato_approv:document.getElementById(\\'f-stato-a\\').value,data_attesa:document.getElementById(\\'f-datta\\').value)+';\n  const det=ll(\\'det\\');if(!det[numero])det[numero]={distinta:[],ore:[],note:\\'\\')+';\n  det[numero].distinta.push(row);ls(\\'det\\',det);syncDetBackground();CC._det=det[numero];\n  closeM();[\\'distinta\\',\\'approv\\',\\'riepilogo\\'].forEach(id=>renderTabContent(id,CC,det[numero]));\n)+'\n\nfunction updateRiga(numero,rid){\n  const costo=parseFloat(document.getElementById(\\'f-costo\\').value||0);\n  const sconto=parseFloat(document.getElementById(\\'f-sconto\\').value||0);\n  const markup=parseFloat(document.getElementById(\\'f-markup\\').value||2.25);\n  const netto=costo*(1-sconto/100);\n  const det=ll(\\'det\\');if(!det[numero])return;\n  const idx=det[numero].distinta.findIndex(r=>r.id===rid);if(idx<0)return;\n  det[numero].distinta[idx]={\n    ...det[numero].distinta[idx],\n    sezione:document.getElementById(\\'f-sez\\').value.trim()||det[numero].distinta[idx].sezione,\n    descrizione:document.getElementById(\\'f-desc\\').value.trim(),\n    qty:parseInt(document.getElementById(\\'f-qty\\').value||1),\n    fornitore:document.getElementById(\\'f-forn\\').value.trim(),\n    codice:document.getElementById(\\'f-cod\\').value.trim(),\n    costo_cad:costo,sconto,\n    netto_cad:parseFloat(netto.toFixed(4)),\n    markup,\n    prezzo_vendita:parseFloat((netto*markup).toFixed(4)),\n    stato_approv:document.getElementById(\\'f-stato-a\\').value,\n    data_attesa:document.getElementById(\\'f-datta\\').value\n  )+';\n  ls(\\'det\\',det);syncDetBackground();CC._det=det[numero];\n  closeM();[\\'distinta\\',\\'approv\\',\\'riepilogo\\'].forEach(id=>renderTabContent(id,CC,det[numero]));\n  showToast(\\'✓ Componente aggiornato\\');\n)+'\n\nfunction saveSezione(numero){\n  const nome=(document.getElementById(\\'f-sez-nome\\').value||\\'\\').trim();\n  if(!nome){alert(\\'Inserisci un nome per la sezione\\');return;)+'\n  // Aggiunge una riga-intestazione sezione nella distinta\n  const row={id:uid(),sezione:nome,_intestazione:true,descrizione:\\'\\',qty:0,fornitore:\\'\\',codice:\\'\\',costo_cad:0,sconto:0,netto_cad:0,markup:1,prezzo_vendita:0,stato_approv:\\'\\',data_attesa:\\'\\')+';\n  const det=ll(\\'det\\');if(!det[numero])det[numero]={distinta:[],ore:[],note:\\'\\')+';\n  det[numero].distinta.push(row);ls(\\'det\\',det);syncDetBackground();CC._det=det[numero];\n  closeM();[\\'distinta\\',\\'approv\\',\\'riepilogo\\'].forEach(id=>renderTabContent(id,CC,det[numero]));\n)+'\n\nfunction saveOre(numero){\n  const row={id:uid(),data:document.getElementById(\\'f-dat\\').value,operatore:document.getElementById(\\'f-op\\').value.trim(),descrizione:document.getElementById(\\'f-desc\\').value.trim(),ore:parseFloat(document.getElementById(\\'f-ore\\').value||0),tariffa:parseFloat(document.getElementById(\\'f-tar\\').value||0))+';\n  const det=ll(\\'det\\');if(!det[numero])det[numero]={distinta:[],ore:[],note:\\'\\')+';\n  (det[numero].ore=det[numero].ore||[]).push(row);ls(\\'det\\',det);syncDetBackground();CC._det=det[numero];\n  closeM();renderTabContent(\\'ore\\',CC,det[numero]);renderTabContent(\\'riepilogo\\',CC,det[numero]);\n)+'\n\n// ════════════════════════════════════════════\n// IMPORT MOVIMENTI BANCARI\n// ════════════════════════════════════════════\n\nfunction dropMovimenti(ev, banca){\n  ev.preventDefault();\n  const file=ev.dataTransfer.files[0];\n  if(file)parseMovimenti(file,banca);\n)+'\nfunction fileMovimenti(input,banca){\n  if(input.files[0])parseMovimenti(input.files[0],banca);\n)+'\n\nasync function parseMovimenti(file, banca){\n  const resEl=document.getElementById(\\'res-\\'+banca);\n  if(resEl)resEl.innerHTML=\\'<span style="color:var(--text3)">⏳ Lettura in corso…</span>\\';\n  try{\n    let movimenti=[];\n    let nomeConto=\\'\\';\n    let saldoFinale=null;\n    let dataUltimo=null;\n\n    if(banca===\\'fineco\\'){\n      ({movimenti,nomeConto,saldoFinale,dataUltimo)+'=await parseFinecoXLSX(file));\n    )+' else if(banca===\\'sella\\'){\n      ({movimenti,nomeConto,saldoFinale,dataUltimo)+'=await parseSellaCSV(file));\n    )+'\n\n    if(!movimenti.length){\n      if(resEl)resEl.innerHTML=\\'<span style="color:var(--amber)">⚠ Nessun movimento trovato nel file.</span>\\';\n      return;\n    )+'\n\n    // Salva movimenti con anti-duplicati\n    const existing=lll(\\'movimenti_\\'+banca);\n    const keys=new Set(existing.map(m=>m._key||\\'\\'));\n    const nuovi=movimenti.filter(m=>!keys.has(m._key));\n    const merged=[...nuovi,...existing].sort((a,b)=>b.data.localeCompare(a.data));\n    ls(\\'movimenti_\\'+banca, merged);\n\n    // Aggiorna saldo conto automaticamente\n    if(saldoFinale!==null && dataUltimo){\n      const contiAll=lll(\\'conti\\');\n      const nomeContoNorm=nomeConto||({fineco:\\'Banca Fineco\\',sella:\\'Banca Sella\\')+'[banca]||banca);\n      const idx=contiAll.findIndex(c=>(c.conto||\\'\\').toLowerCase().includes(banca.toLowerCase()));\n      const row={id:idx>=0?contiAll[idx].id:uid(),conto:nomeContoNorm,saldo:saldoFinale.toFixed(2),data_rilevazione:dataUltimo,note:\\'Import automatico da \\'+file.name)+';\n      if(idx>=0)contiAll[idx]=row; else contiAll.push(row);\n      ls(\\'conti\\',contiAll);\n      await wPut(\\'cassa.csv\\',contiAll,[\\'conto\\',\\'saldo\\',\\'data_rilevazione\\',\\'note\\']);\n      renderCassa();\n    )+'\n\n    const msg=\\'✓ \\'+nuovi.length+\\' nuovi mov. su \\'+movimenti.length+\\' totali\\'+(saldoFinale!==null?\\' · saldo aggiornato: €\\'+fmt(saldoFinale):\\'\\');\n    if(resEl)resEl.innerHTML=\\'<span style="color:var(--green);font-weight:600">\\'+msg+\\'</span>\\';\n    showToast(msg);\n\n  )+'catch(err){\n    if(resEl)resEl.innerHTML=\\'<span style="color:var(--red)">✗ \\'+err.message+\\'</span>\\';\n    console.error(\\'Import movimenti error:\\',err);\n  )+'\n)+'\n\nasync function parseFinecoXLSX(file){\n  return new Promise((resolve,reject)=>{\n    const reader=new FileReader();\n    reader.onload=async e=>{\n      try{\n        if(typeof XLSX===\\'undefined\\'){\n          await new Promise((res,rej)=>{\n            const s=document.createElement(\\'script\\');\n            s.src=\\'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js\\';\n            s.onload=res;s.onerror=()=>rej(new Error(\\'Impossibile caricare SheetJS\\'));\n            document.head.appendChild(s);\n          )+');\n        )+'\n        const wb=XLSX.read(new Uint8Array(e.target.result),{type:\\'array\\',cellDates:true)+');\n        const ws=wb.Sheets[wb.SheetNames[0]];\n        const aoa=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null)+');\n\n        // Estrai intestazione: R0=conto, R2=periodo, R4=saldo\n        let nomeConto=\\'Banca Fineco\\';\n        let saldoFinale=null;\n        for(let i=0;i<10;i++){\n          const r=aoa[i];if(!r)continue;\n          const v=String(r[0]||\\'\\');\n          if(v.includes(\\'Conto Corrente:\\'))nomeConto=\\'Banca Fineco (\\'+v.split(\\':\\')[1].trim()+\\')\\';\n          if(v.includes(\\'Saldo Finale:\\')){\n            const m=v.match(/Saldo Finale:\s*([\d.,]+)/);\n            if(m)saldoFinale=parseFloat(m[1].replace(/\./g,\\'\\').replace(\\',\\',\\'.\\'));\n          )+'\n        )+'\n\n        // Trova riga header (Data_Operazione)\n        let hdrIdx=-1;\n        for(let i=0;i<aoa.length;i++){\n          if(aoa[i]&&String(aoa[i][0]||\\'\\').includes(\\'Data_Operazione\\')){hdrIdx=i;break;)+'\n        )+'\n        if(hdrIdx<0)throw new Error(\\'Header "Data_Operazione" non trovato — controlla il file Fineco.\\');\n\n        const movimenti=[];\n        let dataUltimo=null;\n\n        for(let i=hdrIdx+1;i<aoa.length;i++){\n          const r=aoa[i];if(!r||!r[0])continue;\n          // Data: può essere Date object o stringa\n          let data=\\'\\';\n          if(r[0] instanceof Date){\n            data=r[0].toISOString().slice(0,10);\n          )+' else if(typeof r[0]===\\'number\\'){\n            // Excel serial date\n            const d=XLSX.SSF.parse_date_code(r[0]);\n            data=d.y+\\'-\\'+String(d.m).padStart(2,\\'0\\')+\\'-\\'+String(d.d).padStart(2,\\'0\\');\n          )+' else {\n            const s=String(r[0]);\n            const m=s.match(/(\d{2)+')\/(\d{2)+')\/(\d{4)+')/);\n            if(m)data=\''+(m[3])+'-'+(m[2].padStart(2,"0"))+'-'+(m[1].padStart(2,"0"))+'(\';\n          )+'\n          if(!data)continue;\n\n          const entrate=parseFloat(r[2])||0;\n          const uscite=parseFloat(r[3])||0; // già negativo\n          const importo=entrate>0?entrate:uscite; // uscite < 0\n          const desc=String(r[4]||\\'\\').trim();\n          const descCompl=String(r[5]||\\'\\').trim();\n          const key=\'fineco_'+(data)+'_'+(importo)+'_'+(desc.slice(0,20))+'(\';\n\n          movimenti.push({\n            banca:\\'fineco\\',data,\n            entrata:entrate>0?entrate:0,\n            uscita:uscite<0?Math.abs(uscite):0,\n            importo,\n            descrizione:desc,\n            dettaglio:descCompl,\n            stato:String(r[6]||\\'\\'),\n            _key:key\n          )+');\n          if(!dataUltimo||data>dataUltimo)dataUltimo=data;\n        )+'\n\n        resolve({movimenti,nomeConto,saldoFinale,dataUltimo)+');\n      )+'catch(err){reject(err);)+'\n    )+';\n    reader.onerror=()=>reject(new Error(\\'Errore lettura file\\'));\n    reader.readAsArrayBuffer(file);\n  )+');\n)+'\n\nasync function parseSellaCSV(file){\n  return new Promise((resolve,reject)=>{\n    const reader=new FileReader();\n    reader.onload=e=>{\n      try{\n        const text=e.target.result;\n        const lines=text.split(/\r?\n/).filter(l=>l.trim());\n\n        // Riga 0 = header\n        const headers=lines[0].split(\\',\\').map(h=>h.trim().replace(/^"|"$/g,\\'\\'));\n\n        const iData=headers.findIndex(h=>h.toLowerCase().includes(\\'data operazione\\'));\n        const iDesc=headers.findIndex(h=>h.toLowerCase()===\\'descrizione\\');\n        const iContr=headers.findIndex(h=>h.toLowerCase()===\\'controparte\\');\n        const iDeb=headers.findIndex(h=>h.toLowerCase()===\\'debito\\');\n        const iCred=headers.findIndex(h=>h.toLowerCase()===\\'credito\\');\n        const iImp=headers.findIndex(h=>h.toLowerCase().includes(\\'importo\\'));\n\n        // Cerca righe saldo (Descrizione="Saldo al...") per estrarre saldo finale\n        let saldoFinale=null;\n        let dataUltimo=null;\n        const movimenti=[];\n\n        for(let i=1;i<lines.length;i++){\n          const cols=lines[i].split(\\',\\').map(c=>c.trim().replace(/^"|"$/g,\\'\\'));\n          const desc=cols[iDesc]||\\'\\';\n\n          // Riga saldo — usa parseIta (formato italiano con punto migliaia)\n          if(desc.startsWith(\\'Saldo al\\')){\n            const raw=(cols[iImp]||\\'\\').trim();\n            const s=parseFloat(raw.replace(/\./g,\\'\\').replace(\\',\\',\\'.\\'));\n            if(!isNaN(s))saldoFinale=s;\n            continue;\n          )+'\n\n          const dataRaw=cols[iData]||\\'\\';\n          if(!dataRaw||!dataRaw.match(/\d{2)+'\/\d{2)+'\/\d{4)+'/))continue;\n          const dm=dataRaw.match(/(\d{2)+')\/(\d{2)+')\/(\d{4)+')/);\n          const data=dm?dm[3]+\\'-\\'+dm[2].padStart(2,\\'0\\')+\\'-\\'+dm[1].padStart(2,\\'0\\'):\\'\\';\n          if(!data)continue;\n\n          // parseIta: converte numero formato italiano (1.234,56) in float\n          const parseIta=v=>{\n            if(v===null||v===undefined||v===\\'\\')return 0;\n            const s=String(v).trim();\n            if(!s)return 0;\n            // Se già numero JS valido (es. da SheetJS) restituisce direttamente\n            if(!isNaN(Number(s))&&!s.includes(\\',\\'))return parseFloat(s)||0;\n            // Formato italiano: rimuovi punti migliaia, converti virgola decimale\n            return parseFloat(s.replace(/\./g,\\'\\').replace(\\',\\',\\'.\\'))||0;\n          )+';\n\n          const deb=parseIta(cols[iDeb]);\n          const cred=parseIta(cols[iCred]);\n          const imp=parseIta(cols[iImp]);\n          const controparte=cols[iContr]||\\'\\';\n          const key=\'sella_'+(data)+'_'+(imp)+'_'+(desc.slice(0,20))+'(\';\n\n          movimenti.push({\n            banca:\\'sella\\',data,\n            entrata:cred>0?cred:0,\n            uscita:deb>0?deb:0,\n            importo:imp,\n            descrizione:desc+(controparte?\\' — \\'+controparte:\\'\\'),\n            dettaglio:controparte,\n            stato:\\'\\',_key:key\n          )+');\n          if(!dataUltimo||data>dataUltimo)dataUltimo=data;\n        )+'\n\n        resolve({movimenti,nomeConto:\\'Banca Sella\\',saldoFinale,dataUltimo)+');\n      )+'catch(err){reject(err);)+'\n    )+';\n    reader.onerror=()=>reject(new Error(\\'Errore lettura file\\'));\n    reader.readAsText(file,\\'utf-8\\');\n  )+');\n)+'\n\nasync function salvaRevolut(){\n  const saldo=parseFloat(document.getElementById(\\'rev-saldo\\')?.value||\\'\\');\n  const data=document.getElementById(\\'rev-data\\')?.value||\\'\\';\n  if(isNaN(saldo)||!data){showToast(\\'Inserisci saldo e data\\');return;)+'\n  const conti=lll(\\'conti\\');\n  const idx=conti.findIndex(c=>(c.conto||\\'\\').toLowerCase().includes(\\'revolut\\'));\n  const row={id:idx>=0?conti[idx].id:uid(),conto:\\'Revolut\\',saldo:saldo.toFixed(2),data_rilevazione:data,note:\\'Aggiornato da estratto conto PDF\\')+';\n  if(idx>=0)conti[idx]=row; else conti.push(row);\n  ls(\\'conti\\',conti);\n  await wPut(\\'cassa.csv\\',conti,[\\'conto\\',\\'saldo\\',\\'data_rilevazione\\',\\'note\\']);\n  renderCassa();\n  const el=document.getElementById(\\'res-revolut\\');\n  if(el)el.innerHTML=\'<span style="color:var(--green);font-weight:600">✓ Saldo Revolut aggiornato: €'+(fmt(saldo))+'</span>(\';\n  showToast(\\'✓ Saldo Revolut aggiornato\\');\n)+'\n\nasync function saveConto(){\n  const nome=(document.getElementById(\\'f-nome\\')||{)+').value?.trim()||\\'\\';\n  const saldo=(document.getElementById(\\'f-saldo\\')||{)+').value||\\'0\\';\n  const data_rilevazione=(document.getElementById(\\'f-dat\\')||{)+').value||\\'\\';\n  const note=(document.getElementById(\\'f-note\\')||{)+').value?.trim()||\\'\\';\n  if(!nome){showToast(\\'Inserisci il nome del conto\\');return;)+'\n  const all=lll(\\'conti\\');\n  // Upsert: aggiorna se esiste già un conto con lo stesso nome\n  const idx=all.findIndex(c=>(c.conto||c.nome||\\'\\').toLowerCase()===nome.toLowerCase());\n  const row={id:idx>=0?all[idx].id:uid(),conto:nome,saldo,data_rilevazione,note)+';\n  if(idx>=0)all[idx]=row;else all.push(row);\n  ls(\\'conti\\',all);\n  await wPut(\\'cassa.csv\\',all,[\\'conto\\',\\'saldo\\',\\'data_rilevazione\\',\\'note\\']);\n  closeM();renderCassa();\n  showToast(\\'✓ Saldo aggiornato: \\'+nome);\n)+'\n\nasync function saveScad(){\n  const row={\n    id:uid(),\n    data:document.getElementById(\\'f-dat\\').value,\n    descrizione:(document.getElementById(\\'f-desc\\')||{)+').value?.trim()||\\'\\',\n    importo:document.getElementById(\\'f-imp\\').value||\\'0\\',\n    categoria:(document.getElementById(\\'f-cat\\')||{)+').value||\\'\\',\n    pagato:\\'no\\',\n    _fiscale:false\n  )+';\n  if(!row.data){showToast(\\'Inserisci la data\\');return;)+'\n  const data=lll(\\'scad\\');data.push(row);ls(\\'scad\\',data);\n  await wPut(\\'scadenze.csv\\',[row,...(SD.scad||[])],[\\'data\\',\\'descrizione\\',\\'importo\\',\\'categoria\\',\\'pagato\\']);\n  closeM();renderScad();\n)+'\n\nfunction rigeneraScadenzeFatture(){\n  const scadenze=lll(\\'scad\\');\n  const nonFatt=scadenze.filter(s=>!s._fatt_key);\n  ls(\\'scad\\',nonFatt);\n  const fatture=SD.fatt||lll(\\'fatt\\');\n  if(!fatture.length){showToast(\\'Nessuna fattura importata\\');return;)+'\n  const n=aggiungiScadenzeDaFatture(fatture);\n  showToast(\'✓ Rigenerate '+(n)+' scadenze da '+(fatture.length)+' fatture(\');\n)+'\n\nfunction saveScadEdit(sid){\n  const all=lll(\\'scad\\');\n  const idx=all.findIndex(x=>x.id===sid);\n  if(idx<0){showToast(\\'Scadenza non trovata\\');return;)+'\n  all[idx]={\n    ...all[idx],\n    descrizione:(document.getElementById(\\'f-desc\\')||{)+').value?.trim()||all[idx].descrizione,\n    data:document.getElementById(\\'f-dat\\').value||all[idx].data,\n    importo:document.getElementById(\\'f-imp\\').value||\\'0\\',\n    categoria:(document.getElementById(\\'f-cat\\')||{)+').value||all[idx].categoria||\\'\\',\n    pagato:(document.getElementById(\\'f-pagata\\')||{)+').value||\\'no\\',\n  )+';\n  ls(\\'scad\\',all);\n  closeM();renderScad();\n  showToast(\\'✓ Scadenza aggiornata\\');\n)+'\n\nfunction saveTodo(){\n  const data=lll(\\'todo\\');data.push({id:uid(),testo:document.getElementById(\\'f-desc\\').value.trim(),pri:document.getElementById(\\'f-pri\\').value,done:false)+');\n  ls(\\'todo\\',data);closeM();renderTodo();\n)+'\n\nfunction saveCfg2(){\n  const f24key=(document.getElementById(\\'cfg-f24key\\')||{)+').value||\\'\\';\n  const f24tipo=(document.getElementById(\\'cfg-f24tipo\\')||{)+').value||\\'all\\';\n  const f24sync=(document.getElementById(\\'cfg-f24sync\\')||{)+').value||\\'60\\';\n  const oldCfg=lCfg();\n  // Salva markup per cliente\n  const markup_clienti={)+';\n  Object.keys(CMAP).forEach(cod=>{\n    const el=document.getElementById(\\'cfg-mk-\\'+cod);\n    if(el&&el.value)markup_clienti[cod]=parseFloat(el.value)||2.25;\n  )+');\n  sCfg({\n    nc_url:document.getElementById(\\'cfg-url\\').value.trim().replace(/\/$/,\\'\\'),\n    nc_user:document.getElementById(\\'cfg-user\\').value.trim(),\n    nc_pass:document.getElementById(\\'cfg-pass\\').value.trim(),\n    f24_key:f24key||oldCfg.f24_key||\\'\\',\n    f24_tipo:f24tipo,\n    f24_sync:f24sync,\n    f24_ok:oldCfg.f24_ok||false,\n    markup_clienti\n  )+');\n  closeM();\n  if(f24key&&f24key!==oldCfg.f24_key){\n    testF24Key(f24key,f24tipo,f24sync);\n  )+' else {\n    syncNow();\n  )+'\n)+'\n\nasync function testF24Key(key,tipo,syncMin){\n  const cfg=getCfg();\n  if(!cfg.ok){showToast(\\'Configura prima Nextcloud\\');return;)+'\n  showToast(\\'Salvataggio API key Fattura24…\\');\n  // Scrive f24_config.txt in Nextcloud — lo script Python lo legge al prossimo ciclo\n  await pushF24Config(key,tipo,syncMin);\n  // Prova a verificare via proxy (opzionale, non bloccante)\n  try{\n    const r=await fetch(\''+(cfg.nc_url)+'/f24test(\',{method:\\'POST\\',headers:{\\'Content-Type\\':\\'application/json\\')+',body:JSON.stringify({api_key:key)+'),signal:AbortSignal.timeout(5000))+');\n    if(r.ok){\n      const d=await r.json().catch(()=>({)+'));\n      if(d.ok){const c=lCfg();c.f24_ok=true;sCfg(c);showToast(\\'✓ API key Fattura24 attiva e verificata!\\');)+'\n      else showToast(\\'API key salvata — verifica su Fattura24 se attiva\\');\n    )+' else {\n      showToast(\\'API key salvata in Nextcloud (/Dashboard/f24_config.txt)\\');\n    )+'\n  )+'catch{\n    showToast(\\'API key salvata — lo script la leggerà al prossimo sync\\');\n  )+'\n  syncNow();\n)+'\n\nasync function pushF24Config(key,tipo,syncMin){\n  const cfg=getCfg();\n  if(!cfg.ok)return;\n  const content=\'F24_API_KEY='+(key)+'\nF24_TIPO='+(tipo)+'\nF24_SYNC_MIN='+(syncMin)+'\n(\';\n  try{\n    await fetch(\''+(cfg.nc_url)+'/remote.php/dav/files/'+(cfg.nc_user)+'/Dashboard/f24_config.txt(\',{\n      method:\\'PUT\\',\n      headers:{\\'Authorization\\':\\'Basic \\'+btoa(cfg.nc_user+\\':\\'+cfg.nc_pass),\\'Content-Type\\':\\'text/plain\\')+',\n      body:content\n    )+');\n  )+'catch{/* silenzioso */)+'\n)+'\n\n\nfunction exportAll(){\n  const blob=new Blob([JSON.stringify({commesse:lll(\\'comm\\'),conti:lll(\\'conti\\'),scadenze:lll(\\'scad\\'),todos:lll(\\'todo\\'),dettagli:ll(\\'det\\'),exported:new Date().toISOString())+',null,2)],{type:\\'application/json\\')+');\n  const a=document.createElement(\\'a\\');a.href=URL.createObjectURL(blob);a.download=\'asg-backup-'+(new Date().toISOString().slice(0,10))+'.json(\';a.click();\n)+'\n\n// ═══════════════════════════════════════════════\n// DATABASE FORNITORI\n// ═══════════════════════════════════════════════\nconst FORNITORI=[\n  {\n    id:\\'ARES\\',nome:\\'Ares Elettronica / Tecfluid\\',zona:\\'Reggio Emilia (RE)\\',colore:\\'#166534\\',emoji:\\'⚙\\',\n    url:\\'https://www.areselettronica.it\\',\n    categorie:[\\'Minicentraline PU05/PU10/PU20\\',\\'Collettori modulari\\',\\'Valvole integrate\\',\\'Pompe Gr.1/2\\',\\'Motori DC/AC\\',\\'Serbatoi\\',\\'Blocchi modulari\\',\\'Distanziali\\',\\'Bobine\\',\\'Controllo elettronico\\'],\n    note:\\'Fornitore principale per minicentraline modulari ASG. Ottimi prezzi e disponibilità su serie PU. Listino 2022 disponibile. Stesso gruppo di Tecfluid (RE). Tecfluid produce anche sistemi completi per applicazioni industriali (sollevatori, dock leveller, forbici) e mobile (sponde camion, ribaltabili, barche).\\',\n    accordo:\\'Listino accordato 2022\\',\n    contatti:{tel:\\'+39 0522 926 369\\',email:\\'info@tecfluid.it\\')+',\n    applicazioni:[\n      {cat:\\'Garage & Sollevamento\\',emoji:\\'🚗\\',items:[\\'Ponte sollevatore 2 colonne (max 5.5 kW, 4000 PSI, 5 GPM)\\',\\'Ponte HD a 2 colonne con livellamento elettronico\\',\\'Colonna mobile (12/24V DC + AC, Energy Recovery)\\',\\'Piattaforma sollevatore HD (fino a 13 kW, 6 GPM, serbatoio 25 GAL)\\',\\'Forbice sollevatore (max 4 kW, livellamento opzionale)\\',\\'Cambia pneumatici truck (5 assi, pompa silenzio)\\',\\'Cambia pneumatici HD\\',\\'Sollevatore moto (telecomando opzionale)\\'])+',\n      {cat:\\'Logistica & Dock\\',emoji:\\'🏭\\',items:[\\'Dock leveller swing lip (max 1.5 kW, 3000 PSI)\\',\\'Dock leveller telescopic lip\\',\\'Combi leveller truck & van\\',\\'Truck immobilizer (soluzione CETOP + cartucce)\\'])+',\n      {cat:\\'Industriale Generale\\',emoji:\\'🔧\\',items:[\\'Compattatore carta (soft-switch CETOP)\\',\\'Colonnina mobile (IP67 submerged option)\\',\\'Car parking system (pompa silenzio)\\',\\'Tavola elevatrice (remote control, versione sommersa)\\'])+',\n      {cat:\\'Mobile — Camion\\',emoji:\\'🚚\\',items:[\\'Sponda idraulica (12/24V DC, 4000 PSI)\\',\\'Sponda US version\\',\\'Ribaltabile tipper (wireless remote)\\',\\'Wing body (wired/wireless)\\',\\'Snowplow pick-up (wireless)\\',\\'Wheelchair lift\\'])+',\n      {cat:\\'Mobility\\',emoji:\\'🚐\\',items:[\\'Stabilizzatore caravan (livellamento elettronico)\\',\\'Platform scissor lift (brushless, energy recovery)\\',\\'Pick-up tow truck\\',\\'Pick-up scissor lift\\',\\'Forklift (brushless, energy recovery)\\',\\'Sweeper\\'])+',\n      {cat:\\'Marine\\',emoji:\\'⛵\\',items:[\\'Passerella (gangway, wireless)\\',\\'Tender lift\\',\\'Boat lift (wired/wireless)\\',\\'Boat steering system (24V brushless)\\'])+',\n    ]\n  )+',\n  {\n    id:\\'CPA\\',nome:\\'CPA Fluid\\',zona:\\'Rivoli (TO)\\',colore:\\'#1a56db\\',emoji:\\'🔵\\',\n    url:\\'https://www.cpafluid.eu\\',\n    categorie:[\\'Elettrovalvole Atos\\',\\'Distributori CETOP\\',\\'Pompe ingranaggi\\',\\'Pompe palette/vite\\',\\'Pompe variabili\\',\\'Valvole di massima\\',\\'Valvole riduttrici\\',\\'Valvole di flusso\\',\\'Valvole di ritegno\\',\\'Controbilanciamento\\',\\'Giunti e lanterne\\',\\'Filtri\\',\\'Accumulatori\\'],\n    note:\\'Vasto magazzino con spedizione rapida DHL. Distributore principale Atos. Ottimo per componenti standard con consegna urgente. E-shop con prezzi visibili.\\',\n    accordo:\\'Prezzi concordati — accesso e-shop\\',\n    contatti:{tel:\\'+39 011 9591521\\',email:\\'info@cpafluid.eu\\')+'\n  )+',\n  {\n    id:\\'FIZ\\',nome:\\'FIZ Srl / Tecnical Impianti\\',zona:\\'Verona + Bergamo\\',colore:\\'#5b21b6\\',emoji:\\'🟣\\',\n    url:\\'https://www.fizsrl.it\\',\n    categorie:[\\'Bosch Rexroth\\',\\'Elettrovalvole proporzionali\\',\\'Distributori DN10/16/25\\',\\'Pompe pistoni assiali\\',\\'Pompe palette variabili\\',\\'Motori idraulici\\',\\'Cilindri\\',\\'Centraline su misura\\',\\'Tubi flessibili\\',\\'Pneumatica\\',\\'SKF\\',\\'Festo\\',\\'Siemens\\'],\n    note:\\'Gruppo ampio con Tecnical Impianti (partner diretto). Accesso a catalogo completo Bosch Rexroth a ottimi prezzi. Molti costruttori alternativi gestiti nel gruppo. Buona disponibilità e tempi.\\',\n    accordo:\\'Accordo tramite Tecnical Impianti\\',\n    contatti:{tel:\\'\\',email:\\'\\')+'\n  )+',\n  {\n    id:\\'PACO\\',nome:\\'Pa.Co Fluid\\',zona:\\'Legnano (MI) + Parma (PR)\\',colore:\\'#0369a1\\',emoji:\\'🔧\\',\n    url:\\'https://pacofluid.it\\',\n    categorie:[\\'Tubi flessibili raccordati\\',\\'Raccorderia BSP/UNF/JIC/ORFS\\',\\'Adattatori\\',\\'Tubi rigidi\\',\\'Valvole a sfera\\',\\'Valvole di ritegno\\',\\'Scambiatori di calore\\',\\'Pneumatica\\',\\'Cilindri pneumatici\\',\\'Accessori serraggio\\'],\n    note:\\'Specialista tubi flessibili raccordati e raccorderia. Ampio magazzino ~2000 articoli. Assemblaggio e collaudo in sede. Ottimo per urgenze su tubi e raccordi.\\',\n    accordo:\\'Prezzi concordati — consegna rapida\\',\n    contatti:{tel:\\'+39 0331 455644\\',email:\\'info@pacosrl.it\\')+'\n  )+',\n  {\n    id:\\'COLFER\\',nome:\\'Colfer Srl\\',zona:\\'Monza (MB)\\',colore:\\'#78350f\\',emoji:\\'🏭\\',\n    url:\\'\\',\n    categorie:[\\'Carpenteria su disegno\\',\\'Serbatoi oleodinamici speciali\\',\\'Lamierazione\\',\\'Verniciatura epossidica\\',\\'Strutture saldate\\',\\'Basamenti motori-pompa\\'],\n    note:\\'Partner carpenteria e verniciatura. Serbatoi e strutture a disegno in tempi brevi. Verniciatura RAL epossidica/poliuretanica. Ideale per serbatoi speciali fuori standard e basamenti personalizzati.\\',\n    accordo:\\'Collaborazione diretta\\',\n    contatti:{tel:\\'\\',email:\\'\\')+'\n  )+',\n  {\n    id:\\'MORATTI\\',nome:\\'M.B. Moratti\\',zona:\\'Rovato (BS)\\',colore:\\'#0f766e\\',emoji:\\'🔩\\',\n    url:\\'\\',\n    categorie:[\\'Cilindri oleodinamici saldati\\',\\'Cilindri a disegno\\',\\'Cilindri grandi dimensioni\\',\\'Cilindri telescopici\\',\\'Riparazione cilindri\\'],\n    note:\\'Produzione cilindri oleodinamici saldati su misura, anche di grandi dimensioni. Ottimo per cilindri non standard e riparazioni. Tempi di consegna competitivi.\\',\n    accordo:\\'Collaborazione diretta\\',\n    contatti:{tel:\\'\\',email:\\'\\')+'\n  )+',\n  {\n    id:\\'GTA\\',nome:\\'GTA Lombardia\\',zona:\\'Lombardia\\',colore:\\'#64748b\\',emoji:\\'📦\\',\n    url:\\'\\',\n    categorie:[\\'Catalogo ampio generico\\',\\'Valvole\\',\\'Pompe\\',\\'Motori\\',\\'Cilindri\\',\\'Raccorderia\\',\\'Filtri\\',\\'Serbatoi\\',\\'Accessori\\'],\n    note:\\'Catalogo molto ampio. Prezzi e tempi non sempre ottimali ma utile per componenti difficilmente reperibili altrove o per completare un ordine.\\',\n    accordo:\\'Listino standard\\',\n    contatti:{tel:\\'\\',email:\\'\\')+'\n  )+',\n  {\n    id:\\'SMEM\\',nome:\\'Smem Srl\\',zona:\\'Nord Italia\\',colore:\\'#b91c1c\\',emoji:\\'⚡\\',\n    url:\\'\\',\n    categorie:[\\'Motori elettrici AC trifase\\',\\'Motori AC monofase\\',\\'Motori IE3\\',\\'Motori ATEX\\',\\'Motori freno\\',\\'Riduttori\\'],\n    note:\\'Ottima disponibilità e prezzi competitivi su motori elettrici AC. Riferimento principale per motori standard da catalogo con consegna rapida.\\',\n    accordo:\\'Prezzi concordati\\',\n    contatti:{tel:\\'\\',email:\\'\\')+'\n  )+',\n  {\n    id:\\'XF\\',nome:\\'XF Srl (Fox Group)\\',zona:\\'Italia\\',colore:\\'#92400e\\',emoji:\\'📊\\',\n    url:\\'\\',\n    categorie:[\\'Pressostati\\',\\'Accumulatori a vescica\\',\\'Accumulatori a membrana\\',\\'Accumulatori a pistone\\',\\'Trasduttori di pressione\\',\\'Manometri digitali\\'],\n    note:\\'Società del gruppo Fox Srl. Riferimento per pressostati e accumulatori. Buona disponibilità su gamma standard.\\',\n    accordo:\\'Listino concordato\\',\n    contatti:{tel:\\'\\',email:\\'\\')+'\n  )+',\n  {\n    id:\\'PIOTTI\\',nome:\\'Piotti Oleodinamica\\',zona:\\'Italia\\',colore:\\'#4338ca\\',emoji:\\'🛢\\',\n    url:\\'\\',\n    categorie:[\\'Componenti oleodinamica generici\\',\\'Valvole\\',\\'Pompe\\',\\'Filtri\\',\\'Raccorderia\\'],\n    note:\\'Distributore oleodinamica generale.\\',\n    accordo:\\'Da definire\\',\n    contatti:{tel:\\'\\',email:\\'\\')+'\n  )+',\n  {\n    id:\\'BART\\',nome:\\'Bart Srl\\',zona:\\'Milano (MI)\\',colore:\\'#0891b2\\',emoji:\\'🔬\\',\n    url:\\'https://www.bart-e.com\\',\n    categorie:[\\'Manometri a secco\\',\\'Manometri a glicerina\\',\\'Manometri ATEX\\',\\'Manometri isometrici\\',\\'Salvamanometri / esclusori\\',\\'Termometri\\',\\'Valvole a sfera inox\\',\\'Raccordi strumentazione\\'],\n    note:\\'Specialista manometri e strumentazione. Gamma completa da 0 a 1000 bar. Prodotti certificati CE/Accredia. Versioni ATEX disponibili. Salvamanometri esclusori di vari tipi.\\',\n    accordo:\\'Listino concordato\\',\n    contatti:{tel:\\'\\',email:\\'info@bart-e.com\\')+'\n  )+',\n];\n\n// ═══════════════════════════════════════════════\n// TASSONOMIA CATEGORIE OLEODINAMICA\n// ═══════════════════════════════════════════════\nconst CAT_TREE=[\n  {id:\\'valvole\\',label:\\'Valvole\\',emoji:\\'⚡\\',colore:\\'#5b21b6\\',sub:[\n    {id:\\'val-direz\\',label:\\'Direzionali (Distributori)\\',fornitori:[\\'CPA\\',\\'FIZ\\',\\'GTA\\'],sub2:[\\'A piastra CETOP3 (DN6)\\',\\'A piastra CETOP5 (DN10)\\',\\'A piastra CETOP7 (DN16)\\',\\'In linea / a cartuccia\\',\\'Proporzionali\\',\\'Manuali/meccaniche\\',\\'Sicurezza monitorate\\'])+',\n    {id:\\'val-press\\',label:\\'Pressione\\',fornitori:[\\'CPA\\',\\'FIZ\\',\\'ARES\\',\\'GTA\\'],sub2:[\\'Valvole di massima (in linea)\\',\\'Valvole di massima (a piastra)\\',\\'Proporzionali di pressione\\',\\'Riduttrici di pressione\\',\\'Sequenza\\',\\'Scarico / unloading\\'])+',\n    {id:\\'val-flusso\\',label:\\'Flusso\\',fornitori:[\\'CPA\\',\\'ARES\\',\\'FIZ\\',\\'GTA\\'],sub2:[\\'Regolatrici compensate (in linea)\\',\\'Regolatrici (a piastra)\\',\\'Proporzionali di flusso\\',\\'Divisori di flusso 50/50\\',\\'Prioritarie\\'])+',\n    {id:\\'val-ritegno\\',label:\\'Ritegno & Bilanciamento\\',fornitori:[\\'CPA\\',\\'ARES\\',\\'FIZ\\',\\'PACO\\',\\'GTA\\'],sub2:[\\'Ritegni a cartuccia\\',\\'Ritegni in linea\\',\\'Ritegni pilotati\\',\\'Valvole di bilanciamento (controbilanciamento)\\',\\'Ritegni CETOP\\'])+',\n    {id:\\'val-blocco\\',label:\\'Valvole di blocco / tenuta\\',fornitori:[\\'CPA\\',\\'ARES\\',\\'FIZ\\'],sub2:[\\'A cartuccia singola tenuta NC\\',\\'A cartuccia doppia tenuta\\',\\'Elettriche a cartuccia (V42/V43)\\',\\'Pneumatiche doppia tenuta\\'])+',\n  ])+',\n  {id:\\'pompe\\',label:\\'Pompe\\',emoji:\\'🔄\\',colore:\\'#0f766e\\',sub:[\n    {id:\\'p-ingr\\',label:\\'Ad ingranaggi esterni\\',fornitori:[\\'ARES\\',\\'CPA\\',\\'FIZ\\',\\'GTA\\'],sub2:[\\'Gruppo 05 (max 2cc)\\',\\'Gruppo 1 (max 9.8cc)\\',\\'Gruppo 2 (max 36cc)\\',\\'Gruppo 3\\',\\'Pompe reversibili Gr.1\\',\\'Pompe doppie Gr.2+Gr.1\\',\\'Pompe a rotori elicoidali (silenziose)\\'])+',\n    {id:\\'p-pale\\',label:\\'A palette\\',fornitori:[\\'CPA\\',\\'FIZ\\'],sub2:[\\'Cilindrata fissa\\',\\'Cilindrata variabile\\',\\'Bassa rumorosità\\'])+',\n    {id:\\'p-pist\\',label:\\'A pistoni assiali\\',fornitori:[\\'FIZ\\',\\'CPA\\'],sub2:[\\'Cilindrata fissa\\',\\'Cilindrata variabile\\',\\'Con regolatore di pressione\\',\\'Con regolatore Load Sensing\\'])+',\n    {id:\\'p-spec\\',label:\\'Speciali\\',fornitori:[\\'CPA\\',\\'GTA\\'],sub2:[\\'Pompe a vite\\',\\'Pompe a membrana\\',\\'Hand pump (manuali)\\'])+',\n  ])+',\n  {id:\\'motori-el\\',label:\\'Motori elettrici\\',emoji:\\'⚡\\',colore:\\'#b91c1c\\',sub:[\n    {id:\\'mot-ac\\',label:\\'AC trifase (B14/B5)\\',fornitori:[\\'SMEM\\',\\'ARES\\',\\'FIZ\\'],sub2:[\\'MEC71 0.25-0.55kW\\',\\'MEC80 0.75-1.1kW\\',\\'MEC90 1.5-2.2kW\\',\\'MEC100-112 3-4kW\\',\\'MEC132 5.5-9.2kW\\',\\'IE3 alta efficienza\\',\\'ATEX\\',\\'Freno\\',\\'Flangia quadra (FQ)\\'])+',\n    {id:\\'mot-mono\\',label:\\'AC monofase\\',fornitori:[\\'SMEM\\',\\'ARES\\'],sub2:[\\'MEC71 0.25-0.55kW\\',\\'MEC80 0.75-1.1kW\\',\\'MEC90 1.5-2.2kW\\',\\'Condensatore avviamento\\'])+',\n    {id:\\'mot-dc\\',label:\\'DC (12/24/48V)\\',fornitori:[\\'ARES\\'],sub2:[\\'12V 500W-2400W\\',\\'24V 500W-3000W\\',\\'48V\\',\\'Con ventilazione forzata\\',\\'Reversibili IP44\\',\\'Non reversibili IP54\\'])+',\n    {id:\\'mot-rid\\',label:\\'Riduttori\\',fornitori:[\\'FIZ\\',\\'SMEM\\'],sub2:[\\'Riduttori coassiali\\',\\'Riduttori ortogonali\\'])+',\n  ])+',\n  {id:\\'mot-idr\\',label:\\'Motori idraulici\\',emoji:\\'🔁\\',colore:\\'#0369a1\\',sub:[\n    {id:\\'mi-ingr\\',label:\\'Ad ingranaggi\\',fornitori:[\\'FIZ\\',\\'CPA\\',\\'GTA\\'],sub2:[\\'Gr.1 piccoli\\',\\'Gr.2 medi\\',\\'Gr.3 grandi\\'])+',\n    {id:\\'mi-orb\\',label:\\'Orbitali (gerotori)\\',fornitori:[\\'FIZ\\',\\'CPA\\'],sub2:[\\'50-800cc/giro\\',\\'Con freno\\',\\'Con riduttore\\'])+',\n    {id:\\'mi-pist\\',label:\\'A pistoni assiali\\',fornitori:[\\'FIZ\\'],sub2:[\\'Cilindrata fissa\\',\\'Cilindrata variabile\\'])+',\n  ])+',\n  {id:\\'cilindri\\',label:\\'Cilindri idraulici\\',emoji:\\'📐\\',colore:\\'#92400e\\',sub:[\n    {id:\\'cil-sal\\',label:\\'Saldati su misura\\',fornitori:[\\'MORATTI\\'],sub2:[\\'Alesaggio 40-500mm\\',\\'Stelo singolo\\',\\'Stelo passante\\',\\'Telescopici\\',\\'Grandi dimensioni\\'])+',\n    {id:\\'cil-tir\\',label:\\'A tiranti (standard)\\',fornitori:[\\'FIZ\\',\\'CPA\\',\\'GTA\\'],sub2:[\\'ISO 6020/1\\',\\'ISO 6020/2\\',\\'ISO 6022\\',\\'Compatti\\'])+',\n    {id:\\'cil-rep\\',label:\\'Riparazione cilindri\\',fornitori:[\\'MORATTI\\'],sub2:[\\'Revisione guarnizioni\\',\\'Rettifica stelo\\',\\'Rettifica camicia\\'])+',\n  ])+',\n  {id:\\'tubi-fless\\',label:\\'Tubi flessibili\\',emoji:\\'🌀\\',colore:\\'#0891b2\\',sub:[\n    {id:\\'tf-rac\\',label:\\'Raccordati su misura\\',fornitori:[\\'PACO\\',\\'FIZ\\'],sub2:[\\'DN6 (1/4")\\',\\'DN10 (3/8")\\',\\'DN12 (1/2")\\',\\'DN16 (5/8")\\',\\'DN19 (3/4")\\',\\'DN25 (1")\\',\\'DN32 (1"1/4)\\',\\'Acciaio al carbonio\\',\\'Acciaio inox\\',\\'PVC\\'])+',\n    {id:\\'tf-rig\\',label:\\'Tubi rigidi\\',fornitori:[\\'PACO\\'],sub2:[\\'In barre 6m\\',\\'Rivestiti\\',\\'Inox\\'])+',\n  ])+',\n  {id:\\'raccord\\',label:\\'Raccorderia\\',emoji:\\'🔩\\',colore:\\'#0891b2\\',sub:[\n    {id:\\'rac-bsp\\',label:\\'BSP (gas)\\',fornitori:[\\'PACO\\',\\'CPA\\',\\'GTA\\'],sub2:[\\'Maschio-maschio\\',\\'Femmina-femmina\\',\\'Riduzioni\\',\\'A gomito 90°\\',\\'A T\\'])+',\n    {id:\\'rac-unf\\',label:\\'UNF (SAE)\\',fornitori:[\\'PACO\\',\\'ARES\\',\\'CPA\\'],sub2:[\\'7/16-20 UNF\\',\\'9/16-18 UNF\\',\\'3/4-16 UNF\\',\\'7/8-14 UNF\\',\\'1-1/16-12 UNF\\'])+',\n    {id:\\'rac-jic\\',label:\\'JIC / 37°\\',fornitori:[\\'PACO\\',\\'CPA\\'],sub2:[\\'Maschio JIC\\',\\'Femmina JIC\\'])+',\n    {id:\\'rac-orfs\\',label:\\'ORFS (O-ring face seal)\\',fornitori:[\\'PACO\\',\\'CPA\\'],sub2:[\\'Maschio ORFS\\',\\'Femmina ORFS\\',\\'Perni\\'])+',\n    {id:\\'rac-metr\\',label:\\'Metrici\\',fornitori:[\\'PACO\\',\\'CPA\\',\\'GTA\\'],sub2:[\\'M12×1.5\\',\\'M14×1.5\\',\\'M16×1.5\\',\\'M18×1.5\\',\\'M22×1.5\\',\\'M26×1.5\\',\\'M33×2\\'])+',\n    {id:\\'rac-adatt\\',label:\\'Adattatori misti\\',fornitori:[\\'PACO\\',\\'CPA\\',\\'GTA\\'],sub2:[\\'BSP → UNF\\',\\'BSP → Metrico\\',\\'JIC → ORFS\\',\\'Riduzioni universali\\'])+',\n  ])+',\n  {id:\\'serbatoi\\',label:\\'Serbatoi & Vasche\\',emoji:\\'🛢\\',colore:\\'#78350f\\',sub:[\n    {id:\\'serb-std\\',label:\\'Standard serie ASG\\',fornitori:[\\'ARES\\'],sub2:[\\'Lamiera 1-3L (PU05/10)\\',\\'Lamiera 4-12L (PU10)\\',\\'Plastica 1-12L\\',\\'Lamiera Ø175 30-90L (PU20)\\'])+',\n    {id:\\'serb-spec\\',label:\\'Speciali a disegno\\',fornitori:[\\'COLFER\\'],sub2:[\\'Vasche quadre/rettangolari\\',\\'Con flange custom\\',\\'Con divisori interni\\',\\'Verniciatura epossidica RAL\\',\\'Con kit filtraggio completo\\'])+',\n  ])+',\n  {id:\\'filtri\\',label:\\'Filtri\\',emoji:\\'🔽\\',colore:\\'#166534\\',sub:[\n    {id:\\'fil-asp\\',label:\\'In aspirazione\\',fornitori:[\\'ARES\\',\\'CPA\\',\\'GTA\\'],sub2:[\\'G1/4" fino 5 l/min\\',\\'G3/8" fino 15 l/min\\',\\'1/2" fino 30+ l/min\\',\\'Magnetici\\'])+',\n    {id:\\'fil-man\\',label:\\'In mandata (alta pressione)\\',fornitori:[\\'CPA\\',\\'FIZ\\',\\'GTA\\'],sub2:[\\'10 micron\\',\\'25 micron\\',\\'Corpo alluminio\\',\\'Corpo ghisa\\'])+',\n    {id:\\'fil-rit\\',label:\\'In ritorno (bassa pressione)\\',fornitori:[\\'CPA\\',\\'ARES\\',\\'GTA\\'],sub2:[\\'20 micron\\',\\'10 micron\\',\\'Con indicatore intasamento\\'])+',\n    {id:\\'fil-line\\',label:\\'In linea\\',fornitori:[\\'CPA\\',\\'FIZ\\'],sub2:[\\'Doppi (change-over)\\',\\'Con bypass termico\\'])+',\n  ])+',\n  {id:\\'strument\\',label:\\'Strumentazione\\',emoji:\\'📏\\',colore:\\'#0891b2\\',sub:[\n    {id:\\'str-man\\',label:\\'Manometri\\',fornitori:[\\'BART\\',\\'CPA\\',\\'GTA\\'],sub2:[\\'A secco Ø63 fino 400 bar\\',\\'A glicerina Ø63\\',\\'Isometrici alta sovrappressione\\',\\'ATEX\\',\\'Con contatti elettrici\\',\\'0-60 / 0-150 / 0-250 / 0-400 bar\\'])+',\n    {id:\\'str-salva\\',label:\\'Salvamanometri / esclusori\\',fornitori:[\\'BART\\',\\'CPA\\'],sub2:[\\'1/4" BSP diritti\\',\\'1/4" BSP a 90°\\',\\'Con smorzatore\\'])+',\n    {id:\\'str-press\\',label:\\'Pressostati\\',fornitori:[\\'XF\\',\\'CPA\\'],sub2:[\\'Regolabili NC/NA\\',\\'Con isteresi\\',\\'4-20mA\\'])+',\n    {id:\\'str-trasd\\',label:\\'Trasduttori pressione\\',fornitori:[\\'XF\\',\\'CPA\\',\\'FIZ\\'],sub2:[\\'0-10V\\',\\'4-20mA\\',\\'IO-Link\\',\\'ATEX\\'])+',\n    {id:\\'str-temp\\',label:\\'Termometri & sensori T°\\',fornitori:[\\'BART\\',\\'CPA\\'],sub2:[\\'A bimetallo\\',\\'A espansione gas\\',\\'Elettronici PT100\\'])+',\n    {id:\\'str-flow\\',label:\\'Misuratori di portata\\',fornitori:[\\'CPA\\',\\'FIZ\\'],sub2:[\\'Ad ingranaggi\\',\\'Elettromagnetici\\',\\'Ultrasuoni\\'])+',\n  ])+',\n  {id:\\'accum\\',label:\\'Accumulatori\\',emoji:\\'🔋\\',colore:\\'#4338ca\\',sub:[\n    {id:\\'acc-vesg\\',label:\\'A vescica\\',fornitori:[\\'XF\\',\\'CPA\\',\\'FIZ\\'],sub2:[\\'0.75-50L\\',\\'Alta pressione 350-500 bar\\',\\'Bassa pressione\\'])+',\n    {id:\\'acc-memb\\',label:\\'A membrana\\',fornitori:[\\'XF\\',\\'CPA\\'],sub2:[\\'Piccoli 0.075-1L\\',\\'Compatti\\'])+',\n    {id:\\'acc-pist\\',label:\\'A pistone\\',fornitori:[\\'XF\\',\\'FIZ\\'],sub2:[\\'Grandi volumi\\',\\'Alta pressione\\'])+',\n    {id:\\'acc-acc\\',label:\\'Accessori accumulatori\\',fornitori:[\\'XF\\',\\'CPA\\'],sub2:[\\'Blocchi di sicurezza\\',\\'Valvole di isolamento\\',\\'Caricatori gas N2\\'])+',\n  ])+',\n  {id:\\'scamb\\',label:\\'Scambiatori di calore\\',emoji:\\'🌡\\',colore:\\'#0891b2\\',sub:[\n    {id:\\'sc-olio-aria\\',label:\\'Olio-aria\\',fornitori:[\\'CPA\\',\\'GTA\\'],sub2:[\\'A ventilazione naturale\\',\\'A ventilazione forzata 12/24V DC\\',\\'Trifase 230/400V\\'])+',\n    {id:\\'sc-olio-acq\\',label:\\'Olio-acqua\\',fornitori:[\\'CPA\\',\\'PACO\\',\\'GTA\\'],sub2:[\\'A fascio tubiero\\',\\'A piastre\\'])+',\n  ])+',\n  {id:\\'carpent\\',label:\\'Carpenteria speciale\\',emoji:\\'🏭\\',colore:\\'#78350f\\',sub:[\n    {id:\\'carp-serb\\',label:\\'Serbatoi su disegno\\',fornitori:[\\'COLFER\\'],sub2:[\\'Lamiera nera verniciata\\',\\'Acciaio inox\\',\\'Con flange SAE/BSP\\'])+',\n    {id:\\'carp-basam\\',label:\\'Basamenti e strutture\\',fornitori:[\\'COLFER\\'],sub2:[\\'Basamento motore-pompa\\',\\'Supporti centralina\\',\\'Quadri di controllo\\'])+',\n  ])+',\n];\n\n// ═══════════════════════════════════════════════\n// STATO RICERCA FORNITORI\n// ═══════════════════════════════════════════════\nlet _catSel=\\'\\'; // categoria selezionata\nlet _fornSel=\\'\\'; // fornitore chip selezionato\n\nfunction showView(v){\n  // Mappa vecchi ID view ai nuovi\n  const map={\\'dashboard\\':\\'home\\',\\'magazzino\\':\\'magazzino\\',\\'fornitori\\':\\'fornitori\\',\\'import\\':\\'import-fatture\\')+';\n  navTo(map[v]||v);\n)+'\n\nfunction copyRDO(){\n  const txt=(document.getElementById(\\'rdo-body\\')||{)+').value||\\'\\';\n  const subj=(document.getElementById(\\'rdo-subj\\')||{)+').value||\\'\\';\n  const full=subj+\\'\n\n\\'+txt;\n  navigator.clipboard.writeText(full).then(()=>showToast(\\'Testo copiato negli appunti!\\'));\n)+'\n\nfunction salvaTemplate(fornId){\n  const tpl=(document.getElementById(\\'rdo-tpl-body\\')||{)+').value||\\'\\';\n  const templates=JSON.parse(localStorage.getItem(\\'asg_rdo_templates\\')||\\'{)+'\\');\n  templates[fornId]=tpl;\n  localStorage.setItem(\\'asg_rdo_templates\\',JSON.stringify(templates));\n  showToast(\\'✓ Modello salvato per questo fornitore\\');\n  // Aggiorna il testo nel pannello componi se è visibile\n  const f=FORNITORI.find(x=>x.id===fornId)||{nome:\\'Fornitore\\')+';\n  const oggi=new Date().toLocaleDateString(\\'it-IT\\',{day:\\'2-digit\\',month:\\'long\\',year:\\'numeric\\')+');\n  const bodyEl=document.getElementById(\\'rdo-body\\');\n  if(bodyEl)bodyEl.value=tpl.replace(\\'{FORNITORE)+'\\',f.nome).replace(\\'{DATA)+'\\',oggi);\n)+'\n\nfunction ripristinaTemplatePredefinito(fornId){\n  const templates=JSON.parse(localStorage.getItem(\\'asg_rdo_templates\\')||\\'{)+'\\');\n  delete templates[fornId];\n  localStorage.setItem(\\'asg_rdo_templates\\',JSON.stringify(templates));\n  const el=document.getElementById(\\'rdo-tpl-body\\');\n  if(el)el.value=\'Spett.le {FORNITORE)+',\n\nin riferimento ai Vs. prodotti/servizi, con la presente siamo a richiedere un\'offerta per i seguenti articoli:\n\n1. [CODICE/DESCRIZIONE] — qty ___\n2. \n\nSi prega di indicare:\n- Prezzo unitario IVA esclusa\n- Disponibilità a magazzino\n- Tempi di consegna\n- Condizioni di resa\n\nRingraziamo anticipatamente e restiamo in attesa di un Vostro riscontro.\n\nCordiali saluti,');
   showToast('Modello ripristinato al predefinito');
 }
 
 
 function renderSidebar(){
   const el=document.getElementById('forn-sidebar');
-  el.innerHTML=`<div style="padding:8px 16px 6px;font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em">Categorie</div>`+
+  el.innerHTML=('<div style="padding:8px 16px 6px;font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em">Categorie</div>')+
   CAT_TREE.map(g=>`
     <div class="cat-group">
       <div class="cat-group-hd" onclick="toggleCatGroup(this)">
@@ -4319,7 +2674,7 @@ function selectCat(id,label){
   document.getElementById('comp-results').innerHTML=sub2.length?`
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">
       <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-right:4px">Sottotipi:</span>
-      ${sub2.map(s=>`<span style="font-size:12px;background:#fff;border:1px solid var(--border);padding:3px 9px;border-radius:20px;color:var(--text2)">${s}</span>`).join('')}
+      ${sub2.map(s=>('<span style="font-size:12px;background:#fff;border:1px solid var(--border);padding:3px 9px;border-radius:20px;color:var(--text2)">'+(s)+'</span>')).join('')}
     </div>`:'';
   renderFornCards(fornFilt.length?fornFilt:FORNITORI);
   document.getElementById('forn-cards-section').style.display='block';
@@ -4331,11 +2686,11 @@ function selectCat(id,label){
 function renderFornCards(list){
   const el=document.getElementById('forn-grid');
   el.innerHTML=list.map(f=>{
-    const cats=f.categorie.slice(0,5).map(c=>`<span class="fcat">${c}</span>`).join('');
-    const extra=f.categorie.length>5?`<span class="fcat">+${f.categorie.length-5}</span>`:'';
-    const urlBtn=f.url?`<a class="forn-btn" href="${f.url}" target="_blank">🌐 Sito</a>`:'';
-    const telBtn=f.contatti.tel?`<a class="forn-btn" href="tel:${f.contatti.tel}">📞 Chiama</a>`:'';
-    const rdoBtn=`<button class="forn-btn primary" onclick="openRDO('${f.id}')">✉ RDO</button>`;
+    const cats=f.categorie.slice(0,5).map(c=>('<span class="fcat">'+(c)+'</span>')).join('');
+    const extra=f.categorie.length>5?('<span class="fcat">+'+(f.categorie.length-5)+'</span>'):'';
+    const urlBtn=f.url?('<a class="forn-btn" href="'+(f.url)+'" target="_blank">🌐 Sito</a>'):'';
+    const telBtn=f.contatti.tel?('<a class="forn-btn" href="tel:'+(f.contatti.tel)+'">📞 Chiama</a>'):'';
+    const rdoBtn=('<button class="forn-btn primary" onclick="openRDO(\''+(f.id)+'\')">✉ RDO</button>');
     // Schede applicazione (solo per fornitori che le hanno)
     const appl=f.applicazioni&&f.applicazioni.length?`
       <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">
@@ -4347,7 +2702,7 @@ function renderFornCards(list){
               <span>${a.emoji}</span><span>${a.cat}</span><span style="margin-left:auto;font-size:10px;color:var(--text4)">${a.items.length} sistemi</span>
             </summary>
             <div style="padding:6px 10px;background:#fff;">
-              ${a.items.map(i=>`<div style="font-size:11px;color:var(--text2);padding:2px 0;border-bottom:1px solid var(--border);">· ${i}</div>`).join('')}
+              ${a.items.map(i=>('<div style="font-size:11px;color:var(--text2);padding:2px 0;border-bottom:1px solid var(--border);">· '+(i)+'</div>')).join('')}
             </div>
           </details>`).join('')}
         </div>
@@ -4406,7 +2761,7 @@ function searchComp(){
 
   let html='';
   if(aresHits.length){
-    html+=`<div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">📋 Listino Ares / Tecfluid</div>`;
+    html+=('<div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">📋 Listino Ares / Tecfluid</div>');
     html+=aresHits.map(a=>{
       const st=TIPO_BADGE[a.t]||'background:#f3f4f6;color:#374151;border:1px solid #d1d5db';
       return`<div class="comp-result">
@@ -4424,10 +2779,10 @@ function searchComp(){
   }
 
   if(hits.filter(x=>x.tipo==='cat').length){
-    html+=`<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin:12px 0 6px">🗂 Categorie</div>`;
+    html+=('<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin:12px 0 6px">🗂 Categorie</div>');
     html+=hits.filter(x=>x.tipo==='cat').slice(0,6).map(h=>{
       const fIds=h.sub.fornitori;
-      const tags=fIds.map(id=>{const f=FORNITORI.find(x=>x.id===id);return f?`<span class="comp-forn-tag" style="background:${f.colore}22;color:${f.colore};border-color:${f.colore}44">${f.nome.split(' ')[0]}</span>`:''}).join('');
+      const tags=fIds.map(id=>{const f=FORNITORI.find(x=>x.id===id);return f?('<span class="comp-forn-tag" style="background:'+(f.colore)+'22;color:'+(f.colore)+';border-color:'+(f.colore)+'44">'+(f.nome.split(\' \')[0])+'</span>'):''}).join('');
       return`<div class="comp-result" onclick="selectCat('${h.sub.id}','${h.gruppo.label} › ${h.sub.label}')" style="cursor:pointer">
         <div class="comp-cat-dot" style="background:${h.gruppo.colore}"></div>
         <div class="comp-main">
@@ -4441,7 +2796,7 @@ function searchComp(){
   }
 
   if(hits.filter(x=>x.tipo==='forn').length){
-    html+=`<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin:12px 0 6px">🏢 Fornitori</div>`;
+    html+=('<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin:12px 0 6px">🏢 Fornitori</div>');
     html+=hits.filter(x=>x.tipo==='forn').slice(0,4).map(h=>{
       const f=h.f;
       return`<div class="comp-result">
@@ -4458,7 +2813,7 @@ function searchComp(){
     }).join('');
   }
 
-  resEl.innerHTML=html||`<div class="empty">Nessun risultato per "<strong>${q}</strong>"</div>`;
+  resEl.innerHTML=html||('<div class="empty">Nessun risultato per "<strong>'+(q)+'</strong>"</div>');
 }
 
 function addAresFromSearch(a){
@@ -4512,13 +2867,13 @@ async function processImportFiles(files){
   setImpProgress(false);
   if(!_importRows.length){
     document.getElementById('imp-actions').style.display='none';
-    document.getElementById('imp-preview-area').innerHTML=`<div class="empty" style="padding:16px">Nessuna riga riconosciuta. Usa "Esporta lista semplice in Excel" da Fattura24.</div>`;
+    document.getElementById('imp-preview-area').innerHTML=('<div class="empty" style="padding:16px">Nessuna riga riconosciuta. Usa "Esporta lista semplice in Excel" da Fattura24.</div>';
     return;
   }
   renderImportPreview(_importRows);
   const actEl=document.getElementById('imp-actions');
   actEl.style.display='flex';
-  document.getElementById('btn-confirm-import').textContent=`✓ Importa ${_importRows.length} fatture`;
+  document.getElementById('btn-confirm-import').textContent=('✓ Importa '+(_importRows.length)+' fatture';
 }
 
 async function parseF24File(file){
@@ -4628,14 +2983,14 @@ function normDate(d){
     const giorno=parseInt(mIT[1]),mese=parseInt(mIT[2]);
     // Disambigua: se primo campo > 12 è sicuramente dd/mm, altrimenti ambiguo
     // Per sicurezza trattiamo sempre come dd/mm (formato italiano)
-    return`${mIT[3]}-${mIT[2].padStart(2,'0')}-${mIT[1].padStart(2,'0')}`;
+    return(''+(mIT[3])+'-'+(mIT[2].padStart(2,'0'))+'-'+(mIT[1].padStart(2,'0'))+'';
   }
   // mm/dd/yyyy (americano, da SheetJS) → yyyy-mm-dd
   const mUS=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   // già gestito sopra (stesso pattern) — SheetJS con dateNF:'yyyy-mm-dd' non dovrebbe produrlo
   // dd-mm-yyyy
   const mDash=d.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
-  if(mDash)return`${mDash[3]}-${mDash[2].padStart(2,'0')}-${mDash[1].padStart(2,'0')}`;
+  if(mDash)return(''+(mDash[3])+'-'+(mDash[2].padStart(2,'0'))+'-'+(mDash[1].padStart(2,'0'))+'';
   return d;
 }
 
@@ -4653,27 +3008,7 @@ function renderImportPreview(rows){
   const totFE=fe.reduce((s,r)=>s+parseFloat(r.importo||0),0);
   const totFA=fa.reduce((s,r)=>s+parseFloat(r.importo||0),0);
   const preview=rows.slice(0,8);
-  el.innerHTML=`
-  <div style="display:flex;gap:12px;flex-wrap:wrap;margin:12px 0">
-    ${fe.length?'<div style="background:#dcfce7;border:1px solid #6ee7a0;border-radius:8px;padding:8px 14px;font-size:13px"><strong style="color:#166534">${fe.length} fatture emesse</strong><span style="color:#166534;margin-left:6px">€ ${totFE.toFixed(2)}</span></div>':''}
-    ${fa.length?'<div style="background:#dbeafe;border:1px solid #7fb3f5;border-radius:8px;padding:8px 14px;font-size:13px"><strong style="color:#1e40af">${fa.length} fatture ricevute</strong><span style="color:#1e40af;margin-left:6px">€ ${totFA.toFixed(2)}</span></div>':''}
-  </div>
-  <div class="imp-preview">
-    <div class="imp-preview-hd">📋 Anteprima — prime ${Math.min(8,rows.length)} righe su ${rows.length}</div>
-    <div style="overflow-x:auto"><table>
-      <thead><tr><th>Tipo</th><th>Numero</th><th>Data</th><th>Cliente/Fornitore</th><th style="text-align:right">Importo</th><th>Stato</th><th>Scadenza</th></tr></thead>
-      <tbody>${preview.map(r=>`<tr>
-        <td><span class="imp-badge ${r.tipo==='FE'?'fe':'fa'}">${r.tipo}</span></td>
-        <td style="font-family:monospace;font-size:11px">${r.numero}</td>
-        <td style="white-space:nowrap">${fmtD(r.data)}</td>
-        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.cliente}</td>
-        <td style="text-align:right;font-weight:700">€ ${parseFloat(r.importo).toFixed(2)}</td>
-        <td><span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;${r.stato==='pagata'?'background:#dcfce7;color:#166534':'background:#fee2e2;color:#991b1b'}">${r.stato}</span></td>
-        <td style="color:var(--text3);white-space:nowrap">${fmtD(r.data_scad)||'—'}</td>
-      </tr>`).join('')}</tbody>
-    </table></div>
-    ${rows.length>8?'<div style="padding:6px 12px;font-size:11px;color:var(--text3)">… e altre ${rows.length-8} righe</div>':''}
-  </div>`;
+  el.innerHTML=('\n  <div style="display:flex;gap:12px;flex-wrap:wrap;margin:12px 0">\n    '+(fe.length?'<div style="background:#dcfce7;border:1px solid #6ee7a0;border-radius:8px;padding:8px 14px;font-size:13px"><strong style="color:#166534">${fe.length} fatture emesse</strong><span style="color:#166534;margin-left:6px">€ ${totFE.toFixed(2)}</span></div>':'')+'\n    '+(fa.length?'<div style="background:#dbeafe;border:1px solid #7fb3f5;border-radius:8px;padding:8px 14px;font-size:13px"><strong style="color:#1e40af">${fa.length} fatture ricevute</strong><span style="color:#1e40af;margin-left:6px">€ ${totFA.toFixed(2)}</span></div>':'')+'\n  </div>\n  <div class="imp-preview">\n    <div class="imp-preview-hd">📋 Anteprima — prime '+(Math.min(8,rows.length))+' righe su '+(rows.length)+'</div>\n    <div style="overflow-x:auto"><table>\n      <thead><tr><th>Tipo</th><th>Numero</th><th>Data</th><th>Cliente/Fornitore</th><th style="text-align:right">Importo</th><th>Stato</th><th>Scadenza</th></tr></thead>\n      <tbody>'+(preview.map(r=>'+('<tr>\n        <td><span class="imp-badge '+(r.tipo==='FE'?'fe':'fa')+'">'+(r.tipo)+'</span></td>\n        <td style="font-family:monospace;font-size:11px">'+(r.numero)+'</td>\n        <td style="white-space:nowrap">'+(fmtD(r.data))+'</td>\n        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(r.cliente)+'</td>\n        <td style="text-align:right;font-weight:700">€ '+(parseFloat(r.importo).toFixed(2))+'</td>\n        <td><span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;'+(r.stato==='pagata'?'background:#dcfce7;color:#166534':'background:#fee2e2;color:#991b1b')+'">'+(r.stato)+'</span></td>\n        <td style="color:var(--text3);white-space:nowrap">'+(fmtD(r.data_scad)||'—')+'</td>\n      </tr>').join(''))+'</tbody>\n    </table></div>\n    '+(rows.length>8?'<div style="padding:6px 12px;font-size:11px;color:var(--text3)">… e altre ${rows.length-8} righe</div>':'')+'\n  </div>';
 }
 
 async function confirmImport(){
@@ -4698,7 +3033,7 @@ async function confirmImport(){
     if(actEl)actEl.style.display='none';
 
     // Feedback
-    showToast(`✓ ${merged.length} fatture totali salvate${nScad?' · '+nScad+' scadenze':''}`);
+    showToast(('✓ '+(merged.length)+' fatture totali salvate'+(nScad?' · '+nScad+' scadenze':'')+'');
 
     // Aggiorna status nella view import
     try{updateImpStatus();}catch(e){console.warn('updateImpStatus:',e);}
@@ -4711,7 +3046,7 @@ async function confirmImport(){
       try{
         const fields=['tipo','numero','data','cliente','importo','imponibile','iva','stato','data_scad','oggetto','id_f24','sync_ts'];
         const ok=await wPut('fatture.csv',merged,fields);
-        if(ncEl)ncEl.textContent=ok?`✓ Sync OK · ${merged.length} fatture`:'⚠ Salvataggio solo locale';
+        if(ncEl)ncEl.textContent=ok?('✓ Sync OK · '+(merged.length)+' fatture':'⚠ Salvataggio solo locale';
       }catch(e){if(ncEl)ncEl.textContent='⚠ Errore sync: '+e.message;}
     } else {
       if(ncEl)ncEl.textContent='✓ Salvato in locale (Nextcloud non configurato)';
@@ -4733,32 +3068,14 @@ function updateImpStatus(){
   const el=document.getElementById('imp-status-body');
   if(!el)return;
   const fatt=SD.fatt||lll('fatt');
-  if(!fatt||!fatt.length){el.innerHTML=`<div style="font-size:13px;color:var(--text3)">Nessuna fattura importata ancora.</div>`;return;}
+  if(!fatt||!fatt.length){el.innerHTML=('<div style="font-size:13px;color:var(--text3)">Nessuna fattura importata ancora.</div>';return;}
   const fe=fatt.filter(r=>r.tipo==='FE'),fa=fatt.filter(r=>r.tipo==='FA');
   // parseNum gestisce sia numeri che stringhe con virgola (es. "1.234,56")
   const parseNum=v=>{if(!v)return 0;const s=String(v).replace(/\./g,'').replace(',','.');return parseFloat(s)||0;};
   const totFE=fe.reduce((s,r)=>s+parseNum(r.importo),0);
   const totFA=fa.reduce((s,r)=>s+parseNum(r.importo),0);
   const lastSync=fatt[0]?.sync_ts||'—';
-  el.innerHTML=`
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px;">
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px">
-      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Fatture emesse</div>
-      <div style="font-size:20px;font-weight:800;color:var(--green)">${fe.length}</div>
-      <div style="font-size:12px;color:var(--text3)">€ ${fmt2(totFE)}</div>
-    </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px">
-      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Fatture ricevute</div>
-      <div style="font-size:20px;font-weight:800;color:var(--blue)">${fa.length}</div>
-      <div style="font-size:12px;color:var(--text3)">€ ${fmt2(totFA)}</div>
-    </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px">
-      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Ultimo import</div>
-      <div style="font-size:13px;font-weight:600;color:var(--text)">${lastSync!=='—'?fmtD(lastSync.slice(0,10)):'—'}</div>
-      <div style="font-size:12px;color:var(--text3)">${lastSync.slice(11,16)||''}</div>
-    </div>
-  </div>
-  <button class="btn btn-ghost btn-sm" onclick="navTo('contabilita')">→ Vai a Contabilità per vedere le fatture</button>`;
+  el.innerHTML=('\n  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px;">\n    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px">\n      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Fatture emesse</div>\n      <div style="font-size:20px;font-weight:800;color:var(--green)">'+(fe.length)+'</div>\n      <div style="font-size:12px;color:var(--text3)">€ '+(fmt2(totFE))+'</div>\n    </div>\n    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px">\n      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Fatture ricevute</div>\n      <div style="font-size:20px;font-weight:800;color:var(--blue)">'+(fa.length)+'</div>\n      <div style="font-size:12px;color:var(--text3)">€ '+(fmt2(totFA))+'</div>\n    </div>\n    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px">\n      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Ultimo import</div>\n      <div style="font-size:13px;font-weight:600;color:var(--text)">'+(lastSync!=='—'?fmtD(lastSync.slice(0,10)):'—')+'</div>\n      <div style="font-size:12px;color:var(--text3)">'+(lastSync.slice(11,16)||'')+'</div>\n    </div>\n  </div>\n  <button class="btn btn-ghost btn-sm" onclick="navTo(\'contabilita\')">→ Vai a Contabilità per vedere le fatture</button>';
 }
 
 function initScadenzeFiscali(){
@@ -4768,33 +3085,33 @@ function initScadenzeFiscali(){
   const y=new Date().getFullYear();
   const scadenze=[
     // IVA trimestrale (liquidazione + versamento entro il 16 del mese successivo al trim.)
-    {data:`${y}-02-16`,descrizione:'Liquidazione IVA IV trim. anno prec. (16 feb)',importo:0,categoria:'iva',_fiscale:true},
-    {data:`${y}-05-16`,descrizione:'Liquidazione IVA I trim. (16 mag) — acconto F24',importo:0,categoria:'iva',_fiscale:true},
-    {data:`${y}-08-20`,descrizione:'Liquidazione IVA II trim. (entro 20 ago — proroga agosto)',importo:0,categoria:'iva',_fiscale:true},
-    {data:`${y}-11-16`,descrizione:'Liquidazione IVA III trim. (16 nov)',importo:0,categoria:'iva',_fiscale:true},
+    {data:(''+(y)+'-02-16',descrizione:'Liquidazione IVA IV trim. anno prec. (16 feb)',importo:0,categoria:'iva',_fiscale:true},
+    {data:(''+(y)+'-05-16',descrizione:'Liquidazione IVA I trim. (16 mag) — acconto F24',importo:0,categoria:'iva',_fiscale:true},
+    {data:(''+(y)+'-08-20',descrizione:'Liquidazione IVA II trim. (entro 20 ago — proroga agosto)',importo:0,categoria:'iva',_fiscale:true},
+    {data:(''+(y)+'-11-16',descrizione:'Liquidazione IVA III trim. (16 nov)',importo:0,categoria:'iva',_fiscale:true},
     // Dichiarazione IVA annuale
-    {data:`${y}-04-30`,descrizione:'Dichiarazione IVA annuale (entro 30 apr)',importo:0,categoria:'dichiarazione',_fiscale:true},
+    {data:(''+(y)+'-04-30',descrizione:'Dichiarazione IVA annuale (entro 30 apr)',importo:0,categoria:'dichiarazione',_fiscale:true},
     // IRES / IRAP acconti e saldo
-    {data:`${y}-06-30`,descrizione:'IRES/IRAP — saldo anno prec. + I acconto (30 giu)',importo:0,categoria:'ires',_fiscale:true},
-    {data:`${y}-07-30`,descrizione:'IRES/IRAP — saldo con maggiorazione 0.4% (entro 30 lug)',importo:0,categoria:'ires',_fiscale:true},
-    {data:`${y}-11-30`,descrizione:'IRES/IRAP — II acconto (30 nov)',importo:0,categoria:'ires',_fiscale:true},
+    {data:(''+(y)+'-06-30',descrizione:'IRES/IRAP — saldo anno prec. + I acconto (30 giu)',importo:0,categoria:'ires',_fiscale:true},
+    {data:(''+(y)+'-07-30',descrizione:'IRES/IRAP — saldo con maggiorazione 0.4% (entro 30 lug)',importo:0,categoria:'ires',_fiscale:true},
+    {data:(''+(y)+'-11-30',descrizione:'IRES/IRAP — II acconto (30 nov)',importo:0,categoria:'ires',_fiscale:true},
     // INPS amministratore (compenso amministratore — versamento trimestrale)
-    {data:`${y}-02-16`,descrizione:'INPS gestione separata — IV trim. anno prec. (Andrea)',importo:0,categoria:'inps',_fiscale:true},
-    {data:`${y}-05-16`,descrizione:'INPS gestione separata — I trim. (Andrea)',importo:0,categoria:'inps',_fiscale:true},
-    {data:`${y}-08-20`,descrizione:'INPS gestione separata — II trim. (Andrea)',importo:0,categoria:'inps',_fiscale:true},
-    {data:`${y}-11-16`,descrizione:'INPS gestione separata — III trim. (Andrea)',importo:0,categoria:'inps',_fiscale:true},
+    {data:(''+(y)+'-02-16',descrizione:'INPS gestione separata — IV trim. anno prec. (Andrea)',importo:0,categoria:'inps',_fiscale:true},
+    {data:(''+(y)+'-05-16',descrizione:'INPS gestione separata — I trim. (Andrea)',importo:0,categoria:'inps',_fiscale:true},
+    {data:(''+(y)+'-08-20',descrizione:'INPS gestione separata — II trim. (Andrea)',importo:0,categoria:'inps',_fiscale:true},
+    {data:(''+(y)+'-11-16',descrizione:'INPS gestione separata — III trim. (Andrea)',importo:0,categoria:'inps',_fiscale:true},
     // Dichiarazione redditi SRL (modello Redditi SC)
-    {data:`${y}-10-31`,descrizione:'Dichiarazione redditi SRL Modello Redditi SC (31 ott)',importo:0,categoria:'dichiarazione',_fiscale:true},
+    {data:(''+(y)+'-10-31',descrizione:'Dichiarazione redditi SRL Modello Redditi SC (31 ott)',importo:0,categoria:'dichiarazione',_fiscale:true},
     // Bilancio / deposito CCIAA
-    {data:`${y}-06-30`,descrizione:'Approvazione bilancio assemblea soci (entro 120 gg chiusura esercizio)',importo:0,categoria:'societario',_fiscale:true},
-    {data:`${y}-07-30`,descrizione:'Deposito bilancio CCIAA (30 giorni da approvazione)',importo:0,categoria:'societario',_fiscale:true},
+    {data:(''+(y)+'-06-30',descrizione:'Approvazione bilancio assemblea soci (entro 120 gg chiusura esercizio)',importo:0,categoria:'societario',_fiscale:true},
+    {data:(''+(y)+'-07-30',descrizione:'Deposito bilancio CCIAA (30 giorni da approvazione)',importo:0,categoria:'societario',_fiscale:true},
     // Libro unico del lavoro / CU compensi amministratore
-    {data:`${y}-03-16`,descrizione:'CU compenso amministratore — consegna (16 mar)',importo:0,categoria:'sostituto',_fiscale:true},
-    {data:`${y}-03-31`,descrizione:'CU compenso amministratore — invio telematico Agenzia Entrate (31 mar)',importo:0,categoria:'sostituto',_fiscale:true},
+    {data:(''+(y)+'-03-16',descrizione:'CU compenso amministratore — consegna (16 mar)',importo:0,categoria:'sostituto',_fiscale:true},
+    {data:(''+(y)+'-03-31',descrizione:'CU compenso amministratore — invio telematico Agenzia Entrate (31 mar)',importo:0,categoria:'sostituto',_fiscale:true},
     // Ritenuta d'acconto su compenso amministratore (mensile se erogato)
-    {data:`${y}-01-16`,descrizione:'F24 ritenuta compenso amm. dicembre anno prec.',importo:0,categoria:'ritenuta',_fiscale:true},
+    {data:(''+(y)+'-01-16'),descrizione:'F24 ritenuta compenso amm. dicembre anno prec.',importo:0,categoria:'ritenuta',_fiscale:true},
     // 770 sostituto d'imposta
-    {data:`${y}-10-31`,descrizione:'Modello 770 sostituto d\'imposta (31 ott)',importo:0,categoria:'dichiarazione',_fiscale:true},
+    {data:(''+(y)+'-10-31',descrizione:'Modello 770 sostituto d\'imposta (31 ott)',importo:0,categoria:'dichiarazione',_fiscale:true},
   ];
   const all=[...existing,...scadenze.map(s=>({...s,id:uid()}))];
   ls('scad',all);
@@ -4880,38 +3197,7 @@ function renderCommesse(){
       ${margPct!==null?'<div class="list-row-val ${margPct>=30?\'green\':margPct>=15?\'amber\':\'red\'}" style="font-size:11px">${margPct}%</div>':''}
       <span class="badge ${badge}">${st}</span>
       ${fu?'<a href="'+fu+'" target="_blank" onclick="event.stopPropagation()" style="font-size:14px;text-decoration:none;opacity:.5;padding:2px 6px;" title="Apri cartella Nextcloud">📁</a>':'<span style="width:22px"></span>'}
-    </div>`;
-  }).join('');
-}
-
-// Aggiornamento det-margine quando si apre il dettaglio
-const _origBuildTabs = typeof buildTabs !== 'undefined' ? buildTabs : null;
-function _updateMargine(){
-  if(!CC)return;
-  const el=document.getElementById('det-margine');if(!el)return;
-  const cd=CC._det||{distinta:[]};
-  const dist=cd.distinta||[];
-  const oreArr=cd.ore||[];
-
-  // Costi distinta (netto × qty)
-  const costiDist=dist.reduce((s,r)=>s+(parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)),0);
-  // Valore vendita distinta (prezzo_vendita × qty)
-  const vendDist=dist.reduce((s,r)=>s+(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)),0);
-  // Ore valorizzate
-  const costiOre=oreArr.reduce((s,o)=>s+(parseFloat(o.ore||0)*parseFloat(o.tariffa||0)),0);
-  const totOreH=oreArr.reduce((s,o)=>s+parseFloat(o.ore||0),0);
-  // Importo offerta (fonte prioritaria: offerta.importo_offerto, poi importo commessa)
-  const importoOff=parseFloat(CC._det?.offerta?.importo_offerto||CC.importo||0);
-  // Riferimento valore: usa offerta se disponibile, altrimenti vendita distinta
-  const valRef=importoOff>0?importoOff:vendDist;
-  const costiTot=costiDist+costiOre;
-  const margLordo=valRef-costiDist;   // senza ore
-  const margNetto=valRef-costiTot;    // con ore
-  const percLordo=valRef>0?((margLordo/valRef)*100):null;
-  const percNetto=valRef>0?((margNetto/valRef)*100):null;
-  const col=percNetto===null?'var(--text3)':percNetto>=30?'var(--green)':percNetto>=15?'var(--amber)':'var(--red)';
-
-  el.innerHTML=`
+    </div>(';\n  }).join(\'\');\n}\n\n// Aggiornamento det-margine quando si apre il dettaglio\nconst _origBuildTabs = typeof buildTabs !== \'undefined\' ? buildTabs : null;\nfunction _updateMargine(){\n  if(!CC)return;\n  const el=document.getElementById(\'det-margine\');if(!el)return;\n  const cd=CC._det||{distinta:[]};\n  const dist=cd.distinta||[];\n  const oreArr=cd.ore||[];\n\n  // Costi distinta (netto × qty)\n  const costiDist=dist.reduce((s,r)=>s+(parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)),0);\n  // Valore vendita distinta (prezzo_vendita × qty)\n  const vendDist=dist.reduce((s,r)=>s+(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)),0);\n  // Ore valorizzate\n  const costiOre=oreArr.reduce((s,o)=>s+(parseFloat(o.ore||0)*parseFloat(o.tariffa||0)),0);\n  const totOreH=oreArr.reduce((s,o)=>s+parseFloat(o.ore||0),0);\n  // Importo offerta (fonte prioritaria: offerta.importo_offerto, poi importo commessa)\n  const importoOff=parseFloat(CC._det?.offerta?.importo_offerto||CC.importo||0);\n  // Riferimento valore: usa offerta se disponibile, altrimenti vendita distinta\n  const valRef=importoOff>0?importoOff:vendDist;\n  const costiTot=costiDist+costiOre;\n  const margLordo=valRef-costiDist;   // senza ore\n  const margNetto=valRef-costiTot;    // con ore\n  const percLordo=valRef>0?((margLordo/valRef)*100):null;\n  const percNetto=valRef>0?((margNetto/valRef)*100):null;\n  const col=percNetto===null?\'var(--text3)\':percNetto>=30?\'var(--green)\':percNetto>=15?\'var(--amber)\':\'var(--red)\';\n\n  el.innerHTML='
   <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Margine</div>
   <div style="font-size:26px;font-weight:800;color:${col};line-height:1">${percNetto!==null?percNetto.toFixed(0)+'%':'—'}</div>
   <div style="font-size:10px;color:var(--text3);margin-top:2px;margin-bottom:6px">netto (con ore)</div>
@@ -4923,48 +3209,7 @@ function _updateMargine(){
     <span style="font-weight:600;color:var(--text2)">Margine lordo</span><span style="text-align:right;font-weight:600;color:${margLordo>=0?'var(--green)':'var(--red)'}">€${fmt2(margLordo)} ${percLordo!==null?'('+percLordo.toFixed(0)+'%)':''}</span>
     ${costiOre>0?'<span style="font-weight:600;color:var(--text2)">Margine netto</span><span style="text-align:right;font-weight:600;color:${col}">€${fmt2(margNetto)}</span>':''}
   </div>
-  <button class="btn-ghost btn-sm" onclick="exportDistintaPDF(CC?.numero)" style="width:100%;margin-top:4px;font-size:10px">📄 Stampa distinta</button>`;
-}
-
-
-// Export PDF commesse con margini
-function exportReportCommesse(){
-  const allComms=lll('comm');
-  const det=ll('det');
-  // Rispetta filtri attivi
-  const filtroStato=document.getElementById('comm-anno')?.closest('.filter-bar')?.querySelector('[data-f-stato].active')?.dataset?.fStato||'';
-  const filtroAnno=(document.getElementById('comm-anno')||{}).value||'';
-  const filtroCliente=(document.getElementById('comm-cliente')||{}).value||'';
-  const comms=allComms.filter(c=>{
-    if(filtroStato&&c.stato!==filtroStato)return false;
-    if(filtroAnno&&!(c.numero||'').includes('-'+filtroAnno))return false;
-    if(filtroCliente&&c.cliente!==filtroCliente)return false;
-    return true;
-  });
-  const anno=new Date().getFullYear();
-
-  // Calcola margine per ogni commessa
-  const rows=comms.map(c=>{
-    const cd=det[c.numero]||{distinta:[],ore:[]};
-    const dist=cd.distinta||[];
-    const oreArr=cd.ore||[];
-    const costiDist=dist.reduce((s,r)=>s+(parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)),0);
-    const vendDist=dist.reduce((s,r)=>s+(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)),0);
-    const costiOre=oreArr.reduce((s,o)=>s+(parseFloat(o.ore||0)*parseFloat(o.tariffa||0)),0);
-    const totOreH=oreArr.reduce((s,o)=>s+parseFloat(o.ore||0),0);
-    const valRef=parseFloat(cd.offerta?.importo_offerto||c.importo||0)||vendDist;
-    const costiTot=costiDist+costiOre;
-    const margNetto=valRef-costiTot;
-    const perc=valRef>0?(margNetto/valRef*100):null;
-    return{...c,costiDist,costiOre,costiTot,vendDist,valRef,margNetto,perc,totOreH};
-  }).sort((a,b)=>b.valRef-a.valRef);
-
-  const totVal=rows.reduce((s,r)=>s+r.valRef,0);
-  const totCosti=rows.reduce((s,r)=>s+r.costiTot,0);
-  const totMarg=totVal-totCosti;
-
-  const win=window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+  <button class="btn-ghost btn-sm" onclick="exportDistintaPDF(CC?.numero)" style="width:100%;margin-top:4px;font-size:10px">📄 Stampa distinta</button>(';\n}\n\n\n// Export PDF commesse con margini\nfunction exportReportCommesse(){\n  const allComms=lll(\'comm\');\n  const det=ll(\'det\');\n  // Rispetta filtri attivi\n  const filtroStato=document.getElementById(\'comm-anno\')?.closest(\'.filter-bar\')?.querySelector(\'[data-f-stato].active\')?.dataset?.fStato||\'\';\n  const filtroAnno=(document.getElementById(\'comm-anno\')||{}).value||\'\';\n  const filtroCliente=(document.getElementById(\'comm-cliente\')||{}).value||\'\';\n  const comms=allComms.filter(c=>{\n    if(filtroStato&&c.stato!==filtroStato)return false;\n    if(filtroAnno&&!(c.numero||\'\').includes(\'-\'+filtroAnno))return false;\n    if(filtroCliente&&c.cliente!==filtroCliente)return false;\n    return true;\n  });\n  const anno=new Date().getFullYear();\n\n  // Calcola margine per ogni commessa\n  const rows=comms.map(c=>{\n    const cd=det[c.numero]||{distinta:[],ore:[]};\n    const dist=cd.distinta||[];\n    const oreArr=cd.ore||[];\n    const costiDist=dist.reduce((s,r)=>s+(parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)),0);\n    const vendDist=dist.reduce((s,r)=>s+(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)),0);\n    const costiOre=oreArr.reduce((s,o)=>s+(parseFloat(o.ore||0)*parseFloat(o.tariffa||0)),0);\n    const totOreH=oreArr.reduce((s,o)=>s+parseFloat(o.ore||0),0);\n    const valRef=parseFloat(cd.offerta?.importo_offerto||c.importo||0)||vendDist;\n    const costiTot=costiDist+costiOre;\n    const margNetto=valRef-costiTot;\n    const perc=valRef>0?(margNetto/valRef*100):null;\n    return{...c,costiDist,costiOre,costiTot,vendDist,valRef,margNetto,perc,totOreH};\n  }).sort((a,b)=>b.valRef-a.valRef);\n\n  const totVal=rows.reduce((s,r)=>s+r.valRef,0);\n  const totCosti=rows.reduce((s,r)=>s+r.costiTot,0);\n  const totMarg=totVal-totCosti;\n\n  const win=window.open(\'\',\'_blank\');\n  win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8">
   <title>Report Commesse — ASG LAB</title>
   <style>
     body{font-family:sans-serif;font-size:11px;color:#111;margin:20px}
@@ -5001,19 +3246,7 @@ function exportReportCommesse(){
     ${rows.map(r=>{
       const pClass=r.perc===null?'':r.perc>=30?'green':r.perc>=15?'amber':'red';
       const stClass=r.stato==='chiusa'?'st-chiusa':r.stato==='in-corso'?'st-in-corso':'st-other';
-      return`<tr>
-        <td style="font-family:monospace;font-size:10px">${r.numero}</td>
-        <td>${CMAP[r.cliente]||r.cliente||'—'}</td>
-        <td style="max-width:180px">${r.oggetto||'—'}</td>
-        <td>${(r.numero||'').split('-')[2]||'—'}</td>
-        <td><span class="stato ${stClass}">${r.stato||'—'}</span></td>
-        <td class="num">${r.valRef>0?'€'+fmt2(r.valRef):'—'}</td>
-        <td class="num red">${r.costiDist>0?'€'+fmt2(r.costiDist):'—'}</td>
-        <td class="num">${r.costiOre>0?'€'+fmt2(r.costiOre)+' ('+r.totOreH+'h)':'—'}</td>
-        <td class="num red">${r.costiTot>0?'€'+fmt2(r.costiTot):'—'}</td>
-        <td class="num ${pClass}">${r.margNetto!==0?'€'+fmt2(r.margNetto):'—'}</td>
-        <td class="num ${pClass}">${r.perc!==null?r.perc.toFixed(0)+'%':'—'}</td>
-      </tr>`;
+      return('<tr>\n        <td style="font-family:monospace;font-size:10px">'+(r.numero)+'</td>\n        <td>'+(CMAP[r.cliente]||r.cliente||'—')+'</td>\n        <td style="max-width:180px">'+(r.oggetto||'—')+'</td>\n        <td>'+((r.numero||'').split('-')[2]||'—')+'</td>\n        <td><span class="stato '+(stClass)+'">'+(r.stato||'—')+'</span></td>\n        <td class="num">'+(r.valRef>0?'€'+fmt2(r.valRef):'—')+'</td>\n        <td class="num red">'+(r.costiDist>0?'€'+fmt2(r.costiDist):'—')+'</td>\n        <td class="num">'+(r.costiOre>0?'€'+fmt2(r.costiOre)+' ('+r.totOreH+'h)':'—')+'</td>\n        <td class="num red">'+(r.costiTot>0?'€'+fmt2(r.costiTot):'—')+'</td>\n        <td class="num '+(pClass)+'">'+(r.margNetto!==0?'€'+fmt2(r.margNetto):'—')+'</td>\n        <td class="num '+(pClass)+'">'+(r.perc!==null?r.perc.toFixed(0)+'%':'—')+'</td>\n      </tr>';
     }).join('')}
     </tbody>
     <tfoot><tr>
@@ -5026,27 +3259,7 @@ function exportReportCommesse(){
       <td class="num ${totMarg>=0?'green':'red'}">${totVal>0?(totMarg/totVal*100).toFixed(0)+'%':'—'}</td>
     </tr></tfoot>
   </table>
-  </body></html>`);
-  win.document.close();
-}
-
-function exportDistintaPDF(numero){
-  const comms=lll('comm');
-  const c=comms.find(x=>x.numero===numero)||{numero,oggetto:'',cliente:'',importo:0};
-  const det=ll('det');
-  const cd=det[numero]||{distinta:[],ore:[]};
-  const dist=cd.distinta||[];
-  const ore=cd.ore||[];
-  const totC=dist.reduce((s,r)=>s+(parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)),0);
-  const totV=dist.reduce((s,r)=>s+(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)),0);
-  const totOreEur=ore.reduce((s,o)=>s+(parseFloat(o.ore||0)*parseFloat(o.tariffa||0)),0);
-  const totOreH=ore.reduce((s,o)=>s+parseFloat(o.ore||0),0);
-  const importoOff=parseFloat(cd.offerta?.importo_offerto||c.importo||0)||totV;
-  const margine=importoOff>0?((importoOff-totC-totOreEur)/importoOff*100):null;
-  const sezioni={};
-  dist.forEach(r=>{const s=r.sezione||'Generale';if(!sezioni[s])sezioni[s]=[];sezioni[s].push(r);});
-  const win=window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+  </body></html>(');\n  win.document.close();\n}\n\nfunction exportDistintaPDF(numero){\n  const comms=lll(\'comm\');\n  const c=comms.find(x=>x.numero===numero)||{numero,oggetto:\'\',cliente:\'\',importo:0};\n  const det=ll(\'det\');\n  const cd=det[numero]||{distinta:[],ore:[]};\n  const dist=cd.distinta||[];\n  const ore=cd.ore||[];\n  const totC=dist.reduce((s,r)=>s+(parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)),0);\n  const totV=dist.reduce((s,r)=>s+(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)),0);\n  const totOreEur=ore.reduce((s,o)=>s+(parseFloat(o.ore||0)*parseFloat(o.tariffa||0)),0);\n  const totOreH=ore.reduce((s,o)=>s+parseFloat(o.ore||0),0);\n  const importoOff=parseFloat(cd.offerta?.importo_offerto||c.importo||0)||totV;\n  const margine=importoOff>0?((importoOff-totC-totOreEur)/importoOff*100):null;\n  const sezioni={};\n  dist.forEach(r=>{const s=r.sezione||\'Generale\';if(!sezioni[s])sezioni[s]=[];sezioni[s].push(r);});\n  const win=window.open(\'\',\'_blank\');\n  win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8">
   <title>Distinta ${numero}</title>
   <style>
     body{font-family:sans-serif;font-size:11px;color:#111;margin:20px;}
@@ -5076,336 +3289,20 @@ function exportDistintaPDF(numero){
     Costi materiali: €${fmt2(totC)} | Costi ore: €${fmt2(totOreEur)} | <strong>Totale costi: €${fmt2(totC+totOreEur)}</strong> | 
     Valore vendita: €${fmt2(totV)} ${importoOff>0?' | Offerta: €'+fmt2(importoOff)+' | <span class="'+(margine>=20?'green':'red')+'">Margine: '+(margine!==null?margine.toFixed(1)+'%':'—')+'</span>':''}
   </div>
-  </body></html>`);
-  win.document.close();
-}
-
-
-
-// Tab styling fix: .tab → .det-tab
-document.addEventListener('DOMContentLoaded',()=>{
-  // Override tab CSS per det-tabs
-  const style=document.createElement('style');
-  style.textContent=`
+  </body></html>(');\n  win.document.close();\n}\n\n\n\n// Tab styling fix: .tab → .det-tab\ndocument.addEventListener(\'DOMContentLoaded\',()=>{\n  // Override tab CSS per det-tabs\n  const style=document.createElement(\'style\');\n  style.textContent='
     #det-tabs .tab{padding:9px 14px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;}
     #det-tabs .tab.active{color:var(--blue);border-bottom-color:var(--blue);}
     #det-tabs .tab:hover:not(.active){background:var(--bg2);}
     .tab-content{display:none;padding:14px 20px;}
     .tab-content.active{display:block;}
-  `;
-  document.head.appendChild(style);
-});
-
-
-// ═══════════════════════════════════════════════
-// FUNZIONI MANCANTI / ALIAS v13
-// ═══════════════════════════════════════════════
-
-function renderMagMetrics(){
-  const data=lll('mag');
-  const tot=data.length;
-  const low=data.filter(m=>parseFloat(m.qty_min||0)>0&&parseFloat(m.qty||0)<parseFloat(m.qty_min||0)).length;
-  const val=data.reduce((s,m)=>s+parseFloat(m.costo_cad||0)*parseFloat(m.qty||0),0);
-  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
-  setEl('mag-tot',tot);
-  setEl('mag-low',low||'0');
-  setEl('mag-val','€'+fmt(val));
-  const nb=document.getElementById('nb-mag');
-  if(nb){if(low>0){nb.style.display='';nb.textContent=low;}else nb.style.display='none';}
-  // Popola categorie
-  const sel=document.getElementById('mag-cat');
-  if(sel&&sel.options.length<=1){
-    const cats=[...new Set(data.map(m=>m.categoria||'').filter(Boolean))].sort();
-    cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
-  }
-}
-
-function apriRDO(fornId){
-  // fornId può essere il nome del fornitore (da approvvigionamenti) o l'ID (da fornitori)
-  const f=FORNITORI.find(x=>x.id===fornId||x.nome===fornId);
-  if(f){
-    // Precompila il template con i componenti da ordinare per questo fornitore
-    const aggr=getApprovAggregati('daordinare');
-    const items=aggr[f.nome]||aggr[f.id]||[];
-    if(items.length){
-      const templates=JSON.parse(localStorage.getItem('asg_rdo_templates')||'{}');
-      if(!templates[f.id]){
-        const righe=items.map(r=>`- ${r.descrizione||r.codice||'—'} (rif. ${r._commessa}) × ${r.qty||1}`).join('\n');
-        const tplConArticoli=`Spett.le {FORNITORE},\n\nCon la presente richediamo offerta per:\n\n${righe}\n\nSi prega di indicare prezzi, disponibilità e tempi di consegna.\n\nCordiali saluti,`;
-        const tmp=JSON.parse(localStorage.getItem('asg_rdo_templates')||'{}');
-        tmp[f.id]=tplConArticoli;
-        localStorage.setItem('asg_rdo_templates',JSON.stringify(tmp));
-      }
-    }
-    openModal('rdo',f.id);
-    return;
-  }
-  // Fornitore non in rubrica — modal semplice con textarea
-  const aggr=getApprovAggregati('daordinare');
-  const items=aggr[fornId]||[];
-  const righe=items.map(r=>`- ${r.descrizione||r.codice||'—'} (rif. ${r._commessa}) × ${r.qty||1}`).join('\n');
-  const testo=`Spett.le ${fornId},\n\nSi richiede offerta per:\n\n${righe||'[articoli]'}\n\nCordiali saluti,\nASG LAB SRL`;
-  document.getElementById('modal-body').innerHTML=`<h3>✉ RDO — ${fornId}</h3>
+  (';\n  document.head.appendChild(style);\n});\n\n\n// ═══════════════════════════════════════════════\n// FUNZIONI MANCANTI / ALIAS v13\n// ═══════════════════════════════════════════════\n\nfunction renderMagMetrics(){\n  const data=lll(\'mag\');\n  const tot=data.length;\n  const low=data.filter(m=>parseFloat(m.qty_min||0)>0&&parseFloat(m.qty||0)<parseFloat(m.qty_min||0)).length;\n  const val=data.reduce((s,m)=>s+parseFloat(m.costo_cad||0)*parseFloat(m.qty||0),0);\n  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};\n  setEl(\'mag-tot\',tot);\n  setEl(\'mag-low\',low||\'0\');\n  setEl(\'mag-val\',\'€\'+fmt(val));\n  const nb=document.getElementById(\'nb-mag\');\n  if(nb){if(low>0){nb.style.display=\'\';nb.textContent=low;}else nb.style.display=\'none\';}\n  // Popola categorie\n  const sel=document.getElementById(\'mag-cat\');\n  if(sel&&sel.options.length<=1){\n    const cats=[...new Set(data.map(m=>m.categoria||\'\').filter(Boolean))].sort();\n    cats.forEach(c=>{const o=document.createElement(\'option\');o.value=c;o.textContent=c;sel.appendChild(o);});\n  }\n}\n\nfunction apriRDO(fornId){\n  // fornId può essere il nome del fornitore (da approvvigionamenti) o l\'ID (da fornitori)\n  const f=FORNITORI.find(x=>x.id===fornId||x.nome===fornId);\n  if(f){\n    // Precompila il template con i componenti da ordinare per questo fornitore\n    const aggr=getApprovAggregati(\'daordinare\');\n    const items=aggr[f.nome]||aggr[f.id]||[];\n    if(items.length){\n      const templates=JSON.parse(localStorage.getItem(\'asg_rdo_templates\')||\'{}\');\n      if(!templates[f.id]){\n        const righe=items.map(r=>'- ${r.descrizione||r.codice||'—'} (rif. ${r._commessa}) × ${r.qty||1}(').join(\'\n\');\n        const tplConArticoli='Spett.le {FORNITORE},\n\nCon la presente richediamo offerta per:\n\n${righe}\n\nSi prega di indicare prezzi, disponibilità e tempi di consegna.\n\nCordiali saluti,(';\n        const tmp=JSON.parse(localStorage.getItem(\'asg_rdo_templates\')||\'{}\');\n        tmp[f.id]=tplConArticoli;\n        localStorage.setItem(\'asg_rdo_templates\',JSON.stringify(tmp));\n      }\n    }\n    openModal(\'rdo\',f.id);\n    return;\n  }\n  // Fornitore non in rubrica — modal semplice con textarea\n  const aggr=getApprovAggregati(\'daordinare\');\n  const items=aggr[fornId]||[];\n  const righe=items.map(r=>'- ${r.descrizione||r.codice||'—'} (rif. ${r._commessa}) × ${r.qty||1}(').join(\'\n\');\n  const testo='Spett.le ${fornId},\n\nSi richiede offerta per:\n\n${righe||'[articoli]'}\n\nCordiali saluti,\nASG LAB SRL(';\n  document.getElementById(\'modal-body\').innerHTML='<h3>✉ RDO — ${fornId}</h3>
     <textarea style="width:100%;min-height:200px;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px;font-size:13px;font-family:var(--font);line-height:1.7">${testo}</textarea>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeM()">Chiudi</button>
       <button class="btn btn-primary" onclick="navigator.clipboard.writeText(this.closest('#modal-box').querySelector('textarea').value);showToast('✓ Copiato')">📋 Copia</button>
-    </div>`;
-  document.getElementById('modal-overlay').classList.add('show');
-}
-if(typeof openRDO==='undefined'){
-  function openRDO(fornId){
-    const f=FORNITORI.find(x=>x.id===fornId);
-    if(f)apriRDO(f.nome);
-  }
-}
-
-// Se non esiste apriRDOApprov dal vecchio codice
-if(typeof apriRDOApprov==='undefined'){
-  function apriRDOApprov(numero,forn){apriRDO(forn);}
-}
-
-// Modal RDO manuale
-
-
-// Funzione per aprire dettaglio (alias)
-if(typeof openDetail==='function'&&typeof apriDettaglio==='undefined'){
-  function apriDettaglio(n){openDetail(n);}
-}
-
-// renderTodo alias (per home)
-if(typeof renderTodo==='undefined'){
-  function renderTodo(){}
-}
-
-// Aggiorna DOMContentLoaded per navTo('home') invece di showView
-// già gestito da window.addEventListener sotto
-
-
-// ═══════════════════════════════════════════════
-// ORDINAMENTO TABELLE
-// ═══════════════════════════════════════════════
-// _sortState dichiarato all'inizio con le variabili globali (riga ~1406)
-
-function sortTable(tabella,col){
-  if(_sortState[tabella].col===col){
-    _sortState[tabella].dir*=-1;
-  } else {
-    _sortState[tabella].col=col;
-    _sortState[tabella].dir=1;
-  }
-  if(tabella==='fatt')renderFatt();
-  else if(tabella==='scad')renderScadContabilita();
-}
-
-function _sortData(data,col,dir){
-  if(!col)return data;
-  return [...data].sort((a,b)=>{
-    let va=a[col]||'',vb=b[col]||'';
-    // Numeri
-    const na=parseFloat(va),nb=parseFloat(vb);
-    if(!isNaN(na)&&!isNaN(nb))return(na-nb)*dir;
-    // Stringhe/date
-    return va.toString().localeCompare(vb.toString())*dir;
-  });
-}
-
-function _thSort(tabella,col,label){
-  const s=_sortState[tabella];
-  const cls=s.col===col?(s.dir===1?'asc':'desc'):'';
-  return`<th class="sortable ${cls}" style="padding:7px 8px;text-align:left;cursor:pointer" onclick="sortTable('${tabella}','${col}')">${label}</th>`;
-}
-
-
-
-// ═══════════════════════════════════════════════
-// upgradeSelects — converte <select> in custom dropdown
-// ═══════════════════════════════════════════════
-function upgradeSelects(container){
-  const box=container||document.getElementById('modal-box');
-  if(!box)return;
-  box.querySelectorAll('select:not(.keep-native)').forEach(sel=>{
-    if(sel.closest('.csel'))return; // già convertito
-    if(sel.style.display==='none')return;
-
-    const options=[];
-    Array.from(sel.children).forEach(child=>{
-      if(child.tagName==='OPTGROUP'){
-        const grp={group:child.label,items:[]};
-        Array.from(child.children).forEach(o=>grp.items.push({value:o.value,label:o.textContent.trim()}));
-        options.push(grp);
-      } else if(child.tagName==='OPTION'){
-        options.push({value:child.value,label:child.textContent.trim()});
-      }
-    });
-
-    const value=sel.value||'';
-    const id='csel-'+Math.random().toString(36).slice(2);
-    const isSmall=sel.classList.contains('stato-approv-select')||sel.classList.contains('stato-sel');
-    const w=sel.style.width||sel.offsetWidth>50?(sel.offsetWidth+'px'):'';
-
-    // Ricava la stringa onChange dal listener onchange
-    const onchangeAttr=sel.getAttribute('onchange')||'';
-
-    const html=cselHTML(id,options,value,
-      onchangeAttr.replace(/this\.value/g,'__VAL__').replace(/this\.options\[this\.selectedIndex\]\.text/g,'"__VAL__"'),
-      {small:isSmall,width:w}
-    );
-    const div=document.createElement('div');
-    div.innerHTML=html;
-    const csel=div.firstElementChild;
-
-    // Copia classi/stili rilevanti
-    if(sel.style.width)csel.style.width=sel.style.width;
-
-    sel.parentNode.replaceChild(csel,sel);
-  });
-}
-
-
-// ═══════════════════════════════════════════════
-// CUSTOM DROPDOWN v3 — overlay backdrop
-// ═══════════════════════════════════════════════
-(function(){
-  let _popup = null;
-  let _backdrop = null;
-  let _popupOwner = null;
-
-  function _hidePopup() {
-    if (_backdrop) { _backdrop.remove(); _backdrop = null; }
-    if (_popup) { _popup.remove(); _popup = null; }
-    if (_popupOwner) {
-      _popupOwner.querySelector('.csel-btn')?.classList.remove('open');
-      _popupOwner = null;
-    }
-  }
-
-  window._cselToggle = function(btn, id) {
-    const owner = btn.closest('.csel');
-    if (_popupOwner === owner) { _hidePopup(); return; }
-    _hidePopup();
-
-    const data = window._cselData?.[id];
-    if (!data) return;
-
-    // Backdrop trasparente — cattura click fuori senza interferire col popup
-    const backdrop = document.createElement('div');
-    backdrop.style.cssText = 'position:fixed;inset:0;z-index:99998;';
-    backdrop.addEventListener('click', _hidePopup);
-    document.body.appendChild(backdrop);
-    _backdrop = backdrop;
-
-    // Crea popup
-    const popup = document.createElement('div');
-    popup.className = 'csel-popup show';
-    popup.style.zIndex = '99999';
-    popup.innerHTML = data.opts.map(o => {
-      if (o.group) {
-        return `<div class="csel-group">${o.group}</div>` +
-          (o.items||[]).map(i => `<div class="csel-item${i.v===data.val?' active':''}" tabindex="0">${i.l}</div>`).join('');
-      }
-      return `<div class="csel-item${o.v===data.val?' active':''}${o.v===''?' ph':''}" tabindex="0">${o.l}</div>`;
-    }).join('');
-
-    // Event delegation sul popup — un solo listener, nessun conflitto
-    popup.addEventListener('click', function(e) {
-      const item = e.target.closest('.csel-item');
-      if (!item) return;
-      e.stopPropagation();
-      // Trova valore dall'indice
-      const items = [...popup.querySelectorAll('.csel-item')];
-      const idx = items.indexOf(item);
-      const flat = [];
-      data.opts.forEach(o => { if(o.items) o.items.forEach(i=>flat.push(i)); else flat.push(o); });
-      const opt = flat[idx];
-      if (opt) window._cselPick(id, opt.v, opt.l);
-    });
-
-    document.body.appendChild(popup);
-    _popup = popup;
-    _popupOwner = owner;
-    btn.classList.add('open');
-
-    // Posiziona
-    const rect = btn.getBoundingClientRect();
-    const spaceBelow = window.innerHeight - rect.bottom - 8;
-    const spaceAbove = rect.top - 8;
-    const ph = Math.min(280, 400);
-    if (spaceBelow < 150 && spaceAbove > spaceBelow) {
-      popup.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
-      popup.style.top = 'auto';
-    } else {
-      popup.style.top = (rect.bottom + 4) + 'px';
-      popup.style.bottom = 'auto';
-    }
-    popup.style.left = rect.left + 'px';
-    popup.style.minWidth = rect.width + 'px';
-  };
-
-  window._cselPick = function(id, value, label) {
-    const data = window._cselData?.[id];
-    if (!data) { _hidePopup(); return; }
-    data.val = value;
-    const owner = document.getElementById(id);
-    if (owner) {
-      const lbl = owner.querySelector('.csel-lbl');
-      if (lbl) lbl.textContent = label;
-    }
-    _hidePopup();
-    if (data.cb) {
-      try { data.cb(value); } catch(e) { console.warn('csel cb:', e); }
-    }
-  };
-
-  window._cselData = {};
-
-  window.cselCreate = function(id, options, value, callback, {small=false, width='', placeholder='— seleziona —'}={}) {
-    let label = placeholder;
-    const flat = [];
-    options.forEach(o => { if(o.items) o.items.forEach(i=>flat.push(i)); else flat.push(o); });
-    const found = flat.find(o => o.v === value);
-    if (found) label = found.l;
-    window._cselData[id] = { opts: options, val: value, cb: callback };
-    const w = width ? `style="width:${width}"` : '';
-    return `<div class="csel${small?' small':''}" id="${id}" ${w}>
+    </div>(';\n  document.getElementById(\'modal-overlay\').classList.add(\'show\');\n}\nif(typeof openRDO===\'undefined\'){\n  function openRDO(fornId){\n    const f=FORNITORI.find(x=>x.id===fornId);\n    if(f)apriRDO(f.nome);\n  }\n}\n\n// Se non esiste apriRDOApprov dal vecchio codice\nif(typeof apriRDOApprov===\'undefined\'){\n  function apriRDOApprov(numero,forn){apriRDO(forn);}\n}\n\n// Modal RDO manuale\n\n\n// Funzione per aprire dettaglio (alias)\nif(typeof openDetail===\'function\'&&typeof apriDettaglio===\'undefined\'){\n  function apriDettaglio(n){openDetail(n);}\n}\n\n// renderTodo alias (per home)\nif(typeof renderTodo===\'undefined\'){\n  function renderTodo(){}\n}\n\n// Aggiorna DOMContentLoaded per navTo(\'home\') invece di showView\n// già gestito da window.addEventListener sotto\n\n\n// ═══════════════════════════════════════════════\n// ORDINAMENTO TABELLE\n// ═══════════════════════════════════════════════\n// _sortState dichiarato all\'inizio con le variabili globali (riga ~1406)\n\nfunction sortTable(tabella,col){\n  if(_sortState[tabella].col===col){\n    _sortState[tabella].dir*=-1;\n  } else {\n    _sortState[tabella].col=col;\n    _sortState[tabella].dir=1;\n  }\n  if(tabella===\'fatt\')renderFatt();\n  else if(tabella===\'scad\')renderScadContabilita();\n}\n\nfunction _sortData(data,col,dir){\n  if(!col)return data;\n  return [...data].sort((a,b)=>{\n    let va=a[col]||\'\',vb=b[col]||\'\';\n    // Numeri\n    const na=parseFloat(va),nb=parseFloat(vb);\n    if(!isNaN(na)&&!isNaN(nb))return(na-nb)*dir;\n    // Stringhe/date\n    return va.toString().localeCompare(vb.toString())*dir;\n  });\n}\n\nfunction _thSort(tabella,col,label){\n  const s=_sortState[tabella];\n  const cls=s.col===col?(s.dir===1?\'asc\':\'desc\'):\'\';\n  return'<th class="sortable ${cls}" style="padding:7px 8px;text-align:left;cursor:pointer" onclick="sortTable('${tabella}','${col}')">${label}</th>(';\n}\n\n\n\n// ═══════════════════════════════════════════════\n// upgradeSelects — converte <select> in custom dropdown\n// ═══════════════════════════════════════════════\nfunction upgradeSelects(container){\n  const box=container||document.getElementById(\'modal-box\');\n  if(!box)return;\n  box.querySelectorAll(\'select:not(.keep-native)\').forEach(sel=>{\n    if(sel.closest(\'.csel\'))return; // già convertito\n    if(sel.style.display===\'none\')return;\n\n    const options=[];\n    Array.from(sel.children).forEach(child=>{\n      if(child.tagName===\'OPTGROUP\'){\n        const grp={group:child.label,items:[]};\n        Array.from(child.children).forEach(o=>grp.items.push({value:o.value,label:o.textContent.trim()}));\n        options.push(grp);\n      } else if(child.tagName===\'OPTION\'){\n        options.push({value:child.value,label:child.textContent.trim()});\n      }\n    });\n\n    const value=sel.value||\'\';\n    const id=\'csel-\'+Math.random().toString(36).slice(2);\n    const isSmall=sel.classList.contains(\'stato-approv-select\')||sel.classList.contains(\'stato-sel\');\n    const w=sel.style.width||sel.offsetWidth>50?(sel.offsetWidth+\'px\'):\'\';\n\n    // Ricava la stringa onChange dal listener onchange\n    const onchangeAttr=sel.getAttribute(\'onchange\')||\'\';\n\n    const html=cselHTML(id,options,value,\n      onchangeAttr.replace(/this\.value/g,\'__VAL__\').replace(/this\.options\[this\.selectedIndex\]\.text/g,\'"__VAL__"\'),\n      {small:isSmall,width:w}\n    );\n    const div=document.createElement(\'div\');\n    div.innerHTML=html;\n    const csel=div.firstElementChild;\n\n    // Copia classi/stili rilevanti\n    if(sel.style.width)csel.style.width=sel.style.width;\n\n    sel.parentNode.replaceChild(csel,sel);\n  });\n}\n\n\n// ═══════════════════════════════════════════════\n// CUSTOM DROPDOWN v3 — overlay backdrop\n// ═══════════════════════════════════════════════\n(function(){\n  let _popup = null;\n  let _backdrop = null;\n  let _popupOwner = null;\n\n  function _hidePopup() {\n    if (_backdrop) { _backdrop.remove(); _backdrop = null; }\n    if (_popup) { _popup.remove(); _popup = null; }\n    if (_popupOwner) {\n      _popupOwner.querySelector(\'.csel-btn\')?.classList.remove(\'open\');\n      _popupOwner = null;\n    }\n  }\n\n  window._cselToggle = function(btn, id) {\n    const owner = btn.closest(\'.csel\');\n    if (_popupOwner === owner) { _hidePopup(); return; }\n    _hidePopup();\n\n    const data = window._cselData?.[id];\n    if (!data) return;\n\n    // Backdrop trasparente — cattura click fuori senza interferire col popup\n    const backdrop = document.createElement(\'div\');\n    backdrop.style.cssText = \'position:fixed;inset:0;z-index:99998;\';\n    backdrop.addEventListener(\'click\', _hidePopup);\n    document.body.appendChild(backdrop);\n    _backdrop = backdrop;\n\n    // Crea popup\n    const popup = document.createElement(\'div\');\n    popup.className = \'csel-popup show\';\n    popup.style.zIndex = \'99999\';\n    popup.innerHTML = data.opts.map(o => {\n      if (o.group) {\n        return '<div class="csel-group">${o.group}</div>(' +\n          (o.items||[]).map(i => '<div class="csel-item${i.v===data.val?' active':''}" tabindex="0">${i.l}</div>(').join(\'\');\n      }\n      return '<div class="csel-item${o.v===data.val?' active':''}${o.v===''?' ph':''}" tabindex="0">${o.l}</div>(';\n    }).join(\'\');\n\n    // Event delegation sul popup — un solo listener, nessun conflitto\n    popup.addEventListener(\'click\', function(e) {\n      const item = e.target.closest(\'.csel-item\');\n      if (!item) return;\n      e.stopPropagation();\n      // Trova valore dall\'indice\n      const items = [...popup.querySelectorAll(\'.csel-item\')];\n      const idx = items.indexOf(item);\n      const flat = [];\n      data.opts.forEach(o => { if(o.items) o.items.forEach(i=>flat.push(i)); else flat.push(o); });\n      const opt = flat[idx];\n      if (opt) window._cselPick(id, opt.v, opt.l);\n    });\n\n    document.body.appendChild(popup);\n    _popup = popup;\n    _popupOwner = owner;\n    btn.classList.add(\'open\');\n\n    // Posiziona\n    const rect = btn.getBoundingClientRect();\n    const spaceBelow = window.innerHeight - rect.bottom - 8;\n    const spaceAbove = rect.top - 8;\n    const ph = Math.min(280, 400);\n    if (spaceBelow < 150 && spaceAbove > spaceBelow) {\n      popup.style.bottom = (window.innerHeight - rect.top + 4) + \'px\';\n      popup.style.top = \'auto\';\n    } else {\n      popup.style.top = (rect.bottom + 4) + \'px\';\n      popup.style.bottom = \'auto\';\n    }\n    popup.style.left = rect.left + \'px\';\n    popup.style.minWidth = rect.width + \'px\';\n  };\n\n  window._cselPick = function(id, value, label) {\n    const data = window._cselData?.[id];\n    if (!data) { _hidePopup(); return; }\n    data.val = value;\n    const owner = document.getElementById(id);\n    if (owner) {\n      const lbl = owner.querySelector(\'.csel-lbl\');\n      if (lbl) lbl.textContent = label;\n    }\n    _hidePopup();\n    if (data.cb) {\n      try { data.cb(value); } catch(e) { console.warn(\'csel cb:\', e); }\n    }\n  };\n\n  window._cselData = {};\n\n  window.cselCreate = function(id, options, value, callback, {small=false, width=\'\', placeholder=\'— seleziona —\'}={}) {\n    let label = placeholder;\n    const flat = [];\n    options.forEach(o => { if(o.items) o.items.forEach(i=>flat.push(i)); else flat.push(o); });\n    const found = flat.find(o => o.v === value);\n    if (found) label = found.l;\n    window._cselData[id] = { opts: options, val: value, cb: callback };\n    const w = width ? 'style="width:${width}"(' : \'\';\n    return '<div class="csel${small?' small':''}" id="${id}" ${w}>
       <button type="button" class="csel-btn" onclick="window._cselToggle(this,'${id}')">
         <span class="csel-lbl">${label.replace(/</g,'&lt;')}</span>
         <span class="csel-arrow">▼</span>
       </button>
-    </div>`;
-  };
-
-  window.upgradeSelects = function(container) {
-    const box = container || document.getElementById('modal-box');
-    if (!box) return;
-    box.querySelectorAll('select:not(.keep-native)').forEach(sel => {
-      if (sel.closest('.csel')) return;
-      // Non saltare per display:none — il pannello potrebbe essere nascosto ma il select va upgradato
-      const opts = [];
-      Array.from(sel.children).forEach(child => {
-        if (child.tagName === 'OPTGROUP') {
-          const grp = { group: child.label, items: [] };
-          Array.from(child.children).forEach(o => grp.items.push({v: o.value, l: o.textContent.trim()}));
-          opts.push(grp);
-        } else if (child.tagName === 'OPTION') {
-          opts.push({v: child.value, l: child.textContent.trim()});
-        }
-      });
-      const value = sel.value || '';
-      const id = 'csel-' + Math.random().toString(36).slice(2,8);
-      const onchangeStr = sel.getAttribute('onchange') || '';
-      const isSmall = sel.classList.contains('stato-approv-select') || sel.classList.contains('stato-sel') || sel.classList.contains('small');
-      const w = sel.style.width || (sel.offsetWidth > 50 ? sel.offsetWidth + 'px' : '');
-      const cb = onchangeStr ? function(v) {
-        try { (new Function(onchangeStr.replace(/this\.value/g, JSON.stringify(v)))).call({}); }
-        catch(e) { try { eval(onchangeStr.replace(/this\.value/g, JSON.stringify(v))); } catch(e2) {} }
-      } : null;
-      const html = window.cselCreate(id, opts, value, cb, {small: isSmall, width: w});
-      const div = document.createElement('div');
-      div.innerHTML = html;
-      const csel = div.firstElementChild;
-      sel.parentNode.replaceChild(csel, sel);
-    });
-  };
-})();
-
+    </div>(';\n  };\n\n  window.upgradeSelects = function(container) {\n    const box = container || document.getElementById(\'modal-box\');\n    if (!box) return;\n    box.querySelectorAll(\'select:not(.keep-native)\').forEach(sel => {\n      if (sel.closest(\'.csel\')) return;\n      // Non saltare per display:none — il pannello potrebbe essere nascosto ma il select va upgradato\n      const opts = [];\n      Array.from(sel.children).forEach(child => {\n        if (child.tagName === \'OPTGROUP\') {\n          const grp = { group: child.label, items: [] };\n          Array.from(child.children).forEach(o => grp.items.push({v: o.value, l: o.textContent.trim()}));\n          opts.push(grp);\n        } else if (child.tagName === \'OPTION\') {\n          opts.push({v: child.value, l: child.textContent.trim()});\n        }\n      });\n      const value = sel.value || \'\';\n      const id = \'csel-\' + Math.random().toString(36).slice(2,8);\n      const onchangeStr = sel.getAttribute(\'onchange\') || \'\';\n      const isSmall = sel.classList.contains(\'stato-approv-select\') || sel.classList.contains(\'stato-sel\') || sel.classList.contains(\'small\');\n      const w = sel.style.width || (sel.offsetWidth > 50 ? sel.offsetWidth + \'px\' : \'\');\n      const cb = onchangeStr ? function(v) {\n        try { (new Function(onchangeStr.replace(/this\.value/g, JSON.stringify(v)))).call({}); }\n        catch(e) { try { eval(onchangeStr.replace(/this\.value/g, JSON.stringify(v))); } catch(e2) {} }\n      } : null;\n      const html = window.cselCreate(id, opts, value, cb, {small: isSmall, width: w});\n      const div = document.createElement(\'div\');\n      div.innerHTML = html;\n      const csel = div.firstElementChild;\n      sel.parentNode.replaceChild(csel, sel);\n    });\n  };\n})();\n\n
