@@ -782,14 +782,17 @@ function renderDetTab(tab,el){
     // Sezione file Nextcloud
     html+='<div class="card" style="margin-bottom:12px"><div class="card-head">'+
       '<div class="card-title">&#128193; File Nextcloud</div>'+
-      '<div style="display:flex;gap:6px">'+
-        (ncFolder?'<a href="'+esc(ncFolder)+'" target="_blank" class="btn btn-ghost btn-sm">&#8599; Apri cartella</a>':'')+
-        (ncPath?'<button class="btn btn-secondary btn-sm" data-path="'+esc(ncPath)+'" onclick="caricaFileNC(this.dataset.path)">&#8635; Aggiorna</button>':'')+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+        (ncPath?'<span style="font-size:10px;color:var(--text3);align-self:center;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(ncPath)+'">'+esc(ncPath)+'</span>':'')+
+        (ncFolder?'<a href="'+esc(ncFolder)+'" target="_blank" class="btn btn-ghost btn-sm">&#8599; NC</a>':'')+
+        (ncPath?'<button class="btn btn-secondary btn-sm" data-path="'+esc(ncPath)+'" onclick="caricaFileNC(this.dataset.path)">&#8635;</button>':'')+
+        '<button class="btn btn-ghost btn-sm" data-num="'+esc(c.numero)+'" onclick="impostaPathNC(this.dataset.num)">&#128278; Path</button>'+
       '</div>'+
     '</div>'+
     (ncPath?
       '<div id="'+fileListId+'" style="padding:8px 0"><div style="padding:12px 16px;font-size:12px;color:var(--text3)">Caricamento file...</div></div>'
-      :'<div class="card-body" style="font-size:13px;color:var(--text3)">Configura Nextcloud e verifica che la cartella commessa esista.</div>')+
+      :'<div class="card-body"><div style="font-size:12px;color:var(--text3);margin-bottom:10px">'+(getCfg().ok?'Cartella non trovata automaticamente.':'Nextcloud non configurato.')+'</div>'+
+       '<button class="btn btn-primary btn-sm" data-num="'+esc(c.numero)+'" onclick="impostaPathNC(this.dataset.num)">&#128278; Imposta path cartella</button></div>')+
     '</div>';
     // Riferimenti manuali
     html+='<div class="card"><div class="card-head">'+
@@ -841,10 +844,13 @@ function renderMargine(){
 // ── NEXTCLOUD FILE BROWSER ──────────────────────────────────────
 
 function getNcPath(numero){
-  var a=getAnno(numero),cod=getCod(numero),k=CMAP[cod]?CNAMES[cod]:null;
+  var comm=lg('comm').find(function(x){return x.numero===numero});
+  // Path personalizzato salvato sulla commessa
+  if(comm&&comm.nc_path)return comm.nc_path;
+  // Calcolo automatico
+  var a=getAnno(numero),cod=getCod(numero),k=CNAMES[cod]||null;
   if(!k||!a)return null;
   var seq=parseInt((numero||'').split('-')[1]||'0');
-  var comm=lg('comm').find(function(x){return x.numero===numero});
   if(comm&&comm.oggetto)
     return '/Clienti/'+k+'/'+a+'/'+cod+'-'+seq+'-'+a+' ('+comm.oggetto+')';
   return '/Clienti/'+k+'/'+a;
@@ -933,6 +939,23 @@ async function caricaFileNC(path){
   }catch(e){
     if(listId)listId.innerHTML='<div style="padding:12px 16px;font-size:12px;color:var(--red)">Errore: '+esc(e.message)+'</div>';
   }
+}
+
+function impostaPathNC(numero){
+  var comm=lg('comm').find(function(x){return x.numero===numero});
+  var attuale=comm?( comm.nc_path||getNcPath(numero)||''):'';
+  var msg='Inserisci il path della cartella Nextcloud\n(es. /Clienti/KF Group/2025/KFG-3-2025 (oggetto))\n\nPath attuale: '+( attuale||'automatico');
+  var nuovo=prompt(msg, attuale);
+  if(nuovo===null)return;
+  var all=lg('comm');var idx=all.findIndex(function(x){return x.numero===numero});
+  if(idx<0)return;
+  all[idx].nc_path=nuovo.trim()||'';
+  ls('comm',all);
+  if(CC&&CC.numero===numero)CC=Object.assign({},CC,{nc_path:nuovo.trim()||''});
+  wPut('commesse.csv',all,['numero','cliente','oggetto','tipo_commessa','importo','data_apertura','data_consegna','stato','note','nc_path']);
+  showToast('Path NC aggiornato');
+  // Ricarica tab
+  renderDetTab('documenti',document.getElementById('det-content'));
 }
 
 function cambiaStato(s){
