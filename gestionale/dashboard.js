@@ -3567,13 +3567,13 @@ function aresFilter(){
   if(!res.length){el.innerHTML=q.length>1?'<div style="padding:6px;font-size:13px;color:var(--text3)">Nessun risultato</div>':'';return;}
   el.innerHTML=res.map(a=>{
     const st=TIPO_BADGE[a.t]||'background:#f3f4f6;color:#374151';
-    return`<div style="display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid var(--border);font-size:13px;flex-wrap:wrap;">
-      <span style="font-family:monospace;font-weight:700;color:var(--green);min-width:68px;font-size:12px">${a.s}</span>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;${st};white-space:nowrap">${a.serie||a.t}</span>
-      <span style="flex:1;color:var(--text2);min-width:120px">${a.d}</span>
-      <span style="font-weight:700;white-space:nowrap">€${fmt2(a.p)}</span>
-      <button style="background:var(--green);border:none;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;cursor:pointer;" onclick="fillAres(${JSON.stringify(a).replace(/"/g,'&quot;')})">usa</button>
-    </div>`;
+    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid var(--border);font-size:13px;flex-wrap:wrap;">'+
+      '<span style="font-family:monospace;font-weight:700;color:var(--green);min-width:68px;font-size:12px">'+a.s+'</span>'+
+      '<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;'+st+';white-space:nowrap">'+(a.serie||a.t)+'</span>'+
+      '<span style="flex:1;color:var(--text2);min-width:120px">'+a.d+'</span>'+
+      '<span style="font-weight:700;white-space:nowrap">€'+fmt2(a.p)+'</span>'+
+      '<button style="background:var(--green);border:none;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;cursor:pointer;" onclick="fillAres('+JSON.stringify(a).replace(/"/g,'&quot;')+')">usa</button>'+
+    '</div>';
   }).join('');
 }
 function fillAres(a){
