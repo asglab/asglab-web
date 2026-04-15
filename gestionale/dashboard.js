@@ -3723,14 +3723,14 @@ async function parseMovimenti(file, banca){
       const contiAll=lll('conti');
       const nomeContoNorm=nomeConto||({fineco:'Banca Fineco',sella:'Banca Sella'}[banca]||banca);
       const idx=contiAll.findIndex(c=>(c.conto||'').toLowerCase().includes(banca.toLowerCase()));
-      const row={id:idx>=0?contiAll[idx].id:uid(),conto:nomeContoNorm,saldo:saldoFinale.toFixed(2),data_rilevazione:dataUltimo,note:`Import automatico da ${file.name}`};
+      const row={id:idx>=0?contiAll[idx].id:uid(),conto:nomeContoNorm,saldo:saldoFinale.toFixed(2),data_rilevazione:dataUltimo,note:'Import automatico da '+file.name};
       if(idx>=0)contiAll[idx]=row; else contiAll.push(row);
       ls('conti',contiAll);
       await wPut('cassa.csv',contiAll,['conto','saldo','data_rilevazione','note']);
       renderCassa();
     }
 
-    const msg=`✓ ${nuovi.length} nuovi mov. su ${movimenti.length} totali${saldoFinale!==null?' · saldo aggiornato: €${fmt(saldoFinale)}':''}`;
+    const msg='✓ '+nuovi.length+' nuovi mov. su '+movimenti.length+' totali'+(saldoFinale!==null?' · saldo aggiornato: €'+fmt(saldoFinale):'');
     if(resEl)resEl.innerHTML=`<span style="color:var(--green);font-weight:600">${msg}</span>`;
     showToast(msg);
 
