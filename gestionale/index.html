@@ -690,6 +690,7 @@ function renderDetTab(tab,el){
       html+='</div>';
       if(off.testo)html+='<div style="font-size:12px;white-space:pre-wrap;color:var(--text2);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;max-height:180px;overflow-y:auto;margin-top:12px">'+esc(off.testo)+'</div>';
       if(off.data_risposta)html+='<div style="font-size:12px;color:var(--text3);margin-top:8px">Risposta ricevuta: '+fmtD(off.data_risposta)+(off.note_risposta?' — '+esc(off.note_risposta):'')+'</div>';
+      if(off.url)html+='<div style="margin-top:12px"><a href="'+esc(off.url)+'" target="_blank" class="btn btn-primary btn-sm">&#128196; Apri documento offerta</a></div>';
     }else{
       html+='<div style="color:var(--text3);font-size:13px">Nessuna offerta ancora. Usa <strong>Modifica</strong> per crearla.</div>';
     }
@@ -1681,47 +1682,67 @@ function generaOffertaPDF(numero){
   var det=lgo('det');var cd=det[numero]||{distinta:[],ore:[]};
   var off=cd.offerta||{};
   var comm=lg('comm').find(function(x){return x.numero===numero})||{};
+  // Usa solo righe non intestazione e non fornitore interno (no costi visibili al cliente)
   var dist=cd.distinta.filter(function(r){return !r._intestazione});
+  var impOfferta=parseFloat(off.importo_offerto||comm.importo||0);
   var w=window.open('','_blank');
   var oggi=new Date().toLocaleDateString('it-IT');
-  var scad=off.validita?new Date(Date.now()+off.validita*86400000).toLocaleDateString('it-IT'):'—';
-  w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Offerta '+numero+'</title>'+
-    '<style>body{font-family:Arial,sans-serif;font-size:11px;margin:30px;color:#111}'+
-    'h1{font-size:16px;font-weight:700;margin:0 0 4px}'+
-    '.sub{color:#666;font-size:11px;margin-bottom:20px}'+
-    '.header{display:flex;justify-content:space-between;margin-bottom:24px}'+
-    '.company{font-size:12px}.company strong{font-size:14px;display:block;margin-bottom:4px}'+
-    '.ref{text-align:right;font-size:11px;color:#666}'+
-    '.ref strong{font-size:18px;color:#1a56db;display:block}'+
-    'table{width:100%;border-collapse:collapse;margin:16px 0}'+
-    'th{background:#f0f0f0;padding:5px 8px;text-align:left;border-bottom:2px solid #ccc;font-size:10px;font-weight:700;text-transform:uppercase}'+
+  var dataOfferta=off.data_offerta?new Date(off.data_offerta).toLocaleDateString('it-IT'):oggi;
+  var scadData=off.validita?new Date(Date.now()+parseInt(off.validita||30)*86400000).toLocaleDateString('it-IT'):'—';
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Offerta '+esc(numero)+'</title>'+
+    '<style>'+
+    'body{font-family:Arial,sans-serif;font-size:11px;margin:30px 36px;color:#111}'+
+    '.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:16px;border-bottom:2px solid #1a56db}'+
+    '.company strong{font-size:15px;color:#1a56db;display:block;margin-bottom:3px}'+
+    '.company{font-size:11px;color:#444;line-height:1.6}'+
+    '.ref{text-align:right}.ref .num{font-size:22px;font-weight:800;color:#1a56db;display:block}'+
+    '.ref{font-size:11px;color:#666}'+
+    'h2{font-size:13px;font-weight:700;margin:0 0 4px;color:#111}'+
+    '.cliente{font-size:12px;color:#555;margin-bottom:20px}'+
+    '.note-box{background:#f8faff;border-left:3px solid #1a56db;padding:10px 14px;margin:16px 0;font-size:11px;color:#333;line-height:1.6}'+
+    'table{width:100%;border-collapse:collapse;margin:16px 0;font-size:11px}'+
+    'th{background:#f0f4f8;padding:6px 8px;text-align:left;border-bottom:2px solid #ccc;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}'+
     'td{padding:5px 8px;border-bottom:1px solid #eee}'+
-    '.num{text-align:right}.tot{font-weight:700;background:#f7f7f7;border-top:2px solid #ccc}'+
-    '.total-box{background:#f0f7ff;border:2px solid #1a56db;border-radius:6px;padding:12px 16px;text-align:right;margin-top:16px}'+
-    '.total-box .label{font-size:11px;color:#666}'+
-    '.total-box .amount{font-size:24px;font-weight:800;color:#1a56db}'+
-    '.note{margin-top:20px;font-size:11px;color:#444;line-height:1.5}'+
-    '.footer{margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:10px;color:#999}'+
-    '@media print{button{display:none}}</style></head><body>'+
-    '<button onclick="window.print()" style="margin-bottom:16px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer">&#128424; Stampa / Salva PDF</button>'+
+    '.num{text-align:right}'+
+    '.total-box{background:#1a56db;color:#fff;border-radius:6px;padding:14px 20px;text-align:right;margin-top:20px}'+
+    '.total-box .lbl{font-size:11px;opacity:.8;margin-bottom:4px}'+
+    '.total-box .amt{font-size:26px;font-weight:800}'+
+    '.total-box .sub{font-size:10px;opacity:.7;margin-top:4px}'+
+    '.footer{margin-top:32px;padding-top:10px;border-top:1px solid #ddd;font-size:9px;color:#999}'+
+    '@media print{button{display:none}body{margin:15px}}'+
+    '</style></head><body>'+
+    '<button onclick="window.print()" style="margin-bottom:16px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:12px">&#128424; Stampa / Salva PDF</button>'+
     '<div class="header">'+
-    '<div class="company"><strong>ASG LAB S.r.l.</strong>Via Vitruvio, 3 — 20124 Milano (MI)<br>P.IVA 10122150963<br>info@asglab.it · +39 375 5707492</div>'+
-    '<div class="ref"><span class="label">OFFERTA N.</span><strong>'+esc(numero)+'</strong>Data: '+oggi+'<br>Valida fino: '+scad+'</div>'+
+      '<div class="company"><strong>ASG LAB S.r.l.</strong>Via Vitruvio, 3 — 20124 Milano (MI)<br>P.IVA 10122150963 — REA MI-2784647<br>info@asglab.it · +39 375 5707492</div>'+
+      '<div class="ref"><span style="font-size:10px;text-transform:uppercase;letter-spacing:.1em">OFFERTA</span><span class="num">'+esc(numero)+'</span>'+
+      '<span style="display:block;margin-top:4px">Data: <strong>'+dataOfferta+'</strong></span>'+
+      (off.validita?'<span style="display:block">Valida fino: '+scadData+'</span>':'')+
+      '</div>'+
     '</div>'+
-    '<h2 style="font-size:13px;margin-bottom:4px">Oggetto: '+esc(off.oggetto_offerta||comm.oggetto||'—')+'</h2>'+
-    '<div style="font-size:11px;color:#666;margin-bottom:16px">Cliente: <strong>'+esc(CNAMES[comm.cliente]||comm.cliente||'—')+'</strong></div>'+
-    (off.testo?'<div class="note" style="background:#f9f9f9;border-left:3px solid #1a56db;padding:8px 12px;border-radius:0 4px 4px 0;margin-bottom:16px">'+esc(off.testo).replace(/\n/g,'<br>')+'</div>':'')+
-    (dist.length?
-    '<table><thead><tr><th>Descrizione</th><th>Fornitore</th><th>Q.</th><th class="num">Prezzo unit.</th><th class="num">Totale</th></tr></thead><tbody>'+
+    '<div style="margin-bottom:20px">'+
+      '<h2>'+esc(off.oggetto_offerta||comm.oggetto||'Offerta commerciale')+'</h2>'+
+      '<div class="cliente">Spett. <strong>'+esc(CNAMES[comm.cliente]||comm.cliente||'—')+'</strong></div>'+
+    '</div>';
+  if(off.testo){
+    html+='<div class="note-box">'+esc(off.testo).replace(/\n/g,'<br>')+'</div>';
+  }
+  // Distinta materiali — mostra solo descrizione e quantità, NO prezzi interni
+  if(dist.length){
+    html+='<table><thead><tr><th>Descrizione</th><th class="num">Q.</th></tr></thead><tbody>'+
     dist.map(function(r){
-      var tot=parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1);
-      return '<tr><td>'+esc(r.descrizione||'—')+'</td><td style="font-size:10px;color:#666">'+esc(r.fornitore||'—')+'</td><td class="num">'+esc(String(r.qty||1))+'</td><td class="num">&#8364;'+fmt(r.prezzo_vendita||0)+'</td><td class="num">&#8364;'+fmt(tot)+'</td></tr>';
+      return '<tr><td>'+esc(r.descrizione||'—')+'</td><td class="num">'+esc(String(r.qty||1))+'</td></tr>';
     }).join('')+
-    '<tr class="tot"><td colspan="4" class="num">Totale materiali:</td><td class="num">&#8364;'+fmt(dist.reduce(function(s,r){return s+parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)},0))+'</td></tr>'+
-    '</tbody></table>':'<p style="color:#666">Nessuna distinta materiali allegata.</p>')+
-    '<div class="total-box"><div class="label">TOTALE OFFERTA</div><div class="amount">&#8364;'+fmt(off.importo_offerto||0)+'</div><div style="font-size:10px;color:#999;margin-top:4px">IVA esclusa — validit\u00e0 '+esc(String(off.validita||30))+' giorni</div></div>'+
-    '<div class="footer">ASG LAB S.r.l. — Via Vitruvio, 3 — 20124 Milano (MI) — P.IVA 10122150963 — asglab@legalmail.it</div>'+
-    '</body></html>');
+    '</tbody></table>';
+  }
+  // Totale offerta — sempre dall'importo offerta, non dalla somma distinta
+  html+='<div class="total-box">'+
+    '<div class="lbl">TOTALE OFFERTA</div>'+
+    '<div class="amt">&#8364; '+fmt(impOfferta)+'</div>'+
+    '<div class="sub">IVA esclusa'+(off.validita?' — validit\u00e0 '+off.validita+' giorni':'')+'</div>'+
+  '</div>'+
+  '<div class="footer">ASG LAB S.r.l. — Via Vitruvio, 3 — 20124 Milano (MI) — P.IVA 10122150963 — asglab@legalmail.it — www.asglab.it</div>'+
+  '</body></html>';
+  w.document.write(html);
   w.document.close();
 }
 
@@ -2048,7 +2069,7 @@ function exportAll(){var data={comm:lg('comm'),fatt:lg('fatt'),scad:lg('scad'),c
 // INIT
 (function(){
   // Migrazione nomi banche
-  var bancaMap={'Banca Fineco':'Banca Fineco','Fineco':'Banca Fineco','Banca Fineco (ASG LAB S.R.L.S.)':'Banca Fineco',
+  var bancaMap={'Banca Fineco':'Banca Fineco','Fineco':'Banca Fineco',
     'Banca Sella':'Banca Tot. (Sella)','Sella':'Banca Tot. (Sella)',
     'Tot. S.p.A.':'Banca Tot. (Sella)','Tot. S.p.A. (ex Sella)':'Banca Tot. (Sella)',
     'Revolut':'Banca Revolut','Revolut Bank':'Banca Revolut'};
@@ -2056,7 +2077,7 @@ function exportAll(){var data={comm:lg('comm'),fatt:lg('fatt'),scad:lg('scad'),c
   conti.forEach(function(c){
     if(bancaMap[c.conto]&&bancaMap[c.conto]!==c.conto){c.conto=bancaMap[c.conto];changed=true;}
   });
-  if(changed){ls('conti',conti);renderCassa();}
+  if(changed){ls('conti',conti);}
   var cfg=getCfg();
   if(!cfg.ok)document.getElementById('cfg-banner').classList.add('show');
   else syncNow();
