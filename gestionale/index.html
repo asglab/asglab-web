@@ -50,7 +50,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 .sync-dot.ok{background:#22c55e}.sync-dot.err{background:#ef4444}
 .sync-dot.loading{background:#f59e0b;animation:pulse .8s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-#content{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px}
+#content{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px;-webkit-overflow-scrolling:touch}
 .view{display:none}.view.active{display:block}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow)}
 .card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -155,7 +155,44 @@ tbody tr:hover td{background:var(--surface2)}
 .forn-card:hover{box-shadow:var(--shadow-md);border-color:var(--border2)}
 .forn-tag{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-@media(max-width:700px){:root{--sidebar-w:52px}#sidebar{width:52px}.sidebar-logo .company,.sidebar-logo .sub,.nav-section-label,.nav-item span,.sidebar-footer button span,.sidebar-footer a span,.build-tag{display:none}.nav-item{justify-content:center;padding:12px 0}.sidebar-footer button,.sidebar-footer a{justify-content:center;padding:10px 0}#content{padding:12px}.metrics-grid{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}}
+@media(max-width:700px){
+  :root{--sidebar-w:52px}
+  #sidebar{width:52px}
+  .sidebar-logo .company,.sidebar-logo .sub,.nav-section-label,.nav-item span,.sidebar-footer button span,.sidebar-footer a span,.build-tag{display:none}
+  .nav-item{justify-content:center;padding:12px 0}
+  .sidebar-footer button,.sidebar-footer a{justify-content:center;padding:10px 0}
+  #content{padding:10px 8px}
+  /* Home: 2 colonne metriche, poi 1 colonna */
+  .metrics-grid{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .metric{padding:10px 12px}
+  .metric-val{font-size:18px}
+  .grid-2{grid-template-columns:1fr;gap:10px}
+  /* Tabelle: scroll orizzontale, font piccolo */
+  table{font-size:11px}
+  thead th{padding:6px 6px;font-size:10px}
+  tbody td{padding:6px 6px}
+  /* Commesse lista */
+  .comm-row{flex-wrap:wrap;padding:9px 10px;gap:6px}
+  .comm-num{min-width:80px}
+  .comm-obj{width:100%;order:3;font-size:12px}
+  /* Dettaglio commessa */
+  .det-header{padding:12px 14px}
+  #det-margine{min-width:0;width:100%}
+  /* Filter bar */
+  .filter-bar{gap:6px}
+  .search-input{font-size:12px}
+  /* Tab bar scroll orizzontale */
+  .tab-bar{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+  .tab-btn{white-space:nowrap;padding:8px 12px;font-size:12px}
+  /* Approv rows */
+  .approv-row{flex-wrap:wrap}
+  .approv-group-head{flex-wrap:wrap;gap:6px}
+}
+@media(max-width:480px){
+  .metrics-grid{grid-template-columns:1fr 1fr}
+  .filter-bar .chip{font-size:11px;padding:3px 8px}
+  .btn-sm{font-size:11px;padding:4px 8px}
+}
 </style>
 </head>
 <body>
@@ -188,7 +225,7 @@ tbody tr:hover td{background:var(--surface2)}
     <div id="content">
       <div class="config-banner" id="cfg-banner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Nextcloud non configurato — </span><a href="#" onclick="openModal(&quot;config&quot;);return false" style="color:var(--amber);font-weight:700">configura ora</a></div>
       <!-- HOME -->
-      <div class="view active" id="view-home"><div class="metrics-grid" id="home-metrics"></div><div class="grid-2"><div class="card"><div class="card-head"><div class="card-title">Commesse in corso</div><a href="#" class="btn btn-ghost btn-sm" onclick="navTo('commesse');return false">tutte</a></div><div id="home-commesse"><div class="empty">Caricamento...</div></div></div><div class="card"><div class="card-head"><div class="card-title">Scadenze urgenti</div></div><div id="home-scadenze"><div class="empty">Caricamento...</div></div></div></div></div>
+      <div class="view active" id="view-home"><div class="metrics-grid" id="home-metrics"></div><div id="home-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div class="card"><div class="card-head"><div class="card-title">Commesse in corso</div><a href="#" class="btn btn-ghost btn-sm" onclick="navTo('commesse');return false">tutte</a></div><div id="home-commesse"><div class="empty">Caricamento...</div></div></div><div class="card"><div class="card-head"><div class="card-title">Scadenze urgenti</div></div><div id="home-scadenze"><div class="empty">Caricamento...</div></div></div></div></div>
       <!-- COMMESSE -->
       <div class="view" id="view-commesse">
         <div class="filter-bar">
@@ -211,7 +248,7 @@ tbody tr:hover td{background:var(--surface2)}
       </div>
       <!-- COMMESSA DETAIL -->
       <div class="view" id="view-commessa-det">
-        <div class="card" style="margin-bottom:16px"><div style="padding:16px 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px"><div><div class="comm-num" id="det-num"></div><div style="font-size:18px;font-weight:700;color:var(--text)" id="det-title"></div><div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap" id="det-meta"></div><div class="flow-bar" id="det-flow"></div></div><div id="det-margine" style="min-width:160px;text-align:right"></div></div></div>
+        <div class="card" style="margin-bottom:12px"><div style="padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div class="comm-num" id="det-num"></div><div style="font-size:18px;font-weight:700;color:var(--text)" id="det-title"></div><div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap" id="det-meta"></div><div class="flow-bar" id="det-flow"></div></div><div id="det-margine" style="min-width:160px;text-align:right"></div></div></div>
         <div class="tab-bar" id="det-tabs"></div>
         <div id="det-content"></div>
       </div>
@@ -613,7 +650,10 @@ function renderDetTab(tab,el){
       dist.map(function(r){
         if(r._intestazione)return'<tr style="background:var(--surface2)"><td colspan="8" style="padding:8px 12px;font-weight:700;font-size:12px;color:var(--text3)">'+esc(r.descrizione)+'</td></tr>';
         return'<tr>'+
-          '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(r.descrizione||'—')+'</td>'+
+          '<td>'+
+            '<div style="font-size:12px;font-weight:600">'+esc(r.descrizione||'\u2014')+'</div>'+
+            (r.note?'<div style="font-size:11px;color:var(--amber);margin-top:2px">\u{1F4CB} '+esc(r.note)+'</div>':'')+
+          '</td>'+
           '<td style="text-align:center">'+esc(String(r.qty||1))+'</td>'+
           '<td style="font-size:11px;color:var(--text3)">'+esc(r.fornitore||'—')+'</td>'+
           '<td style="font-family:monospace;font-size:11px">'+esc(r.codice||'—')+'</td>'+
@@ -823,7 +863,7 @@ function saveRiga(numero){
   var row={id:uid(),sezione:G('f-sez')||'Generale',descrizione:G('f-desc'),qty:parseInt(G('f-qty')||1),
     fornitore:G('f-forn'),codice:G('f-cod'),costo_cad:costo,sconto:sconto,
     netto_cad:parseFloat(netto.toFixed(4)),markup:markup,prezzo_vendita:parseFloat((netto*markup).toFixed(4)),
-    stato_approv:G('f-stato-a')||'daordinare',data_attesa:G('f-datta')};
+    stato_approv:G('f-stato-a')||'daordinare',data_attesa:G('f-datta'),note:G('f-note-riga')};
   var det=lgo('det');if(!det[numero])det[numero]={distinta:[],ore:[],note:''};
   det[numero].distinta.push(row);ls('det',det);CC._det=det[numero];
   closeM();renderDetTab('distinta',document.getElementById('det-content'));renderMargine();syncDetBg();
@@ -1370,6 +1410,7 @@ function getModalHTML(type,extra){
     '<div class="form-row"><div class="form-group"><label>Stato approvv.</label><select class="form-control" id="f-stato-a">'+
     '<option value="daordinare">Da ordinare</option><option value="ordinato">Ordinato</option><option value="arrivato">Arrivato</option></select></div>'+
     '<div class="form-group"><label>Data attesa</label><input class="form-control" id="f-datta" type="date"></div></div>'+
+    '<div class="form-group"><label>Note / avanzamento</label><input class="form-control" id="f-note-riga" placeholder="es. da suddividere, in attesa quotazione..."></div>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button><button class="btn btn-primary" onclick="saveRiga(\''+esc(num)+'\')">Aggiungi</button></div>'}}
   if(type==='edit-riga'){
     var parts=(extra||'').split('|');var num=parts[0];var rid=parts[1];
@@ -1394,6 +1435,8 @@ function getModalHTML(type,extra){
     ['daordinare','ordinato','arrivato'].map(function(s){return'<option value="'+s+'"'+(r.stato_approv===s?' selected':'')+'>'+s+'</option>'}).join('')+
     '</select></div>'+
     '<div class="form-group"><label>Data attesa</label><input class="form-control" id="f-datta" type="date" value="'+esc(r.data_attesa||'')+'"></div></div>'+
+    '<div class="form-group"><label>Note / avanzamento</label>'+
+    '<input class="form-control" id="f-note-riga" value="'+esc(r.note||'')+'" placeholder="es. da suddividere, in attesa quotazione, dettaglio da definire..."></div>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
     '<button class="btn btn-danger btn-sm" data-id="'+esc(rid)+'" data-num="'+esc(num)+'" onclick="delRiga(this.dataset.id,this.dataset.num)">Elimina</button>'+
     '<button class="btn btn-primary" data-id="'+esc(rid)+'" data-num="'+esc(num)+'" onclick="updateRiga(this.dataset.id,this.dataset.num)">Salva</button></div>'}}
@@ -1637,7 +1680,7 @@ function updateRiga(rid,numero){
     qty:parseInt(G('f-qty')||1),fornitore:G('f-forn'),codice:G('f-cod'),
     costo_cad:costo,sconto:sconto,netto_cad:parseFloat(netto.toFixed(4)),
     markup:markup,prezzo_vendita:parseFloat((netto*markup).toFixed(4)),
-    stato_approv:G('f-stato-a')||'daordinare',data_attesa:G('f-datta')
+    stato_approv:G('f-stato-a')||'daordinare',data_attesa:G('f-datta'),note:G('f-note-riga')
   });
   // Rimuovi dalla posizione attuale
   det[numero].distinta.splice(idx,1);
@@ -1875,7 +1918,6 @@ function saveConto(){
 function saveScad(){var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};var scad=lg('scad');var row={id:uid(),data:G('f-data'),importo:G('f-importo'),descrizione:G('f-desc'),tipo:G('f-tipo'),stato:G('f-stato')};if(!row.data)return;scad.push(row);ls('scad',scad);closeM();wPut('scadenze.csv',scad,['id','data','importo','descrizione','tipo','stato']);showToast('Scadenza aggiunta');renderScad()}
 function saveMag(){var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};var mag=lg('mag');var row={id:uid(),descrizione:G('f-desc'),codice:G('f-cod'),fornitore:G('f-forn'),categoria:G('f-cat'),costo_cad:G('f-costo'),qty:G('f-qty'),soglia_min:G('f-soglia')};if(!row.descrizione)return;mag.push(row);ls('mag',mag);closeM();wPut('magazzino.csv',mag,['id','codice','descrizione','fornitore','categoria','costo_cad','qty','soglia_min']);showToast('Componente aggiunto');renderMag()}
 function calcNetto(){var costo=parseFloat((document.getElementById('f-costo')||{}).value||0);var sc=parseFloat((document.getElementById('f-sconto')||{}).value||0);var mk=parseFloat((document.getElementById('f-markup')||{}).value||2.25);var netto=costo*(1-sc/100);var pre=document.getElementById('calc-preview');if(pre)pre.textContent='Netto: €'+fmt(netto)+' → Vendita: €'+fmt(netto*mk)}
-function apriRDO(fornId){var f=FORNITORI.find(function(x){return x.id===fornId||x.nome===fornId});var nome=f?f.nome:fornId;var det=lgo('det'),comm=lg('comm');var items=[];comm.forEach(function(c){var d=det[c.numero]||{distinta:[]};(d.distinta||[]).forEach(function(r){if(!r._intestazione&&(r.fornitore||'').includes(nome.split(' ')[0])&&r.stato_approv!=='arrivato')items.push(Object.assign({},r,{_commessa:c.numero}))})});var testo=items.map(function(r,i){return(i+1)+'. '+r.descrizione+(r.codice?' ('+r.codice+')':'')+' x'+r.qty+' — rif. '+r._commessa}).join('\n');var subj='Richiesta di Offerta — ASG LAB';var body='Gentili '+nome+',\n\nRichiediamo offerta per:\n\n'+testo+'\n\nCordiali saluti\nASG LAB';var email=f&&f.contatti&&f.contatti.email?f.contatti.email:'';if(email)window.open('mailto:'+email+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body));else navigator.clipboard.writeText(subj+'\n\n'+body).then(function(){showToast('Testo RDO copiato')})}
 
 // EXPORT PDF
 function exportReportCommesse(){var comms=lg('comm');var det=lgo('det');var w=window.open('','_blank');var rows=comms.map(function(c){var cd=det[c.numero]||{distinta:[],ore:[]};var cM=cd.distinta.reduce(function(s,r){return s+parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)},0);var cO=cd.ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);var imp=parseFloat(c.importo||0);var tot=cM+cO;var pct=imp>0?((imp-tot)/imp*100):null;return Object.assign({},c,{cM:cM,cO:cO,tot:tot,imp:imp,pct:pct})});w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title><style>body{font-family:sans-serif;font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th{background:#f0f0f0;padding:5px 6px;border-bottom:2px solid #ccc;text-align:left;font-size:10px}td{padding:4px 6px;border-bottom:1px solid #eee}.num{text-align:right}.g{color:green;font-weight:700}.r{color:red;font-weight:700}@media print{button{display:none}}</style></head><body>'+
