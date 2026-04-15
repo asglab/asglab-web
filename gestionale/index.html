@@ -616,7 +616,7 @@ function renderDetTab(tab,el){
       (ncFolder?'Cartella commessa su Nextcloud.':'Configura Nextcloud per vedere i documenti.')+
       '</div></div>'+
       '<div class="card"><div class="card-head"><div class="card-title">Riferimenti</div>'+
-      '<button class="btn btn-secondary btn-sm" onclick="openModal('add-doc',''+esc(c.numero)+'')">+ Aggiungi</button>'+
+      '<button class="btn btn-secondary btn-sm" data-commessa="'+esc(c.numero)+'" onclick="openModal(&quot;add-doc&quot;,this.dataset.commessa)">+ Aggiungi</button>'+
       '</div>'+
       (docs.length?
         '<div>'+docs.map(function(d){
