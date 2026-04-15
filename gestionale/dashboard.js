@@ -1289,9 +1289,9 @@ function folderUrl(n,url){
   const comm=lll('comm').find(x=>x.numero===n);
   if(comm?.oggetto){
     const nomeCartella=`${c}-${seqNum}-${a} (${comm.oggetto})`;
-    return`${ncBase}/apps/files/?dir=${encodeURIComponent('/Clienti/'+k+'/'+a+'/'+nomeCartella)}`;
+    return ncBase+'/apps/files/?dir='+encodeURIComponent('/Clienti/'+k+'/'+a+'/'+nomeCartella);
   }
-  return`${ncBase}/apps/files/?dir=${encodeURIComponent('/Clienti/'+k+'/'+a)}`;
+  return ncBase+'/apps/files/?dir='+encodeURIComponent('/Clienti/'+k+'/'+a);
 }
 
 // ═══════════════════════════════════════════════
@@ -1421,7 +1421,7 @@ async function createCommFolder(numero, oggetto){
   const anno=getAnno(numero), cod=getCod(numero), cliente=CMAP[cod];
   if(!anno||!cliente)return false;
   const seqNum=parseInt((numero||'').split('-')[1]||'0');
-  const nomeCartella=`${cod}-${seqNum}-${anno}${oggetto?' ('+oggetto+')':''}`;
+  const nomeCartella=cod+'-'+seqNum+'-'+anno+(oggetto?' ('+oggetto+')':'');
   // Crea in sequenza (ogni livello deve esistere prima del successivo)
   await wMkdir('/Clienti');
   await wMkdir('/Clienti/'+cliente);
@@ -2136,7 +2136,7 @@ function tabDocumenti(c,cd){
   const docs=cd.documenti||[];
   const anno=getAnno(c.numero);const cod=getCod(c.numero);const client=CMAP[cod]||cod;
   const ncPath=cod&&anno?'/Clienti/'+client+'/'+anno:null;
-  const ncFolder=ncPath?`https://cloud.asglab.it/apps/files/?dir=${encodeURIComponent(ncPath)}`:null;
+  const ncFolder=ncPath?'https://cloud.asglab.it/apps/files/?dir='+encodeURIComponent(ncPath):null;
   const fileListId='nc-files-'+c.numero;
   if(ncPath&&cfg.ok){
     setTimeout(async()=>{
@@ -2246,7 +2246,7 @@ function togTodo(id){const d=lll('todo');const i=d.find(t=>t.id===id);if(i){i.do
 
 async function eliminaCommessa(){
   const c=CC;if(!c)return;
-  if(!confirm(`Eliminare definitivamente la commessa ${c.numero}?\n\nQuesta azione non può essere annullata. La distinta e tutti i dati collegati verranno rimossi.`))return;
+  if(!confirm('Eliminare definitivamente la commessa '+c.numero+'?\n\nQuesta azione non può essere annullata. La distinta e tutti i dati collegati verranno rimossi.'))return;
   // Rimuovi da localStorage
   const all=lll('comm').filter(x=>x.numero!==c.numero);
   ls('comm',all);
@@ -3731,11 +3731,11 @@ async function parseMovimenti(file, banca){
     }
 
     const msg='✓ '+nuovi.length+' nuovi mov. su '+movimenti.length+' totali'+(saldoFinale!==null?' · saldo aggiornato: €'+fmt(saldoFinale):'');
-    if(resEl)resEl.innerHTML=`<span style="color:var(--green);font-weight:600">${msg}</span>`;
+    if(resEl)resEl.innerHTML='<span style="color:var(--green);font-weight:600">'+msg+'</span>';
     showToast(msg);
 
   }catch(err){
-    if(resEl)resEl.innerHTML=`<span style="color:var(--red)">✗ ${err.message}</span>`;
+    if(resEl)resEl.innerHTML='<span style="color:var(--red)">✗ '+err.message+'</span>';
     console.error('Import movimenti error:',err);
   }
 }
