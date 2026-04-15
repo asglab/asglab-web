@@ -2066,7 +2066,7 @@ function tabApprov(c,cd){
     const stl=prob?'Problema':tutti?'Tutto arrivato':qualcuno?'Parziale':'Da ordinare';
     // Trova ID fornitore per RDO
     const fornObj=FORNITORI.find(f2=>f2.nome.toLowerCase().includes(forn.toLowerCase().split(' ')[0])||forn.toLowerCase().includes(f2.nome.toLowerCase().split(' ')[0]));
-    const rdoBtn=`<button class="btn-ghost" style="font-size:11px;padding:3px 10px;" onclick="openRDOApprov('${c.numero}','${forn.replace(/'/g,"\\'")}')">✉ RDO a ${forn.split(' ')[0]}</button>`;
+    const rdoBtn='<button class="btn-ghost" style="font-size:11px;padding:3px 10px;" onclick="openRDOApprov(\''+c.numero+'\',\''+forn+'\')">✉ RDO</button>';
     return`<div class="approv-card">
       <div class="approv-head" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <span class="approv-name">${forn}</span>
@@ -3789,7 +3789,7 @@ async function parseFinecoXLSX(file){
           } else if(typeof r[0]==='number'){
             // Excel serial date
             const d=XLSX.SSF.parse_date_code(r[0]);
-            data=`${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
+            data=d.y+'-'+String(d.m).padStart(2,'0')+'-'+String(d.d).padStart(2,'0');
           } else {
             const s=String(r[0]);
             const m=s.match(/(\d{2})\/(\d{2})\/(\d{4})/);
@@ -3863,7 +3863,7 @@ async function parseSellaCSV(file){
           const dataRaw=cols[iData]||'';
           if(!dataRaw||!dataRaw.match(/\d{2}\/\d{2}\/\d{4}/))continue;
           const dm=dataRaw.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-          const data=dm?`${dm[3]}-${dm[2].padStart(2,'0')}-${dm[1].padStart(2,'0')}`:'';
+          const data=dm?dm[3]+'-'+dm[2].padStart(2,'0')+'-'+dm[1].padStart(2,'0'):'';
           if(!data)continue;
 
           // parseIta: converte numero formato italiano (1.234,56) in float
