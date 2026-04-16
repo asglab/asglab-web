@@ -229,6 +229,11 @@ tbody tr:hover td{background:var(--surface2)}
       <div class="view" id="view-commesse">
         <div class="filter-bar">
           <input type="text" class="search-input" id="comm-search" placeholder="Cerca commessa..." oninput="renderCommesse()">
+          <select id="comm-sort" onchange="renderCommesse()" style="font-size:12px;padding:5px 8px;border:1px solid var(--border2);border-radius:5px;background:var(--bg2);color:var(--text)">
+            <option value="num">Numero ↓</option>
+            <option value="seen">Ultima apertura</option>
+            <option value="stato">Stato</option>
+          </select>
           <div class="chip active" onclick="setChip(this,'comm-stato','');renderCommesse()">Tutte</div>
           <div class="chip" onclick="setChip(this,'comm-stato','in-corso');renderCommesse()">In lavoro</div>
           <div class="chip" onclick="setChip(this,'comm-stato','confermata');renderCommesse()">Confermate</div>
@@ -526,12 +531,41 @@ function renderHome(){
   var og=today();
   var urg=scad.filter(function(s){return s.data&&s.data>=og&&s.data<=addDays(og,7)&&s.stato!=='pagata'});
   var hs=document.getElementById('home-scadenze');
-  if(!urg.length){hs.innerHTML='<div class="empty">Nessuna scadenza urgente</div>';return}
-  hs.innerHTML=urg.slice(0,5).map(function(s){
+  if(!urg.length){hs.innerHTML='<div class="empty">Nessuna scadenza urgente</div>';}
+  else{hs.innerHTML=urg.slice(0,5).map(function(s){
     return '<div class="scad-item">'+
       '<span class="scad-date urgent">'+fmtD(s.data)+'</span>'+
       '<span style="flex:1;font-size:12px">'+esc(s.descrizione||'—')+'</span>'+
       '<span style="font-size:12px;font-weight:700;color:var(--red)">€'+fmt(s.importo)+'</span></div>';
+  }).join('');}
+  // Materiale in arrivo (ordinato con data attesa prossima)
+  var det2=lgo('det');
+  var inArrivo=[];
+  lg('comm').forEach(function(c){
+    var d=det2[c.numero]||{distinta:[]};
+    (d.distinta||[]).forEach(function(r){
+      if(!r._intestazione&&r.stato_approv==='ordinato'){
+        inArrivo.push(Object.assign({},r,{_num:c.numero,_cliente:CNAMES[c.cliente]||c.cliente||'—'}));
+      }
+    });
+  });
+  inArrivo.sort(function(a,b){
+    var da=a.data_attesa||'9999',db=b.data_attesa||'9999';
+    return da.localeCompare(db);
+  });
+  var ha=document.getElementById('home-arrivo');
+  if(!ha)return;
+  if(!inArrivo.length){ha.innerHTML='<div class="empty">Nessun materiale in attesa</div>';return;}
+  ha.innerHTML=inArrivo.slice(0,8).map(function(r){
+    var scaduto=r.data_attesa&&r.data_attesa<og;
+    var oggi=r.data_attesa&&r.data_attesa===og;
+    var colData=scaduto?'var(--red)':oggi?'var(--amber)':'var(--text3)';
+    return'<div class="scad-item" data-n="'+esc(r._num)+'" onclick="openDetail(this.dataset.n)" style="cursor:pointer">'+
+      '<span style="font-size:11px;color:var(--text3);min-width:60px">'+esc(r._num)+'</span>'+
+      '<span style="flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(r.descrizione||'—')+'</span>'+
+      '<span style="font-size:11px;color:var(--text3);margin:0 8px">'+esc(r.fornitore||'—')+'</span>'+
+      (r.data_attesa?'<span style="font-size:11px;font-weight:700;color:'+colData+'">'+fmtD(r.data_attesa)+'</span>':'<span style="font-size:10px;color:var(--text3)">data N/D</span>')+
+    '</div>';
   }).join('');
 }
 function mkMetric(label,val,color,sub){
@@ -573,6 +607,15 @@ function renderCommesse(){
 
   var inCorso=comm.filter(function(c){return c.stato==='in-corso'||c.stato==='confermata'}).length;
   var b=document.getElementById('badge-commesse');if(b){b.textContent=inCorso;b.style.display=inCorso?'':'none'}
+  // Ordinamento
+  var sortBy=(document.getElementById('comm-sort')||{}).value||'num';
+  if(sortBy==='seen'){
+    var ls3=JSON.parse(localStorage.getItem('asg_lastseen')||'{}');
+    rows=rows.slice().sort(function(a,b){return (ls3[b.numero]||0)-(ls3[a.numero]||0);});
+  } else if(sortBy==='stato'){
+    var ORD_S={bozza:0,offerta:1,inviata:2,confermata:3,'in-corso':4,chiusa:5};
+    rows=rows.slice().sort(function(a,b){return (ORD_S[a.stato]||0)-(ORD_S[b.stato]||0);});
+  }
   var el=document.getElementById('comm-list');
   if(!rows.length){
     el.innerHTML='<div class="empty">'+(mostraChiuse||stato==='chiusa'?'Nessuna commessa':'Nessuna commessa attiva'+(nChiuse?' — '+nChiuse+' in archivio':''))+'</div>';
@@ -594,6 +637,10 @@ function renderCommesse(){
 function openDetail(numero){
   var comm=lg('comm');var c=comm.find(function(x){return x.numero===numero});if(!c)return;
   var det=lgo('det');CC=Object.assign({},c,{_det:det[numero]||{distinta:[],ore:[],note:''}});
+  // Salva timestamp ultima apertura
+  var ls2=JSON.parse(localStorage.getItem('asg_lastseen')||'{}');
+  ls2[numero]=Date.now();
+  localStorage.setItem('asg_lastseen',JSON.stringify(ls2));
   navTo('commessa-det');renderDetail();
 }
 
@@ -661,7 +708,28 @@ function renderDetTab(tab,el){
       '<thead><tr><th>Descrizione</th><th>Q.</th><th>Fornitore</th><th>Codice</th>'+
       '<th style="text-align:right">Netto</th><th style="text-align:right">Vendita</th><th>Stato</th><th></th></tr></thead><tbody>'+
       dist.map(function(r){
-        if(r._intestazione)return'<tr style="background:var(--surface2)"><td colspan="8" style="padding:8px 12px;font-weight:700;font-size:12px;color:var(--text3)">'+esc(r.descrizione)+'</td></tr>';
+        if(r._intestazione){
+          // Calcola subtotale sezione (righe fino alla prossima intestazione)
+          var secIdx=dist.indexOf(r);
+          var secVendita=0,secCosto=0,secRighe=0;
+          for(var si=secIdx+1;si<dist.length;si++){
+            if(dist[si]._intestazione)break;
+            secVendita+=parseFloat(dist[si].prezzo_vendita||0)*parseFloat(dist[si].qty||1);
+            secCosto+=parseFloat(dist[si].netto_cad||dist[si].costo_cad||0)*parseFloat(dist[si].qty||1);
+            secRighe++;
+          }
+          return'<tr style="background:var(--surface);border-top:2px solid var(--blue);border-bottom:1px solid var(--border2)">'+
+            '<td colspan="4" style="padding:7px 12px;font-weight:700;font-size:12px;color:var(--blue);letter-spacing:.03em">'+
+              '📁 '+esc(r.descrizione)+
+              '<span style="font-size:10px;font-weight:400;color:var(--text3);margin-left:8px">'+secRighe+' componenti</span>'+
+            '</td>'+
+            (secVendita>0?
+              '<td style="text-align:right;font-size:11px;color:var(--text3);padding:7px 6px">€'+fmt(secCosto)+'</td>'+
+              '<td colspan="2" style="text-align:right;font-size:11px;font-weight:700;color:var(--blue);padding:7px 6px">€'+fmt(secVendita)+'</td>'+
+              '<td></td>'
+            :'<td colspan="4"></td>')+
+          '</tr>';
+        }
         return'<tr>'+
           '<td>'+
             '<div style="font-size:12px;font-weight:600">'+esc(r.descrizione||'\u2014')+'</div>'+
@@ -759,7 +827,10 @@ function renderDetTab(tab,el){
           '<td style="font-size:11px;color:var(--text3)">'+esc(catLabel)+'</td>'+
           '<td style="text-align:right;font-weight:700">'+esc(String(o.ore||0))+unita+'</td>'+
           '<td style="text-align:right;font-weight:700;color:var(--blue)">€'+fmt(parseFloat(o.ore||0)*parseFloat(o.tariffa||0))+'</td>'+
-          '<td><button class="btn-icon" style="color:var(--red)" data-id="'+esc(o.id)+'" data-num="'+esc(cNum)+'" onclick="delOra(this.dataset.id,this.dataset.num)">✕</button></td>'+
+          '<td style="white-space:nowrap">'+
+           '<button class="btn-icon" data-id="'+esc(o.id)+'" data-num="'+esc(cNum)+'" onclick="openModal(&quot;edit-ora&quot;,this.dataset.id+&quot;|&quot;+this.dataset.num)" title="Modifica">&#9998;</button>'+
+          '<button class="btn-icon" style="color:var(--red);margin-left:4px" data-id="'+esc(o.id)+'" data-num="'+esc(cNum)+'" onclick="delOra(this.dataset.id,this.dataset.num)" title="Elimina">✕</button>'+
+          '</td>'+
         '</tr>';
       });
       h+='<div class="table-wrap"><table><thead><tr><th>Data</th><th>Descrizione</th><th>Operatore</th><th>Categoria</th><th class="num">Q.tà</th><th class="num">Totale</th><th></th></tr></thead><tbody>'+
@@ -793,7 +864,10 @@ function renderDetTab(tab,el){
           '</td>'+
           '<td style="text-align:right;font-weight:700;color:var(--blue)">€'+fmt(t.totale||0)+'</td>'+
           '<td>'+esc(t.note||'')+'</td>'+
-          '<td><button class="btn-icon" style="color:var(--red)" data-id="'+esc(t.id)+'" data-num="'+esc(cNum)+'" onclick="delTrasferta(this.dataset.id,this.dataset.num)">✕</button></td>'+
+          '<td style="white-space:nowrap">'+
+           '<button class="btn-icon" data-id="'+esc(t.id)+'" data-num="'+esc(cNum)+'" onclick="openModal(&quot;edit-trasferta&quot;,this.dataset.id+&quot;|&quot;+this.dataset.num)" title="Modifica">&#9998;</button>'+
+          '<button class="btn-icon" style="color:var(--red);margin-left:4px" data-id="'+esc(t.id)+'" data-num="'+esc(cNum)+'" onclick="delTrasferta(this.dataset.id,this.dataset.num)" title="Elimina">✕</button>'+
+          '</td>'+
         '</tr>';
       });
       h+='<div class="table-wrap"><table><thead><tr><th>Data</th><th>Destinazione</th><th>Operatore</th><th>Dettaglio spese</th><th class="num">Totale</th><th>Note</th><th></th></tr></thead><tbody>'+
@@ -1256,6 +1330,30 @@ function saveTrasferta(numero){
   showToast('Trasferta aggiunta');
 }
 
+function saveEditTrasferta(tid,tnum){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var gN=function(id){return parseFloat(G(id)||0);};
+  var det=lgo('det');if(!det[tnum])return;
+  var idx=( det[tnum].trasferte||[]).findIndex(function(x){return x.id===tid;});
+  if(idx<0)return;
+  var old=det[tnum].trasferte[idx];
+  var km=gN('f-km'),aciKm=parseFloat(G('f-aci-km')||0.4774);
+  var rimbKm=parseFloat((km*aciKm).toFixed(2));
+  var ngg=Math.max(1,gN('f-ngg'));
+  var diaria=parseFloat((gN('f-diaria')*ngg).toFixed(2));
+  var treno=gN('f-treno'),aereo=gN('f-aereo'),pedaggi=gN('f-pedaggi'),parcheggio=gN('f-parcheggio'),vitto=gN('f-vitto'),altro=gN('f-altro');
+  var tot=parseFloat((rimbKm+diaria+treno+aereo+pedaggi+parcheggio+vitto+altro).toFixed(2));
+  det[tnum].trasferte[idx]=Object.assign({},old,{
+    data:G('f-data')||old.data,destinazione:G('f-dest'),operatore:G('f-oper'),
+    km:km,veicolo:G('f-veicolo'),aci_km:aciKm,rimb_km:rimbKm,
+    ngg:ngg,diaria:diaria,treno:treno,aereo:aereo,pedaggi:pedaggi,
+    parcheggio:parcheggio,vitto:vitto,altro:altro,totale:tot,note:G('f-note')
+  });
+  ls('det',det);if(CC&&CC.numero===tnum)CC._det=det[tnum];
+  closeM();renderDetTab('ore',document.getElementById('det-content'));renderMargine();syncDetBg();
+  showToast('Trasferta aggiornata');
+}
+
 function delTrasferta(id,numero){
   var det=lgo('det');if(!det[numero])return;
   det[numero].trasferte=(det[numero].trasferte||[]).filter(function(t){return t.id!==id;});
@@ -1405,6 +1503,26 @@ function stampaNoteSpese(numero){
   w.document.write(html);w.document.close();
 }
 
+function saveEditOra(oid,onum){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var det=lgo('det');if(!det[onum])return;
+  var idx=( det[onum].ore||[]).findIndex(function(x){return x.id===oid;});
+  if(idx<0)return;
+  var old=det[onum].ore[idx];
+  var cat=G('f-cat')||old.categoria||'diurna_ord';
+  det[onum].ore[idx]=Object.assign({},old,{
+    data:G('f-data')||old.data,
+    descrizione:G('f-desc'),operatore:G('f-oper'),
+    categoria:cat,figura:G('f-figura')||old.figura||'ms',
+    unita:cat==='inoperoso'?'gg':'h',
+    ore:parseFloat(G('f-ore')||old.ore),
+    tariffa:parseFloat(G('f-tariffa')||old.tariffa)
+  });
+  ls('det',det);if(CC&&CC.numero===onum)CC._det=det[onum];
+  closeM();renderDetTab('ore',document.getElementById('det-content'));renderMargine();syncDetBg();
+  showToast('Ora aggiornata');
+}
+
 function delOra(id,numero){
   var det=lgo('det');if(!det[numero])return;
   det[numero].ore=(det[numero].ore||[]).filter(function(o){return o.id!==id});
@@ -1457,7 +1575,9 @@ function renderApprov(){
   if(commSel&&commSel.options.length<=1){
     var commAttive=[...new Set(righe.map(function(r){return r._commessa}))].sort();
     commAttive.forEach(function(n){
-      var o=document.createElement('option');o.value=n;o.textContent=n;commSel.appendChild(o);
+      var cObj=comm.find(function(x){return x.numero===n;})||{};
+      var label=n+(cObj.cliente?(' — '+esc(CNAMES[cObj.cliente]||cObj.cliente)):'');
+      var o=document.createElement('option');o.value=n;o.textContent=label;commSel.appendChild(o);
     });
   }
 
@@ -2014,6 +2134,50 @@ function getModalHTML(type,extra){
     '</div>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
     '<button class="btn btn-primary" onclick="saveOra(\''+esc(num2)+'\')">Aggiungi</button></div>'}}
+  if(type==='edit-ora'){
+    var parts2=extra.split('|');var oid=parts2[0];var onum=parts2[1]||'';
+    var det0=lgo('det');var cd0=det0[onum]||{ore:[]};
+    var o0=(cd0.ore||[]).find(function(x){return x.id===oid;})||{};
+    var TARIFFE_ORE2=TARIFFE_ORE||{diurna_ord:{ms:60,ts:80,te:100,unita:'h'}};
+    var catV=o0.categoria||'diurna_ord';var figV=o0.figura||'ms';
+    var tarV=o0.tariffa||60;
+    return{title:'Modifica ora prestazione',body:
+      '<div class="form-row">'+
+        '<div class="form-group"><label>Data</label><input class="form-control" id="f-data" type="date" value="'+esc(o0.data||today())+'"></div>'+
+        '<div class="form-group"><label>Operatore</label><input class="form-control" id="f-oper" value="'+esc(o0.operatore||'')+'" placeholder="es. Rossi M."></div>'+
+      '</div>'+
+      '<div class="form-group"><label>Descrizione attivita</label><input class="form-control" id="f-desc" value="'+esc(o0.descrizione||'')+'"></div>'+
+      '<div class="form-row">'+
+        '<div class="form-group"><label>Figura professionale</label>'+
+          '<select class="form-control" id="f-figura" onchange="aggiornaOreModal()">'+
+            ['ms','ts','te'].map(function(v){var l={ms:'Montatore Specializzato',ts:'Tecnico Specializzato',te:'Tecnico Elettronico'};return'<option value="'+v+'"'+(figV===v?' selected':'')+'>'+l[v]+'</option>';}).join('')+
+          '</select>'+
+        '</div>'+
+        '<div class="form-group"><label>Categoria oraria</label>'+
+          '<select class="form-control" id="f-cat" onchange="aggiornaOreModal()">'+
+            [['diurna_ord','Diurne ordinarie (8h/gg)'],['diurna_str','Diurne straordinarie (fino 20:00)'],
+             ['notturna_str','Notturne straordinarie (20-6)'],['festiva','Festive (€/ora)'],
+             ['inoperoso','Giorno inoperoso a disp. (€/gg)'],['viaggio','Ore viaggio e attesa']
+            ].map(function(p){return'<option value="'+p[0]+'"'+(catV===p[0]?' selected':'')+'>'+p[1]+'</option>';}).join('')+
+          '</select>'+
+        '</div>'+
+      '</div>'+
+      '<div class="form-row">'+
+        '<div class="form-group"><label>Ore / Giorni</label>'+
+          '<input class="form-control" id="f-ore" type="number" step="0.5" value="'+esc(String(o0.ore||8))+'" oninput="aggiornaOreModal()">'+
+        '</div>'+
+        '<div class="form-group"><label>Tariffa (€) — tabella 2026</label>'+
+          '<input class="form-control" id="f-tariffa" type="number" value="'+esc(String(tarV))+'" readonly style="background:var(--surface2);color:var(--blue);font-weight:700">'+
+        '</div>'+
+      '</div>'+
+      '<div style="background:var(--surface2);border-radius:6px;padding:10px 14px;font-size:13px;display:flex;align-items:center;justify-content:space-between">'+
+        '<span style="color:var(--text3)">Totale voce</span>'+
+        '<strong id="f-ore-tot" style="color:var(--blue);font-size:18px">€ '+fmt(parseFloat(o0.ore||0)*tarV)+'</strong>'+
+      '</div>'+
+      '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
+      '<button class="btn btn-primary" data-oid="'+esc(oid)+'" data-onum="'+esc(onum)+'" onclick="saveEditOra(this.dataset.oid,this.dataset.onum)">Salva modifiche</button></div>'
+    };}
+
   if(type==='add-trasferta'){var num3=extra||'';return{title:'Aggiungi trasferta / rimborso spese',body:
     '<div class="form-row">'+
       '<div class="form-group"><label>Data</label><input class="form-control" id="f-data" type="date" value="'+today()+'"></div>'+
@@ -2097,6 +2261,55 @@ function getModalHTML(type,extra){
     '</div>'+
     '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
     '<button class="btn btn-primary" onclick="saveTrasferta(\''+esc(num3)+'\')">Salva trasferta</button></div>'}}
+
+  if(type==='edit-trasferta'){
+    var tparts=extra.split('|');var tid=tparts[0];var tnum=tparts[1]||'';
+    var tdet=lgo('det');var tcd=tdet[tnum]||{trasferte:[]};
+    var t0=(tcd.trasferte||[]).find(function(x){return x.id===tid;})||{};
+    return{title:'Modifica trasferta',body:
+      '<div class="form-row">'+
+        '<div class="form-group"><label>Data</label><input class="form-control" id="f-data" type="date" value="'+esc(t0.data||today())+'"></div>'+
+        '<div class="form-group"><label>Operatore</label><input class="form-control" id="f-oper" value="'+esc(t0.operatore||'')+'" placeholder="es. Rossi M."></div>'+
+      '</div>'+
+      '<div class="form-group"><label>Destinazione / luogo</label><input class="form-control" id="f-dest" value="'+esc(t0.destinazione||'')+'"></div>'+
+      '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:12px 0 6px;border-bottom:1px solid var(--border);padding-bottom:3px">🚗 Rimborso km</div>'+
+      '<div class="form-row">'+
+        '<div class="form-group"><label>Km percorsi</label><input class="form-control" id="f-km" type="number" step="1" value="'+esc(String(t0.km||0))+'" oninput="aggiornaKmModal()"></div>'+
+        '<div class="form-group"><label>Veicolo</label><input class="form-control" id="f-veicolo" value="'+esc(t0.veicolo||'')+'"></div>'+
+      '</div>'+
+      '<div class="form-row">'+
+        '<div class="form-group"><label>Tariffa ACI (€/km)</label>'+
+          '<input class="form-control" id="f-aci-km" type="number" step="0.0001" value="'+esc(String(t0.aci_km||0.4774))+'" oninput="aggiornaKmModal()">'+
+        '</div>'+
+        '<div class="form-group"><label>Rimborso km</label>'+
+          '<input class="form-control" id="f-rimb-km-disp" readonly value="€ '+fmt((t0.km||0)*(t0.aci_km||0))+'" style="background:var(--surface2);color:var(--blue);font-weight:700">'+
+        '</div>'+
+      '</div>'+
+      '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:12px 0 6px;border-bottom:1px solid var(--border);padding-bottom:3px">💰 Spese</div>'+
+      '<div class="form-row">'+
+        '<div class="form-group"><label>Diaria (€)</label><input class="form-control" id="f-diaria" type="number" step="0.01" value="'+esc(String(t0.diaria||(t0.ngg>1?t0.diaria/t0.ngg:t0.diaria)||0))+'" oninput="aggiornaTotTrasferta()"></div>'+
+        '<div class="form-group"><label>N. giorni</label><input class="form-control" id="f-ngg" type="number" step="1" value="'+esc(String(t0.ngg||1))+'" oninput="aggiornaTotTrasferta()"></div>'+
+      '</div>'+
+      '<div class="form-row">'+
+        '<div class="form-group"><label>Treno (€)</label><input class="form-control" id="f-treno" type="number" step="0.01" value="'+esc(String(t0.treno||0))+'" oninput="aggiornaTotTrasferta()"></div>'+
+        '<div class="form-group"><label>Aereo (€)</label><input class="form-control" id="f-aereo" type="number" step="0.01" value="'+esc(String(t0.aereo||0))+'" oninput="aggiornaTotTrasferta()"></div>'+
+      '</div>'+
+      '<div class="form-row">'+
+        '<div class="form-group"><label>Pedaggi (€)</label><input class="form-control" id="f-pedaggi" type="number" step="0.01" value="'+esc(String(t0.pedaggi||0))+'" oninput="aggiornaTotTrasferta()"></div>'+
+        '<div class="form-group"><label>Parcheggio (€)</label><input class="form-control" id="f-parcheggio" type="number" step="0.01" value="'+esc(String(t0.parcheggio||0))+'" oninput="aggiornaTotTrasferta()"></div>'+
+      '</div>'+
+      '<div class="form-row">'+
+        '<div class="form-group"><label>Vitto (€)</label><input class="form-control" id="f-vitto" type="number" step="0.01" value="'+esc(String(t0.vitto||0))+'" oninput="aggiornaTotTrasferta()"></div>'+
+        '<div class="form-group"><label>Altro (€)</label><input class="form-control" id="f-altro" type="number" step="0.01" value="'+esc(String(t0.altro||0))+'" oninput="aggiornaTotTrasferta()"></div>'+
+      '</div>'+
+      '<div class="form-group"><label>Note</label><input class="form-control" id="f-note" value="'+esc(t0.note||'')+'"></div>'+
+      '<div style="background:var(--surface2);border-radius:6px;padding:10px 14px;font-size:13px;display:flex;align-items:center;justify-content:space-between;margin-top:6px">'+
+        '<span style="color:var(--text3)">Totale trasferta</span>'+
+        '<strong id="f-trasf-tot" style="color:var(--blue);font-size:18px">€ '+fmt(t0.totale||0)+'</strong>'+
+      '</div>'+
+      '<div class="modal-foot"><button class="btn btn-ghost" onclick="closeM()">Annulla</button>'+
+      '<button class="btn btn-primary" data-tid="'+esc(tid)+'" data-tnum="'+esc(tnum)+'" onclick="saveEditTrasferta(this.dataset.tid,this.dataset.tnum)">Salva modifiche</button></div>'
+    };}
 
   if(type==='config'){var cfg2=lgo('cfg');var mk2=cfg2.markup_clienti||{};return{title:'Configurazione',body:
     '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">Nextcloud</div>'+
@@ -2650,7 +2863,7 @@ function saveMag(){var G=function(id){var el=document.getElementById(id);return 
 function calcNetto(){var costo=parseFloat((document.getElementById('f-costo')||{}).value||0);var sc=parseFloat((document.getElementById('f-sconto')||{}).value||0);var mk=parseFloat((document.getElementById('f-markup')||{}).value||2.25);var netto=costo*(1-sc/100);var pre=document.getElementById('calc-preview');if(pre)pre.textContent='Netto: €'+fmt(netto)+' → Vendita: €'+fmt(netto*mk)}
 
 // EXPORT PDF
-function exportReportCommesse(){var comms=lg('comm');var det=lgo('det');var w=window.open('','_blank');var rows=comms.map(function(c){var cd=det[c.numero]||{distinta:[],ore:[]};var cM=cd.distinta.reduce(function(s,r){return s+parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)},0);var ricavoOre=cd.ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);var imp=parseFloat(c.importo||0)||(vM+ricavoOre);var tot=cM;var pct=imp>0?((imp-tot)/imp*100):null;return Object.assign({},c,{cM:cM,ricavoOre:ricavoOre,tot:tot,imp:imp,pct:pct})});w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title><style>body{font-family:sans-serif;font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th{background:#f0f0f0;padding:5px 6px;border-bottom:2px solid #ccc;text-align:left;font-size:10px}td{padding:4px 6px;border-bottom:1px solid #eee}.num{text-align:right}.g{color:green;font-weight:700}.r{color:red;font-weight:700}@media print{button{display:none}}</style></head><body>'+
+function exportReportCommesse(){var comms=lg('comm');var det=lgo('det');var w=window.open('','_blank');var rows=comms.map(function(c){var cd=det[c.numero]||{distinta:[],ore:[]};var cM=cd.distinta.reduce(function(s,r){return s+parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)},0);var ricavoOre=cd.ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);var vM2=cd.distinta.reduce(function(s,r){return s+parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)},0);var imp=parseFloat(c.importo||0)||(vM2+ricavoOre);var tot=cM;var pct=imp>0?((imp-tot)/imp*100):null;return Object.assign({},c,{cM:cM,ricavoOre:ricavoOre,tot:tot,imp:imp,pct:pct})});w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title><style>body{font-family:sans-serif;font-size:11px;margin:20px}table{width:100%;border-collapse:collapse}th{background:#f0f0f0;padding:5px 6px;border-bottom:2px solid #ccc;text-align:left;font-size:10px}td{padding:4px 6px;border-bottom:1px solid #eee}.num{text-align:right}.g{color:green;font-weight:700}.r{color:red;font-weight:700}@media print{button{display:none}}</style></head><body>'+
   '<button onclick="window.print()" style="margin-bottom:12px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer">Stampa</button>'+
   '<h2 style="margin-bottom:4px">Report Commesse — ASG LAB</h2><p style="color:#666;margin-bottom:12px">'+comms.length+' commesse · '+new Date().toLocaleDateString('it-IT')+'</p>'+
   '<table><thead><tr><th>N.</th><th>Cliente</th><th>Oggetto</th><th>Stato</th>'+
@@ -3252,7 +3465,23 @@ function exportAll(){var data={comm:lg('comm'),fatt:lg('fatt'),scad:lg('scad'),c
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('/gestionale/sw.js')
-      .then(function(reg){ console.log('SW registrato:', reg.scope); })
+      .then(function(reg){
+        console.log('SW registrato:', reg.scope);
+        // Controlla aggiornamento ad ogni caricamento pagina
+        reg.update();
+        reg.addEventListener('updatefound', function(){
+          var newWorker = reg.installing;
+          newWorker.addEventListener('statechange', function(){
+            if(newWorker.state==='installed' && navigator.serviceWorker.controller){
+              // Nuovo SW disponibile — notifica discreta
+              var bar = document.createElement('div');
+              bar.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#1a3a7a;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:9999;display:flex;align-items:center;gap:12px;box-shadow:0 4px 12px rgba(0,0,0,.3)';
+              bar.innerHTML = 'Nuova versione disponibile <button onclick="window.location.reload()" style="background:#60a5fa;border:none;color:#fff;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">Aggiorna</button>';
+              document.body.appendChild(bar);
+            }
+          });
+        });
+      })
       .catch(function(err){ console.log('SW errore:', err); });
   });
 }

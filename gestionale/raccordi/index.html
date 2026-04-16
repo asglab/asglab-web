@@ -277,20 +277,122 @@ select:focus{border-color:var(--blue)}
 
 <!-- ═══════════════════════════ BSP ═══════════════════════════ -->
 <div class="tab-panel" id="tab-bsp">
-  <div style="padding:40px;text-align:center;color:var(--text3)">
-    <div style="font-size:32px;margin-bottom:12px">🔧</div>
-    <div style="font-size:16px;font-weight:600;margin-bottom:8px">Adattatori BSP — in sviluppo</div>
-    <div style="font-size:13px">Adattatori BSP con tenuta cono 60°, O-Ring, riduzioni M/F. Disponibile nella prossima versione.</div>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-hd">Tipo adattatore BSP</div>
+    <div id="forme-bsp"></div>
   </div>
+  <div class="centro">
+    <div style="font-size:17px;font-weight:700;margin-bottom:4px" id="bsp-title">—</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5" id="bsp-desc">Seleziona tipo adattatore</div>
+    <div id="bsp-forma-img-wrap" style="display:none;margin-bottom:16px;text-align:center;background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:16px">
+      <img id="bsp-forma-img" src="" alt="" style="max-height:140px;max-width:100%;object-fit:contain;cursor:zoom-in" onclick="dinZoomImg(this.src,this.alt)">
+      <div style="font-size:10px;color:var(--text3);margin-top:6px">Click per ingrandire · Fonte: Rastelli Raccordi</div>
+    </div>
+    <div class="fg"><div class="fg-hd">Filetto BSP</div><div class="fg-body">
+      <div class="chips" id="bsp-fil">
+        <div class="chip" data-v="1/8">G 1/8"</div><div class="chip on" data-v="1/4">G 1/4"</div>
+        <div class="chip" data-v="3/8">G 3/8"</div><div class="chip" data-v="1/2">G 1/2"</div>
+        <div class="chip" data-v="3/4">G 3/4"</div><div class="chip" data-v="1">G 1"</div>
+        <div class="chip" data-v="1-1/4">G 1¼"</div><div class="chip" data-v="1-1/2">G 1½"</div>
+        <div class="chip" data-v="2">G 2"</div>
+      </div>
+    </div></div>
+    <div class="fg" id="bsp-fil2-group" style="display:none"><div class="fg-hd">Filetto 2 (riduzione)</div><div class="fg-body">
+      <div class="chips" id="bsp-fil2">
+        <div class="chip" data-v="1/8">G 1/8"</div><div class="chip on" data-v="1/4">G 1/4"</div>
+        <div class="chip" data-v="3/8">G 3/8"</div><div class="chip" data-v="1/2">G 1/2"</div>
+        <div class="chip" data-v="3/4">G 3/4"</div><div class="chip" data-v="1">G 1"</div>
+      </div>
+    </div></div>
+    <div class="fg"><div class="fg-hd">Materiale</div><div class="fg-body">
+      <div class="chips" id="bsp-mat">
+        <div class="chip on" data-v="ACC">Acciaio</div>
+        <div class="chip" data-v="INOX">Inox 316L</div>
+        <div class="chip" data-v="OTT">Ottone</div>
+      </div>
+    </div></div>
+  </div>
+  <div class="destra">
+    <div class="result-panel">
+      <div class="rp-lbl">Codici generati</div>
+      <div class="codici-box" id="bsp-result"><div style="color:var(--text3);font-size:12px">Seleziona tipo e parametri</div></div>
+      <div class="qty-row"><button class="qb" onclick="bspQd(-1)">−</button><span class="qn" id="bsp-qty-n">1</span><button class="qb" onclick="bspQd(1)">+</button><span style="font-size:12px;color:var(--text3)">pz</span></div>
+      <button class="btn btn-primary" id="bsp-btn-add" onclick="bspAddL()">+ Aggiungi alla lista</button>
+    </div>
+    <div class="lista-panel">
+      <div class="lp-hd"><span>Lista</span><span id="bsp-lista-c" style="color:var(--text3)">vuota</span></div>
+      <div id="bsp-lista-el"><div class="empty">Nessun raccordo</div></div>
+    </div>
+    <div class="exp-panel" id="bsp-exp" style="display:none">
+      <div class="export-pre" id="bsp-exp-pre"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('bsp-exp-pre').textContent).then(function(){alert('Copiato!')})">📋 Copia</button>
+        <button class="btn btn-ghost btn-sm" onclick="invia()">→ Gestionale</button>
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('Svuotare?')){BSPLista=[];bspRenderL()}">🗑</button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 
 <!-- ═══════════════════════════ JIC ═══════════════════════════ -->
 <div class="tab-panel" id="tab-jic">
-  <div style="padding:40px;text-align:center;color:var(--text3)">
-    <div style="font-size:32px;margin-bottom:12px">🔩</div>
-    <div style="font-size:16px;font-weight:600;margin-bottom:8px">JIC 37° (SAE J514) — in sviluppo</div>
-    <div style="font-size:13px">Parker Triple-Lok®, svasatura 37°. Disponibile nella prossima versione.</div>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-hd">Forma JIC 37°</div>
+    <div id="forme-jic"></div>
   </div>
+  <div class="centro">
+    <div style="font-size:17px;font-weight:700;margin-bottom:4px" id="jic-title">—</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5" id="jic-desc">Seleziona forma raccordo JIC</div>
+    <div class="fg"><div class="fg-hd">Ø Tubo (mm)</div><div class="fg-body">
+      <div class="chips" id="jic-diam">
+        <div class="chip" data-v="6">6</div><div class="chip" data-v="8">8</div>
+        <div class="chip on" data-v="10">10</div><div class="chip" data-v="12">12</div>
+        <div class="chip" data-v="14">14</div><div class="chip" data-v="16">16</div>
+        <div class="chip" data-v="18">18</div><div class="chip" data-v="20">20</div>
+        <div class="chip" data-v="22">22</div><div class="chip" data-v="25">25</div>
+      </div>
+    </div></div>
+    <div class="fg"><div class="fg-hd">Filetto UNF lato impianto</div><div class="fg-body">
+      <div class="chips" id="jic-fil">
+        <div class="chip" data-v="7/16-20">7/16"-20 UNF</div>
+        <div class="chip on" data-v="1/2-20">½"-20 UNF</div>
+        <div class="chip" data-v="9/16-18">9/16"-18 UNF</div>
+        <div class="chip" data-v="3/4-16">¾"-16 UNF</div>
+        <div class="chip" data-v="7/8-14">7/8"-14 UNF</div>
+        <div class="chip" data-v="1-1/16-12">1 1/16"-12 UNF</div>
+      </div>
+    </div></div>
+    <div class="fg"><div class="fg-hd">Materiale</div><div class="fg-body">
+      <div class="chips" id="jic-mat">
+        <div class="chip on" data-v="ACC">Acciaio</div>
+        <div class="chip" data-v="INOX">Inox 316L</div>
+      </div>
+    </div></div>
+  </div>
+  <div class="destra">
+    <div class="result-panel">
+      <div class="rp-lbl">Codici generati</div>
+      <div class="codici-box" id="jic-result"><div style="color:var(--text3);font-size:12px">Seleziona forma e parametri</div></div>
+      <div class="qty-row"><button class="qb" onclick="jicQd(-1)">−</button><span class="qn" id="jic-qty-n">1</span><button class="qb" onclick="jicQd(1)">+</button><span style="font-size:12px;color:var(--text3)">pz</span></div>
+      <button class="btn btn-primary" id="jic-btn-add" onclick="jicAddL()">+ Aggiungi alla lista</button>
+    </div>
+    <div class="lista-panel">
+      <div class="lp-hd"><span>Lista</span><span id="jic-lista-c" style="color:var(--text3)">vuota</span></div>
+      <div id="jic-lista-el"><div class="empty">Nessun raccordo</div></div>
+    </div>
+    <div class="exp-panel" id="jic-exp" style="display:none">
+      <div class="export-pre" id="jic-exp-pre"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('jic-exp-pre').textContent).then(function(){alert('Copiato!')})">📋 Copia</button>
+        <button class="btn btn-ghost btn-sm" onclick="invia()">→ Gestionale</button>
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('Svuotare?')){JICLista=[];jicRenderL()}">🗑</button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 
 <script>
@@ -706,6 +808,226 @@ function dinZoomImg(src,alt){
   ov.innerHTML='<div style="text-align:center"><img src="'+src+'" alt="'+alt+'" style="max-width:90vw;max-height:80vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 32px #000a"><div style="color:#94a3b8;font-size:12px;margin-top:12px">'+alt+' · click per chiudere</div></div>';
   document.body.appendChild(ov);
 }
+
+
+// ══ BSP ══════════════════════════════════════════════════════════════════════
+var FORME_BSP=[
+  {id:'BSP-MM',  nome:'Nipplo M/M',       short:'Maschio-maschio BSP dritto',
+   img:'TN-185-GG.bmp',rastelli:'BSP-MM',parker:'BSPP-MM',haRid:false,
+   desc:'Nipplo maschio-maschio BSP. Collega due filetti femmina BSP o adatta tra taglie diverse.'},
+  {id:'BSP-MF',  nome:'Riduzione M/F',    short:'Maschio-femmina BSP dritto',
+   img:'TN-185-GG.bmp',rastelli:'BSP-MF',parker:'BSPP-MF',haRid:true,
+   desc:'Riduzione maschio BSP × femmina BSP. La piu comune per adattare passi diversi.'},
+  {id:'BSP-90',  nome:'Gomito 90° M/M',   short:'Curva 90° maschio-maschio BSP',
+   img:'TN-95-1.bmp',  rastelli:'BSP-90',parker:'BSPP-EL90',haRid:false,
+   desc:'Gomito 90° maschio BSP su entrambi i lati. Per cambio direzione senza tubo.'},
+  {id:'BSP-T',   nome:'T maschio BSP',    short:'Derivazione a T maschio BSP',
+   img:'TN-97.bmp',    rastelli:'BSP-T', parker:'BSPP-T',haRid:false,
+   desc:'Raccordo a T maschio BSP su tutti e tre i lati.'},
+  {id:'BSP-OR',  nome:'Orientabile BSP',  short:'Raccordo orientabile M/M BSP',
+   img:'TN-111K-M-R.bmp',rastelli:'BSP-OR',parker:'BSPP-OR',haRid:false,
+   desc:'Raccordo orientabile maschio BSP con O-ring. Si orienta prima di bloccare.'},
+  {id:'BSP-PP',  nome:'Tappo maschio BSP',short:'Vite chiusura BSP hex + guarnizione',
+   img:'TN-185-GG.bmp',rastelli:'TN 185 GG',parker:'BSPP-PLG',haRid:false,
+   desc:'Tappo esagonale maschio BSP con guarnizione in gomma.'},
+  {id:'BSP-PF',  nome:'Tappo femmina BSP',short:'Dado chiusura femmina BSP',
+   img:'TN-185-GG.bmp',rastelli:'TN 192 R', parker:'BSPP-CAP',haRid:false,
+   desc:'Dado di chiusura femmina BSP. Per protezione o chiusura temporanea.'},
+];
+var BSP_FIL_DISP={'1/8':'G 1/8"','1/4':'G 1/4"','3/8':'G 3/8"','1/2':'G 1/2"','3/4':'G 3/4"','1':'G 1"','1-1/4':'G 1.1/4"','1-1/2':'G 1.1/2"'};
+var BSP_PREZZI={'BSP-MM':1.8,'BSP-MF':2.2,'BSP-90':3.5,'BSP-T':4.8,'BSP-OR':5.5,'BSP-PP':1.5,'BSP-PF':1.3};
+var BS={forma:null,fil:'1/4',fil2:'1/4',mat:'ACC',qty:1,_cod:'',_desc:'',_prezzo:0};
+var BSPLista=[];
+
+function buildSidebarBSP(){
+  var el=document.getElementById('forme-bsp');if(!el)return;
+  el.innerHTML=FORME_BSP.map(function(f){
+    return'<div class="forma-item'+(BS.forma===f.id?' on':'')+'" onclick="bspSelForma(\''+f.id+'\')">'+
+      '<div><div class="fi-nome">'+f.nome+'</div><div class="fi-cod">'+f.short+'</div></div></div>';
+  }).join('');
+}
+function bspSelForma(id){
+  BS.forma=id;buildSidebarBSP();
+  var f=FORME_BSP.find(function(x){return x.id===id;});
+  if(!f)return;
+  document.getElementById('bsp-title').textContent=f.nome;
+  document.getElementById('bsp-desc').textContent=f.desc;
+  var iw=document.getElementById('bsp-forma-img-wrap'),im=document.getElementById('bsp-forma-img');
+  if(im&&iw){im.src='https://rastelliraccordi.com/wp-content/uploads/2017/06/'+f.img;im.alt=f.nome;iw.style.display='';}
+  var g2=document.getElementById('bsp-fil2-group');
+  if(g2)g2.style.display=f.haRid?'':'none';
+  calcBSP();
+}
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('#bsp-fil .chip,#bsp-fil2 .chip,#bsp-mat .chip').forEach(function(c){
+    c.addEventListener('click',function(){
+      var gid=c.parentElement.id;
+      c.parentElement.querySelectorAll('.chip').forEach(function(x){x.className='chip';});
+      c.classList.add('on');
+      if(gid==='bsp-fil')BS.fil=c.dataset.v;
+      else if(gid==='bsp-fil2')BS.fil2=c.dataset.v;
+      else if(gid==='bsp-mat'){BS.mat=c.dataset.v;if(BS.mat!=='ACC')c.classList.add('on-inox');}
+      calcBSP();
+    });
+  });
+  document.querySelectorAll('#jic-diam .chip,#jic-fil .chip,#jic-mat .chip').forEach(function(c){
+    c.addEventListener('click',function(){
+      var gid=c.parentElement.id;
+      c.parentElement.querySelectorAll('.chip').forEach(function(x){x.className='chip';});
+      c.classList.add('on');
+      if(gid==='jic-diam')JS.diam=c.dataset.v;
+      else if(gid==='jic-fil')JS.fil=c.dataset.v;
+      else if(gid==='jic-mat'){JS.mat=c.dataset.v;if(JS.mat!=='ACC')c.classList.add('on-inox');}
+      calcJIC();
+    });
+  });
+});
+function calcBSP(){
+  if(!BS.forma)return;
+  var f=FORME_BSP.find(function(x){return x.id===BS.forma;});if(!f)return;
+  var matSuf=BS.mat==='INOX'?'/VA':BS.mat==='OTT'?'/BR':'';
+  var parkerMatSuf=BS.mat==='INOX'?'SS':BS.mat==='OTT'?'BR':'';
+  var fil=BS.fil;var fil2=BS.fil2;
+  var rastCod=f.rastelli+'-'+fil+(f.haRid?'x'+fil2:'')+matSuf;
+  var parkerCod=f.parker+'-'+fil+(f.haRid?'X'+fil2:'')+parkerMatSuf;
+  var desc=f.nome+' '+BSP_FIL_DISP[fil]+(f.haRid?' x '+BSP_FIL_DISP[fil2]:'');
+  if(BS.mat!=='ACC')desc+=' '+(BS.mat==='INOX'?'Inox 316L':'Ottone');
+  var pBase=BSP_PREZZI[BS.forma]||2.0;
+  var pMat=BS.mat==='INOX'?2.9:BS.mat==='OTT'?1.4:1.0;
+  var pAcc=pBase,pInox=pBase*2.9;
+  var html='<div class="cod-row"><span class="cod-src">Rastelli</span><span class="cod-val">'+rastCod+'</span></div>'+
+    '<div class="cod-row"><span class="cod-src">Parker</span><span class="cod-val secondary">'+parkerCod+'</span></div>'+
+    '<div class="cod-desc">'+desc+'<br><span style="font-size:11px;color:var(--text3)">Tenuta cono 60° — filetto parallelo BSP (BSPP / Gas ISO 228)</span></div>'+
+    '<div class="price-row"><span class="pc pc-acc">Acc ~\u20ac'+pAcc.toFixed(2)+'/pz</span>'+
+    (BS.mat==='ACC'?'<span class="pc pc-inox">Inox ~\u20ac'+pInox.toFixed(2)+'/pz</span>':'')+
+    '</div>';
+  document.getElementById('bsp-result').innerHTML=html;
+  BS._cod=rastCod;BS._parker=parkerCod;BS._desc=desc;BS._prezzo=pBase*pMat;
+}
+function bspQd(d){BS.qty=Math.max(1,BS.qty+d);document.getElementById('bsp-qty-n').textContent=BS.qty;}
+function bspAddL(){
+  if(!BS._cod)return;
+  var ex=BSPLista.find(function(i){return i.cod===BS._cod;});
+  if(ex)ex.qty+=BS.qty;else BSPLista.push({cod:BS._cod,parker:BS._parker,desc:BS._desc,qty:BS.qty,prezzo:BS._prezzo});
+  bspRenderL();
+  var b=document.getElementById('bsp-btn-add');
+  b.textContent='\u2713 Aggiunto!';b.style.background='#16a34a';
+  setTimeout(function(){b.textContent='+ Aggiungi alla lista';b.style.background='';},1200);
+}
+function bspRenderL(){
+  var el=document.getElementById('bsp-lista-el'),ea=document.getElementById('bsp-exp'),lc=document.getElementById('bsp-lista-c');
+  if(!BSPLista.length){el.innerHTML='<div class="empty">Nessun adattatore</div>';ea.style.display='none';lc.textContent='vuota';return;}
+  lc.textContent=BSPLista.reduce(function(s,i){return s+i.qty;},0)+' pz';
+  el.innerHTML=BSPLista.map(function(item,i){
+    return'<div class="li-item"><div class="li-cod">'+item.cod+'</div><div class="li-desc">'+item.desc+'</div>'+
+    '<div class="li-row"><span class="ip">\u20ac'+(item.prezzo*item.qty).toFixed(2)+'</span>'+
+    '<button class="ib" data-i="'+i+'" onclick="BSPLista[parseInt(this.dataset.i)].qty=Math.max(1,BSPLista[parseInt(this.dataset.i)].qty-1);bspRenderL()">\u2212</button>'+
+    '<span class="in">'+item.qty+'</span>'+
+    '<button class="ib" data-i="'+i+'" onclick="BSPLista[parseInt(this.dataset.i)].qty++;bspRenderL()">+</button>'+
+    '<button class="btn btn-danger btn-sm" data-i="'+i+'" onclick="BSPLista.splice(parseInt(this.dataset.i),1);bspRenderL()" style="margin-left:auto">\u2715</button>'+
+    '</div></div>';
+  }).join('');
+  var lines=['LISTA ADATTATORI BSP \u2014 '+new Date().toLocaleDateString('it-IT'),''];
+  BSPLista.forEach(function(item){lines.push(item.qty+'x  '+item.cod+' (Parker: '+item.parker+')  \u2014  '+item.desc);});
+  document.getElementById('bsp-exp-pre').textContent=lines.join('\n');
+  ea.style.display='';
+}
+
+// ══ JIC 37° ══════════════════════════════════════════════════════════════════
+var IMG_B='https://rastelliraccordi.com/wp-content/uploads/2017/06/';
+var FORME_JIC=[
+  {id:'JIC-D',  nome:'Dritto maschio JIC',    short:'Terminale diretto JIC 37°',
+   img:'TN-92-1.bmp', parker:'GE',rastelli:'TN 92 JIC',
+   desc:'Raccordo terminale diretto JIC 37° \u2014 svasatura tubo 37\u00b0 lato DIN, filetto UNF maschio lato impianto. Standard SAE J514 (Triple-Lok\u00ae Parker).'},
+  {id:'JIC-90', nome:'Gomito 90° JIC',         short:'Gomito 90\u00b0 JIC 37\u00b0',
+   img:'TN-95-1.bmp', parker:'WE',rastelli:'TN 95 JIC',
+   desc:'Raccordo gomito 90\u00b0 JIC 37\u00b0. Richiede svasatura tubo a 37\u00b0.'},
+  {id:'JIC-45', nome:'Gomito 45° JIC',         short:'Gomito 45\u00b0 JIC 37\u00b0',
+   img:'TN-95-1.bmp', parker:'WE45',rastelli:'TN 94/45 JIC',
+   desc:'Raccordo gomito 45\u00b0 JIC 37\u00b0.'},
+  {id:'JIC-T',  nome:'T maschio JIC',          short:'Derivazione a T JIC 37\u00b0',
+   img:'TN-97.bmp',   parker:'TE',rastelli:'TN 97 JIC',
+   desc:'Raccordo a T JIC 37\u00b0 \u2014 tre uscite per svasatura.'},
+  {id:'JIC-FG', nome:'Femmina girevole JIC',   short:'Dado girevole JIC 37\u00b0',
+   img:'TN-147.bmp',  parker:'GEI',rastelli:'TN 147 JIC',
+   desc:'Raccordo femmina girevole JIC 37\u00b0. Il dado scorre libero facilitando il montaggio.'},
+  {id:'JIC-NP', nome:'Nipple M/M JIC',         short:'Nipplo maschio-maschio JIC',
+   img:'TN-98-1.bmp', parker:'NP',rastelli:'JIC-NP',
+   desc:'Nipple maschio-maschio JIC 37\u00b0 per giunzioni tubo-tubo.'},
+];
+var JIC_DIAM_F={'6':0.62,'8':0.75,'10':0.9,'12':1.0,'14':1.1,'16':1.2,'18':1.35,'20':1.5,'22':1.7,'25':2.0};
+var JIC_FIL_DISP={'7/16-20':'7/16"-20 UNF','1/2-20':'1/2"-20 UNF','9/16-18':'9/16"-18 UNF','3/4-16':'3/4"-16 UNF','7/8-14':'7/8"-14 UNF','1-1/16-12':'1 1/16"-12 UNF'};
+var JS={forma:null,diam:'10',fil:'1/2-20',mat:'ACC',qty:1,_cod:'',_desc:'',_prezzo:0};
+var JICLista=[];
+
+function buildSidebarJIC(){
+  var el=document.getElementById('forme-jic');if(!el)return;
+  el.innerHTML=FORME_JIC.map(function(f){
+    return'<div class="forma-item'+(JS.forma===f.id?' on':'')+'" onclick="jicSelForma(\''+f.id+'\')">'+
+      '<div><div class="fi-nome">'+f.nome+'</div><div class="fi-cod">'+f.short+'</div></div></div>';
+  }).join('');
+}
+function jicSelForma(id){
+  JS.forma=id;buildSidebarJIC();
+  var f=FORME_JIC.find(function(x){return x.id===id;});if(!f)return;
+  document.getElementById('jic-title').textContent=f.nome;
+  document.getElementById('jic-desc').textContent=f.desc;
+  calcJIC();
+}
+function calcJIC(){
+  if(!JS.forma)return;
+  var f=FORME_JIC.find(function(x){return x.id===JS.forma;});if(!f)return;
+  var matSuf=JS.mat==='INOX'?'SS':'';
+  var rastSuf=JS.mat==='INOX'?'/VA':'';
+  var parkerCod=f.parker+JS.diam+matSuf;
+  var rastCod=f.rastelli+'-'+JS.diam+rastSuf;
+  var filDisp=JIC_FIL_DISP[JS.fil]||JS.fil;
+  var desc=f.nome+' \u00d8'+JS.diam+'mm \u00d7 UNF '+filDisp+' \u2014 svasatura 37\u00b0';
+  if(JS.mat!=='ACC')desc+=' Inox 316L';
+  var pBase=3.2,pd=JIC_DIAM_F[JS.diam]||1.0,pMat=JS.mat==='INOX'?2.9:1.0;
+  var html='<div class="cod-row"><span class="cod-src">Parker</span><span class="cod-val">'+parkerCod+'</span></div>'+
+    '<div class="cod-row"><span class="cod-src">Rastelli</span><span class="cod-val secondary">'+rastCod+'</span></div>'+
+    '<div class="cod-desc">'+desc+
+    '<br><span style="font-size:11px;color:var(--amber)">&#9888; Richiede svasatura tubo 37\u00b0 (SAE J514) \u2014 non intercambiabile con DIN 24\u00b0</span></div>'+
+    '<div class="price-row"><span class="pc pc-acc">Acc ~\u20ac'+(pBase*pd).toFixed(2)+'/pz</span>'+
+    (JS.mat==='ACC'?'<span class="pc pc-inox">Inox ~\u20ac'+(pBase*pd*2.9).toFixed(2)+'/pz</span>':'')+
+    '</div>';
+  document.getElementById('jic-result').innerHTML=html;
+  JS._cod=parkerCod;JS._rastelli=rastCod;JS._desc=desc;JS._prezzo=pBase*pd*pMat;
+}
+function jicQd(d){JS.qty=Math.max(1,JS.qty+d);document.getElementById('jic-qty-n').textContent=JS.qty;}
+function jicAddL(){
+  if(!JS._cod)return;
+  var ex=JICLista.find(function(i){return i.cod===JS._cod;});
+  if(ex)ex.qty+=JS.qty;else JICLista.push({cod:JS._cod,rastelli:JS._rastelli,desc:JS._desc,qty:JS.qty,prezzo:JS._prezzo});
+  jicRenderL();
+  var b=document.getElementById('jic-btn-add');
+  b.textContent='\u2713 Aggiunto!';b.style.background='#16a34a';
+  setTimeout(function(){b.textContent='+ Aggiungi alla lista';b.style.background='';},1200);
+}
+function jicRenderL(){
+  var el=document.getElementById('jic-lista-el'),ea=document.getElementById('jic-exp'),lc=document.getElementById('jic-lista-c');
+  if(!JICLista.length){el.innerHTML='<div class="empty">Nessun raccordo</div>';ea.style.display='none';lc.textContent='vuota';return;}
+  lc.textContent=JICLista.reduce(function(s,i){return s+i.qty;},0)+' pz';
+  el.innerHTML=JICLista.map(function(item,i){
+    return'<div class="li-item"><div class="li-cod">'+item.cod+'</div><div class="li-desc">'+item.desc+'</div>'+
+    '<div class="li-row"><span class="ip">\u20ac'+(item.prezzo*item.qty).toFixed(2)+'</span>'+
+    '<button class="ib" data-i="'+i+'" onclick="JICLista[parseInt(this.dataset.i)].qty=Math.max(1,JICLista[parseInt(this.dataset.i)].qty-1);jicRenderL()">\u2212</button>'+
+    '<span class="in">'+item.qty+'</span>'+
+    '<button class="ib" data-i="'+i+'" onclick="JICLista[parseInt(this.dataset.i)].qty++;jicRenderL()">+</button>'+
+    '<button class="btn btn-danger btn-sm" data-i="'+i+'" onclick="JICLista.splice(parseInt(this.dataset.i),1);jicRenderL()" style="margin-left:auto">\u2715</button>'+
+    '</div></div>';
+  }).join('');
+  var lines=['LISTA RACCORDI JIC 37\u00b0 \u2014 '+new Date().toLocaleDateString('it-IT'),''];
+  JICLista.forEach(function(item){lines.push(item.qty+'x  '+item.cod+' (Rastelli: '+item.rastelli+')  \u2014  '+item.desc);});
+  document.getElementById('jic-exp-pre').textContent=lines.join('\n');
+  ea.style.display='';
+}
+// Init BSP e JIC
+buildSidebarBSP();
+buildSidebarJIC();
+bspSelForma('BSP-MM');
+jicSelForma('JIC-D');
 
 // ── INIT ──────────────────────────────────────────────────────
 // Legge numero commessa dall'URL se aperto dalla commessa
