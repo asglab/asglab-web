@@ -197,7 +197,7 @@ tbody tr:hover td{background:var(--surface2)}
 <body>
 <div id="app">
   <aside id="sidebar">
-    <div class="sidebar-logo"><div class="company">ASG LAB</div><div class="sub">Oleodinamica SRL</div></div>
+    <div class="sidebar-logo" style="display:flex;align-items:center;gap:10px"><img src="https://asglab.it/img/icon-light_hu_402522ffdb7dabc2.png" alt="ASG LAB" style="height:28px;object-fit:contain;filter:brightness(0) invert(1);opacity:.9" onerror="this.style.display='none'"><div><div class="company">ASG LAB</div><div class="sub">Gestionale</div></div></div>
     <div class="nav-section-label">Principale</div>
     <a class="nav-item active" data-view="home" href="#" onclick="navTo('home');return false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></a>
     <a class="nav-item" data-view="commesse" href="#" onclick="navTo('commesse');return false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>Commesse</span><span class="nav-badge" id="badge-commesse" style="display:none">0</span></a>
@@ -1265,58 +1265,142 @@ function delTrasferta(id,numero){
 }
 
 function stampaNoteSpese(numero){
-  var c=(lg('comm')||[]).find(function(x){return x.numero===numero;})||{numero:numero,cliente:'—'};
+  var LOGO='https://asglab.it/img/icon-light_hu_402522ffdb7dabc2.png';
+  var TARIFFE_L={diurna_ord:'Ore diurne ordinarie',diurna_str:'Ore diurne straordinarie',notturna_str:'Ore notturne straordinarie',festiva:'Ore festive',inoperoso:'Giorno inoperoso a disposizione',viaggio:'Ore viaggio / attesa inoperosa'};
+  var FIGURA_L={ms:'Montatore Specializzato',ts:'Tecnico Specializzato',te:'Tecnico Elettronico'};
+  var c=(lg('comm')||[]).find(function(x){return x.numero===numero;})||{numero:numero,cliente:'—',oggetto:'—'};
+  var CNAMES2=getClienti();
+  var clienteNome=CNAMES2[c.cliente]||c.cliente||'—';
   var det=lgo('det');var cd=det[numero]||{distinta:[],ore:[],trasferte:[]};
   var ore=cd.ore||[];var trasferte=cd.trasferte||[];
-  var TARIFFE_L={diurna_ord:'Diurne ordinarie',diurna_str:'Diurne straord.',notturna_str:'Notturne straord.',festiva:'Festive',inoperoso:'Giorno inoperoso',viaggio:'Viaggio/attesa'};
   var totOre=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0);},0);
   var totTrasf=trasferte.reduce(function(s,t){return s+parseFloat(t.totale||0);},0);
+  var totH=ore.reduce(function(s,o){return s+parseFloat(o.ore||0);},0);
   var w=window.open('','_blank');
-  var css='body{font-family:Arial,sans-serif;font-size:10px;margin:20px;color:#111}h1{font-size:14px;margin:0 0 2px}h2{font-size:11px;margin:14px 0 4px;color:#333;border-bottom:1px solid #ccc;padding-bottom:2px}table{width:100%;border-collapse:collapse;margin-bottom:6px}th{background:#f0f4f8;padding:4px 6px;border-bottom:2px solid #ccc;font-size:9px;text-align:left}td{padding:3px 6px;border-bottom:1px solid #eee}.num{text-align:right}.tot{font-weight:700;background:#f7f9fb;border-top:2px solid #999}.sub{font-size:9px;color:#666}.firma{margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:40px}.firma-box{border-top:1px solid #999;padding-top:6px;font-size:9px;color:#666}@media print{button{display:none}}';
+  var CSS='   @import url(\'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\');   *{box-sizing:border-box;margin:0;padding:0}   body{font-family:\'Inter\',Arial,sans-serif;font-size:10px;color:#1a1a2e;background:#fff;padding:0}   @page{size:A4;margin:18mm 14mm 22mm 14mm}   @media print{     body{margin:0;padding:0}     .no-print{display:none!important}     .page-break{page-break-after:always}     thead{display:table-header-group}   }   /* HEADER fisso */   .doc-header{     display:flex;align-items:center;justify-content:space-between;     padding-bottom:10px;margin-bottom:14px;     border-bottom:2px solid #1a3a7a;   }   .doc-header-logo{height:36px;object-fit:contain}   .doc-header-right{text-align:right;font-size:9px;color:#555;line-height:1.5}   .doc-header-right strong{font-size:11px;color:#1a1a2e}   /* TITOLO documento */   .doc-title{font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:2px;letter-spacing:-.02em}   .doc-subtitle{font-size:10px;color:#64748b;margin-bottom:14px}   /* INFO BOX */   .info-grid{     display:grid;grid-template-columns:1fr 1fr;gap:0;     border:1px solid #e2e8f0;border-radius:5px;overflow:hidden;     margin-bottom:14px;font-size:9.5px;   }   .info-cell{padding:5px 10px;border-bottom:1px solid #e2e8f0}   .info-cell:nth-child(odd){background:#f8fafc;border-right:1px solid #e2e8f0}   .info-cell:last-child,.info-cell:nth-last-child(2){border-bottom:none}   .info-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:1px}   .info-val{font-weight:600;color:#1a1a2e}   /* NOTA RIFERIMENTO */   .ref-box{     background:#f0f4ff;border-left:3px solid #1a3a7a;     padding:6px 10px;font-size:9px;color:#334155;     margin-bottom:14px;border-radius:0 4px 4px 0;line-height:1.5   }   /* SEZIONI */   h2.section{     font-size:11px;font-weight:700;color:#1a3a7a;     border-bottom:1.5px solid #1a3a7a;padding-bottom:3px;     margin:16px 0 8px;text-transform:uppercase;letter-spacing:.05em   }   /* TABELLE */   table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:9.5px}   thead tr{background:#1a3a7a;color:#fff}   thead th{padding:5px 7px;font-weight:600;font-size:8.5px;text-transform:uppercase;letter-spacing:.05em;text-align:left}   thead th.num{text-align:right}   tbody tr:nth-child(even){background:#f8fafc}   tbody tr:hover{background:#eff6ff}   td{padding:4px 7px;border-bottom:1px solid #e2e8f0;vertical-align:top}   td.num{text-align:right;font-variant-numeric:tabular-nums}   td.sub{font-size:8.5px;color:#64748b}   td.bold{font-weight:700}   /* TOTALE ROW */   tr.tot-row td{     background:#1a3a7a!important;color:#fff!important;     font-weight:700;padding:5px 7px;border:none;font-size:10px   }   tr.tot-row td.num{text-align:right}   tr.subtot-row td{     background:#dbeafe!important;color:#1e3a8a!important;     font-weight:600;padding:4px 7px;border:none   }   tr.subtot-row td.num{text-align:right}   /* INNERTABLE spese trasferta */   .inner-table{width:100%;border:none;font-size:8.5px;margin:0}   .inner-table td{padding:1px 3px;border:none;background:transparent!important}   .inner-table td.num{text-align:right;font-variant-numeric:tabular-nums}   /* TOTALE COMPLESSIVO */   .total-box{     background:#1a3a7a;color:#fff;border-radius:5px;     padding:10px 14px;margin:14px 0;     display:flex;align-items:center;justify-content:space-between   }   .total-box-label{font-size:10px;font-weight:600;letter-spacing:.03em}   .total-box-value{font-size:18px;font-weight:700;letter-spacing:-.02em}   .total-detail{display:flex;gap:20px;margin-top:4px;font-size:8.5px;opacity:.85}   /* FIRME */   .firma-grid{     display:grid;grid-template-columns:1fr 1fr;gap:32px;     margin-top:28px;padding-top:12px   }   .firma-box{border-top:1px solid #94a3b8;padding-top:6px;font-size:8.5px;color:#64748b}   .firma-name{font-weight:700;color:#1a1a2e;font-size:10px;margin-bottom:2px}   /* FOOTER */   .doc-footer{     position:fixed;bottom:0;left:0;right:0;     border-top:1px solid #e2e8f0;padding:5px 14mm;     background:#fff;font-size:8px;color:#94a3b8;     display:flex;justify-content:space-between;align-items:center   }   @media screen{     body{max-width:820px;margin:0 auto;padding:20px}     .doc-footer{position:static;margin-top:24px}   }   /* PRINT BTN */   .print-btn{     background:#1a3a7a;color:#fff;border:none;     padding:8px 20px;border-radius:5px;cursor:pointer;     font-family:inherit;font-size:12px;font-weight:600;     margin-bottom:16px;display:flex;align-items:center;gap:6px   } ';
+
+  /* DATE PERIODO: min e max tra ore+trasferte */
+  var allDate=ore.map(function(o){return o.data||'';}).concat(trasferte.map(function(t){return t.data||'';})).filter(Boolean).sort();
+  var periodoStr=allDate.length?fmtD(allDate[0])+(allDate.length>1&&allDate[allDate.length-1]!==allDate[0]?' — '+fmtD(allDate[allDate.length-1]):''):'—';
+
+  /* SEZIONE ORE */
   var oreHtml='';
   if(ore.length){
-    var totH=ore.reduce(function(s,o){return s+parseFloat(o.ore||0);},0);
-    oreHtml='<h2>Ore di prestazione</h2><table><thead><tr><th>Data</th><th>Operatore</th><th>Descrizione</th><th>Categoria</th><th class=num>Qta</th><th class=num>Tariffa</th><th class=num>Totale</th></tr></thead><tbody>'+
-      ore.map(function(o){return'<tr><td>'+fmtD(o.data)+'</td><td>'+esc(o.operatore||'—')+'</td><td>'+esc(o.descrizione||'—')+'</td><td class=sub>'+esc((TARIFFE_L[o.categoria]||o.categoria||'—'))+'</td><td class=num>'+o.ore+(o.unita||'h')+'</td><td class=num>€'+fmt(o.tariffa||0)+'</td><td class=num>€'+fmt(parseFloat(o.ore||0)*parseFloat(o.tariffa||0))+'</td></tr>';}).join('')+
-      '<tr class=tot><td colspan=6 class=num>Totale ore</td><td class=num>€'+fmt(totOre)+'</td></tr></tbody></table>';
+    oreHtml='<h2 class="section">Dettaglio ore lavorative</h2>'+
+    '<table><thead><tr>'+
+      '<th>Data</th><th>Operatore</th><th>Figura professionale</th><th>Categoria</th><th>Descrizione attivita</th>'+
+      '<th class=num>Ore/gg</th><th class=num>Tariffa €</th><th class=num>Importo</th>'+
+    '</tr></thead><tbody>'+
+    ore.map(function(o){
+      var catL=TARIFFE_L[o.categoria||'diurna_ord']||o.categoria||'—';
+      var figL=FIGURA_L[o.figura||'ms']||'—';
+      var unita=o.unita||'h';
+      var importo=parseFloat(o.ore||0)*parseFloat(o.tariffa||0);
+      return'<tr>'+
+        '<td>'+fmtD(o.data)+'</td>'+
+        '<td class=bold>'+esc(o.operatore||'—')+'</td>'+
+        '<td>'+esc(figL)+'</td>'+
+        '<td class=sub>'+esc(catL)+'</td>'+
+        '<td>'+esc(o.descrizione||'—')+'</td>'+
+        '<td class=num>'+o.ore+' '+unita+'</td>'+
+        '<td class=num>€ '+fmt(o.tariffa||0)+'/'+unita+'</td>'+
+        '<td class=num><strong>€ '+fmt(importo)+'</strong></td>'+
+      '</tr>';
+    }).join('')+
+    '<tr class=subtot-row>'+
+      '<td colspan=5 class=num><strong>Totale ore lavorative</strong></td>'+
+      '<td class=num><strong>'+totH+'h</strong></td>'+
+      '<td></td>'+
+      '<td class=num><strong>€ '+fmt(totOre)+'</strong></td>'+
+    '</tr>'+
+    '</tbody></table>'+
+    '<div class=ref-box>Tariffe applicate: <strong>Oneri per prestazioni di personale fuori sede — Aggiornamento 01-2026, Milano</strong> (documento ASG LAB allegato).</div>';
   }
+
+  /* SEZIONE TRASFERTE */
   var trasfHtml='';
   if(trasferte.length){
-    trasfHtml='<h2>Trasferte e rimborsi spese</h2><table><thead><tr><th>Data</th><th>Operatore</th><th>Destinazione</th><th>Dettaglio spese</th><th class=num>Totale</th><th>Note</th></tr></thead><tbody>'+
-      trasferte.map(function(t){var vv=function(v,l){return v>0?'<tr><td class=sub>'+l+'</td><td class=num>€'+fmt(v)+'</td></tr>':''};return'<tr><td>'+fmtD(t.data)+'</td><td>'+esc(t.operatore||'—')+'</td><td>'+esc(t.destinazione||'—')+'</td>'+
-        '<td><table style=width:100%;font-size:9px;border:none>'+
-        (t.km>0?'<tr><td>🚗 '+t.km+'km × €'+fmt(t.aci_km||0)+'/km</td><td class=num>€'+fmt(t.rimb_km||0)+'</td></tr>':'')+
-        (t.diaria>0?'<tr><td>🏨 Diaria'+(t.ngg>1?' ('+t.ngg+'gg)':'')+'</td><td class=num>€'+fmt(t.diaria)+'</td></tr>':'')+
-        vv(t.treno,'🚆 Treno')+vv(t.aereo,'✈ Aereo')+vv(t.pedaggi,'🛣 Pedaggi')+vv(t.parcheggio,'🅿 Parcheggio')+vv(t.vitto,'🍽 Vitto')+vv(t.altro,'📎 Altro')+
-        '</table></td>'+
-        '<td class=num><strong>€'+fmt(t.totale||0)+'</strong></td><td class=sub>'+esc(t.note||'')+'</td></tr>';}).join('')+
-      '<tr class=tot><td colspan=8 class=num>Totale trasferte</td><td class=num>€'+fmt(totTrasf)+'</td><td></td></tr></tbody></table>';
+    var trasfRows=trasferte.map(function(t){
+      var righeInterno='';
+      if(t.km>0)righeInterno+='<tr><td>🚗 Rimborso km: '+t.km+' km × €'+fmt(t.aci_km||0)+'/km (ACI 2026 — '+esc(t.veicolo||'veicolo')+')</td><td class=num>€ '+fmt(t.rimb_km||0)+'</td></tr>';
+      if(t.diaria>0)righeInterno+='<tr><td>🏨 Trasferta diaria'+(t.ngg>1?' ('+t.ngg+' gg × €'+fmt(t.diaria/t.ngg)+')':'')+'</td><td class=num>€ '+fmt(t.diaria)+'</td></tr>';
+      if(t.treno>0)righeInterno+='<tr><td>🚆 Viaggio ferroviario (Trenitalia)</td><td class=num>€ '+fmt(t.treno)+'</td></tr>';
+      if(t.aereo>0)righeInterno+='<tr><td>✈ Viaggio aereo (IATA)</td><td class=num>€ '+fmt(t.aereo)+'</td></tr>';
+      if(t.pedaggi>0)righeInterno+='<tr><td>🛣 Pedaggi autostradali</td><td class=num>€ '+fmt(t.pedaggi)+'</td></tr>';
+      if(t.parcheggio>0)righeInterno+='<tr><td>🅿 Parcheggio</td><td class=num>€ '+fmt(t.parcheggio)+'</td></tr>';
+      if(t.vitto>0)righeInterno+='<tr><td>🍽 Vitto / pasti</td><td class=num>€ '+fmt(t.vitto)+'</td></tr>';
+      if(t.altro>0)righeInterno+='<tr><td>📎 Altre spese'+(t.note?' ('+esc(t.note)+')':'')+'</td><td class=num>€ '+fmt(t.altro)+'</td></tr>';
+      return'<tr>'+
+        '<td>'+fmtD(t.data)+'</td>'+
+        '<td class=bold>'+esc(t.operatore||'—')+'</td>'+
+        '<td>'+esc(t.destinazione||'—')+'</td>'+
+        '<td><table class=inner-table>'+righeInterno+'</table></td>'+
+        '<td class=num><strong>€ '+fmt(t.totale||0)+'</strong></td>'+
+      '</tr>';
+    }).join('');
+    trasfHtml='<h2 class="section">Dettaglio spese di trasferta</h2>'+
+    '<table><thead><tr>'+
+      '<th>Data</th><th>Operatore</th><th>Destinazione</th><th>Dettaglio voci</th>'+
+      '<th class=num>Totale</th>'+
+    '</tr></thead><tbody>'+trasfRows+
+    '<tr class=subtot-row>'+
+      '<td colspan=4 class=num><strong>Totale spese trasferta</strong></td>'+
+      '<td class=num><strong>€ '+fmt(totTrasf)+'</strong></td>'+
+    '</tr>'+
+    '</tbody></table>'+
+    '<div class=ref-box>Rimborso chilometrico calcolato su base tabelle ACI 2026 (GU n. 297 del 23/12/2025) per il tipo di veicolo utilizzato.</div>';
   }
-  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Nota Spese — '+esc(numero)+'</title><style>'+css+'</style></head><body>'+
-    '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">'+
-      '<div><h1>NOTA SPESE PERSONALE FUORI SEDE</h1>'+
-        '<div style="font-size:11px;color:#555">ASG LAB S.r.l. a socio unico — P.IVA 10122150963</div>'+
-      '</div>'+
-      '<div style="text-align:right;font-size:10px;color:#555">'+
+
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8">'+
+    '<title>Nota Spese — '+esc(numero)+'</title>'+
+    '<style>'+CSS+'</style></head><body>'+
+
+    /* PRINT BUTTON */
+    '<button class="print-btn no-print" onclick="window.print()">&#128424; Stampa / Salva PDF</button>'+
+
+    /* HEADER con logo */
+    '<div class="doc-header">'+
+      '<img class="doc-header-logo" src="'+LOGO+'" alt="ASG LAB" onerror="this.style.display=\'none\'">'+
+      '<div class="doc-header-right">'+
         'Commessa: <strong>'+esc(numero)+'</strong><br>'+
-        'Cliente: <strong>'+esc(c.cliente||'—')+'</strong><br>'+
-        'Stampato: '+new Date().toLocaleDateString('it-IT')+
+        'Cliente: <strong>'+esc(clienteNome)+'</strong><br>'+
+        'Data stampa: '+new Date().toLocaleDateString('it-IT')+
       '</div>'+
     '</div>'+
-    '<div style="background:#f0f4f8;padding:8px 12px;border-radius:4px;margin-bottom:12px;font-size:11px">'+
-      'Tariffe secondo: <strong>Oneri per prestazioni di personale fuori sede — Aggiornamento 01-2026, Milano</strong><br>'+
-      'Rimborso km secondo tabelle ACI vigenti per il tipo di veicolo utilizzato.'+
+
+    /* TITOLO */
+    '<div class="doc-title">Report spese intervento fuori sede</div>'+
+    '<div class="doc-subtitle">'+esc(c.oggetto||'')+'</div>'+
+
+    /* INFO GRID */
+    '<div class="info-grid">'+
+      '<div class="info-cell"><div class="info-label">Commessa</div><div class="info-val">'+esc(numero)+'</div></div>'+
+      '<div class="info-cell"><div class="info-label">Cliente</div><div class="info-val">'+esc(clienteNome)+'</div></div>'+
+      '<div class="info-cell"><div class="info-label">Periodo intervento</div><div class="info-val">'+periodoStr+'</div></div>'+
+      '<div class="info-cell"><div class="info-label">Societa</div><div class="info-val">ASG LAB S.r.l. a socio unico</div></div>'+
     '</div>'+
+
     oreHtml+trasfHtml+
-    '<div style="margin-top:12px;background:#f7f9fb;border:1px solid #ddd;padding:10px;border-radius:4px">'+
-      '<strong>TOTALE COMPLESSIVO: €'+fmt(totOre+totTrasf)+'</strong>'+
-      '<span style="font-size:9px;color:#666;margin-left:16px">(Ore: €'+fmt(totOre)+' + Trasferte: €'+fmt(totTrasf)+')</span>'+
+
+    /* TOTALE COMPLESSIVO */
+    '<div class="total-box">'+
+      '<div>'+
+        '<div class="total-box-label">TOTALE COMPLESSIVO INTERVENTO</div>'+
+        '<div class="total-detail">'+
+          (ore.length?'<span>Ore lavorative: € '+fmt(totOre)+'</span>':'')+
+          (trasferte.length?'<span>Spese trasferta: € '+fmt(totTrasf)+'</span>':'')+
+        '</div>'+
+      '</div>'+
+      '<div class="total-box-value">€ '+fmt(totOre+totTrasf)+'</div>'+
     '</div>'+
-    '<div class=firma>'+
-      '<div class=firma-box>Data e firma del dipendente / operatore</div>'+
-      '<div class=firma-box>Data e firma del responsabile ASG LAB</div>'+
+
+    /* FIRME */
+    '<div class="firma-grid">'+
+      '<div class="firma-box"><div class="firma-name">Operatore / Tecnico</div>Data e firma</div>'+
+      '<div class="firma-box"><div class="firma-name">Responsabile ASG LAB</div>Data, firma e timbro</div>'+
     '</div>'+
-    '<div style="margin-top:16px"><button onclick="window.print()">🖨 Stampa / Salva PDF</button></div>'+
+
+    +FOOTER_HTML++
   '</body></html>';
   w.document.write(html);w.document.close();
 }
@@ -2584,15 +2668,160 @@ function exportReportCommesse(){var comms=lg('comm');var det=lgo('det');var w=wi
   '</tr>'}).join('')+
   '</tbody></table></body></html>');w.document.close()}
 
-function exportDistintaPDF(numero){var c=lg('comm').find(function(x){return x.numero===numero})||{numero:numero};var det=lgo('det');var cd=det[numero]||{distinta:[],ore:[]};var dist=cd.distinta||[];var ore=cd.ore||[];var totM=dist.reduce(function(s,r){return s+parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)},0);var cM=dist.reduce(function(s,r){return s+parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)},0);var totO=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);var w=window.open('','_blank');w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Distinta '+numero+'</title><style>body{font-family:sans-serif;font-size:10px;margin:20px}h1{font-size:14px}table{width:100%;border-collapse:collapse}th{background:#f7f7f7;padding:4px 6px;border-bottom:2px solid #ccc;text-align:left}td{padding:3px 6px;border-bottom:1px solid #eee}.num{text-align:right}.tot{font-weight:700;background:#f7f7f7;border-top:2px solid #ccc}@media print{button{display:none}}</style></head><body>'+
-  '<button onclick="window.print()" style="margin-bottom:12px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer">Stampa</button>'+
-  '<h1>Distinta — '+esc(numero)+'</h1><p style="color:#666;margin-bottom:12px">'+esc(c.oggetto||'')+'</p>'+
-  '<table><thead><tr><th>Descrizione</th><th>Q.</th><th>Fornitore</th><th>Codice</th><th class="num">Netto</th><th class="num">Vendita</th><th class="num">Totale</th><th>Stato</th></tr></thead><tbody>'+
-  dist.filter(function(r){return!r._intestazione}).map(function(r){return'<tr><td>'+esc(r.descrizione||'—')+'</td><td class="num">'+esc(String(r.qty||1))+'</td><td style="font-size:9px">'+esc(r.fornitore||'—')+'</td><td style="font-family:monospace;font-size:9px">'+esc(r.codice||'—')+'</td><td class="num">€'+fmt(r.netto_cad||r.costo_cad||0)+'</td><td class="num">€'+fmt(r.prezzo_vendita||0)+'</td><td class="num">€'+fmt(parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1))+'</td><td style="font-size:9px">'+esc(r.stato_approv||'—')+'</td></tr>'}).join('')+
-  '<tr class="tot"><td colspan="6" class="num">Totale vendita:</td><td class="num">€'+fmt(totM)+'</td><td></td></tr></tbody></table>'+
-  (ore.length?'<h2 style="margin:14px 0 4px;font-size:12px">Ore di prestazione (ricavo)</h2><table><thead><tr><th>Data</th><th>Descrizione</th><th>Operatore</th><th>Figura / Categoria</th><th class="num">Q.ta</th><th class="num">Tariffa</th><th class="num">Totale</th></tr></thead><tbody>'+ore.map(function(o){var catL={diurna_ord:'Diurne ord.',diurna_str:'Diurne straord.',notturna_str:'Notturne straord.',festiva:'Festive',inoperoso:'Inoperoso',viaggio:'Viaggio'}[o.categoria||'diurna_ord']||'—';var figL={ms:'Mont.Spec.',ts:'Tecn.Spec.',te:'Tecn.Elett.'}[o.figura||'ms']||'—';return'<tr><td>'+fmtD(o.data)+'</td><td>'+esc(o.descrizione||'')+'</td><td>'+esc(o.operatore||'')+'</td><td style="font-size:10px">'+figL+' / '+catL+'</td><td class="num">'+o.ore+(o.unita||'h')+'</td><td class="num">€'+fmt(o.tariffa||0)+'</td><td class="num">€'+fmt(parseFloat(o.ore||0)*parseFloat(o.tariffa||0))+'</td></tr>'}).join('')+'<tr class="tot"><td colspan="6" class="num">Totale ore fatturate (ricavo):</td><td class="num">€'+fmt(totO)+'</td></tr></tbody></table>':'')  +
-  '<div style="margin-top:12px;padding:8px;background:#f7f7f7;border-radius:4px;font-size:11px">Costi: €'+fmt(cM+totO)+' | Valore vendita: €'+fmt(totM)+'</div>'+
-  '</body></html>');w.document.close()}
+function exportDistintaPDF(numero){
+  var LOGO='https://asglab.it/img/icon-light_hu_402522ffdb7dabc2.png';
+  var TARIFFE_L={diurna_ord:'Ore diurne ordinarie',diurna_str:'Ore diurne straordinarie',notturna_str:'Ore notturne straordinarie',festiva:'Ore festive',inoperoso:'Giorno inoperoso',viaggio:'Ore viaggio/attesa'};
+  var FIGURA_L={ms:'Montatore Specializzato',ts:'Tecnico Specializzato',te:'Tecnico Elettronico'};
+  var STATO_L={daordinare:'Da ord.',ordinato:'Ordinato',arrivato:'Arrivato'};
+  var c=lg('comm').find(function(x){return x.numero===numero})||{numero:numero};
+  var CNAMES3=getClienti();var clienteNome=CNAMES3[c.cliente]||c.cliente||'—';
+  var det=lgo('det');var cd=det[numero]||{distinta:[],ore:[],trasferte:[]};
+  var dist=cd.distinta||[];var ore=cd.ore||[];var trasferte=cd.trasferte||[];
+  var totM=dist.filter(function(r){return!r._intestazione}).reduce(function(s,r){return s+parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)},0);
+  var cM=dist.filter(function(r){return!r._intestazione}).reduce(function(s,r){return s+parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)},0);
+  var totOre=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);
+  var totTrasf=trasferte.reduce(function(s,t){return s+parseFloat(t.totale||0)},0);
+  var impOfferta=parseFloat((cd.offerta&&cd.offerta.importo_offerto)||c.importo||0)||(totM+totOre);
+  var margEuro=impOfferta>0?impOfferta-cM:null;
+  var margPct=impOfferta>0?((impOfferta-cM)/impOfferta*100):null;
+  var w=window.open('','_blank');
+  var CSS='   @import url(\'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\');   *{box-sizing:border-box;margin:0;padding:0}   body{font-family:\'Inter\',Arial,sans-serif;font-size:10px;color:#1a1a2e;background:#fff;padding:0}   @page{size:A4;margin:18mm 14mm 22mm 14mm}   @media print{body{margin:0;padding:0}.no-print{display:none!important}thead{display:table-header-group}}   .doc-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:14px;border-bottom:2px solid #1a3a7a}   .doc-header-logo{height:36px;object-fit:contain}   .doc-header-right{text-align:right;font-size:9px;color:#555;line-height:1.5}   .doc-header-right strong{font-size:11px;color:#1a1a2e}   .doc-title{font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:2px;letter-spacing:-.02em}   .doc-subtitle{font-size:10px;color:#64748b;margin-bottom:14px}   .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #e2e8f0;border-radius:5px;overflow:hidden;margin-bottom:14px;font-size:9.5px}   .info-cell{padding:5px 10px;border-bottom:1px solid #e2e8f0}   .info-cell:nth-child(odd){background:#f8fafc;border-right:1px solid #e2e8f0}   .info-cell:last-child,.info-cell:nth-last-child(2){border-bottom:none}   .info-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:1px}   .info-val{font-weight:600;color:#1a1a2e}   .ref-box{background:#f0f4ff;border-left:3px solid #1a3a7a;padding:6px 10px;font-size:9px;color:#334155;margin-bottom:14px;border-radius:0 4px 4px 0;line-height:1.5}   h2.section{font-size:11px;font-weight:700;color:#1a3a7a;border-bottom:1.5px solid #1a3a7a;padding-bottom:3px;margin:16px 0 8px;text-transform:uppercase;letter-spacing:.05em}   table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:9.5px}   thead tr{background:#1a3a7a;color:#fff}   thead th{padding:5px 7px;font-weight:600;font-size:8.5px;text-transform:uppercase;letter-spacing:.05em;text-align:left}   thead th.num{text-align:right}   tbody tr:nth-child(even){background:#f8fafc}   td{padding:4px 7px;border-bottom:1px solid #e2e8f0;vertical-align:top}   td.num{text-align:right;font-variant-numeric:tabular-nums}   td.sub{font-size:8.5px;color:#64748b}   td.bold{font-weight:700}   tr.tot-row td{background:#1a3a7a!important;color:#fff!important;font-weight:700;padding:5px 7px;border:none;font-size:10px}   tr.tot-row td.num{text-align:right}   tr.subtot-row td{background:#dbeafe!important;color:#1e3a8a!important;font-weight:600;padding:4px 7px;border:none}   tr.subtot-row td.num{text-align:right}   .inner-table{width:100%;border:none;font-size:8.5px;margin:0}   .inner-table td{padding:1px 3px;border:none;background:transparent!important}   .inner-table td.num{text-align:right;font-variant-numeric:tabular-nums}   .total-box{background:#1a3a7a;color:#fff;border-radius:5px;padding:10px 14px;margin:14px 0;display:flex;align-items:center;justify-content:space-between}   .total-box-label{font-size:10px;font-weight:600;letter-spacing:.03em}   .total-box-value{font-size:18px;font-weight:700;letter-spacing:-.02em}   .total-detail{display:flex;gap:20px;margin-top:4px;font-size:8.5px;opacity:.85}   .firma-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:28px;padding-top:12px}   .firma-box{border-top:1px solid #94a3b8;padding-top:6px;font-size:8.5px;color:#64748b}   .firma-name{font-weight:700;color:#1a1a2e;font-size:10px;margin-bottom:2px}   .doc-footer{border-top:1px solid #e2e8f0;margin-top:24px;padding-top:6px;font-size:8px;color:#94a3b8;display:flex;justify-content:space-between}   .print-btn{background:#1a3a7a;color:#fff;border:none;padding:8px 20px;border-radius:5px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;margin-bottom:16px} ';
+
+  /* DISTINTA ROWS — rispetta sezioni */
+  var distRows='';
+  dist.forEach(function(r){
+    if(r._intestazione){
+      distRows+='<tr style="background:#f0f4ff"><td colspan=8 style="font-weight:700;color:#1a3a7a;padding:6px 7px;font-size:10px;letter-spacing:.04em">'+esc(r.descrizione||'')+'</td></tr>';
+    } else {
+      var tot=parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1);
+      var stato=STATO_L[r.stato_approv]||r.stato_approv||'—';
+      var statoCol=r.stato_approv==='arrivato'?'color:#16a34a':r.stato_approv==='ordinato'?'color:#d97706':'color:#94a3b8';
+      distRows+='<tr>'+
+        '<td>'+esc(r.descrizione||'—')+'</td>'+
+        '<td class=num>'+esc(String(r.qty||1))+'</td>'+
+        '<td class=sub>'+esc(r.fornitore||'—')+'</td>'+
+        '<td style="font-family:monospace;font-size:8.5px">'+esc(r.codice||'—')+'</td>'+
+        '<td class=num>€ '+fmt(r.netto_cad||r.costo_cad||0)+'</td>'+
+        '<td class=num>€ '+fmt(r.prezzo_vendita||0)+'</td>'+
+        '<td class=num><strong>€ '+fmt(tot)+'</strong></td>'+
+        '<td style="font-size:8.5px;'+statoCol+'">'+stato+'</td>'+
+      '</tr>';
+    }
+  });
+
+  /* ORE ROWS */
+  var oreRows='';
+  if(ore.length){
+    oreRows='<h2 class="section">Ore di prestazione</h2>'+
+    '<table><thead><tr>'+
+      '<th>Data</th><th>Operatore</th><th>Figura</th><th>Categoria</th><th>Descrizione</th>'+
+      '<th class=num>Q.ta</th><th class=num>Tariffa</th><th class=num>Importo</th>'+
+    '</tr></thead><tbody>'+
+    ore.map(function(o){
+      var catL=TARIFFE_L[o.categoria||'diurna_ord']||'—';
+      var figL=FIGURA_L[o.figura||'ms']||'—';
+      var unita=o.unita||'h';
+      return'<tr>'+
+        '<td>'+fmtD(o.data)+'</td>'+
+        '<td class=bold>'+esc(o.operatore||'—')+'</td>'+
+        '<td>'+esc(figL)+'</td>'+
+        '<td class=sub>'+esc(catL)+'</td>'+
+        '<td>'+esc(o.descrizione||'—')+'</td>'+
+        '<td class=num>'+o.ore+' '+unita+'</td>'+
+        '<td class=num>€ '+fmt(o.tariffa||0)+'/'+unita+'</td>'+
+        '<td class=num><strong>€ '+fmt(parseFloat(o.ore||0)*parseFloat(o.tariffa||0))+'</strong></td>'+
+      '</tr>';
+    }).join('')+
+    '<tr class=subtot-row><td colspan=7 class=num><strong>Totale ore fatturate (ricavo)</strong></td>'+
+    '<td class=num><strong>€ '+fmt(totOre)+'</strong></td></tr>'+
+    '</tbody></table>';
+  }
+
+  /* TRASFERTE ROWS */
+  var trasfRows='';
+  if(trasferte.length){
+    trasfRows='<h2 class="section">Spese di trasferta</h2>'+
+    '<table><thead><tr>'+
+      '<th>Data</th><th>Operatore</th><th>Destinazione</th><th>Voci</th><th class=num>Totale</th>'+
+    '</tr></thead><tbody>'+
+    trasferte.map(function(t){
+      var rr='';
+      if(t.km>0)rr+='<tr><td>🚗 '+t.km+' km × €'+fmt(t.aci_km||0)+'/km ('+esc(t.veicolo||'—')+')</td><td class=num>€ '+fmt(t.rimb_km||0)+'</td></tr>';
+      if(t.diaria>0)rr+='<tr><td>🏨 Diaria'+(t.ngg>1?' '+t.ngg+'gg':'')+'</td><td class=num>€ '+fmt(t.diaria)+'</td></tr>';
+      if(t.treno>0)rr+='<tr><td>🚆 Treno</td><td class=num>€ '+fmt(t.treno)+'</td></tr>';
+      if(t.aereo>0)rr+='<tr><td>✈ Aereo</td><td class=num>€ '+fmt(t.aereo)+'</td></tr>';
+      if(t.pedaggi>0)rr+='<tr><td>🛣 Pedaggi</td><td class=num>€ '+fmt(t.pedaggi)+'</td></tr>';
+      if(t.parcheggio>0)rr+='<tr><td>🅿 Parcheggio</td><td class=num>€ '+fmt(t.parcheggio)+'</td></tr>';
+      if(t.vitto>0)rr+='<tr><td>🍽 Vitto</td><td class=num>€ '+fmt(t.vitto)+'</td></tr>';
+      if(t.altro>0)rr+='<tr><td>📎 Altro</td><td class=num>€ '+fmt(t.altro)+'</td></tr>';
+      return'<tr><td>'+fmtD(t.data)+'</td><td class=bold>'+esc(t.operatore||'—')+'</td>'+
+        '<td>'+esc(t.destinazione||'—')+'</td>'+
+        '<td><table class=inner-table>'+rr+'</table></td>'+
+        '<td class=num><strong>€ '+fmt(t.totale||0)+'</strong></td></tr>';
+    }).join('')+
+    '<tr class=subtot-row><td colspan=4 class=num><strong>Totale trasferte</strong></td>'+
+    '<td class=num><strong>€ '+fmt(totTrasf)+'</strong></td></tr>'+
+    '</tbody></table>';
+  }
+
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8">'+
+    '<title>Distinta — '+esc(numero)+'</title>'+
+    '<style>'+CSS+'</style></head><body>'+
+    '<button class="print-btn no-print" onclick="window.print()">&#128424; Stampa / Salva PDF</button>'+
+    '<div class="doc-header">'+
+      '<img class="doc-header-logo" src="'+LOGO+'" alt="ASG LAB" onerror="this.style.display=\'none\'">'+
+      '<div class="doc-header-right">'+
+        'Commessa: <strong>'+esc(numero)+'</strong><br>'+
+        'Cliente: <strong>'+esc(clienteNome)+'</strong><br>'+
+        'Data: '+new Date().toLocaleDateString('it-IT')+
+      '</div>'+
+    '</div>'+
+    '<div class="doc-title">Distinta e consuntivo commessa</div>'+
+    '<div class="doc-subtitle">'+esc(c.oggetto||'')+'</div>'+
+    '<div class="info-grid">'+
+      '<div class="info-cell"><div class="info-label">Commessa</div><div class="info-val">'+esc(numero)+'</div></div>'+
+      '<div class="info-cell"><div class="info-label">Cliente</div><div class="info-val">'+esc(clienteNome)+'</div></div>'+
+      '<div class="info-cell"><div class="info-label">Stato</div><div class="info-val">'+esc(c.stato||'—')+'</div></div>'+
+      '<div class="info-cell"><div class="info-label">Offerta / Importo</div><div class="info-val">'+(impOfferta>0?'€ '+fmt(impOfferta):'—')+'</div></div>'+
+    '</div>'+
+    '<h2 class="section">Distinta materiali</h2>'+
+    '<table><thead><tr>'+
+      '<th>Descrizione</th><th class=num>Q.</th><th>Fornitore</th><th>Codice</th>'+
+      '<th class=num>Netto</th><th class=num>Vendita</th><th class=num>Totale</th><th>Stato</th>'+
+    '</tr></thead><tbody>'+distRows+
+    '<tr class=subtot-row>'+
+      '<td colspan=6 class=num><strong>Totale vendita materiali</strong></td>'+
+      '<td class=num><strong>€ '+fmt(totM)+'</strong></td><td></td>'+
+    '</tr>'+
+    '</tbody></table>'+
+    oreRows+trasfRows+
+    /* RIEPILOGO ECONOMICO */
+    '<h2 class="section">Riepilogo economico</h2>'+
+    '<div class="info-grid" style="margin-bottom:10px">'+
+      '<div class="info-cell"><div class="info-label">Costi materiali (netto)</div><div class="info-val" style="color:#dc2626">€ '+fmt(cM)+'</div></div>'+
+      '<div class="info-cell"><div class="info-label">Vendita materiali</div><div class="info-val">€ '+fmt(totM)+'</div></div>'+
+      '<div class="info-cell"><div class="info-label">Ore fatturate (ricavo)</div><div class="info-val" style="color:#16a34a">€ '+fmt(totOre)+'</div></div>'+
+      '<div class="info-cell"><div class="info-label">Spese trasferta</div><div class="info-val" style="color:#16a34a">€ '+fmt(totTrasf)+'</div></div>'+
+    '</div>'+
+    '<div class="total-box">'+
+      '<div>'+
+        '<div class="total-box-label">OFFERTA / RICAVO TOTALE</div>'+
+        '<div class="total-detail">'+
+          '<span>Materiali vendita: €'+fmt(totM)+'</span>'+
+          (totOre>0?'<span>Ore: €'+fmt(totOre)+'</span>':'')+
+          (totTrasf>0?'<span>Trasferte: €'+fmt(totTrasf)+'</span>':'')+
+          (margPct!==null?'<span>Margine: €'+fmt(margEuro)+' ('+margPct.toFixed(0)+'%)</span>':'')+
+        '</div>'+
+      '</div>'+
+      '<div class="total-box-value">'+(impOfferta>0?'€ '+fmt(impOfferta):'€ '+fmt(totM+totOre+totTrasf))+'</div>'+
+    '</div>'+
+    '<div style="border-top:1px solid #e2e8f0;margin-top:24px;padding-top:6px;font-size:8px;color:#94a3b8;display:flex;justify-content:space-between">'+
+      '<span><strong>ASG LAB\u00ae</strong> &mdash; ASG LAB S.r.l. a socio unico &mdash; https://asglab.it &mdash; info@asglab.it</span>'+
+      '<span>P.IVA 10122150963 &mdash; REA MI-2784647</span>'+
+    '</div>'+
+  '</body></html>';
+  w.document.write(html);w.document.close();
+}
 
 function exportPNpdf(){var data=lg('pn');var filtConto=(document.getElementById('pn-conto')||{}).value||'';var filtDa=(document.getElementById('pn-da')||{}).value||'';var filtA=(document.getElementById('pn-a')||{}).value||'';var rows=data;if(filtConto)rows=rows.filter(function(r){return r.conto===filtConto});if(filtDa)rows=rows.filter(function(r){return r.data_pag>=filtDa+'-01'});if(filtA)rows=rows.filter(function(r){return r.data_pag<=filtA+'-31'});rows=[...rows].sort(function(a,b){return(a.data_pag||'').localeCompare(b.data_pag||'')});var totEn=rows.reduce(function(s,r){return s+(r.entrata||0)},0);var totUs=rows.reduce(function(s,r){return s+(r.uscita||0)},0);var w=window.open('','_blank');w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Prima Nota</title><style>body{font-family:sans-serif;font-size:10px;margin:20px}table{width:100%;border-collapse:collapse}th{background:#f0f0f0;padding:5px 6px;border-bottom:2px solid #ccc;text-align:left;font-size:10px}td{padding:4px 6px;border-bottom:1px solid #eee}.num{text-align:right}tfoot td{font-weight:700;background:#f7f7f7;border-top:2px solid #ccc}@media print{button{display:none}}</style></head><body>'+
   '<button onclick="window.print()" style="margin-bottom:12px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer">Stampa</button>'+
