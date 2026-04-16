@@ -211,14 +211,14 @@ tbody tr:hover td{background:var(--surface2)}
       <button onclick="syncNow()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg><span>Sync Nextcloud</span></button>
       <a href="#" onclick="openModal(&quot;config&quot;);return false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Configurazione</span></a>
       <a href="#" onclick="exportAll();return false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Backup JSON</span></a>
-      <div class="build-tag" id="build-tag">v16</div>
+      <div class="build-tag" id="build-tag">v17</div>
     </div>
   </aside>
   <div id="main">
     <div id="topbar">
       <div class="topbar-title" id="topbar-title">Home</div>
       <div id="topbar-actions"></div>
-      <span id="build-ts" style="font-size:10px;color:var(--text4);font-family:monospace">v16·15/04</span>
+      <span id="build-ts" style="font-size:10px;color:var(--text4);font-family:monospace">v17·16/04</span>
       <div class="sync-pill" onclick="syncNow()"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">—</span></div>
     </div>
     <div id="content">
@@ -4450,9 +4450,9 @@ function exportAll(){var data={comm:lg('comm'),fatt:lg('fatt'),scad:lg('scad'),c
   else syncNow();
   renderHome();
   var bt=document.getElementById('build-tag');
-  if(bt)bt.textContent='v16 · '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  if(bt)bt.textContent='v17 · '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   var bts=document.getElementById('build-ts');
-  if(bts)bts.textContent='v16·15/04 '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  if(bts)bts.textContent='v17·16/04 '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 })();
 
 // ── PWA SERVICE WORKER ───────────────────────────────────────────
