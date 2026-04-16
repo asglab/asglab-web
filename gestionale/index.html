@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="ASG LAB">
 <link rel="manifest" href="/gestionale/manifest.json">
 <link rel="apple-touch-icon" href="/gestionale/icon-192.png">
-<title>ASG LAB — Gestionale v16</title>
+<title>ASG LAB — Gestionale v17</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -373,6 +373,65 @@ tbody tr:hover td{background:var(--surface2)}
         <div class="filter-bar"><input type="text" class="search-input" id="forn-search" placeholder="Cerca fornitore..." oninput="renderFornitori()"></div>
         <div id="forn-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
       </div>
+      <!-- CLIENTI -->
+      <div class="view" id="view-clienti">
+        <div class="filter-bar">
+          <input type="text" class="search-input" id="cli-search" placeholder="Cerca cliente..." oninput="renderClienti()">
+          <div style="flex:1"></div>
+          <button class="btn btn-primary btn-sm" onclick="openModal(&quot;new-cliente&quot;)">+ Nuovo cliente</button>
+        </div>
+        <div id="cli-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px"></div>
+      </div>
+      <!-- CLIENTE DETAIL -->
+      <div class="view" id="view-cliente-det">
+        <div class="card" style="margin-bottom:12px"><div style="padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px">
+            <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:3px" id="cli-det-nome">Cliente</div>
+            <div style="font-size:12px;color:var(--text3);font-family:monospace" id="cli-det-sigla">—</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="navTo('clienti')">← Indietro</button>
+            <button class="btn btn-secondary btn-sm" id="cli-det-edit">&#9998; Modifica</button>
+          </div>
+        </div></div>
+        <div id="cli-det-content"></div>
+      </div>
+      <!-- KIT VENDITA -->
+      <div class="view" id="view-kit">
+        <div class="filter-bar">
+          <input type="text" class="search-input" id="kit-search" placeholder="Cerca kit..." oninput="renderKit()">
+          <div style="flex:1"></div>
+          <button class="btn btn-primary btn-sm" onclick="openModal(&quot;new-kit&quot;)">+ Nuovo kit</button>
+        </div>
+        <div id="kit-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px"></div>
+      </div>
+      <!-- KIT DETAIL -->
+      <div class="view" id="view-kit-det">
+        <div class="card" style="margin-bottom:12px"><div style="padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div style="flex:1">
+            <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:3px" id="kit-det-nome">Kit</div>
+            <div style="font-size:12px;color:var(--text3)" id="kit-det-desc">—</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="navTo('kit')">← Indietro</button>
+            <button class="btn btn-secondary btn-sm" id="kit-det-edit">&#9998; Modifica</button>
+            <button class="btn btn-primary btn-sm" id="kit-det-genera">+ Genera commessa</button>
+          </div>
+        </div></div>
+        <div id="kit-det-content"></div>
+      </div>
+      <!-- SPEDIZIONI/CORRIERI -->
+      <div class="view" id="view-corrieri">
+        <div class="filter-bar">
+          <input type="text" class="search-input" id="sped-search" placeholder="Cerca spedizione..." oninput="renderSpedizioni()">
+          <div class="chip active" onclick="setChip(this,'sped-filtro','');renderSpedizioni()">Tutte</div>
+          <div class="chip" onclick="setChip(this,'sped-filtro','in-transito');renderSpedizioni()">In transito</div>
+          <div class="chip" onclick="setChip(this,'sped-filtro','consegnata');renderSpedizioni()">Consegnate</div>
+          <div style="flex:1"></div>
+          <button class="btn btn-primary btn-sm" onclick="openModal(&quot;new-spedizione&quot;)">+ Spedizione</button>
+        </div>
+        <div class="card"><div id="sped-list"><div class="empty">Caricamento...</div></div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -388,11 +447,11 @@ tbody tr:hover td{background:var(--surface2)}
 <script>
 'use strict';
 // ═══════════════════════════════════════
-// ASG LAB GESTIONALE v16
+// ASG LAB GESTIONALE v17
 // ZERO template literals annidati
 // ═══════════════════════════════════════
 
-const K={comm:'asg_commesse',fatt:'asg_fatture',scad:'asg_scadenze',conti:'asg_conti',det:'asg_det',mag:'asg_mag',pn:'asg_primanota',cfg:'asg_cfg'};
+const K={comm:'asg_commesse',fatt:'asg_fatture',scad:'asg_scadenze',conti:'asg_conti',det:'asg_det',mag:'asg_mag',pn:'asg_primanota',cfg:'asg_cfg',clientiExt:'asg_clienti_ext',kit:'asg_kit',sped:'asg_spedizioni'};
 function ls(k,v){try{localStorage.setItem(K[k],JSON.stringify(v))}catch(e){}}
 function lg(k){try{return JSON.parse(localStorage.getItem(K[k])||'[]')}catch{return[]}}
 function lgo(k){try{return JSON.parse(localStorage.getItem(K[k])||'{}')}catch{return{}}}
@@ -429,7 +488,7 @@ function navTo(v){
   document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active')});
   document.querySelectorAll('.nav-item').forEach(function(el){el.classList.toggle('active',el.dataset.view===v)});
   var ve=document.getElementById('view-'+v);if(ve)ve.classList.add('active');
-  var titles={home:'Home',commesse:'Commesse',approv:'Approvvigionamenti',contabilita:'Contabilita','import-fatture':'Import Fatture',magazzino:'Magazzino',fornitori:'Fornitori','commessa-det':'Commessa'};
+  var titles={home:'Home',commesse:'Commesse',approv:'Approvvigionamenti',contabilita:'Contabilita','import-fatture':'Import Fatture',magazzino:'Magazzino',fornitori:'Fornitori',clienti:'Clienti','cliente-det':'Cliente','commessa-det':'Commessa',kit:'Kit di vendita','kit-det':'Kit',corrieri:'Spedizioni'};
   document.getElementById('topbar-title').textContent=titles[v]||v;
   if(v==='home')renderHome();
   else if(v==='commesse')renderCommesse();
@@ -437,6 +496,9 @@ function navTo(v){
   else if(v==='contabilita')renderContabilita();
   else if(v==='magazzino')renderMag();
   else if(v==='fornitori')renderFornitori();
+  else if(v==='clienti')renderClienti();
+  else if(v==='kit')renderKit();
+  else if(v==='corrieri')renderSpedizioni();
 }
 
 // CHIP
@@ -504,7 +566,7 @@ async function syncNow(){
     renderAll();
   }catch(e){setSyncUI('err','errore')}
 }
-function renderAll(){if(_view==='home')renderHome();else if(_view==='commesse')renderCommesse();else if(_view==='approv')renderApprov();else if(_view==='contabilita')renderContabilita();else if(_view==='magazzino')renderMag()}
+function renderAll(){if(_view==='home')renderHome();else if(_view==='commesse')renderCommesse();else if(_view==='approv')renderApprov();else if(_view==='contabilita')renderContabilita();else if(_view==='magazzino')renderMag();else if(_view==='clienti')renderClienti();else if(_view==='kit')renderKit();else if(_view==='corrieri')renderSpedizioni();}
 
 // HOME
 function renderHome(){
@@ -1014,7 +1076,11 @@ function renderMargine(){
     '<div style="font-size:11px;color:var(--text3)">Offerta: €'+fmt(imp)+'</div>'+
     '<div style="font-size:11px;color:var(--text3)">Costi: €'+fmt(tot)+'</div>'+
     (ricavoOre>0?'<div style="font-size:11px;color:var(--text3)">Ore: '+totH+'h (€'+fmt(ricavoOre)+' fatturati)</div>':'')+
-    '<button class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;font-size:11px" onclick="exportDistintaPDF(\''+esc(CC.numero)+'\')">PDF Distinta</button>';
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:8px">'+
+    '<button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="exportDistintaPDF(\''+esc(CC.numero)+'\')">\u{1F4C4} PDF Distinta</button>'+
+    '<button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="reportConsuntivoCommessa(\''+esc(CC.numero)+'\')">\u{1F4CA} PDF Consuntivo (interno)</button>'+
+    '<button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="openModal(\'new-spedizione\',\''+esc(CC.numero)+'\')">\u{1F69A} Nuova spedizione</button>'+
+    '</div>';
 }
 
 // ── NEXTCLOUD FILE BROWSER ──────────────────────────────────────
@@ -1498,7 +1564,10 @@ function stampaNoteSpese(numero){
       '<div class="firma-box"><div class="firma-name">Responsabile ASG LAB</div>Data, firma e timbro</div>'+
     '</div>'+
 
-    +FOOTER_HTML++
+    '<div style="border-top:1px solid #e2e8f0;margin-top:24px;padding-top:6px;font-size:8px;color:#94a3b8;display:flex;justify-content:space-between">'+
+      '<span><strong>ASG LAB®</strong> — ASG LAB S.r.l. a socio unico — <a href="https://asglab.it" style="color:#94a3b8">https://asglab.it</a> — info@asglab.it</span>'+
+      '<span>P.IVA 10122150963 — REA MI-2784647</span>'+
+    '</div>'+
   '</body></html>';
   w.document.write(html);w.document.close();
 }
@@ -1862,6 +1931,655 @@ function getFornitori(){
 }
 function setFornitori(arr){localStorage.setItem('asg_fornitori',JSON.stringify(arr))}
 var FORNITORI=getFornitori();
+
+// ═══════════════════════════════════════════════════════════════════════
+// CLIENTI ESTESI — dati arricchiti dei clienti (oltre alla sigla/nome base)
+// ═══════════════════════════════════════════════════════════════════════
+
+function getClientiExt(){
+  var d=lgo('clientiExt')||{};
+  return d;
+}
+function saveClientiExt(data){ls('clientiExt',data);}
+
+function renderClienti(){
+  var nomi=getClienti();
+  var ext=getClientiExt();
+  var comm=lg('comm');
+  var q=(document.getElementById('cli-search')||{}).value||'';
+  var gridEl=document.getElementById('cli-grid');
+  if(!gridEl)return;
+  var sigle=Object.keys(nomi).sort();
+  if(q)sigle=sigle.filter(function(s){return(s+' '+nomi[s]).toLowerCase().includes(q.toLowerCase())});
+  if(!sigle.length){gridEl.innerHTML='<div class=empty>Nessun cliente trovato</div>';return;}
+  gridEl.innerHTML=sigle.map(function(s){
+    var e=ext[s]||{};
+    var nComm=comm.filter(function(c){return c.cliente===s}).length;
+    var nAttive=comm.filter(function(c){return c.cliente===s&&(c.stato==='in-corso'||c.stato==='confermata')}).length;
+    var valOff=comm.filter(function(c){return c.cliente===s}).reduce(function(sum,c){return sum+parseFloat(c.importo||0)},0);
+    return '<div class=card style="cursor:pointer;padding:14px 16px" data-s="'+esc(s)+'" onclick="openClienteDet(this.dataset.s)">'+
+      '<div style="display:flex;align-items:start;gap:10px;margin-bottom:8px">'+
+        '<div style="width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--blue-dark,#1a3a7a));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0">'+esc(s.substring(0,3))+'</div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(nomi[s])+'</div>'+
+          '<div style="font-size:11px;color:var(--text3);font-family:monospace">'+esc(s)+'</div>'+
+        '</div>'+
+        (e.abituale?'<span class="badge badge-blue" style="font-size:9px">abituale</span>':'')+
+      '</div>'+
+      (e.contatto||e.email||e.telefono?'<div style="font-size:11px;color:var(--text3);margin-bottom:8px">'+esc(e.contatto||'')+(e.email?' · '+esc(e.email):'')+(e.telefono?' · '+esc(e.telefono):'')+'</div>':'')+
+      '<div style="display:flex;gap:12px;font-size:11px;color:var(--text3);margin-top:8px;border-top:1px solid var(--border);padding-top:8px">'+
+        '<span><strong style="color:var(--text)">'+nComm+'</strong> commesse</span>'+
+        (nAttive>0?'<span style="color:var(--blue)"><strong>'+nAttive+'</strong> attive</span>':'')+
+        (valOff>0?'<span style="margin-left:auto"><strong style="color:var(--green)">\u20ac'+fmt(valOff)+'</strong></span>':'')+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+var CLI_DET_CUR=null;
+function openClienteDet(sigla){
+  CLI_DET_CUR=sigla;
+  var nomi=getClienti();
+  var ext=getClientiExt();
+  var e=ext[sigla]||{};
+  var nome=nomi[sigla]||sigla;
+  var comm=lg('comm').filter(function(c){return c.cliente===sigla});
+  var fatt=lg('fatt').filter(function(f){return f.cliente===nome||f.cliente===sigla});
+
+  document.getElementById('cli-det-nome').textContent=nome;
+  document.getElementById('cli-det-sigla').textContent=sigla;
+  document.getElementById('cli-det-edit').onclick=function(){openModal('edit-cliente',sigla);};
+
+  var totImp=comm.reduce(function(s,c){return s+parseFloat(c.importo||0)},0);
+  var totFatt=fatt.reduce(function(s,f){return s+parseFloat(f.importo||0)},0);
+  var inCorso=comm.filter(function(c){return c.stato==='in-corso'||c.stato==='confermata'}).length;
+
+  var html='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px">'+
+    mkMetric('COMMESSE TOTALI',comm.length,'blue')+
+    mkMetric('IN CORSO',inCorso,'amber')+
+    mkMetric('VALORE OFFERTE','\u20ac'+fmt(totImp),'green')+
+    mkMetric('FATTURATO','\u20ac'+fmt(totFatt),'green')+
+  '</div>';
+
+  // Card Contatti
+  html+='<div class=card style="margin-bottom:12px"><div class=card-head><span class=card-title>\ud83d\udcde Contatti e dati aziendali</span></div><div class=card-body>'+
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 16px;font-size:13px">'+
+    mkField('Ragione sociale',e.ragione_sociale||nome)+
+    mkField('P.IVA',e.piva||'—')+
+    mkField('Codice fiscale',e.cf||'—')+
+    mkField('Codice SDI',e.sdi||'—')+
+    mkField('PEC',e.pec||'—')+
+    mkField('Indirizzo',e.indirizzo||'—')+
+    mkField('Citt\u00e0',(e.cap?e.cap+' ':'')+(e.citta||'—')+(e.prov?' ('+e.prov+')':''))+
+    mkField('Referente',e.contatto||'—')+
+    mkField('Telefono',e.telefono||'—')+
+    mkField('Email',e.email||'—')+
+    '</div></div></div>';
+
+  // Card Documenti condivisi
+  var docs=(e.documenti_cliente||[]);
+  html+='<div class=card style="margin-bottom:12px"><div class=card-head>'+
+    '<span class=card-title>\ud83d\udcc1 Documenti condivisi con il cliente</span>'+
+    '<button class="btn btn-primary btn-sm" onclick="openModal(&quot;add-doc-cli&quot;,&quot;'+esc(sigla)+'&quot;)">+ Documento</button>'+
+    '</div><div class=card-body>';
+  if(!docs.length){
+    html+='<div class=empty style="padding:20px">Nessun documento condiviso. Usa "+Documento" per aggiungere disegni, listini, manuali o istruzioni visibili al cliente.</div>';
+  }else{
+    html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px">';
+    html+=docs.map(function(d,i){
+      var ic={listino:'\ud83d\udcca',disegno:'\ud83d\udcd0',manuale:'\ud83d\udcd6',istruzioni:'\u2699',foto:'\ud83d\udcf7',altro:'\ud83d\udcc4'}[d.tipo]||'\ud83d\udcc4';
+      return '<div style="border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;background:var(--surface)">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
+          '<span style="font-size:18px">'+ic+'</span>'+
+          '<strong style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(d.nome||'-')+'</strong>'+
+        '</div>'+
+        '<div style="font-size:10px;color:var(--text3);margin-bottom:6px">'+esc(d.tipo||'altro')+(d.data?' \u00b7 '+fmtD(d.data):'')+'</div>'+
+        (d.descrizione?'<div style="font-size:11px;color:var(--text2);margin-bottom:6px;max-height:40px;overflow:hidden">'+esc(d.descrizione)+'</div>':'')+
+        '<div style="display:flex;gap:4px;align-items:center">'+
+          (d.url?'<a href="'+esc(d.url)+'" target=_blank class="btn btn-ghost btn-sm" style="font-size:10px;padding:3px 8px">\u2197 Apri</a>':'')+
+          '<button class="btn-icon" style="color:var(--red);margin-left:auto" data-s="'+esc(sigla)+'" data-i="'+i+'" onclick="delDocCli(this.dataset.s,parseInt(this.dataset.i))">\u2715</button>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+    html+='</div>';
+  }
+  html+='</div></div>';
+
+  // Card Storico commesse
+  html+='<div class=card style="margin-bottom:12px"><div class=card-head><span class=card-title>\ud83d\udcc2 Storico commesse</span></div><div>';
+  if(!comm.length){
+    html+='<div class=empty>Nessuna commessa per questo cliente</div>';
+  }else{
+    var commSort=comm.slice().sort(function(a,b){return(b.numero||'').localeCompare(a.numero||'')});
+    html+=commSort.slice(0,15).map(function(c){
+      return '<div class=comm-row data-num="'+esc(c.numero)+'" onclick="openDetail(this.dataset.num)" style="cursor:pointer">'+
+        '<span class=comm-num>'+esc(c.numero)+'</span>'+
+        '<span class=comm-obj>'+esc(c.oggetto||'-')+'</span>'+
+        statoBadge(c.stato)+
+        (c.importo>0?'<span style="font-size:12px;font-weight:700;color:var(--green);min-width:80px;text-align:right">\u20ac'+fmt(c.importo)+'</span>':'')+
+      '</div>';
+    }).join('');
+    if(comm.length>15)html+='<div style="text-align:center;padding:10px;font-size:11px;color:var(--text3)">... e altre '+(comm.length-15)+' commesse</div>';
+  }
+  html+='</div></div>';
+
+  // Card Note
+  if(e.note){
+    html+='<div class=card style="margin-bottom:12px"><div class=card-head><span class=card-title>\ud83d\udcdd Note</span></div><div class=card-body><div style="font-size:13px;white-space:pre-wrap;color:var(--text2)">'+esc(e.note)+'</div></div></div>';
+  }
+
+  document.getElementById('cli-det-content').innerHTML=html;
+  navTo('cliente-det');
+}
+
+function mkField(lbl,val){
+  return '<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:2px">'+esc(lbl)+'</div><div style="color:var(--text)">'+esc(val)+'</div></div>';
+}
+
+function saveCliExt(sigla){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var ext=getClientiExt();
+  var prev=ext[sigla]||{};
+  ext[sigla]=Object.assign({},prev,{
+    ragione_sociale:G('cli-rs'),piva:G('cli-piva'),cf:G('cli-cf'),sdi:G('cli-sdi'),pec:G('cli-pec'),
+    indirizzo:G('cli-ind'),cap:G('cli-cap'),citta:G('cli-citta'),prov:G('cli-prov'),
+    contatto:G('cli-cont'),telefono:G('cli-tel'),email:G('cli-mail'),
+    abituale:(document.getElementById('cli-abit')||{}).checked||false,
+    note:G('cli-note')
+  });
+  saveClientiExt(ext);closeM();showToast('Cliente aggiornato');
+  if(_view==='cliente-det')openClienteDet(sigla);
+  else renderClienti();
+}
+
+function saveNuovoCliente(){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var sigla=(G('cli-sigla')||'').toUpperCase().trim();
+  var nome=G('cli-nome').trim();
+  if(!sigla||!nome){showToast('Sigla e nome obbligatori');return;}
+  var cfg=lgo('cfg')||{};
+  var clienti=cfg.clienti||{};
+  if(clienti[sigla]){showToast('Sigla gia esistente');return;}
+  clienti[sigla]=nome;cfg.clienti=clienti;ls('cfg',cfg);
+  // Salva anche dati estesi
+  var ext=getClientiExt();
+  ext[sigla]={ragione_sociale:G('cli-rs')||nome,piva:G('cli-piva'),contatto:G('cli-cont'),email:G('cli-mail'),telefono:G('cli-tel')};
+  saveClientiExt(ext);
+  CNAMES=getClienti();CMAP={};Object.entries(CNAMES).forEach(function(e){CMAP[e[0]]=e[1]+' ('+e[0]+')'});
+  closeM();showToast('Cliente creato');renderClienti();
+}
+
+function delDocCli(sigla,idx){
+  if(!confirm('Eliminare questo documento?'))return;
+  var ext=getClientiExt();
+  if(!ext[sigla]||!ext[sigla].documenti_cliente)return;
+  ext[sigla].documenti_cliente.splice(idx,1);
+  saveClientiExt(ext);openClienteDet(sigla);
+}
+
+function saveDocCli(sigla){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var ext=getClientiExt();
+  if(!ext[sigla])ext[sigla]={};
+  if(!ext[sigla].documenti_cliente)ext[sigla].documenti_cliente=[];
+  ext[sigla].documenti_cliente.push({
+    nome:G('doc-nome'),tipo:G('doc-tipo'),url:G('doc-url'),descrizione:G('doc-desc'),data:today()
+  });
+  saveClientiExt(ext);closeM();openClienteDet(sigla);showToast('Documento aggiunto');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// KIT DI VENDITA — configurazioni standard pre-definite
+// ═══════════════════════════════════════════════════════════════════════
+
+function getKit(){var d=lg('kit');return d&&d.length?d:KIT_DEFAULT.slice();}
+
+var KIT_DEFAULT=[
+  {id:'SPACCA-6T',nome:'Spaccalegna orizzontale 6 Tonnellate',categoria:'Spaccalegna',
+   descrizione:'Kit idraulico per spaccalegna orizzontale 6t con motore PTO trattore o motore elettrico',
+   prezzo_base:1850,opzioni:[
+     {id:'motorizz',label:'Motorizzazione',tipo:'select',valori:['PTO 540 giri','Motore elettrico 3kW 400V','Motore benzina 6.5hp'],default:'PTO 540 giri',delta:[0,380,260]},
+     {id:'corsa',label:'Corsa cilindro',tipo:'select',valori:['500mm','600mm','700mm'],default:'500mm',delta:[0,75,140]},
+     {id:'cuneo',label:'Cuneo',tipo:'select',valori:['Singolo','Cross 4 spicchi','Cross 6 spicchi'],default:'Singolo',delta:[0,95,165]},
+   ],
+   componenti:[
+     {descrizione:'Cilindro oleodinamico 80/45/500mm DE',qty:1,prezzo:280},
+     {descrizione:'Pompa a ingranaggi gruppo 2 — 11cc',qty:1,prezzo:145},
+     {descrizione:'Distributore monoleva 3/8 BSP ritorno',qty:1,prezzo:85},
+     {descrizione:'Serbatoio 20L con tappo sfiato',qty:1,prezzo:95},
+     {descrizione:'Tubi flessibili alta pressione 1/4 (set)',qty:1,prezzo:65},
+     {descrizione:'Raccorderia BSP + innesti rapidi',qty:1,prezzo:75},
+     {descrizione:'Olio idraulico ISO 46 (20L)',qty:1,prezzo:55},
+     {descrizione:'Telaio saldato + cuneo',qty:1,prezzo:420},
+     {descrizione:'Manodopera assemblaggio e collaudo',qty:4,prezzo:80,tipo:'ore'},
+   ]
+  },
+  {id:'VERR-SUB',nome:'Verricello subacqueo 800kg',categoria:'Verricelli',
+   descrizione:'Verricello idraulico compatto per applicazioni subacquee o industriali',
+   prezzo_base:2400,opzioni:[
+     {id:'tiro',label:'Forza di tiro',tipo:'select',valori:['500 kg','800 kg','1200 kg'],default:'800 kg',delta:[-350,0,420]},
+     {id:'fune',label:'Fune',tipo:'select',valori:['Acciaio 8mm 30m','Acciaio 10mm 40m','Dyneema 10mm 50m'],default:'Acciaio 8mm 30m',delta:[0,85,280]},
+     {id:'comando',label:'Comando',tipo:'select',valori:['Leva meccanica','Elettrovalvola 12V','Elettrovalvola 24V radiocomando'],default:'Leva meccanica',delta:[0,180,420]},
+   ],
+   componenti:[
+     {descrizione:'Motoriduttore idraulico orbitrol 160cc',qty:1,prezzo:580},
+     {descrizione:'Tamburo verricello Inox 316L',qty:1,prezzo:340},
+     {descrizione:'Fune acciaio 8mm 30m',qty:1,prezzo:75},
+     {descrizione:'Gruppo freno negativo',qty:1,prezzo:220},
+     {descrizione:'Distributore 3/8 BSP',qty:1,prezzo:95},
+     {descrizione:'Raccorderia alta pressione',qty:1,prezzo:85},
+     {descrizione:'Telaio Inox 316L',qty:1,prezzo:380},
+     {descrizione:'Manodopera assemblaggio e collaudo',qty:6,prezzo:80,tipo:'ore'},
+   ]
+  },
+  {id:'CENT-PU10',nome:'Centralina oleodinamica compatta PU10',categoria:'Centraline',
+   descrizione:'Centralina idraulica base 10L con pompa manuale o elettrica',
+   prezzo_base:680,opzioni:[
+     {id:'pompa',label:'Pompa',tipo:'select',valori:['Manuale 25cc','Elettrica 0.75kW','Elettrica 1.5kW'],default:'Manuale 25cc',delta:[0,220,380]},
+     {id:'serbatoio',label:'Capacita serbatoio',tipo:'select',valori:['5 L','10 L','15 L'],default:'10 L',delta:[-40,0,55]},
+     {id:'press',label:'Pressione max',tipo:'select',valori:['100 bar','160 bar','200 bar'],default:'160 bar',delta:[-30,0,45]},
+   ],
+   componenti:[
+     {descrizione:'Pompa manuale 25cc G1/4',qty:1,prezzo:95},
+     {descrizione:'Serbatoio 10L con tappo',qty:1,prezzo:65},
+     {descrizione:'Distributore a leva 4/3',qty:1,prezzo:120},
+     {descrizione:'Valvola max pressione',qty:1,prezzo:45},
+     {descrizione:'Manometro 0-250 bar',qty:1,prezzo:25},
+     {descrizione:'Raccorderia BSP assortita',qty:1,prezzo:40},
+     {descrizione:'Olio idraulico ISO 46 (10L)',qty:1,prezzo:28},
+     {descrizione:'Manodopera assemblaggio',qty:3,prezzo:80,tipo:'ore'},
+   ]
+  },
+];
+
+function renderKit(){
+  var kits=getKit();
+  var q=(document.getElementById('kit-search')||{}).value||'';
+  if(q)kits=kits.filter(function(k){return(k.nome+' '+k.categoria+' '+k.descrizione).toLowerCase().includes(q.toLowerCase())});
+  var gridEl=document.getElementById('kit-grid');
+  if(!gridEl)return;
+  if(!kits.length){gridEl.innerHTML='<div class=empty>Nessun kit. Crea un nuovo kit con "+Nuovo kit".</div>';return;}
+  gridEl.innerHTML=kits.map(function(k){
+    var prezzo=calcPrezzoKit(k);
+    var ic={Spaccalegna:'\ud83e\udeb5',Verricelli:'\u26d3',Centraline:'\u2699',Altri:'\ud83d\udce6'}[k.categoria]||'\ud83d\udce6';
+    return '<div class=card style="cursor:pointer;padding:14px 16px" data-id="'+esc(k.id)+'" onclick="openKitDet(this.dataset.id)">'+
+      '<div style="display:flex;align-items:start;gap:10px;margin-bottom:8px">'+
+        '<div style="font-size:32px;flex-shrink:0">'+ic+'</div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:1px">'+esc(k.categoria)+'</div>'+
+          '<div style="font-size:14px;font-weight:700;color:var(--text)">'+esc(k.nome)+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:10px;min-height:36px">'+esc(k.descrizione||'')+'</div>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:8px">'+
+        '<div style="font-size:11px;color:var(--text3)">'+k.componenti.length+' componenti \u00b7 '+(k.opzioni||[]).length+' opzioni</div>'+
+        '<div style="font-size:18px;font-weight:800;color:var(--green)">\u20ac'+fmt(prezzo)+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function calcPrezzoKit(k,scelte){
+  var p=parseFloat(k.prezzo_base||0);
+  if(scelte){
+    (k.opzioni||[]).forEach(function(o){
+      var v=scelte[o.id];
+      if(v){
+        var idx=o.valori.indexOf(v);
+        if(idx>=0&&o.delta)p+=parseFloat(o.delta[idx]||0);
+      }
+    });
+  }
+  return p;
+}
+
+var KIT_DET_CUR=null;
+var KIT_DET_SCELTE={};
+function openKitDet(id){
+  var kits=getKit();
+  var k=kits.find(function(x){return x.id===id;});
+  if(!k)return;
+  KIT_DET_CUR=k;KIT_DET_SCELTE={};
+  (k.opzioni||[]).forEach(function(o){KIT_DET_SCELTE[o.id]=o.default||(o.valori||[''])[0]});
+  document.getElementById('kit-det-nome').textContent=k.nome;
+  document.getElementById('kit-det-desc').textContent=k.descrizione||'';
+  document.getElementById('kit-det-edit').onclick=function(){openModal('edit-kit',id);};
+  document.getElementById('kit-det-genera').onclick=function(){generaCommessaDaKit(id);};
+  renderKitDet();
+  navTo('kit-det');
+}
+
+function renderKitDet(){
+  var k=KIT_DET_CUR;if(!k)return;
+  var prezzo=calcPrezzoKit(k,KIT_DET_SCELTE);
+  var html='';
+  // Opzioni
+  if((k.opzioni||[]).length){
+    html+='<div class=card style="margin-bottom:12px"><div class=card-head><span class=card-title>\u2699 Configurazione</span></div><div class=card-body>';
+    html+=k.opzioni.map(function(o){
+      var scelto=KIT_DET_SCELTE[o.id]||o.default;
+      return '<div class=form-group><label>'+esc(o.label)+'</label>'+
+        '<select class=form-control data-opt="'+esc(o.id)+'" onchange="KIT_DET_SCELTE[this.dataset.opt]=this.value;renderKitDet()">'+
+        o.valori.map(function(v,i){
+          var delta=o.delta?parseFloat(o.delta[i]||0):0;
+          var lblDelta=delta===0?'':(delta>0?' (+\u20ac'+fmt(delta)+')':' (\u2212\u20ac'+fmt(-delta)+')');
+          return '<option value="'+esc(v)+'"'+(scelto===v?' selected':'')+'>'+esc(v)+lblDelta+'</option>';
+        }).join('')+
+        '</select></div>';
+    }).join('');
+    html+='</div></div>';
+  }
+  // Componenti
+  html+='<div class=card style="margin-bottom:12px"><div class=card-head><span class=card-title>\ud83d\udce6 Componenti kit base</span></div>';
+  var totComp=0;
+  html+='<div class=table-wrap><table><thead><tr><th>Descrizione</th><th style="text-align:right">Q.</th><th style="text-align:right">Prezzo/cad</th><th style="text-align:right">Subtotale</th></tr></thead><tbody>';
+  html+=k.componenti.map(function(c){
+    var sub=parseFloat(c.qty||1)*parseFloat(c.prezzo||0);
+    totComp+=sub;
+    return '<tr><td>'+esc(c.descrizione||'-')+(c.tipo==='ore'?' <span class="badge badge-blue" style="font-size:9px">ore</span>':'')+'</td>'+
+      '<td style="text-align:right">'+c.qty+'</td>'+
+      '<td style="text-align:right">\u20ac'+fmt(c.prezzo||0)+'</td>'+
+      '<td style="text-align:right;font-weight:700">\u20ac'+fmt(sub)+'</td></tr>';
+  }).join('');
+  html+='<tr style="background:var(--surface2);font-weight:700"><td colspan=3 style="text-align:right">Totale componenti:</td><td style="text-align:right">\u20ac'+fmt(totComp)+'</td></tr>';
+  html+='</tbody></table></div></div>';
+  // Prezzo finale
+  html+='<div style="background:linear-gradient(135deg,var(--blue),var(--blue-dark,#1a3a7a));color:#fff;border-radius:var(--r);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'+
+    '<div><div style="font-size:11px;opacity:.9;text-transform:uppercase;letter-spacing:.05em">Prezzo configurato</div>'+
+    '<div style="font-size:10px;opacity:.7;margin-top:2px">IVA esclusa \u00b7 Franco fabbrica</div></div>'+
+    '<div style="font-size:28px;font-weight:800">\u20ac'+fmt(prezzo)+'</div>'+
+  '</div>';
+  document.getElementById('kit-det-content').innerHTML=html;
+}
+
+function generaCommessaDaKit(kitId){
+  var k=(getKit()).find(function(x){return x.id===kitId;});
+  if(!k)return;
+  // Apri modal nuova commessa con kit pre-compilato
+  var cliente=prompt('Codice cliente (sigla) per la commessa:','');
+  if(!cliente)return;
+  cliente=cliente.toUpperCase().trim();
+  if(!getClienti()[cliente]){
+    if(!confirm('Cliente "'+cliente+'" non esiste. Creare commessa ugualmente?'))return;
+  }
+  var comm=lg('comm');
+  var anno=new Date().getFullYear();
+  // Trova prossimo numero per questo cliente/anno
+  var pattern=cliente+'-';
+  var maxN=0;
+  comm.forEach(function(c){
+    if(c.numero&&c.numero.startsWith(pattern)){
+      var m=c.numero.match(/-(\d+)-\d{4}$/);
+      if(m)maxN=Math.max(maxN,parseInt(m[1]));
+    }
+  });
+  var numero=cliente+'-'+(maxN+1)+'-'+anno;
+  var nuovaComm={numero:numero,cliente:cliente,oggetto:k.nome,tipo_commessa:'kit',stato:'bozza',
+    importo:calcPrezzoKit(k,KIT_DET_SCELTE),data_creazione:today(),note:'Generata da kit '+k.id};
+  comm.push(nuovaComm);ls('comm',comm);
+  // Popola distinta
+  var det=lgo('det');
+  if(!det[numero])det[numero]={distinta:[],ore:[],trasferte:[]};
+  det[numero].distinta.push({id:uid(),_intestazione:true,descrizione:'KIT: '+k.nome,sezione:k.nome});
+  (KIT_DET_SCELTE&&Object.keys(KIT_DET_SCELTE).length)&&
+    det[numero].distinta.push({id:uid(),_intestazione:true,descrizione:'Configurazione: '+Object.values(KIT_DET_SCELTE).join(' \u00b7 '),sezione:'Config'});
+  k.componenti.filter(function(c){return c.tipo!=='ore'}).forEach(function(c){
+    det[numero].distinta.push({id:uid(),descrizione:c.descrizione,qty:c.qty,
+      costo_cad:c.prezzo*0.5,netto_cad:c.prezzo*0.5,prezzo_vendita:c.prezzo,markup:2.0,
+      fornitore:'',codice:'',stato_approv:'daordinare',note:''});
+  });
+  // Popola ore da componenti tipo 'ore'
+  k.componenti.filter(function(c){return c.tipo==='ore'}).forEach(function(c){
+    det[numero].ore.push({id:uid(),data:today(),descrizione:c.descrizione,operatore:'',
+      categoria:'diurna_ord',figura:'ms',unita:'h',ore:c.qty,tariffa:c.prezzo});
+  });
+  ls('det',det);
+  showToast('Commessa '+numero+' creata dal kit');
+  openDetail(numero);
+}
+
+function saveNuovoKit(){
+  var G=function(id){var el=document.getElementById(id);return el?el.value||'':''};
+  var id=G('kit-id').toUpperCase().trim();
+  var nome=G('kit-nome');
+  if(!id||!nome){showToast('ID e nome obbligatori');return;}
+  var kits=getKit();
+  if(kits.find(function(k){return k.id===id})){showToast('ID gia esistente');return;}
+  kits.push({id:id,nome:nome,categoria:G('kit-cat')||'Altri',descrizione:G('kit-desc'),
+    prezzo_base:parseFloat(G('kit-prezzo')||0),opzioni:[],componenti:[]});
+  ls('kit',kits);closeM();showToast('Kit creato');renderKit();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// SPEDIZIONI / CORRIERI
+// ═══════════════════════════════════════════════════════════════════════
+
+var CORRIERI=['BRT','GLS','SDA','DHL','UPS','FedEx','TNT/FedEx','Poste Italiane','Corriere convenzionato','Ritiro in sede','Altro'];
+
+function renderSpedizioni(){
+  var data=lg('sped');
+  var filtro=_chipState['sped-filtro']||'';
+  var q=(document.getElementById('sped-search')||{}).value||'';
+  var rows=data.slice().sort(function(a,b){return(b.data_spedizione||'').localeCompare(a.data_spedizione||'')});
+  if(filtro)rows=rows.filter(function(r){return r.stato===filtro});
+  if(q)rows=rows.filter(function(r){return(r.corriere+' '+r.tracking+' '+r.commessa+' '+r.destinazione).toLowerCase().includes(q.toLowerCase())});
+  var el=document.getElementById('sped-list');
+  if(!el)return;
+  if(!rows.length){el.innerHTML='<div class=empty>Nessuna spedizione</div>';return;}
+  el.innerHTML='<div class=table-wrap><table><thead><tr>'+
+    '<th>Data</th><th>Commessa</th><th>Destinazione</th><th>Corriere</th><th>Tracking</th>'+
+    '<th style="text-align:right">Costo</th><th>Stato</th><th></th>'+
+  '</tr></thead><tbody>'+
+  rows.map(function(s){
+    var statoCol={'preparazione':'badge-gray','in-transito':'badge-amber','consegnata':'badge-green','problemi':'badge-red'}[s.stato]||'badge-gray';
+    var statoL={'preparazione':'Preparazione','in-transito':'In transito','consegnata':'Consegnata','problemi':'Problemi'}[s.stato]||s.stato;
+    return '<tr>'+
+      '<td style="font-family:monospace;font-size:12px">'+fmtD(s.data_spedizione)+'</td>'+
+      '<td><a href="#" onclick="openDetail(\''+esc(s.commessa||'')+'\');return false" style="color:var(--blue);text-decoration:none">'+esc(s.commessa||'-')+'</a></td>'+
+      '<td>'+esc(s.destinazione||'-')+'</td>'+
+      '<td><strong>'+esc(s.corriere||'-')+'</strong></td>'+
+      '<td style="font-family:monospace;font-size:12px">'+
+        (s.tracking_url?'<a href="'+esc(s.tracking_url)+'" target=_blank style="color:var(--blue)">'+esc(s.tracking||'-')+' \u2197</a>':esc(s.tracking||'-'))+
+      '</td>'+
+      '<td style="text-align:right;font-weight:700">'+(s.costo>0?'\u20ac'+fmt(s.costo):'-')+'</td>'+
+      '<td><span class="badge '+statoCol+'">'+statoL+'</span></td>'+
+      '<td style="white-space:nowrap">'+
+        '<button class=btn-icon data-id="'+esc(s.id)+'" onclick="openModal(&quot;edit-spedizione&quot;,this.dataset.id)">\u270e</button>'+
+        '<button class=btn-icon style="color:var(--red);margin-left:4px" data-id="'+esc(s.id)+'" onclick="delSpedizione(this.dataset.id)">\u2715</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('')+
+  '</tbody></table></div>';
+}
+
+function saveSpedizione(id){
+  var G=function(i){var el=document.getElementById(i);return el?el.value||'':''};
+  var data=lg('sped');
+  var row={id:id||uid(),data_spedizione:G('sp-data')||today(),
+    commessa:G('sp-comm'),destinazione:G('sp-dest'),
+    corriere:G('sp-corr'),tracking:G('sp-track'),tracking_url:G('sp-url'),
+    costo:parseFloat(G('sp-costo')||0),stato:G('sp-stato')||'preparazione',
+    peso:parseFloat(G('sp-peso')||0),colli:parseInt(G('sp-colli')||1),
+    note:G('sp-note'),data_consegna:G('sp-data-c')};
+  if(id){
+    var idx=data.findIndex(function(x){return x.id===id;});
+    if(idx>=0)data[idx]=Object.assign({},data[idx],row);
+  }else{
+    data.push(row);
+  }
+  ls('sped',data);closeM();showToast('Spedizione salvata');renderSpedizioni();
+}
+
+function delSpedizione(id){
+  if(!confirm('Eliminare spedizione?'))return;
+  var data=lg('sped').filter(function(x){return x.id!==id});
+  ls('sped',data);renderSpedizioni();showToast('Eliminata');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// REPORT CONSUNTIVO COMMESSA — PDF finale fine lavori
+// ═══════════════════════════════════════════════════════════════════════
+
+function reportConsuntivoCommessa(numero){
+  var LOGO='https://asglab.it/img/icon-light_hu_402522ffdb7dabc2.png';
+  var c=(lg('comm')||[]).find(function(x){return x.numero===numero})||{numero:numero};
+  var CN=getClienti();var clienteNome=CN[c.cliente]||c.cliente||'-';
+  var det=lgo('det');var cd=det[numero]||{distinta:[],ore:[],trasferte:[]};
+  var dist=cd.distinta.filter(function(r){return!r._intestazione});
+  var ore=cd.ore||[];var trasferte=cd.trasferte||[];
+  var sped=lg('sped').filter(function(s){return s.commessa===numero});
+  var cM=dist.reduce(function(s,r){return s+parseFloat(r.netto_cad||r.costo_cad||0)*parseFloat(r.qty||1)},0);
+  var vM=dist.reduce(function(s,r){return s+parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1)},0);
+  var totOre=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);
+  var totH=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)},0);
+  var totTrasf=trasferte.reduce(function(s,t){return s+parseFloat(t.totale||0)},0);
+  var totSped=sped.reduce(function(s,x){return s+parseFloat(x.costo||0)},0);
+  var impOfferta=parseFloat((cd.offerta&&cd.offerta.importo_offerto)||c.importo||0);
+  var ricavoTot=impOfferta>0?impOfferta:(vM+totOre+totTrasf);
+  var costoTot=cM+totSped;
+  var margEuro=ricavoTot-costoTot;
+  var margPct=ricavoTot>0?(margEuro/ricavoTot*100):0;
+
+  var allDate=ore.map(function(o){return o.data||''}).concat(trasferte.map(function(t){return t.data||''})).filter(Boolean).sort();
+  var periodo=allDate.length?(fmtD(allDate[0])+(allDate[allDate.length-1]!==allDate[0]?' \u2014 '+fmtD(allDate[allDate.length-1]):'')):'-';
+
+  var w=window.open('','_blank');
+  var CSS='@import url(\'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap\');'+
+    '*{box-sizing:border-box;margin:0;padding:0}'+
+    'body{font-family:\'Inter\',Arial,sans-serif;font-size:10.5px;color:#1a1a2e;background:#fff}'+
+    '@page{size:A4;margin:16mm 14mm 18mm 14mm}'+
+    '@media print{body{margin:0;padding:0}.no-print{display:none!important}thead{display:table-header-group}.page-break{page-break-after:always}}'+
+    '.doc-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:16px;border-bottom:2px solid #1a3a7a}'+
+    '.doc-header-logo{height:40px}'+
+    '.doc-header-right{text-align:right;font-size:9.5px;color:#555}'+
+    '.doc-header-right .num{font-size:20px;font-weight:800;color:#1a3a7a;display:block}'+
+    '.doc-title{font-size:18px;font-weight:800;margin-bottom:2px}'+
+    '.doc-subtitle{font-size:11px;color:#64748b;margin-bottom:16px}'+
+    '.info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid #e2e8f0;border-radius:5px;overflow:hidden;margin-bottom:16px;font-size:10px}'+
+    '.info-cell{padding:7px 10px;border-right:1px solid #e2e8f0}'+
+    '.info-cell:last-child{border-right:none}'+
+    '.info-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:2px}'+
+    '.info-val{font-weight:600}'+
+    'h2.section{font-size:12px;font-weight:700;color:#1a3a7a;border-bottom:1.5px solid #1a3a7a;padding-bottom:3px;margin:18px 0 8px;text-transform:uppercase;letter-spacing:.05em}'+
+    'table{width:100%;border-collapse:collapse;margin-bottom:8px;font-size:9.5px}'+
+    'thead tr{background:#1a3a7a;color:#fff}'+
+    'thead th{padding:6px 8px;font-weight:600;font-size:9px;text-transform:uppercase;letter-spacing:.05em;text-align:left}'+
+    'thead th.num{text-align:right}'+
+    'tbody tr:nth-child(even){background:#f8fafc}'+
+    'td{padding:5px 8px;border-bottom:1px solid #e2e8f0;vertical-align:top}'+
+    'td.num{text-align:right;font-variant-numeric:tabular-nums}'+
+    'td.sub{font-size:9px;color:#64748b}'+
+    'tr.subtot td{background:#dbeafe!important;color:#1e3a8a;font-weight:700;padding:5px 8px;border:none}'+
+    'tr.subtot td.num{text-align:right}'+
+    '.econ-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}'+
+    '.econ-card{border:1px solid #e2e8f0;border-radius:5px;padding:10px 12px;background:#f8fafc}'+
+    '.econ-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;margin-bottom:3px}'+
+    '.econ-val{font-size:17px;font-weight:700}'+
+    '.total-box{background:linear-gradient(135deg,#1a3a7a,#2648a3);color:#fff;border-radius:6px;padding:16px 20px;margin:14px 0;display:flex;align-items:center;justify-content:space-between}'+
+    '.total-box-value{font-size:26px;font-weight:800}'+
+    '.doc-footer{border-top:1px solid #e2e8f0;margin-top:30px;padding-top:8px;font-size:8.5px;color:#94a3b8;display:flex;justify-content:space-between}'+
+    '.print-btn{background:#1a3a7a;color:#fff;border:none;padding:8px 20px;border-radius:5px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;margin-bottom:16px}';
+
+  var distHtml='';
+  if(dist.length){
+    distHtml='<h2 class=section>Materiali impiegati</h2>'+
+    '<table><thead><tr><th>Descrizione</th><th>Fornitore</th><th>Codice</th><th class=num>Q.</th><th class=num>Netto/cad</th><th class=num>Subtotale</th></tr></thead><tbody>'+
+    dist.map(function(r){return '<tr><td>'+esc(r.descrizione||'-')+'</td><td class=sub>'+esc(r.fornitore||'-')+'</td>'+
+      '<td style="font-family:monospace;font-size:8.5px">'+esc(r.codice||'-')+'</td>'+
+      '<td class=num>'+(r.qty||1)+'</td>'+
+      '<td class=num>\u20ac '+fmt(r.netto_cad||r.costo_cad||0)+'</td>'+
+      '<td class=num><strong>\u20ac '+fmt((r.netto_cad||r.costo_cad||0)*(r.qty||1))+'</strong></td></tr>';
+    }).join('')+
+    '<tr class=subtot><td colspan=5 class=num>Totale costo materiali</td><td class=num>\u20ac '+fmt(cM)+'</td></tr>'+
+    '</tbody></table>';
+  }
+
+  var oreHtml='';
+  if(ore.length){
+    var TL={diurna_ord:'Diurne ord.',diurna_str:'Diurne str.',notturna_str:'Notturne',festiva:'Festive',inoperoso:'Inoperoso',viaggio:'Viaggio'};
+    var FL={ms:'Mont.Spec.',ts:'Tecn.Spec.',te:'Tecn.Elett.'};
+    oreHtml='<h2 class=section>Ore lavorative</h2>'+
+    '<table><thead><tr><th>Data</th><th>Operatore</th><th>Figura</th><th>Cat.</th><th>Descrizione</th><th class=num>Q.</th><th class=num>Tariffa</th><th class=num>Importo</th></tr></thead><tbody>'+
+    ore.map(function(o){return '<tr><td>'+fmtD(o.data)+'</td><td>'+esc(o.operatore||'-')+'</td><td>'+(FL[o.figura]||'-')+'</td><td class=sub>'+(TL[o.categoria]||'-')+'</td><td>'+esc(o.descrizione||'-')+'</td><td class=num>'+o.ore+(o.unita||'h')+'</td><td class=num>\u20ac'+fmt(o.tariffa||0)+'</td><td class=num><strong>\u20ac'+fmt(parseFloat(o.ore||0)*parseFloat(o.tariffa||0))+'</strong></td></tr>';}).join('')+
+    '<tr class=subtot><td colspan=7 class=num>Totale ore ('+totH+'h)</td><td class=num>\u20ac '+fmt(totOre)+'</td></tr>'+
+    '</tbody></table>';
+  }
+
+  var trasfHtml='';
+  if(trasferte.length){
+    trasfHtml='<h2 class=section>Trasferte e rimborsi</h2>'+
+    '<table><thead><tr><th>Data</th><th>Destinazione</th><th>Dettaglio</th><th class=num>Totale</th></tr></thead><tbody>'+
+    trasferte.map(function(t){
+      var voci=[];
+      if(t.km>0)voci.push('km '+t.km+'\u00d7\u20ac'+fmt(t.aci_km));
+      if(t.diaria>0)voci.push('diaria \u20ac'+fmt(t.diaria));
+      if(t.treno>0)voci.push('treno \u20ac'+fmt(t.treno));
+      if(t.aereo>0)voci.push('aereo \u20ac'+fmt(t.aereo));
+      if(t.pedaggi>0)voci.push('ped. \u20ac'+fmt(t.pedaggi));
+      if(t.parcheggio>0)voci.push('parch. \u20ac'+fmt(t.parcheggio));
+      if(t.vitto>0)voci.push('vitto \u20ac'+fmt(t.vitto));
+      if(t.altro>0)voci.push('altro \u20ac'+fmt(t.altro));
+      return '<tr><td>'+fmtD(t.data)+'</td><td>'+esc(t.destinazione||'-')+'</td><td class=sub>'+voci.join(', ')+'</td><td class=num><strong>\u20ac '+fmt(t.totale||0)+'</strong></td></tr>';
+    }).join('')+
+    '<tr class=subtot><td colspan=3 class=num>Totale trasferte</td><td class=num>\u20ac '+fmt(totTrasf)+'</td></tr>'+
+    '</tbody></table>';
+  }
+
+  var spedHtml='';
+  if(sped.length){
+    spedHtml='<h2 class=section>Spedizioni</h2>'+
+    '<table><thead><tr><th>Data</th><th>Corriere</th><th>Destinazione</th><th>Tracking</th><th class=num>Costo</th></tr></thead><tbody>'+
+    sped.map(function(s){return '<tr><td>'+fmtD(s.data_spedizione)+'</td><td><strong>'+esc(s.corriere||'-')+'</strong></td><td>'+esc(s.destinazione||'-')+'</td><td style="font-family:monospace;font-size:9px">'+esc(s.tracking||'-')+'</td><td class=num>\u20ac '+fmt(s.costo||0)+'</td></tr>';}).join('')+
+    '<tr class=subtot><td colspan=4 class=num>Totale spedizioni</td><td class=num>\u20ac '+fmt(totSped)+'</td></tr>'+
+    '</tbody></table>';
+  }
+
+  var html='<!DOCTYPE html><html><head><meta charset=utf-8><title>Consuntivo '+esc(numero)+'</title><style>'+CSS+'</style></head><body>'+
+    '<button class="print-btn no-print" onclick="window.print()">\ud83d\udda8 Stampa / Salva PDF</button>'+
+    '<div class=doc-header>'+
+      '<img class=doc-header-logo src="'+LOGO+'" alt="ASG LAB" onerror="this.style.display=none">'+
+      '<div class=doc-header-right>'+
+        '<span class=num>'+esc(numero)+'</span>'+
+        'Consuntivo lavori<br>'+new Date().toLocaleDateString('it-IT')+
+      '</div>'+
+    '</div>'+
+    '<div class=doc-title>Consuntivo di commessa</div>'+
+    '<div class=doc-subtitle>'+esc(c.oggetto||'')+'</div>'+
+    '<div class=info-grid>'+
+      '<div class=info-cell><div class=info-label>Commessa</div><div class=info-val>'+esc(numero)+'</div></div>'+
+      '<div class=info-cell><div class=info-label>Cliente</div><div class=info-val>'+esc(clienteNome)+'</div></div>'+
+      '<div class=info-cell><div class=info-label>Periodo</div><div class=info-val>'+periodo+'</div></div>'+
+      '<div class=info-cell><div class=info-label>Stato</div><div class=info-val>'+esc(c.stato||'-')+'</div></div>'+
+    '</div>'+
+    '<div class=econ-grid>'+
+      '<div class=econ-card><div class=econ-lbl>Ricavo totale</div><div class=econ-val style="color:#1a3a7a">\u20ac '+fmt(ricavoTot)+'</div></div>'+
+      '<div class=econ-card><div class=econ-lbl>Costi diretti</div><div class=econ-val style="color:#dc2626">\u20ac '+fmt(costoTot)+'</div></div>'+
+      '<div class=econ-card><div class=econ-lbl>Margine</div><div class=econ-val style="color:'+(margEuro>=0?'#16a34a':'#dc2626')+'">\u20ac '+fmt(margEuro)+' <span style="font-size:11px;font-weight:500">('+margPct.toFixed(1)+'%)</span></div></div>'+
+    '</div>'+
+    distHtml+oreHtml+trasfHtml+spedHtml+
+    '<h2 class=section>Riepilogo economico</h2>'+
+    '<table><tbody>'+
+      '<tr><td>Materiali vendita (ricavo)</td><td class=num style="color:#16a34a"><strong>\u20ac '+fmt(vM)+'</strong></td></tr>'+
+      '<tr><td>Materiali costo (netto)</td><td class=num style="color:#dc2626">\u20ac '+fmt(cM)+'</td></tr>'+
+      '<tr><td>Ore fatturate (ricavo)</td><td class=num style="color:#16a34a"><strong>\u20ac '+fmt(totOre)+'</strong></td></tr>'+
+      '<tr><td>Rimborsi trasferta (ricavo)</td><td class=num style="color:#16a34a"><strong>\u20ac '+fmt(totTrasf)+'</strong></td></tr>'+
+      (totSped>0?'<tr><td>Costi spedizioni</td><td class=num style="color:#dc2626">\u20ac '+fmt(totSped)+'</td></tr>':'')+
+      (impOfferta>0?'<tr><td><strong>Offerta concordata</strong></td><td class=num><strong>\u20ac '+fmt(impOfferta)+'</strong></td></tr>':'')+
+    '</tbody></table>'+
+    '<div class=total-box>'+
+      '<div><div style="font-size:11px;opacity:.9;text-transform:uppercase;letter-spacing:.05em">MARGINE NETTO COMMESSA</div>'+
+      '<div style="font-size:10px;opacity:.8;margin-top:2px">Ricavo \u20ac'+fmt(ricavoTot)+' \u2212 Costi \u20ac'+fmt(costoTot)+'</div></div>'+
+      '<div class=total-box-value>\u20ac '+fmt(margEuro)+' <span style="font-size:14px;opacity:.8">('+margPct.toFixed(1)+'%)</span></div>'+
+    '</div>'+
+    '<div class=doc-footer>'+
+      '<span><strong>ASG LAB\u00ae</strong> \u2014 ASG LAB S.r.l. a socio unico \u2014 <a href=https://asglab.it style="color:#94a3b8">https://asglab.it</a></span>'+
+      '<span>P.IVA 10122150963 \u2014 Riservato uso interno</span>'+
+    '</div>'+
+  '</body></html>';
+  w.document.write(html);w.document.close();
+}
+
+
 function renderFornitori(){
   FORNITORI=getFornitori();
   var q=(document.getElementById('forn-search')||{}).value||'';
@@ -2311,6 +3029,143 @@ function getModalHTML(type,extra){
       '<button class="btn btn-primary" data-tid="'+esc(tid)+'" data-tnum="'+esc(tnum)+'" onclick="saveEditTrasferta(this.dataset.tid,this.dataset.tnum)">Salva modifiche</button></div>'
     };}
 
+  if(type==='new-cliente'){
+    return{title:'Nuovo cliente',body:
+      '<div class=form-row>'+
+        '<div class=form-group><label>Sigla (3-6 car., maiuscolo)</label><input class=form-control id=cli-sigla placeholder="es. NUOVO" maxlength=6 style="text-transform:uppercase"></div>'+
+        '<div class=form-group><label>Nome breve</label><input class=form-control id=cli-nome placeholder="es. Nuovo Cliente"></div>'+
+      '</div>'+
+      '<div class=form-group><label>Ragione sociale completa</label><input class=form-control id=cli-rs></div>'+
+      '<div class=form-row>'+
+        '<div class=form-group><label>P.IVA</label><input class=form-control id=cli-piva></div>'+
+        '<div class=form-group><label>Referente</label><input class=form-control id=cli-cont></div>'+
+      '</div>'+
+      '<div class=form-row>'+
+        '<div class=form-group><label>Email</label><input class=form-control id=cli-mail type=email></div>'+
+        '<div class=form-group><label>Telefono</label><input class=form-control id=cli-tel></div>'+
+      '</div>'+
+      '<div class=modal-foot><button class="btn btn-ghost" onclick=closeM()>Annulla</button>'+
+      '<button class="btn btn-primary" onclick=saveNuovoCliente()>Crea cliente</button></div>'
+    };
+  }
+  if(type==='edit-cliente'){
+    var sigla=extra;var ext=getClientiExt();var e=ext[sigla]||{};var nomi=getClienti();
+    return{title:'Modifica '+(nomi[sigla]||sigla),body:
+      '<div class=form-group><label>Ragione sociale completa</label><input class=form-control id=cli-rs value="'+esc(e.ragione_sociale||'')+'"></div>'+
+      '<div class=form-row>'+
+        '<div class=form-group><label>P.IVA</label><input class=form-control id=cli-piva value="'+esc(e.piva||'')+'"></div>'+
+        '<div class=form-group><label>Codice fiscale</label><input class=form-control id=cli-cf value="'+esc(e.cf||'')+'"></div>'+
+      '</div>'+
+      '<div class=form-row>'+
+        '<div class=form-group><label>Codice SDI</label><input class=form-control id=cli-sdi value="'+esc(e.sdi||'')+'"></div>'+
+        '<div class=form-group><label>PEC</label><input class=form-control id=cli-pec value="'+esc(e.pec||'')+'"></div>'+
+      '</div>'+
+      '<div class=form-group><label>Indirizzo</label><input class=form-control id=cli-ind value="'+esc(e.indirizzo||'')+'"></div>'+
+      '<div class=form-row>'+
+        '<div class=form-group><label>CAP</label><input class=form-control id=cli-cap value="'+esc(e.cap||'')+'" style="max-width:100px"></div>'+
+        '<div class=form-group><label>Citta</label><input class=form-control id=cli-citta value="'+esc(e.citta||'')+'"></div>'+
+        '<div class=form-group><label>Prov.</label><input class=form-control id=cli-prov value="'+esc(e.prov||'')+'" style="max-width:80px" maxlength=2></div>'+
+      '</div>'+
+      '<div class=form-group><label>Referente</label><input class=form-control id=cli-cont value="'+esc(e.contatto||'')+'"></div>'+
+      '<div class=form-row>'+
+        '<div class=form-group><label>Email</label><input class=form-control id=cli-mail type=email value="'+esc(e.email||'')+'"></div>'+
+        '<div class=form-group><label>Telefono</label><input class=form-control id=cli-tel value="'+esc(e.telefono||'')+'"></div>'+
+      '</div>'+
+      '<div class=form-group><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type=checkbox id=cli-abit'+(e.abituale?' checked':'')+'> Cliente abituale</label></div>'+
+      '<div class=form-group><label>Note</label><textarea class=form-control id=cli-note rows=3>'+esc(e.note||'')+'</textarea></div>'+
+      '<div class=modal-foot><button class="btn btn-ghost" onclick=closeM()>Annulla</button>'+
+      '<button class="btn btn-primary" data-s="'+esc(sigla)+'" onclick="saveCliExt(this.dataset.s)">Salva</button></div>'
+    };
+  }
+  if(type==='add-doc-cli'){
+    var sigla=extra;
+    return{title:'Aggiungi documento condiviso',body:
+      '<div class=form-group><label>Nome documento</label><input class=form-control id=doc-nome placeholder="es. Listino ricambi 2026"></div>'+
+      '<div class=form-group><label>Tipo</label>'+
+        '<select class=form-control id=doc-tipo>'+
+          '<option value=listino>\u{1F4CA} Listino</option>'+
+          '<option value=disegno>\u{1F4D0} Disegno</option>'+
+          '<option value=manuale>\u{1F4D6} Manuale</option>'+
+          '<option value=istruzioni>\u2699 Istruzioni</option>'+
+          '<option value=foto>\u{1F4F7} Foto</option>'+
+          '<option value=altro>\u{1F4C4} Altro</option>'+
+        '</select>'+
+      '</div>'+
+      '<div class=form-group><label>URL documento (Nextcloud, Drive...)</label><input class=form-control id=doc-url placeholder="https://..."></div>'+
+      '<div class=form-group><label>Descrizione</label><input class=form-control id=doc-desc></div>'+
+      '<div class=modal-foot><button class="btn btn-ghost" onclick=closeM()>Annulla</button>'+
+      '<button class="btn btn-primary" data-s="'+esc(sigla)+'" onclick="saveDocCli(this.dataset.s)">Aggiungi</button></div>'
+    };
+  }
+  if(type==='new-kit'){
+    return{title:'Nuovo kit di vendita',body:
+      '<div class=form-row>'+
+        '<div class=form-group><label>ID kit (maiuscolo)</label><input class=form-control id=kit-id placeholder="es. SPACCA-8T" style="text-transform:uppercase"></div>'+
+        '<div class=form-group><label>Categoria</label>'+
+          '<select class=form-control id=kit-cat>'+
+            '<option>Spaccalegna</option><option>Verricelli</option><option>Centraline</option><option>Altri</option>'+
+          '</select>'+
+        '</div>'+
+      '</div>'+
+      '<div class=form-group><label>Nome completo</label><input class=form-control id=kit-nome placeholder="es. Spaccalegna orizzontale 8t"></div>'+
+      '<div class=form-group><label>Descrizione</label><textarea class=form-control id=kit-desc rows=2></textarea></div>'+
+      '<div class=form-group><label>Prezzo base (\u20ac)</label><input class=form-control id=kit-prezzo type=number step=0.01 value=0></div>'+
+      '<div style="background:var(--surface2);padding:8px 10px;border-radius:5px;font-size:11px;color:var(--text3);margin-bottom:10px">'+
+        'Componenti e opzioni si aggiungono dal dettaglio kit dopo la creazione.'+
+      '</div>'+
+      '<div class=modal-foot><button class="btn btn-ghost" onclick=closeM()>Annulla</button>'+
+      '<button class="btn btn-primary" onclick=saveNuovoKit()>Crea kit</button></div>'
+    };
+  }
+  if(type==='new-spedizione'||type==='edit-spedizione'){
+    var spId=type==='edit-spedizione'?extra:'';
+    var preComm=type==='new-spedizione'?(extra||''):'';
+    var sp={};
+    if(spId){var d=lg('sped');sp=d.find(function(x){return x.id===spId;})||{};}
+    if(preComm)sp.commessa=preComm;
+    var comm=lg('comm');
+    return{title:spId?'Modifica spedizione':'Nuova spedizione',body:
+      '<div class=form-row>'+
+        '<div class=form-group><label>Data spedizione</label><input class=form-control id=sp-data type=date value="'+esc(sp.data_spedizione||today())+'"></div>'+
+        '<div class=form-group><label>Commessa</label>'+
+          '<select class=form-control id=sp-comm>'+
+            '<option value="">-- Nessuna --</option>'+
+            comm.map(function(c){return'<option value="'+esc(c.numero)+'"'+(sp.commessa===c.numero?' selected':'')+'>'+esc(c.numero)+' - '+esc((getClienti()[c.cliente]||c.cliente)||'')+'</option>';}).join('')+
+          '</select>'+
+        '</div>'+
+      '</div>'+
+      '<div class=form-group><label>Destinazione</label><input class=form-control id=sp-dest value="'+esc(sp.destinazione||'')+'" placeholder="Citta o indirizzo"></div>'+
+      '<div class=form-row>'+
+        '<div class=form-group><label>Corriere</label>'+
+          '<select class=form-control id=sp-corr>'+
+            CORRIERI.map(function(c){return'<option value="'+esc(c)+'"'+(sp.corriere===c?' selected':'')+'>'+esc(c)+'</option>';}).join('')+
+          '</select>'+
+        '</div>'+
+        '<div class=form-group><label>Tracking n.</label><input class=form-control id=sp-track value="'+esc(sp.tracking||'')+'"></div>'+
+      '</div>'+
+      '<div class=form-group><label>URL tracking (opzionale)</label><input class=form-control id=sp-url value="'+esc(sp.tracking_url||'')+'" placeholder="https://..."></div>'+
+      '<div class=form-row>'+
+        '<div class=form-group><label>Peso (kg)</label><input class=form-control id=sp-peso type=number step=0.01 value="'+esc(String(sp.peso||0))+'"></div>'+
+        '<div class=form-group><label>Colli</label><input class=form-control id=sp-colli type=number value="'+esc(String(sp.colli||1))+'"></div>'+
+        '<div class=form-group><label>Costo (\u20ac)</label><input class=form-control id=sp-costo type=number step=0.01 value="'+esc(String(sp.costo||0))+'"></div>'+
+      '</div>'+
+      '<div class=form-row>'+
+        '<div class=form-group><label>Stato</label>'+
+          '<select class=form-control id=sp-stato>'+
+            '<option value=preparazione'+(sp.stato==='preparazione'?' selected':'')+'>Preparazione</option>'+
+            '<option value=in-transito'+(sp.stato==='in-transito'?' selected':'')+'>In transito</option>'+
+            '<option value=consegnata'+(sp.stato==='consegnata'?' selected':'')+'>Consegnata</option>'+
+            '<option value=problemi'+(sp.stato==='problemi'?' selected':'')+'>Problemi</option>'+
+          '</select>'+
+        '</div>'+
+        '<div class=form-group><label>Data consegna</label><input class=form-control id=sp-data-c type=date value="'+esc(sp.data_consegna||'')+'"></div>'+
+      '</div>'+
+      '<div class=form-group><label>Note</label><input class=form-control id=sp-note value="'+esc(sp.note||'')+'"></div>'+
+      '<div class=modal-foot><button class="btn btn-ghost" onclick=closeM()>Annulla</button>'+
+      '<button class="btn btn-primary" data-id="'+esc(spId)+'" onclick="saveSpedizione(this.dataset.id)">'+(spId?'Salva':'Crea')+'</button></div>'
+    };
+  }
+
   if(type==='config'){var cfg2=lgo('cfg');var mk2=cfg2.markup_clienti||{};return{title:'Configurazione',body:
     '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">Nextcloud</div>'+
     '<div class="form-group"><label>URL WebDAV / API (proxy)</label><input class="form-control" id="cfg-url" value="'+esc(cfg2.nc_url||'https://dash.asglab.it:8766')+'" placeholder="https://dash.asglab.it:8766"></div>'+
@@ -2689,71 +3544,210 @@ function setStatoOfferta(numero, stato){
 }
 
 function generaOffertaPDF(numero){
+  var LOGO='https://asglab.it/img/icon-light_hu_402522ffdb7dabc2.png';
   var det=lgo('det');var cd=det[numero]||{distinta:[],ore:[]};
   var off=cd.offerta||{};
   var comm=lg('comm').find(function(x){return x.numero===numero})||{};
-  // Usa solo righe non intestazione e non fornitore interno (no costi visibili al cliente)
+  var CN=getClienti();var clienteNome=CN[comm.cliente]||comm.cliente||'-';
   var dist=cd.distinta.filter(function(r){return !r._intestazione});
+  var distBySec=[];
+  var curSec={nome:'Distinta materiali',righe:[]};
+  (cd.distinta||[]).forEach(function(r){
+    if(r._intestazione){
+      if(curSec.righe.length)distBySec.push(curSec);
+      curSec={nome:r.descrizione||'Sezione',righe:[]};
+    }else{
+      curSec.righe.push(r);
+    }
+  });
+  if(curSec.righe.length)distBySec.push(curSec);
+  if(!distBySec.length)distBySec=[{nome:'Distinta materiali',righe:dist}];
+
   var impOfferta=parseFloat(off.importo_offerto||comm.importo||0);
-  var w=window.open('','_blank');
   var oggi=new Date().toLocaleDateString('it-IT');
-  var dataOfferta=off.data_offerta?new Date(off.data_offerta).toLocaleDateString('it-IT'):oggi;
-  var scadData=off.validita?new Date(Date.now()+parseInt(off.validita||30)*86400000).toLocaleDateString('it-IT'):'—';
-  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Offerta '+esc(numero)+'</title>'+
-    '<style>'+
-    'body{font-family:Arial,sans-serif;font-size:11px;margin:30px 36px;color:#111}'+
-    '.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:16px;border-bottom:2px solid #1a56db}'+
-    '.company strong{font-size:15px;color:#1a56db;display:block;margin-bottom:3px}'+
-    '.company{font-size:11px;color:#444;line-height:1.6}'+
-    '.ref{text-align:right}.ref .num{font-size:22px;font-weight:800;color:#1a56db;display:block}'+
-    '.ref{font-size:11px;color:#666}'+
-    'h2{font-size:13px;font-weight:700;margin:0 0 4px;color:#111}'+
-    '.cliente{font-size:12px;color:#555;margin-bottom:20px}'+
-    '.note-box{background:#f8faff;border-left:3px solid #1a56db;padding:10px 14px;margin:16px 0;font-size:11px;color:#333;line-height:1.6}'+
-    'table{width:100%;border-collapse:collapse;margin:16px 0;font-size:11px}'+
-    'th{background:#f0f4f8;padding:6px 8px;text-align:left;border-bottom:2px solid #ccc;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}'+
-    'td{padding:5px 8px;border-bottom:1px solid #eee}'+
-    '.num{text-align:right}'+
-    '.total-box{background:#1a56db;color:#fff;border-radius:6px;padding:14px 20px;text-align:right;margin-top:20px}'+
-    '.total-box .lbl{font-size:11px;opacity:.8;margin-bottom:4px}'+
-    '.total-box .amt{font-size:26px;font-weight:800}'+
-    '.total-box .sub{font-size:10px;opacity:.7;margin-top:4px}'+
-    '.footer{margin-top:32px;padding-top:10px;border-top:1px solid #ddd;font-size:9px;color:#999}'+
-    '@media print{button{display:none}body{margin:15px}}'+
-    '</style></head><body>'+
-    '<button onclick="window.print()" style="margin-bottom:16px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:12px">&#128424; Stampa / Salva PDF</button>'+
-    '<div class="header">'+
-      '<div class="company"><strong>ASG LAB S.r.l.</strong>Via Vitruvio, 3 — 20124 Milano (MI)<br>P.IVA 10122150963 — REA MI-2784647<br>info@asglab.it · +39 375 5707492</div>'+
-      '<div class="ref"><span style="font-size:10px;text-transform:uppercase;letter-spacing:.1em">OFFERTA</span><span class="num">'+esc(numero)+'</span>'+
-      '<span style="display:block;margin-top:4px">Data: <strong>'+dataOfferta+'</strong></span>'+
-      (off.validita?'<span style="display:block">Valida fino: '+scadData+'</span>':'')+
-      '</div>'+
-    '</div>'+
-    '<div style="margin-bottom:20px">'+
-      '<h2>'+esc(off.oggetto_offerta||comm.oggetto||'Offerta commerciale')+'</h2>'+
-      '<div class="cliente">Spett. <strong>'+esc(CNAMES[comm.cliente]||comm.cliente||'—')+'</strong></div>'+
-    '</div>';
-  if(off.testo){
-    html+='<div class="note-box">'+esc(off.testo).replace(/\n/g,'<br>')+'</div>';
-  }
-  // Distinta materiali — mostra solo descrizione e quantità, NO prezzi interni
-  if(dist.length){
-    html+='<table><thead><tr><th>Descrizione</th><th class="num">Q.</th></tr></thead><tbody>'+
-    dist.map(function(r){
-      return '<tr><td>'+esc(r.descrizione||'—')+'</td><td class="num">'+esc(String(r.qty||1))+'</td></tr>';
+  var dataOfferta=off.data_offerta?fmtD(off.data_offerta):oggi;
+  var scadData=off.validita?new Date((off.data_offerta?new Date(off.data_offerta).getTime():Date.now())+parseInt(off.validita||30)*86400000).toLocaleDateString('it-IT'):'-';
+  var w=window.open('','_blank');
+
+  var CSS='@import url(\'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap\');'+
+    '*{box-sizing:border-box;margin:0;padding:0}'+
+    'body{font-family:\'Inter\',Arial,sans-serif;font-size:10.5px;color:#1a1a2e;background:#fff;padding:0}'+
+    '@page{size:A4;margin:16mm 14mm 18mm 14mm}'+
+    '@media print{body{margin:0;padding:0}.no-print{display:none!important}thead{display:table-header-group}.page-break{page-break-after:always}}'+
+    '.doc-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:16px;border-bottom:2px solid #1a3a7a}'+
+    '.doc-header-logo{height:40px;object-fit:contain}'+
+    '.doc-header-right{text-align:right;font-size:9.5px;color:#555;line-height:1.5}'+
+    '.doc-header-right .num-off{font-size:22px;font-weight:800;color:#1a3a7a;letter-spacing:-.02em;display:block;margin-bottom:2px}'+
+    '.doc-title{font-size:18px;font-weight:800;color:#1a1a2e;margin-bottom:2px;letter-spacing:-.02em}'+
+    '.doc-subtitle{font-size:11px;color:#64748b;margin-bottom:16px}'+
+    '.cliente-box{background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #1a3a7a;padding:10px 14px;margin-bottom:14px;border-radius:0 4px 4px 0}'+
+    '.cliente-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:3px}'+
+    '.cliente-nome{font-size:13px;font-weight:700;color:#1a1a2e}'+
+    '.info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid #e2e8f0;border-radius:5px;overflow:hidden;margin-bottom:16px;font-size:10px}'+
+    '.info-cell{padding:7px 12px;border-right:1px solid #e2e8f0}'+
+    '.info-cell:last-child{border-right:none}'+
+    '.info-label{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:2px}'+
+    '.info-val{font-weight:600;color:#1a1a2e}'+
+    '.intro-text{font-size:11px;color:#334155;line-height:1.6;margin-bottom:14px;padding:0 2px}'+
+    'h2.section{font-size:12px;font-weight:700;color:#1a3a7a;border-bottom:1.5px solid #1a3a7a;padding-bottom:3px;margin:18px 0 8px;text-transform:uppercase;letter-spacing:.05em}'+
+    'h3.sottosezione{font-size:11px;font-weight:700;color:#1a1a2e;background:#f0f4ff;padding:5px 10px;margin:10px 0 4px;border-radius:3px}'+
+    'table{width:100%;border-collapse:collapse;margin-bottom:8px;font-size:10px}'+
+    'thead tr{background:#1a3a7a;color:#fff}'+
+    'thead th{padding:6px 8px;font-weight:600;font-size:9px;text-transform:uppercase;letter-spacing:.05em;text-align:left}'+
+    'thead th.num{text-align:right}'+
+    'tbody tr:nth-child(even){background:#f8fafc}'+
+    'td{padding:5px 8px;border-bottom:1px solid #e2e8f0;vertical-align:top}'+
+    'td.num{text-align:right;font-variant-numeric:tabular-nums}'+
+    'td.sub{font-size:9px;color:#64748b}'+
+    'td.bold{font-weight:700}'+
+    'tr.subtot-row td{background:#dbeafe!important;color:#1e3a8a!important;font-weight:700;padding:5px 8px;border:none}'+
+    'tr.subtot-row td.num{text-align:right}'+
+    '.note-box{background:#fffbeb;border-left:3px solid #f59e0b;padding:10px 14px;margin:14px 0;font-size:10px;color:#78350f;line-height:1.6;border-radius:0 4px 4px 0}'+
+    '.condizioni{background:#f8fafc;border:1px solid #e2e8f0;padding:12px 16px;margin-top:16px;border-radius:5px;font-size:10px;line-height:1.7}'+
+    '.condizioni h4{font-size:10.5px;color:#1a3a7a;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}'+
+    '.condizioni ul{list-style:none;padding:0;margin:0}'+
+    '.condizioni li{padding:2px 0;color:#334155}'+
+    '.condizioni li strong{color:#1a1a2e;display:inline-block;min-width:140px}'+
+    '.total-box{background:linear-gradient(135deg,#1a3a7a,#2648a3);color:#fff;border-radius:6px;padding:14px 20px;margin:18px 0;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(26,58,122,.2)}'+
+    '.total-box-label{font-size:11px;font-weight:600;letter-spacing:.05em;opacity:.9}'+
+    '.total-box-sub{font-size:9.5px;opacity:.75;margin-top:2px}'+
+    '.total-box-value{font-size:26px;font-weight:800;letter-spacing:-.02em}'+
+    '.firma-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:30px}'+
+    '.firma-box{border-top:1px solid #94a3b8;padding-top:8px;font-size:9.5px;color:#64748b}'+
+    '.firma-name{font-weight:700;color:#1a1a2e;font-size:10.5px;margin-bottom:2px}'+
+    '.doc-footer{border-top:1px solid #e2e8f0;margin-top:30px;padding-top:8px;font-size:8.5px;color:#94a3b8;display:flex;justify-content:space-between}'+
+    '.print-btn{background:#1a3a7a;color:#fff;border:none;padding:8px 20px;border-radius:5px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;margin-bottom:16px}';
+
+  var distRows='';
+  var totVendita=0;
+  distBySec.forEach(function(sec){
+    if(distBySec.length>1)distRows+='<tr class=subtot-row><td colspan=5>'+esc(sec.nome)+'</td></tr>';
+    sec.righe.forEach(function(r){
+      var tot=parseFloat(r.prezzo_vendita||0)*parseFloat(r.qty||1);
+      totVendita+=tot;
+      distRows+='<tr>'+
+        '<td>'+esc(r.descrizione||'-')+'</td>'+
+        '<td style=\"font-family:monospace;font-size:9.5px;color:#64748b\">'+esc(r.codice||'')+'</td>'+
+        '<td class=num>'+esc(String(r.qty||1))+'</td>'+
+        '<td class=num>\u20ac '+fmt(r.prezzo_vendita||0)+'</td>'+
+        '<td class=num><strong>\u20ac '+fmt(tot)+'</strong></td>'+
+      '</tr>';
+    });
+  });
+
+  var ore=cd.ore||[];
+  var totOre=ore.reduce(function(s,o){return s+parseFloat(o.ore||0)*parseFloat(o.tariffa||0)},0);
+  var oreHtml='';
+  if(ore.length){
+    var TAR_L={diurna_ord:'Ore diurne ordinarie',diurna_str:'Ore diurne straordinarie',notturna_str:'Ore notturne straordinarie',festiva:'Ore festive',inoperoso:'Giorno inoperoso',viaggio:'Ore viaggio/attesa'};
+    var FIG_L={ms:'Mont. Spec.',ts:'Tecn. Spec.',te:'Tecn. Elett.'};
+    oreHtml='<h2 class=section>Manodopera prevista / svolta</h2>'+
+    '<table><thead><tr>'+
+      '<th>Descrizione</th><th>Figura</th><th>Categoria</th>'+
+      '<th class=num>Qta</th><th class=num>Tariffa</th><th class=num>Importo</th>'+
+    '</tr></thead><tbody>'+
+    ore.map(function(o){
+      var unita=o.unita||'h';
+      return '<tr><td>'+esc(o.descrizione||'-')+'</td>'+
+        '<td>'+esc(FIG_L[o.figura]||'-')+'</td>'+
+        '<td class=sub>'+esc(TAR_L[o.categoria]||'-')+'</td>'+
+        '<td class=num>'+o.ore+unita+'</td>'+
+        '<td class=num>\u20ac '+fmt(o.tariffa||0)+'/'+unita+'</td>'+
+        '<td class=num><strong>\u20ac '+fmt(parseFloat(o.ore||0)*parseFloat(o.tariffa||0))+'</strong></td></tr>';
     }).join('')+
+    '<tr class=subtot-row><td colspan=5 class=num>Totale manodopera</td><td class=num>\u20ac '+fmt(totOre)+'</td></tr>'+
     '</tbody></table>';
   }
-  // Totale offerta — sempre dall'importo offerta, non dalla somma distinta
-  html+='<div class="total-box">'+
-    '<div class="lbl">TOTALE OFFERTA</div>'+
-    '<div class="amt">&#8364; '+fmt(impOfferta)+'</div>'+
-    '<div class="sub">IVA esclusa'+(off.validita?' — validit\u00e0 '+off.validita+' giorni':'')+'</div>'+
-  '</div>'+
-  '<div class="footer">ASG LAB S.r.l. — Via Vitruvio, 3 — 20124 Milano (MI) — P.IVA 10122150963 — asglab@legalmail.it — www.asglab.it</div>'+
+
+  var trasferte=cd.trasferte||[];
+  var totTrasf=trasferte.reduce(function(s,t){return s+parseFloat(t.totale||0)},0);
+  var trasfHtml='';
+  if(trasferte.length){
+    trasfHtml='<h2 class=section>Trasferte e rimborsi spese</h2>'+
+    '<table><thead><tr>'+
+      '<th>Data</th><th>Destinazione</th><th>Voci</th><th class=num>Totale</th>'+
+    '</tr></thead><tbody>'+
+    trasferte.map(function(t){
+      var voci=[];
+      if(t.km>0)voci.push('km '+t.km+' \u00d7 \u20ac'+fmt(t.aci_km||0));
+      if(t.diaria>0)voci.push('diaria \u20ac'+fmt(t.diaria));
+      if(t.treno>0)voci.push('treno \u20ac'+fmt(t.treno));
+      if(t.aereo>0)voci.push('aereo \u20ac'+fmt(t.aereo));
+      if(t.pedaggi>0)voci.push('pedaggi \u20ac'+fmt(t.pedaggi));
+      if(t.parcheggio>0)voci.push('parcheggio \u20ac'+fmt(t.parcheggio));
+      if(t.vitto>0)voci.push('vitto \u20ac'+fmt(t.vitto));
+      if(t.altro>0)voci.push('altro \u20ac'+fmt(t.altro));
+      return '<tr><td>'+fmtD(t.data)+'</td><td>'+esc(t.destinazione||'-')+'</td>'+
+        '<td class=sub>'+voci.join(', ')+'</td>'+
+        '<td class=num><strong>\u20ac '+fmt(t.totale||0)+'</strong></td></tr>';
+    }).join('')+
+    '<tr class=subtot-row><td colspan=3 class=num>Totale trasferte</td><td class=num>\u20ac '+fmt(totTrasf)+'</td></tr>'+
+    '</tbody></table>';
+  }
+
+  var totCalcolato=totVendita+totOre+totTrasf;
+  var totFinale=impOfferta>0?impOfferta:totCalcolato;
+
+  var html='<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Offerta '+esc(numero)+'</title><style>'+CSS+'</style></head><body>'+
+    '<button class=\"print-btn no-print\" onclick=\"window.print()\">\ud83d\udda8 Stampa / Salva PDF</button>'+
+    '<div class=doc-header>'+
+      '<img class=doc-header-logo src=\"'+LOGO+'\" alt=\"ASG LAB\" onerror=\"this.style.display=\'none\'\">'+
+      '<div class=doc-header-right>'+
+        '<span class=num-off>Offerta '+esc(numero)+'</span>'+
+        'Redatta: <strong>'+dataOfferta+'</strong><br>'+
+        'Valida fino al: <strong>'+scadData+'</strong>'+
+      '</div>'+
+    '</div>'+
+    '<div class=cliente-box>'+
+      '<div class=cliente-lbl>Spett.le Cliente</div>'+
+      '<div class=cliente-nome>'+esc(clienteNome)+'</div>'+
+    '</div>'+
+    '<div class=doc-title>'+esc(off.oggetto_offerta||comm.oggetto||'Offerta economica')+'</div>'+
+    (comm.oggetto&&comm.oggetto!==off.oggetto_offerta?'<div class=doc-subtitle>'+esc(comm.oggetto)+'</div>':'')+
+    '<div class=info-grid>'+
+      '<div class=info-cell><div class=info-label>Riferimento interno</div><div class=info-val>'+esc(numero)+'</div></div>'+
+      '<div class=info-cell><div class=info-label>Data offerta</div><div class=info-val>'+dataOfferta+'</div></div>'+
+      '<div class=info-cell><div class=info-label>Validita</div><div class=info-val>'+(off.validita||30)+' giorni</div></div>'+
+    '</div>'+
+    (off.testo?'<div class=intro-text>'+esc(off.testo).replace(/\n/g,'<br>')+'</div>':'')+
+    (distRows?'<h2 class=section>Fornitura materiali</h2>'+
+      '<table><thead><tr>'+
+        '<th>Descrizione</th><th>Codice</th><th class=num>Q.ta</th><th class=num>Prezzo</th><th class=num>Importo</th>'+
+      '</tr></thead><tbody>'+distRows+
+      '<tr class=subtot-row><td colspan=4 class=num>Totale materiali</td><td class=num>\u20ac '+fmt(totVendita)+'</td></tr>'+
+      '</tbody></table>':'')+
+    oreHtml+trasfHtml+
+    '<div class=total-box>'+
+      '<div>'+
+        '<div class=total-box-label>IMPORTO OFFERTA TOTALE</div>'+
+        '<div class=total-box-sub>IVA esclusa \u00b7 Ref. '+esc(numero)+'</div>'+
+      '</div>'+
+      '<div class=total-box-value>\u20ac '+fmt(totFinale)+'</div>'+
+    '</div>'+
+    '<div class=condizioni>'+
+      '<h4>Condizioni generali</h4>'+
+      '<ul>'+
+        '<li><strong>Validita offerta:</strong> '+(off.validita||30)+' giorni dalla data di emissione</li>'+
+        '<li><strong>Tempi di consegna:</strong> '+esc(off.tempi_consegna||'da concordare all\'ordine')+'</li>'+
+        '<li><strong>Pagamento:</strong> '+esc(off.pagamento||'da concordare')+'</li>'+
+        '<li><strong>Trasporto:</strong> '+esc(off.trasporto||'franco fabbrica / da definire')+'</li>'+
+        '<li><strong>Garanzia:</strong> 12 mesi su difetti di fabbricazione, secondo condizioni ASG LAB</li>'+
+        '<li><strong>Imballo:</strong> standard incluso</li>'+
+      '</ul>'+
+    '</div>'+
+    '<div class=note-box>'+
+      '<strong>Note:</strong> '+esc(off.note_offerta||'La presente offerta e valida esclusivamente alle condizioni sopra riportate. Eventuali varianti richiedono riformulazione dell\'offerta. I prezzi si intendono IVA esclusa, salvo diversa indicazione.')+
+    '</div>'+
+    '<div class=firma-grid>'+
+      '<div class=firma-box><div class=firma-name>Per accettazione (Cliente)</div>Data, firma e timbro</div>'+
+      '<div class=firma-box><div class=firma-name>ASG LAB S.r.l.</div>Data e firma responsabile</div>'+
+    '</div>'+
+    '<div class=doc-footer>'+
+      '<span><strong>ASG LAB\u00ae</strong> \u2014 ASG LAB S.r.l. a socio unico \u2014 <a href=\"https://asglab.it\" style=\"color:#94a3b8\">https://asglab.it</a> \u2014 info@asglab.it</span>'+
+      '<span>P.IVA 10122150963 \u2014 REA MI-2784647 \u2014 PEC: asglab@legalmail.it</span>'+
+    '</div>'+
   '</body></html>';
-  w.document.write(html);
-  w.document.close();
+  w.document.write(html);w.document.close();
 }
 
 function saveSezione(numero){
