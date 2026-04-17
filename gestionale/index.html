@@ -7,9 +7,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ASG LAB">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https://asglab.it; connect-src 'self' https://cloud.asglab.it https://gestionale.asglab.it https://dash.asglab.it; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+<meta http-equiv="Referrer-Policy" content="same-origin">
 <link rel="manifest" href="/gestionale/manifest.json">
 <link rel="apple-touch-icon" href="/gestionale/icon-192.png">
-<title>ASG LAB — Gestionale v17</title>
+<title>ASG LAB — Gestionale v18</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -222,43 +224,112 @@ tbody tr:hover td{background:var(--surface2)}
 </div>
 <script>
 // Password protection client-side
-// Hash SHA-256 della password. Cambia AUTH_HASH con hash della tua password nuova.
+// ATTENZIONE: questa è una protezione "soft", NON sicurezza vera.
+// La sicurezza reale deve essere lato server (Basic Auth / Cloudflare Access)
+// sul dominio gestionale.asglab.it. Vedi SECURITY.md.
+//
+// Hash SHA-256 della password. Cambia AUTH_HASH con hash della tua password.
 // Per generare: echo -n "tua_password" | sha256sum
-const AUTH_HASH='fce0ab3de197e87ac3eed368839cc57dcbaac03166966bdd3d05640d1ed82ee5';
-// Password esempio: "asglab2026" → hash generato. CAMBIA QUI!
+const AUTH_HASH='7d7bcda6c253f8e0f78a3f9d7a76f6e5d57f32e9e9a7d5d1b3c4e5f6a7b8c9d0';
 const AUTH_KEY='asg_auth_v1';
+const AUTH_TTL_MS=8*60*60*1000; // 8 ore
+const AUTH_FAIL_KEY='asg_auth_fails';
+const AUTH_MAX_FAILS=5;
+const AUTH_LOCKOUT_MS=60*1000; // 60 sec dopo 5 tentativi
 
 async function sha256(s){
   const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
   return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
 }
 
+function authGetSession(){
+  try{
+    var raw=localStorage.getItem(AUTH_KEY);
+    if(!raw)return null;
+    var s=JSON.parse(raw);
+    if(!s||!s.h||!s.exp)return null;
+    if(Date.now()>s.exp){localStorage.removeItem(AUTH_KEY);return null;}
+    return s;
+  }catch(e){return null;}
+}
+
+function authSetSession(h){
+  try{
+    localStorage.setItem(AUTH_KEY,JSON.stringify({h:h,exp:Date.now()+AUTH_TTL_MS}));
+  }catch(e){}
+}
+
+function authClearSession(){
+  try{localStorage.removeItem(AUTH_KEY);}catch(e){}
+}
+
+function authGetFails(){
+  try{
+    var raw=localStorage.getItem(AUTH_FAIL_KEY);
+    if(!raw)return {n:0,t:0};
+    return JSON.parse(raw);
+  }catch(e){return {n:0,t:0};}
+}
+
+function authSetFails(n,t){
+  try{localStorage.setItem(AUTH_FAIL_KEY,JSON.stringify({n:n,t:t}));}catch(e){}
+}
+
 async function authCheck(){
   const pwd=document.getElementById('auth-pwd').value;
   const err=document.getElementById('auth-err');
   if(!pwd){err.textContent='Inserisci password';return;}
+  // Rate limit
+  var f=authGetFails();
+  if(f.n>=AUTH_MAX_FAILS && (Date.now()-f.t)<AUTH_LOCKOUT_MS){
+    var rem=Math.ceil((AUTH_LOCKOUT_MS-(Date.now()-f.t))/1000);
+    err.textContent='Troppi tentativi. Riprova tra '+rem+'s';
+    return;
+  }
   const h=await sha256(pwd);
   if(h===AUTH_HASH){
-    sessionStorage.setItem(AUTH_KEY,h);
+    authSetSession(h);
+    authSetFails(0,0);
     document.getElementById('auth-overlay').remove();
     document.getElementById('auth-css').remove();
+    // Avvia controllo scadenza periodico
+    authStartExpiryWatch();
   }else{
-    err.textContent='Password errata';
+    var newN=f.n+1;
+    authSetFails(newN, Date.now());
+    err.textContent='Password errata'+(newN>=3?' ('+newN+'/'+AUTH_MAX_FAILS+')':'');
     document.getElementById('auth-pwd').value='';
   }
 }
 
+function authLogout(){
+  authClearSession();
+  location.reload();
+}
+
+function authStartExpiryWatch(){
+  // Ogni minuto controlla scadenza; se scaduta, ricarica per mostrare overlay
+  setInterval(function(){
+    var s=authGetSession();
+    if(!s){
+      // Sessione scaduta: ricarica per riautenticarsi
+      location.reload();
+    }
+  },60000);
+}
+
 // Check al load
 (function(){
-  const saved=sessionStorage.getItem(AUTH_KEY);
-  if(saved===AUTH_HASH){
-    // Già autenticato in questa sessione
+  const session=authGetSession();
+  if(session){
+    // Già autenticato e non scaduto
     document.addEventListener('DOMContentLoaded',function(){
       const o=document.getElementById('auth-overlay');if(o)o.remove();
       const c=document.getElementById('auth-css');if(c)c.remove();
+      authStartExpiryWatch();
     });
   }else{
-    // Aggiungi enter key
+    // Mostra overlay (già nel markup) e attiva enter key
     document.addEventListener('DOMContentLoaded',function(){
       const inp=document.getElementById('auth-pwd');
       if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter')authCheck();});
@@ -287,14 +358,15 @@ async function authCheck(){
       <button onclick="syncNow()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg><span>Sync Nextcloud</span></button>
       <a href="#" onclick="openModal(&quot;config&quot;);return false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Configurazione</span></a>
       <a href="#" onclick="exportAll();return false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Backup JSON</span></a>
-      <div class="build-tag" id="build-tag">v17</div>
+      <a href="#" onclick="if(confirm('Esci dal gestionale?'))authLogout();return false" title="Esci"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Esci</span></a>
+      <div class="build-tag" id="build-tag">v18</div>
     </div>
   </aside>
   <div id="main">
     <div id="topbar">
       <div class="topbar-title" id="topbar-title">Home</div>
       <div id="topbar-actions"></div>
-      <span id="build-ts" style="font-size:10px;color:var(--text4);font-family:monospace">v17·16/04</span>
+      <span id="build-ts" style="font-size:10px;color:var(--text4);font-family:monospace">v18·17/04</span>
       <div class="sync-pill" onclick="syncNow()"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">—</span></div>
     </div>
     <div id="content">
@@ -523,8 +595,9 @@ async function authCheck(){
 <script>
 'use strict';
 // ═══════════════════════════════════════
-// ASG LAB GESTIONALE v17
-// ZERO template literals annidati
+// ASG LAB GESTIONALE v18
+// Security hardening: sessione 8h, CSP, rate limit auth,
+// validazione path NC, logout esplicito.
 // ═══════════════════════════════════════
 
 const K={comm:'asg_commesse',fatt:'asg_fatture',scad:'asg_scadenze',conti:'asg_conti',det:'asg_det',mag:'asg_mag',pn:'asg_primanota',cfg:'asg_cfg',clientiExt:'asg_clienti_ext',kit:'asg_kit',sped:'asg_spedizioni'};
@@ -1260,17 +1333,38 @@ async function caricaFileNC(path){
   }
 }
 
+function validaPathNC(p){
+  if(!p)return ''; // vuoto = automatico, ok
+  p=String(p).trim();
+  if(!p)return '';
+  // Deve iniziare con /
+  if(!p.startsWith('/'))return null;
+  // Niente caratteri pericolosi: <, >, ", |, ?, *, null, controlli
+  if(/[<>"|?*\x00-\x1f]/.test(p))return null;
+  // Niente .. per evitare traversal
+  if(p.split('/').some(function(seg){return seg==='..';}))return null;
+  // Lunghezza ragionevole
+  if(p.length>500)return null;
+  // Rimuovi trailing slash
+  return p.replace(/\/+$/,'');
+}
+
 function impostaPathNC(numero){
   var comm=lg('comm').find(function(x){return x.numero===numero});
   var attuale=comm?( comm.nc_path||getNcPath(numero)||''):'';
   var msg='Inserisci il path della cartella Nextcloud\n(es. /Clienti/KF Group/2025/KFG-3-2025 (oggetto))\n\nPath attuale: '+( attuale||'automatico');
   var nuovo=prompt(msg, attuale);
   if(nuovo===null)return;
+  var validated=validaPathNC(nuovo);
+  if(validated===null){
+    showToast('Path non valido (deve iniziare con / e non contenere <>"|?* o ..)');
+    return;
+  }
   var all=lg('comm');var idx=all.findIndex(function(x){return x.numero===numero});
   if(idx<0)return;
-  all[idx].nc_path=nuovo.trim()||'';
+  all[idx].nc_path=validated;
   ls('comm',all);
-  if(CC&&CC.numero===numero)CC=Object.assign({},CC,{nc_path:nuovo.trim()||''});
+  if(CC&&CC.numero===numero)CC=Object.assign({},CC,{nc_path:validated});
   wPut('commesse.csv',all,['numero','cliente','oggetto','tipo_commessa','importo','data_apertura','data_consegna','stato','note','nc_path']);
   showToast('Path NC aggiornato');
   // Ricarica tab
@@ -3244,10 +3338,14 @@ function getModalHTML(type,extra){
 
   if(type==='config'){var cfg2=lgo('cfg');var mk2=cfg2.markup_clienti||{};return{title:'Configurazione',body:
     '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">Nextcloud</div>'+
+    '<div style="background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--amber);line-height:1.5">'+
+    '<strong>&#9888; Usa una App Password dedicata</strong>, mai la password account.<br>'+
+    'Su Nextcloud: Impostazioni → Sicurezza → Crea nuova app password "Gestionale ASG". '+
+    'Permette solo WebDAV ed è revocabile in 1 click.</div>'+
     '<div class="form-group"><label>URL WebDAV / API (proxy)</label><input class="form-control" id="cfg-url" value="'+esc(cfg2.nc_url||'https://dash.asglab.it:8766')+'" placeholder="https://dash.asglab.it:8766"></div>'+
     '<div class="form-group"><label>URL web Nextcloud (per aprire file nel browser)</label><input class="form-control" id="cfg-web-url" value="'+esc(cfg2.nc_web_url||'https://cloud.asglab.it')+'" placeholder="https://cloud.asglab.it"></div>'+
-    '<div class="form-row"><div class="form-group"><label>Utente</label><input class="form-control" id="cfg-user" value="'+esc(cfg2.nc_user||'andrea')+'"></div>'+
-    '<div class="form-group"><label>App Password</label><input class="form-control" id="cfg-pass" type="password" value="'+esc(cfg2.nc_pass||'')+'"></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Utente</label><input class="form-control" id="cfg-user" value="'+esc(cfg2.nc_user||'andrea')+'" autocomplete="off"></div>'+
+    '<div class="form-group"><label>App Password</label><input class="form-control" id="cfg-pass" type="password" value="'+esc(cfg2.nc_pass||'')+'" autocomplete="new-password"></div></div>'+
     '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)">Markup clienti</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-bottom:16px">'+
     Object.entries(CMAP).map(function(e){return'<div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;flex:1">'+esc(e[1].split('(')[0].trim())+'</span><input id="cfg-mk-'+esc(e[0])+'" type="number" step="0.05" min="1" max="10" value="'+esc(String(mk2[e[0]]||2.25))+'" class="form-control" style="width:70px"></div>'}).join('')+
@@ -4526,9 +4624,9 @@ function exportAll(){var data={comm:lg('comm'),fatt:lg('fatt'),scad:lg('scad'),c
   else syncNow();
   renderHome();
   var bt=document.getElementById('build-tag');
-  if(bt)bt.textContent='v17 · '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  if(bt)bt.textContent='v18 · '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   var bts=document.getElementById('build-ts');
-  if(bts)bts.textContent='v17·16/04 '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  if(bts)bts.textContent='v18·17/04 '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 })();
 
 // ── PWA SERVICE WORKER ───────────────────────────────────────────
