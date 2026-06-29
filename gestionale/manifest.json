@@ -1,0 +1,29 @@
+{
+  "name": "ASG LAB Gestionale",
+  "short_name": "ASG LAB",
+  "description": "Gestionale interno ASG LAB — commesse, contabilità, magazzino, clienti, kit vendita, spedizioni.",
+  "start_url": "/gestionale/",
+  "scope": "/gestionale/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "it",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/gestionale/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/gestionale/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "prefer_related_applications": false
+}

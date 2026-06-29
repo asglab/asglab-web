@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuratore Raccordi Oleodinamici</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+:root{
+  --bg:#f1f5f9;--bg2:#fff;--bg3:#f8fafc;
+  --border:#e2e8f0;--border2:#cbd5e1;--border3:#94a3b8;
+  --text:#0f172a;--text2:#475569;--text3:#94a3b8;
+  --blue:#2563eb;--blue-lt:#eff6ff;--blue-bd:#bfdbfe;
+  --green:#16a34a;--green-lt:#f0fdf4;--green-bd:#bbf7d0;
+  --amber:#d97706;--amber-lt:#fffbeb;
+  --red:#dc2626;--red-lt:#fef2f2;
+  --inox:#475569;
+  --r:8px;--r-sm:5px;
+  --shadow:0 1px 3px #0002,0 1px 2px #0001;
+  --shadow-lg:0 4px 12px #0009;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+
+/* TOP */
+.topbar{background:#1e293b;color:#fff;padding:0 20px;height:50px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.topbar-logo{font-size:15px;font-weight:700;letter-spacing:-.02em}
+.topbar-sub{font-size:11px;color:#64748b;font-family:'JetBrains Mono',monospace}
+.tab-bar{display:flex;gap:2px;background:#0f172a;padding:0 20px}
+.tab-btn{padding:10px 18px;font-size:12px;font-weight:600;color:#64748b;cursor:pointer;border-bottom:3px solid transparent;transition:all .15s}
+.tab-btn:hover{color:#94a3b8}
+.tab-btn.on{color:#fff;border-bottom-color:#3b82f6}
+.tab-panel{display:none}.tab-panel.on{display:block}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:230px 1fr 320px;height:calc(100vh - 86px)}
+@media(max-width:960px){.layout{grid-template-columns:200px 1fr 280px}}
+@media(max-width:700px){.layout{grid-template-columns:1fr;height:auto}}
+
+/* SIDEBAR */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto}
+.sidebar-hd{padding:10px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg3)}
+.forma-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s}
+.forma-item:hover{background:var(--bg3)}
+.forma-item.on{background:var(--blue-lt);border-left:3px solid var(--blue)}
+.forma-item.on .fi-nome{color:var(--blue);font-weight:600}
+.fi-nome{font-size:12px;font-weight:500;color:var(--text);line-height:1.3}
+.fi-cod{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);margin-top:1px}
+
+/* CENTRO */
+.centro{background:var(--bg3);overflow-y:auto;padding:16px}
+.fg{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;box-shadow:var(--shadow)}
+.fg-hd{padding:9px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text3);border-radius:var(--r) var(--r) 0 0}
+.fg-body{padding:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:5px 13px;border-radius:20px;border:1.5px solid var(--border2);font-size:12px;font-weight:500;cursor:pointer;transition:all .1s;color:var(--text2);background:var(--bg2);user-select:none}
+.chip:hover{border-color:var(--blue);color:var(--blue)}
+.chip.on{background:var(--blue-lt);border-color:var(--blue);color:var(--blue);font-weight:600}
+.chip.on-inox{background:#f1f5f9;border-color:var(--inox);color:var(--inox)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:500px){.row2{grid-template-columns:1fr}}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+select{width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-family:'Inter',sans-serif;font-size:13px;color:var(--text);background:var(--bg2);outline:none;cursor:pointer}
+select:focus{border-color:var(--blue)}
+.nota-inox{background:var(--amber-lt);border-left:3px solid var(--amber);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:7px 12px;font-size:11px;color:var(--amber);line-height:1.6;margin-top:8px;display:none}
+
+/* DESTRA */
+.destra{background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.result-panel{padding:14px;border-bottom:1px solid var(--border)}
+.rp-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px}
+.codici-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:10px}
+.cod-row{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.cod-src{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);width:80px;flex-shrink:0}
+.cod-val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--blue);word-break:break-all}
+.cod-val.secondary{font-size:12px;color:var(--text2)}
+.cod-desc{font-size:12px;color:var(--text2);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);line-height:1.5}
+.price-row{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
+.pc{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace}
+.pc-acc{background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd)}
+.pc-inox{background:var(--amber-lt);color:var(--amber);border:1px solid #fde68a}
+.warn-box{background:var(--amber-lt);border-left:3px solid var(--amber);padding:8px 12px;font-size:11px;color:var(--amber);line-height:1.5;margin-bottom:10px;border-radius:0 var(--r-sm) var(--r-sm) 0;display:none}
+.qty-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.qb{width:28px;height:28px;border-radius:5px;border:1.5px solid var(--border2);background:var(--bg3);cursor:pointer;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:all .1s}
+.qb:hover{border-color:var(--blue);color:var(--blue)}
+.qn{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;width:32px;text-align:center}
+.btn{padding:9px 16px;border-radius:var(--r-sm);border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .12s;width:100%}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#1d4ed8}
+.btn-ghost{background:transparent;border:1.5px solid var(--border2);color:var(--text2);width:auto}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue)}
+.btn-danger{background:var(--red-lt);color:var(--red);border:1px solid #fecaca;width:auto}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap}
+
+/* LISTA */
+.lista-panel{flex:1;overflow-y:auto;padding:14px}
+.lp-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)}
+.li-item{border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:6px;background:var(--bg)}
+.li-cod{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--blue)}
+.li-desc{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4}
+.li-row{display:flex;align-items:center;gap:5px;margin-top:6px}
+.ib{width:20px;height:20px;border-radius:3px;border:1px solid var(--border2);background:var(--bg2);cursor:pointer;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--text2)}
+.in{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;width:26px;text-align:center}
+.ip{margin-left:auto;font-size:11px;color:var(--green);font-weight:600;font-family:'JetBrains Mono',monospace}
+.empty{text-align:center;padding:24px;color:var(--text3);font-size:12px}
+
+/* EXPORT */
+.exp-panel{padding:12px 14px;border-top:1px solid var(--border);background:var(--bg3)}
+.exp-pre{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);white-space:pre-wrap;line-height:1.7;max-height:110px;overflow-y:auto;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px;margin-bottom:8px}
+
+/* ══ MOBILE ══════════════════════════════════════════════════════ */
+@media(max-width:700px){
+  .layout{grid-template-columns:1fr;height:auto}
+  .sidebar{display:none}
+  .centro{padding:12px;border:none}
+  .destra{border-left:none;border-top:1px solid var(--border)}
+  .tab-bar{overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
+  .tab-btn{padding:9px 14px;font-size:11px}
+  /* Selector mobile forme */
+  .mobile-forma-sel{display:block!important}
+  .row2{grid-template-columns:1fr}
+  .chips .chip{padding:7px 14px;font-size:13px} /* più grandi da toccare */
+  .result-panel{padding:12px}
+  .lista-panel{padding:12px;min-height:200px}
+}
+@media(min-width:701px){.mobile-forma-sel{display:none!important}}
+/* Zoom overlay */
+#img-overlay{animation:fadeIn .15s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-logo">Configuratore Raccordi Oleodinamici</div>
+    <div class="topbar-sub">Codici: Rastelli · Parker Ermeto · Pa.Co — DIN 2353 · BSP · JIC 37°</div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <div class="tab-btn on" onclick="switchTab('din',this)">DIN 2353 / ISO 8434-1</div>
+  <div class="tab-btn" onclick="switchTab('bsp',this)">Adattatori BSP</div>
+  <div class="tab-btn" onclick="switchTab('jic',this)">JIC 37° (SAE J514)</div>
+</div>
+
+<!-- ═══════════════════════════ DIN 2353 ═══════════════════════════ -->
+<div class="tab-panel on" id="tab-din">
+<!-- Select forme visibile solo su mobile -->
+<div class="mobile-forma-sel" style="padding:10px 12px;background:var(--bg2);border-bottom:1px solid var(--border)">
+  <select id="mobile-forma-sel-din" onchange="dinSelForma(this.value)" style="font-size:14px;padding:8px 12px;border:1.5px solid var(--border2);border-radius:var(--r-sm);width:100%;background:var(--bg2);font-family:Inter,sans-serif">
+    <option value="">— Seleziona forma raccordo —</option>
+  </select>
+</div>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-hd">Forma costruttiva</div>
+    <div id="forme-din"></div>
+  </div>
+
+  <!-- CENTRO -->
+  <div class="centro">
+    <div id="din-forma-img-wrap" style="display:none;margin-bottom:16px;text-align:center;background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:16px;position:relative">
+      <img id="din-forma-img" src="" alt="" style="max-height:160px;max-width:100%;object-fit:contain;cursor:zoom-in" onclick="dinZoomImg(this.src,this.alt)" title="Click per ingrandire">
+      <div style="font-size:10px;color:var(--text3);margin-top:6px">Click sull'immagine per ingrandire · Fonte: Rastelli Raccordi</div>
+    </div>
+    <div style="font-size:17px;font-weight:700;margin-bottom:4px" id="din-title">—</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5" id="din-desc">Seleziona una forma</div>
+
+    <div class="fg">
+      <div class="fg-hd">Ø Tubo (mm)</div>
+      <div class="fg-body">
+        <div class="chips" id="din-diam">
+          <div class="chip" data-v="6">6</div><div class="chip" data-v="8">8</div>
+          <div class="chip" data-v="10">10</div><div class="chip on" data-v="12">12</div>
+          <div class="chip" data-v="14">14</div><div class="chip" data-v="16">16</div>
+          <div class="chip" data-v="18">18</div><div class="chip" data-v="20">20</div>
+          <div class="chip" data-v="22">22</div><div class="chip" data-v="25">25</div>
+          <div class="chip" data-v="28">28</div><div class="chip" data-v="30">30</div>
+          <div class="chip" data-v="38">38</div><div class="chip" data-v="42">42</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <div class="fg-hd">Serie DIN</div>
+      <div class="fg-body">
+        <div class="chips" id="din-serie">
+          <div class="chip on" data-v="L">L — leggera (≤315 bar)</div>
+          <div class="chip" data-v="S">S — pesante (≤630 bar)</div>
+          <div class="chip" data-v="LL">LL — extra leggera (≤100 bar)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fg" id="din-conn-group">
+      <div class="fg-hd">Connessione lato impianto</div>
+      <div class="fg-body">
+        <div class="row2">
+          <div>
+            <label class="fl">Tipo tenuta / filetto</label>
+            <select id="din-conn" onchange="calcDin()">
+              <option value="R">BSP cilindrico Gas (R) — il più comune</option>
+              <option value="M">Metrico cilindrico (M)</option>
+              <option value="GG">Guarnizione gomma (GG) — filetto BSP con guarn.</option>
+              <option value="SV">SV 60° con O-Ring</option>
+              <option value="RC">Gas conico BSPT</option>
+              <option value="MC">Metrico conico</option>
+              <option value="NPT">NPT</option>
+              <option value="UNF">UNF/UN</option>
+            </select>
+          </div>
+          <div>
+            <label class="fl">Filetto</label>
+            <select id="din-fil" onchange="calcDin()">
+              <option value="1/8">G 1/8"</option>
+              <option value="1/4" selected>G 1/4"</option>
+              <option value="3/8">G 3/8"</option>
+              <option value="1/2">G 1/2"</option>
+              <option value="3/4">G 3/4"</option>
+              <option value="1">G 1"</option>
+              <option value="1.1/4">G 1¼"</option>
+              <option value="1.1/2">G 1½"</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <div class="fg-hd">Materiale</div>
+      <div class="fg-body">
+        <div class="chips" id="din-mat">
+          <div class="chip on" data-v="ACC">Acciaio (zinco-nichel)</div>
+          <div class="chip" data-v="INOX">Inox 316L</div>
+        </div>
+        <div class="nota-inox" id="nota-inox-din">⚠ Per raccordi inox: usare dado TN81 e anello tagliente specifici per inox. Lubrificare filettature. Prezzo indicativo ×2.8÷3.2.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESTRA -->
+  <div class="destra">
+    <div class="result-panel">
+      <div class="rp-lbl">Codici generati</div>
+      <div class="codici-box" id="din-result">
+        <div style="color:var(--text3);font-size:12px">Seleziona forma e parametri</div>
+      </div>
+      <div class="warn-box" id="din-warn"></div>
+      <div class="qty-row">
+        <button class="qb" onclick="dinQd(-1)">−</button>
+        <span class="qn" id="din-qty-n">1</span>
+        <button class="qb" onclick="dinQd(1)">+</button>
+        <span style="font-size:12px;color:var(--text3)">pz</span>
+      </div>
+      <button class="btn btn-primary" id="din-btn-add" onclick="dinAddL()">+ Aggiungi alla lista</button>
+    </div>
+    <div class="lista-panel">
+      <div class="lp-hd"><span>Lista ordine</span><span id="din-lista-c" style="color:var(--text3)">vuota</span></div>
+      <div id="din-lista-el"><div class="empty">Nessun raccordo</div></div>
+    </div>
+    <div class="exp-panel" id="din-exp" style="display:none">
+      <div class="exp-pre" id="din-exp-pre"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="dinCopia()">📋 Copia RDO</button>
+        <button class="btn btn-ghost btn-sm" onclick="dinCsv()">⬇ CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="dinInvia()">→ Gestionale</button>
+        <button class="btn btn-danger btn-sm" onclick="dinSvuota()">🗑</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /tab-din -->
+
+<!-- ═══════════════════════════ BSP ═══════════════════════════ -->
+<div class="tab-panel" id="tab-bsp">
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-hd">Tipo adattatore BSP</div>
+    <div id="forme-bsp"></div>
+  </div>
+  <div class="centro">
+    <div style="font-size:17px;font-weight:700;margin-bottom:4px" id="bsp-title">—</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5" id="bsp-desc">Seleziona tipo adattatore</div>
+    <div id="bsp-forma-img-wrap" style="display:none;margin-bottom:16px;text-align:center;background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:16px">
+      <img id="bsp-forma-img" src="" alt="" style="max-height:140px;max-width:100%;object-fit:contain;cursor:zoom-in" onclick="dinZoomImg(this.src,this.alt)">
+      <div style="font-size:10px;color:var(--text3);margin-top:6px">Click per ingrandire · Fonte: Rastelli Raccordi</div>
+    </div>
+    <div class="fg"><div class="fg-hd">Filetto BSP</div><div class="fg-body">
+      <div class="chips" id="bsp-fil">
+        <div class="chip" data-v="1/8">G 1/8"</div><div class="chip on" data-v="1/4">G 1/4"</div>
+        <div class="chip" data-v="3/8">G 3/8"</div><div class="chip" data-v="1/2">G 1/2"</div>
+        <div class="chip" data-v="3/4">G 3/4"</div><div class="chip" data-v="1">G 1"</div>
+        <div class="chip" data-v="1-1/4">G 1¼"</div><div class="chip" data-v="1-1/2">G 1½"</div>
+        <div class="chip" data-v="2">G 2"</div>
+      </div>
+    </div></div>
+    <div class="fg" id="bsp-fil2-group" style="display:none"><div class="fg-hd">Filetto 2 (riduzione)</div><div class="fg-body">
+      <div class="chips" id="bsp-fil2">
+        <div class="chip" data-v="1/8">G 1/8"</div><div class="chip on" data-v="1/4">G 1/4"</div>
+        <div class="chip" data-v="3/8">G 3/8"</div><div class="chip" data-v="1/2">G 1/2"</div>
+        <div class="chip" data-v="3/4">G 3/4"</div><div class="chip" data-v="1">G 1"</div>
+      </div>
+    </div></div>
+    <div class="fg"><div class="fg-hd">Materiale</div><div class="fg-body">
+      <div class="chips" id="bsp-mat">
+        <div class="chip on" data-v="ACC">Acciaio</div>
+        <div class="chip" data-v="INOX">Inox 316L</div>
+        <div class="chip" data-v="OTT">Ottone</div>
+      </div>
+    </div></div>
+  </div>
+  <div class="destra">
+    <div class="result-panel">
+      <div class="rp-lbl">Codici generati</div>
+      <div class="codici-box" id="bsp-result"><div style="color:var(--text3);font-size:12px">Seleziona tipo e parametri</div></div>
+      <div class="qty-row"><button class="qb" onclick="bspQd(-1)">−</button><span class="qn" id="bsp-qty-n">1</span><button class="qb" onclick="bspQd(1)">+</button><span style="font-size:12px;color:var(--text3)">pz</span></div>
+      <button class="btn btn-primary" id="bsp-btn-add" onclick="bspAddL()">+ Aggiungi alla lista</button>
+    </div>
+    <div class="lista-panel">
+      <div class="lp-hd"><span>Lista</span><span id="bsp-lista-c" style="color:var(--text3)">vuota</span></div>
+      <div id="bsp-lista-el"><div class="empty">Nessun raccordo</div></div>
+    </div>
+    <div class="exp-panel" id="bsp-exp" style="display:none">
+      <div class="export-pre" id="bsp-exp-pre"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('bsp-exp-pre').textContent).then(function(){alert('Copiato!')})">📋 Copia</button>
+        <button class="btn btn-ghost btn-sm" onclick="invia()">→ Gestionale</button>
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('Svuotare?')){BSPLista=[];bspRenderL()}">🗑</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════ JIC ═══════════════════════════ -->
+<div class="tab-panel" id="tab-jic">
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-hd">Forma JIC 37°</div>
+    <div id="forme-jic"></div>
+  </div>
+  <div class="centro">
+    <div style="font-size:17px;font-weight:700;margin-bottom:4px" id="jic-title">—</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5" id="jic-desc">Seleziona forma raccordo JIC</div>
+    <div class="fg"><div class="fg-hd">Ø Tubo (mm)</div><div class="fg-body">
+      <div class="chips" id="jic-diam">
+        <div class="chip" data-v="6">6</div><div class="chip" data-v="8">8</div>
+        <div class="chip on" data-v="10">10</div><div class="chip" data-v="12">12</div>
+        <div class="chip" data-v="14">14</div><div class="chip" data-v="16">16</div>
+        <div class="chip" data-v="18">18</div><div class="chip" data-v="20">20</div>
+        <div class="chip" data-v="22">22</div><div class="chip" data-v="25">25</div>
+      </div>
+    </div></div>
+    <div class="fg"><div class="fg-hd">Filetto UNF lato impianto</div><div class="fg-body">
+      <div class="chips" id="jic-fil">
+        <div class="chip" data-v="7/16-20">7/16"-20 UNF</div>
+        <div class="chip on" data-v="1/2-20">½"-20 UNF</div>
+        <div class="chip" data-v="9/16-18">9/16"-18 UNF</div>
+        <div class="chip" data-v="3/4-16">¾"-16 UNF</div>
+        <div class="chip" data-v="7/8-14">7/8"-14 UNF</div>
+        <div class="chip" data-v="1-1/16-12">1 1/16"-12 UNF</div>
+      </div>
+    </div></div>
+    <div class="fg"><div class="fg-hd">Materiale</div><div class="fg-body">
+      <div class="chips" id="jic-mat">
+        <div class="chip on" data-v="ACC">Acciaio</div>
+        <div class="chip" data-v="INOX">Inox 316L</div>
+      </div>
+    </div></div>
+  </div>
+  <div class="destra">
+    <div class="result-panel">
+      <div class="rp-lbl">Codici generati</div>
+      <div class="codici-box" id="jic-result"><div style="color:var(--text3);font-size:12px">Seleziona forma e parametri</div></div>
+      <div class="qty-row"><button class="qb" onclick="jicQd(-1)">−</button><span class="qn" id="jic-qty-n">1</span><button class="qb" onclick="jicQd(1)">+</button><span style="font-size:12px;color:var(--text3)">pz</span></div>
+      <button class="btn btn-primary" id="jic-btn-add" onclick="jicAddL()">+ Aggiungi alla lista</button>
+    </div>
+    <div class="lista-panel">
+      <div class="lp-hd"><span>Lista</span><span id="jic-lista-c" style="color:var(--text3)">vuota</span></div>
+      <div id="jic-lista-el"><div class="empty">Nessun raccordo</div></div>
+    </div>
+    <div class="exp-panel" id="jic-exp" style="display:none">
+      <div class="export-pre" id="jic-exp-pre"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('jic-exp-pre').textContent).then(function(){alert('Copiato!')})">📋 Copia</button>
+        <button class="btn btn-ghost btn-sm" onclick="invia()">→ Gestionale</button>
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('Svuotare?')){JICLista=[];jicRenderL()}">🗑</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+// ══ TAB ══════════════════════════════════════════════════════════
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('on');});
+  btn.classList.add('on');
+  document.getElementById('tab-'+id).classList.add('on');
+}
+
+// ══ CATALOGO DIN 2353 ════════════════════════════════════════════
+// Rastelli TN-codes: immagini da cdn Rastelli
+// img_url: path sotto https://rastelliraccordi.com/wp-content/uploads/2017/06/
+var FORME_DIN = [
+  // ── RACCORDI TERMINALI MASCHI ─────────────────────────────────
+  {cat:'Terminali maschi',
+   id:'TN92',  nome:'Dritto maschio', short:'Estremità diritto',
+   img:'TN-92-1.bmp',
+   rastelli:'TN 92', parker:'GE', paco_pref:'902EDG',
+   desc:'Raccordo terminale diritto maschio — anello tagliente + dado. Lato tubo: DIN 24°. Lato impianto: filetto BSP/metrico/SV. Il raccordo DIN più usato.',
+   haConn:true, haRid:false, isTT:false, isTappo:false,
+   formati_rastelli:'TN 92-12LR (BSP), TN 92-12LM (metrico), TN 92-12LGG (guarn.), TN 92 SV-12L (SV60°)',
+   prezzi:{acc:2.8,inox_mult:2.9}},
+  {cat:'Terminali maschi',
+   id:'TN95',  nome:'Gomito 90° BSP', short:'Estremità gomito 90° BSP cil.',
+   img:'TN-95-1.bmp',
+   rastelli:'TN 95', parker:'WE', paco_pref:'903EWG',
+   desc:'Raccordo terminale a gomito 90° maschio — filettatura BSP cilindrica (Gas). Forma normale (lunga).',
+   haConn:false, haRid:false, isTT:false, isTappo:false,
+   prezzi:{acc:4.2,inox_mult:2.9},
+   conn_fisso:'R'},
+  {cat:'Terminali maschi',
+   id:'TN94',  nome:'Gomito 90° metrico/conico', short:'Estremità gomito 90° met./conico',
+   img:'TN-94-2.bmp',
+   rastelli:'TN 94', parker:'WEM', paco_pref:'904DCP',
+   desc:'Raccordo terminale a gomito 90° maschio — filettatura metrica o gas conica. Forma compatta.',
+   haConn:true, haRid:false, isTT:false, isTappo:false,
+   prezzi:{acc:5.5,inox_mult:2.9}},
+  {cat:'Terminali maschi',
+   id:'TN97',  nome:'T Gas cilindrico', short:'Estremità a T BSP cil.',
+   img:'TN-97.bmp',
+   rastelli:'TN 97', parker:'TEE', paco_pref:'906OC',
+   desc:'Raccordo terminale a T — due uscite DIN 24° + filettatura BSP cilindrica al piede. Per derivazioni.',
+   haConn:false, haRid:true, isTT:false, isTappo:false,
+   prezzi:{acc:5.8,inox_mult:3.0},
+   conn_fisso:'R'},
+  {cat:'Terminali maschi',
+   id:'TN96',  nome:'T metrico/conico', short:'Estremità a T met./conico',
+   img:'TN-96.bmp',
+   rastelli:'TN 96', parker:'TEEM', paco_pref:'906OC',
+   desc:'Raccordo terminale a T — filettatura metrica o gas conica. Disponibile anche con riduzione al piede.',
+   haConn:true, haRid:true, isTT:false, isTappo:false,
+   prezzi:{acc:6.0,inox_mult:3.0}},
+  {cat:'Terminali maschi',
+   id:'TN129', nome:'L BSP cilindrico', short:'Estremità a L BSP cil.',
+   img:'TN-129.bmp',
+   rastelli:'TN 129', parker:'LE', paco_pref:'921TR',
+   desc:'Raccordo terminale a L — due uscite DIN 24° a 90° + filetto BSP. Meno comune del T.',
+   haConn:false, haRid:false, isTT:false, isTappo:false,
+   prezzi:{acc:5.0,inox_mult:2.9},
+   conn_fisso:'R'},
+  {cat:'Terminali maschi',
+   id:'TN127', nome:'L metrico', short:'Estremità a L metrico',
+   img:'TN-127.bmp',
+   rastelli:'TN 127', parker:'LEM', paco_pref:'921TR',
+   desc:'Raccordo terminale a L — filettatura metrica. Due uscite DIN a 90°.',
+   haConn:true, haRid:false, isTT:false, isTappo:false,
+   prezzi:{acc:5.2,inox_mult:2.9}},
+
+  // ── RACCORDI TERMINALI FEMMINA ────────────────────────────────
+  {cat:'Terminali femmina (dado girevole)',
+   id:'TN147', nome:'Dritto femmina', short:'Estremità diritto F girevole',
+   img:'TN-147.bmp',
+   rastelli:'TN 147', parker:'GAI', paco_pref:'918EDG',
+   desc:'Raccordo terminale diritto femmina girevole — il dado gira liberamente attorno al cono 24°. Più comodo del maschio in molti montaggi.',
+   haConn:true, haRid:false, isTT:false, isTappo:false,
+   prezzi:{acc:3.2,inox_mult:2.9}},
+
+  // ── RACCORDI INTERMEDI ────────────────────────────────────────
+  {cat:'Raccordi intermedi (tubo-tubo)',
+   id:'TN98',  nome:'Dritto tubo-tubo', short:'Intermedio diretto',
+   img:'TN-98-1.bmp',
+   rastelli:'TN 98', parker:'EGE', paco_pref:'920TR',
+   desc:'Raccordo intermedio diretto — collega due tubi DIN dello stesso diametro in linea. Nessun filetto impianto.',
+   haConn:false, haRid:false, isTT:true, isTappo:false,
+   prezzi:{acc:3.5,inox_mult:2.8}},
+  {cat:'Raccordi intermedi (tubo-tubo)',
+   id:'TN99',  nome:'Gomito 90° tubo-tubo', short:'Intermedio gomito 90°',
+   img:'TN-99.bmp',
+   rastelli:'TN 99', parker:'EGE90', paco_pref:'921TR',
+   desc:'Raccordo intermedio a gomito 90° — collega due tubi DIN a 90°. Nessun filetto impianto.',
+   haConn:false, haRid:false, isTT:true, isTappo:false,
+   prezzi:{acc:5.0,inox_mult:2.8}},
+  {cat:'Raccordi intermedi (tubo-tubo)',
+   id:'TN100', nome:'T tubo-tubo', short:'Intermedio a T',
+   img:'TN-100-2.bmp',
+   rastelli:'TN 100', parker:'TEGE', paco_pref:'906OC',
+   desc:'Raccordo intermedio a T — tre uscite DIN. Derivazione su tubo rigido. Nessun filetto impianto.',
+   haConn:false, haRid:false, isTT:true, isTappo:false,
+   prezzi:{acc:6.5,inox_mult:2.9}},
+  {cat:'Raccordi intermedi (tubo-tubo)',
+   id:'TN101', nome:'Croce tubo-tubo', short:'Intermedio a croce',
+   img:'TN-101.bmp',
+   rastelli:'TN 101', parker:'CRGE', paco_pref:'907OG',
+   desc:'Raccordo intermedio a croce — quattro uscite DIN. Per distribuzioni a 4 vie.',
+   haConn:false, haRid:false, isTT:true, isTappo:false,
+   prezzi:{acc:7.5,inox_mult:3.0}},
+
+  // ── RACCORDI ORIENTABILI ──────────────────────────────────────
+  {cat:'Raccordi orientabili',
+   id:'TN119', nome:'Orientabile gomito (spinato)', short:'Orientabile 90° con spinotto',
+   img:'TN-119.bmp',
+   rastelli:'TN 119', parker:'WEL', paco_pref:'910BSV',
+   desc:'Raccordo orientabile a gomito — si orienta nella posizione desiderata poi si blocca. Sistema a spinotto (DKO). Per cilindri e attuatori.',
+   haConn:true, haRid:false, isTT:false, isTappo:false,
+   prezzi:{acc:6.5,inox_mult:3.0}},
+  {cat:'Raccordi orientabili',
+   id:'TN514', nome:'Orientabile gomito (controdado)', short:'Orientabile 90° con controdado',
+   img:'TN-514-R.bmp',
+   rastelli:'TN 514', parker:'WEL2', paco_pref:'910BSV',
+   desc:'Raccordo orientabile a gomito con controdado — versione con bloccaggio tramite controdado. Più robusto in applicazioni con vibrazioni.',
+   haConn:true, haRid:false, isTT:false, isTappo:false,
+   prezzi:{acc:7.0,inox_mult:3.0}},
+  {cat:'Raccordi orientabili',
+   id:'TN120', nome:'Orientabile T (spinato)', short:'Orientabile a T con spinotto',
+   img:'TN-120.bmp',
+   rastelli:'TN 120', parker:'TEEL', paco_pref:'910BSV',
+   desc:'Raccordo orientabile a T con sistema a spinotto (DKO).',
+   haConn:true, haRid:false, isTT:false, isTappo:false,
+   prezzi:{acc:8.5,inox_mult:3.0}},
+  {cat:'Raccordi orientabili',
+   id:'TN111', nome:'Orientabile 360° (filettato)', short:'Orientabile 360° con dado',
+   img:'TN-111K-M-R.bmp',
+   rastelli:'TN 111K', parker:'GEL', paco_pref:'911OC',
+   desc:'Raccordo orientabile 360° — il dado gira liberamente per l\'orientamento, poi si stringe. Sistemi a tenuta metallica o con guarnizione GG.',
+   haConn:true, haRid:false, isTT:false, isTappo:false,
+   prezzi:{acc:6.8,inox_mult:3.0}},
+
+  // ── RACCORDI DI ATTRAVERSAMENTO (passaparete) ────────────────
+  {cat:'Passaparete',
+   id:'TN102', nome:'Passaparete dritto', short:'Attraversamento diretto',
+   img:'TN-102.bmp',
+   rastelli:'TN 102', parker:'EPS', paco_pref:'952PP',
+   desc:'Raccordo di attraversamento diretto — per far passare la tubazione attraverso pareti, pannelli o serbatoi. Include controdado.',
+   haConn:true, haRid:false, isTT:false, isTappo:false,
+   prezzi:{acc:4.5,inox_mult:2.9}},
+  {cat:'Passaparete',
+   id:'TN118', nome:'Passaparete gomito', short:'Attraversamento a gomito',
+   img:'TN-118-1.bmp',
+   rastelli:'TN 118', parker:'EPS90', paco_pref:'952PP',
+   desc:'Raccordo di attraversamento a gomito 90° — per passaggi con cambio di direzione.',
+   haConn:true, haRid:false, isTT:false, isTappo:false,
+   prezzi:{acc:6.0,inox_mult:2.9}},
+
+  // ── TAPPI ─────────────────────────────────────────────────────
+  {cat:'Tappi e chiusure',
+   id:'TN185',  nome:'Tappo BSP cilindrico', short:'Tappo hex con guarnizione',
+   img:'TN-185-GG.bmp',
+   rastelli:'TN 185 GG', parker:'PLBSP', paco_pref:'960TP',
+   desc:'Tappo con esagono incassato e guarnizione in gomma — chiusura filettatura BSP cilindrica.',
+   haConn:false, haRid:false, isTT:false, isTappo:true,
+   prezzi:{acc:1.8,inox_mult:2.5},
+   conn_fisso:'R'},
+  {cat:'Tappi e chiusure',
+   id:'TN296', nome:'Tappo tubico DIN', short:'Tappo per raccordo DIN',
+   img:'TN-296.bmp',
+   rastelli:'TN 296', parker:'CAPDIN', paco_pref:'960TP',
+   desc:'Tappo di chiusura tubi — chiude un\'uscita maschio DIN. Per protezione, test o uscite non utilizzate.',
+   haConn:false, haRid:false, isTT:false, isTappo:true,
+   prezzi:{acc:1.5,inox_mult:2.5}},
+];
+
+// Mappatura filetto Rastelli: BSP → R suffix, metrico → M suffix
+// Formato Rastelli: TN92-12LR (BSP cil.), TN92-12LGG (BSP con guarn.), TN92-12LM (metr. cil.)
+// Formato Parker: GE12LR (acciaio), GE12LRSS (inox)
+var CONN_RAST = {R:'R',M:'M',GG:'GG',SV:'SV',RC:'RC',MC:'MC',NPT:'NPT',UNF:'UNF'};
+var CONN_PARKER = {R:'R',M:'M',GG:'GGR',SV:'SVSR',RC:'RCN',MC:'M',NPT:'NPT',UNF:'UN'};
+var FIL_LABELS = {'1/8':'1/8"','1/4':'1/4"','3/8':'3/8"','1/2':'1/2"','3/4':'3/4"','1':'1"','1.1/4':'1¼"','1.1/2':'1½"'};
+var FD={'6':0.62,'8':0.75,'10':0.9,'12':1.0,'14':1.1,'16':1.2,'18':1.35,'20':1.5,'22':1.7,'25':2.0,'28':2.4,'30':2.7,'38':3.5,'42':4.2};
+var FS={'LL':0.8,'L':1.0,'S':1.25};
+var IMG_BASE='https://rastelliraccordi.com/wp-content/uploads/2017/06/';
+
+var DS = {forma:null,diam:'12',serie:'L',conn:'R',fil:'1/4',mat:'ACC',rid:'',qty:1};
+var DLista = [];
+
+// ── BUILD SIDEBAR ──────────────────────────────────────────────
+
+function buildSidebarDin(){
+  var el=document.getElementById('forme-din');
+  var lastCat='';
+  // Popola select mobile
+  var msel=document.getElementById('mobile-forma-sel-din');
+  if(msel){
+    var lastCatM='';
+    msel.innerHTML='<option value="">— Seleziona forma raccordo —</option>';
+    FORME_DIN.forEach(function(f){
+      if(f.cat!==lastCatM){
+        var og=document.createElement('optgroup');og.label=f.cat;msel.appendChild(og);lastCatM=f.cat;
+      }
+      var op=document.createElement('option');op.value=f.id;op.textContent=f.nome+' ('+f.rastelli+')';
+      if(f.id===DS.forma)op.selected=true;
+      msel.lastChild.appendChild(op);
+    });
+  }
+  el.innerHTML=FORME_DIN.map(function(f){
+    var catHd=f.cat!==lastCat?'<div class="sidebar-hd" style="font-size:9px">'+f.cat+'</div>':'';
+    lastCat=f.cat;
+    return catHd+'<div class="forma-item'+(DS.forma===f.id?' on':'')+' " onclick="dinSelForma(\''+f.id+'\')">'+'<div>'+'<div class="fi-nome">'+f.nome+'</div>'+'<div class="fi-cod">'+f.rastelli+' · '+f.short+'</div>'+'</div>'+'</div>';
+  }).join('');
+}
+
+function dinSelForma(id){
+  DS.forma=id;
+  buildSidebarDin();
+  var f=FORME_DIN.find(function(x){return x.id===id;});
+  if(f){
+    document.getElementById('din-title').textContent=f.nome;
+    document.getElementById('din-desc').textContent=f.desc;
+    document.getElementById('din-conn-group').style.display=(f.haConn&&!f.isTT&&!f.isTappo)?'':'none';
+    // Immagine grande
+    var imgEl=document.getElementById('din-forma-img');
+    var imgWrap=document.getElementById('din-forma-img-wrap');
+    if(imgEl&&imgWrap){
+      imgEl.src=IMG_BASE+f.img;
+      imgEl.alt=f.nome;
+      imgWrap.style.display='';
+    }
+  }
+  calcDin();
+}
+
+// ── CHIP DIN ──────────────────────────────────────────────────
+
+document.querySelectorAll('#din-diam .chip, #din-serie .chip, #din-mat .chip').forEach(function(c){
+  c.addEventListener('click',function(){
+    var g=c.parentElement.id;
+    c.parentElement.querySelectorAll('.chip').forEach(function(x){x.className='chip';});
+    c.classList.add('on');
+    if(g==='din-mat'){
+      if(c.dataset.v!=='ACC')c.classList.add('on-inox');
+      document.getElementById('nota-inox-din').style.display=c.dataset.v!=='ACC'?'block':'none';
+    }
+    calcDin();
+  });
+});
+document.querySelectorAll('#din-mat .chip').forEach(function(c){
+  c.addEventListener('click',function(){
+    if(c.dataset.v!=='ACC')c.classList.add('on-inox');
+  });
+});
+
+function dinGetV(gid){var el=document.querySelector('#'+gid+' .chip.on');return el?el.dataset.v:'';}
+
+// ── CALC CODICI DIN ───────────────────────────────────────────
+
+function calcDin(){
+  DS.diam=dinGetV('din-diam')||DS.diam;
+  DS.serie=dinGetV('din-serie')||DS.serie;
+  DS.mat=dinGetV('din-mat')||DS.mat;
+  DS.conn=document.getElementById('din-conn').value||'R';
+  DS.fil=document.getElementById('din-fil').value||'1/4';
+  DS.rid=dinGetV('din-rid')||DS.rid;
+
+  if(!DS.forma){document.getElementById('din-result').innerHTML='<div style="color:var(--text3);font-size:12px">Seleziona forma e parametri</div>';return;}
+  var f=FORME_DIN.find(function(x){return x.id===DS.forma;});
+  if(!f)return;
+
+  var conn=f.conn_fisso||DS.conn;
+  var matInox=DS.mat!=='ACC';
+  var inoxSuf=matInox?'/VA':''; // Rastelli usa /VA per inox
+  var parkerInox=matInox?'SS':'';
+
+  var serie=DS.serie;
+  var diam=DS.diam;
+  var fil=DS.fil;
+  var filLabel=FIL_LABELS[fil]||fil;
+
+  // ─ Rastelli ─
+  var rastCod='';
+  if(f.isTT||f.isTappo){
+    rastCod=f.rastelli+'-'+diam+serie+(matInox?'/VA':'');
+  } else {
+    var suffR=CONN_RAST[conn]||conn;
+    rastCod=f.rastelli+'-'+diam+serie+suffR+(fil!=='1/4'?' '+filLabel:'')+(matInox?'/VA':'');
+  }
+
+  // ─ Parker Ermeto ─
+  var parkerCod='';
+  if(!f.isTT&&!f.isTappo){
+    var parkerConn=CONN_PARKER[conn]||conn;
+    parkerCod=f.parker+diam+serie+parkerConn+(fil!=='1/4'?fil.replace('/',''):'')+(matInox?'SS':'');
+  } else {
+    parkerCod=f.parker+diam+serie+(matInox?'SS':'');
+  }
+
+  // ─ Pa.Co ─
+  var pacoSuf=matInox?'-INOX':'';
+  var pacoCod=f.paco_pref+'-'+diam+serie+pacoSuf;
+
+  // ─ Descrizione ─
+  var descParts=[f.nome,'Ø'+diam+'mm','Serie '+serie];
+  if(!f.isTT&&!f.isTappo&&f.haConn){
+    descParts.push(conn==='R'?'BSP cil. G '+filLabel:conn==='M'?'Metr. G '+filLabel:conn);
+  }
+  if(matInox)descParts.push('Inox 316L');
+
+  // ─ Prezzi ─
+  var pb=f.prezzi.acc;var pd=FD[diam]||1;var ps=FS[serie]||1;
+  var pAcc=pb*pd*ps; var pInox=pAcc*f.prezzi.inox_mult;
+
+  var html='<div class="cod-row"><span class="cod-src">Rastelli</span><span class="cod-val">'+rastCod+'</span></div>'+
+    '<div class="cod-row"><span class="cod-src">Parker</span><span class="cod-val secondary">'+parkerCod+'</span></div>'+
+    '<div class="cod-row"><span class="cod-src">Pa.Co</span><span class="cod-val secondary">'+pacoCod+'</span></div>'+
+    '<div class="cod-desc">'+descParts.join(' · ')+'</div>'+
+    '<div class="price-row">'+
+      '<span class="pc pc-acc">Acc ~€'+pAcc.toFixed(2)+'/pz</span>'+
+      '<span class="pc pc-inox">Inox ~€'+pInox.toFixed(2)+'/pz</span>'+
+    '</div>';
+  document.getElementById('din-result').innerHTML=html;
+
+  var warnEl=document.getElementById('din-warn');
+  if(f.formati_rastelli){warnEl.textContent='📋 Formati Rastelli: '+f.formati_rastelli;warnEl.style.display='block';}
+  else warnEl.style.display='none';
+
+  DS._rastelli=rastCod; DS._parker=parkerCod; DS._paco=pacoCod;
+  DS._desc=descParts.join(' · ');
+  DS._prezzo=matInox?pInox:pAcc;
+}
+
+function dinQd(d){DS.qty=Math.max(1,DS.qty+d);document.getElementById('din-qty-n').textContent=DS.qty;}
+
+function dinAddL(){
+  if(!DS._rastelli)return;
+  var ex=DLista.find(function(i){return i.rastelli===DS._rastelli;});
+  if(ex)ex.qty+=DS.qty;
+  else DLista.push({rastelli:DS._rastelli,parker:DS._parker,paco:DS._paco,desc:DS._desc,qty:DS.qty,prezzo:DS._prezzo});
+  dinRenderL();
+  var b=document.getElementById('din-btn-add');
+  b.textContent='✓ Aggiunto!';b.style.background='#16a34a';
+  setTimeout(function(){b.textContent='+ Aggiungi alla lista';b.style.background='';},1200);
+}
+
+function dinRenderL(){
+  var el=document.getElementById('din-lista-el'),ea=document.getElementById('din-exp'),lc=document.getElementById('din-lista-c');
+  if(!DLista.length){el.innerHTML='<div class="empty">Nessun raccordo</div>';ea.style.display='none';lc.textContent='vuota';return;}
+  var tot=DLista.reduce(function(s,i){return s+i.qty;},0);
+  lc.textContent=DLista.length+' art. · '+tot+' pz';
+  el.innerHTML=DLista.map(function(item,i){
+    return'<div class="li-item">'+
+      '<div class="li-cod">'+item.rastelli+'</div>'+
+      '<div class="li-desc">'+item.desc+
+        (item.parker?'<br><span style="color:var(--text3)">Parker: '+item.parker+' · Pa.Co: '+item.paco+'</span>':'')+
+      '</div>'+
+      '<div class="li-row">'+
+        '<button class="ib" data-i="'+i+'" onclick="dinIqd(this.dataset.i,-1)">−</button>'+
+        '<span class="in">'+item.qty+'</span>'+
+        '<button class="ib" data-i="'+i+'" onclick="dinIqd(this.dataset.i,1)">+</button>'+
+        '<span class="ip">~€'+(item.prezzo*item.qty).toFixed(2)+'</span>'+
+        '<button class="btn btn-danger btn-sm" data-i="'+i+'" onclick="dinDel(this.dataset.i)" style="margin-left:auto;padding:2px 8px">✕</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  var lines=[
+    'LISTA RACCORDI DIN 2353 — '+new Date().toLocaleDateString('it-IT'),
+    'Riferimenti: Rastelli Raccordi / Parker Ermeto / Pa.Co Fluid & Air Group',''];
+  DLista.forEach(function(item){
+    lines.push(item.qty+'x  '+item.rastelli);
+    lines.push('    Parker: '+item.parker+'  |  Pa.Co: '+item.paco);
+    lines.push('    '+item.desc);
+    lines.push('');
+  });
+  var totEuro=DLista.reduce(function(s,i){return s+i.prezzo*i.qty;},0);
+  lines.push('TOT. INDICATIVO: ~€'+totEuro.toFixed(2)+' (verificare con fornitore)');
+  document.getElementById('din-exp-pre').textContent=lines.join('\n');
+  ea.style.display='';
+}
+
+function dinIqd(i,d){DLista[parseInt(i)].qty=Math.max(1,DLista[parseInt(i)].qty+d);dinRenderL();}
+function dinDel(i){DLista.splice(parseInt(i),1);dinRenderL();}
+function dinSvuota(){if(confirm('Svuotare la lista?')){DLista=[];dinRenderL();}}
+function dinCopia(){navigator.clipboard.writeText(document.getElementById('din-exp-pre').textContent).then(function(){alert('Copiato!');});}
+function dinCsv(){
+  var c='Rastelli,Parker,PaCo,Descrizione,Qty,Prezzo_ind\n';
+  DLista.forEach(function(i){c+='"'+i.rastelli+'","'+i.parker+'","'+i.paco+'","'+i.desc+'",'+i.qty+','+i.prezzo.toFixed(2)+'\n';});
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));
+  a.download='raccordi_din_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+function dinInvia(){
+  if(window.opener&&window.opener._riceviRaccordi){
+    window.opener._riceviRaccordi(DLista);
+    window.close();
+  } else if(window.opener){
+    alert('La finestra del gestionale non è più aperta. Copia il CSV e importalo manualmente.');
+  } else {
+    navigator.clipboard.writeText(JSON.stringify(DLista,null,2)).then(function(){
+      alert('Dati copiati come JSON.'+(_commessaNum?' Apri il gestionale e incolla nella distinta della commessa '+_commessaNum:''));
+    });
+  }
+}
+
+// ── ZOOM IMMAGINE ─────────────────────────────────────────────
+function dinZoomImg(src,alt){
+  var ov=document.getElementById('img-overlay');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='img-overlay';
+    ov.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:20px';
+    ov.onclick=function(){ov.remove();};
+    document.body.appendChild(ov);
+  }
+  ov.innerHTML='<div style="text-align:center"><img src="'+src+'" alt="'+alt+'" style="max-width:90vw;max-height:80vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 32px #000a"><div style="color:#94a3b8;font-size:12px;margin-top:12px">'+alt+' · click per chiudere</div></div>';
+  document.body.appendChild(ov);
+}
+
+
+// ══ BSP ══════════════════════════════════════════════════════════════════════
+var FORME_BSP=[
+  {id:'BSP-MM',  nome:'Nipplo M/M',       short:'Maschio-maschio BSP dritto',
+   img:'TN-185-GG.bmp',rastelli:'BSP-MM',parker:'BSPP-MM',haRid:false,
+   desc:'Nipplo maschio-maschio BSP. Collega due filetti femmina BSP o adatta tra taglie diverse.'},
+  {id:'BSP-MF',  nome:'Riduzione M/F',    short:'Maschio-femmina BSP dritto',
+   img:'TN-185-GG.bmp',rastelli:'BSP-MF',parker:'BSPP-MF',haRid:true,
+   desc:'Riduzione maschio BSP × femmina BSP. La piu comune per adattare passi diversi.'},
+  {id:'BSP-90',  nome:'Gomito 90° M/M',   short:'Curva 90° maschio-maschio BSP',
+   img:'TN-95-1.bmp',  rastelli:'BSP-90',parker:'BSPP-EL90',haRid:false,
+   desc:'Gomito 90° maschio BSP su entrambi i lati. Per cambio direzione senza tubo.'},
+  {id:'BSP-T',   nome:'T maschio BSP',    short:'Derivazione a T maschio BSP',
+   img:'TN-97.bmp',    rastelli:'BSP-T', parker:'BSPP-T',haRid:false,
+   desc:'Raccordo a T maschio BSP su tutti e tre i lati.'},
+  {id:'BSP-OR',  nome:'Orientabile BSP',  short:'Raccordo orientabile M/M BSP',
+   img:'TN-111K-M-R.bmp',rastelli:'BSP-OR',parker:'BSPP-OR',haRid:false,
+   desc:'Raccordo orientabile maschio BSP con O-ring. Si orienta prima di bloccare.'},
+  {id:'BSP-PP',  nome:'Tappo maschio BSP',short:'Vite chiusura BSP hex + guarnizione',
+   img:'TN-185-GG.bmp',rastelli:'TN 185 GG',parker:'BSPP-PLG',haRid:false,
+   desc:'Tappo esagonale maschio BSP con guarnizione in gomma.'},
+  {id:'BSP-PF',  nome:'Tappo femmina BSP',short:'Dado chiusura femmina BSP',
+   img:'TN-185-GG.bmp',rastelli:'TN 192 R', parker:'BSPP-CAP',haRid:false,
+   desc:'Dado di chiusura femmina BSP. Per protezione o chiusura temporanea.'},
+];
+var BSP_FIL_DISP={'1/8':'G 1/8"','1/4':'G 1/4"','3/8':'G 3/8"','1/2':'G 1/2"','3/4':'G 3/4"','1':'G 1"','1-1/4':'G 1.1/4"','1-1/2':'G 1.1/2"'};
+var BSP_PREZZI={'BSP-MM':1.8,'BSP-MF':2.2,'BSP-90':3.5,'BSP-T':4.8,'BSP-OR':5.5,'BSP-PP':1.5,'BSP-PF':1.3};
+var BS={forma:null,fil:'1/4',fil2:'1/4',mat:'ACC',qty:1,_cod:'',_desc:'',_prezzo:0};
+var BSPLista=[];
+
+function buildSidebarBSP(){
+  var el=document.getElementById('forme-bsp');if(!el)return;
+  el.innerHTML=FORME_BSP.map(function(f){
+    return'<div class="forma-item'+(BS.forma===f.id?' on':'')+'" onclick="bspSelForma(\''+f.id+'\')">'+
+      '<div><div class="fi-nome">'+f.nome+'</div><div class="fi-cod">'+f.short+'</div></div></div>';
+  }).join('');
+}
+function bspSelForma(id){
+  BS.forma=id;buildSidebarBSP();
+  var f=FORME_BSP.find(function(x){return x.id===id;});
+  if(!f)return;
+  document.getElementById('bsp-title').textContent=f.nome;
+  document.getElementById('bsp-desc').textContent=f.desc;
+  var iw=document.getElementById('bsp-forma-img-wrap'),im=document.getElementById('bsp-forma-img');
+  if(im&&iw){im.src='https://rastelliraccordi.com/wp-content/uploads/2017/06/'+f.img;im.alt=f.nome;iw.style.display='';}
+  var g2=document.getElementById('bsp-fil2-group');
+  if(g2)g2.style.display=f.haRid?'':'none';
+  calcBSP();
+}
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('#bsp-fil .chip,#bsp-fil2 .chip,#bsp-mat .chip').forEach(function(c){
+    c.addEventListener('click',function(){
+      var gid=c.parentElement.id;
+      c.parentElement.querySelectorAll('.chip').forEach(function(x){x.className='chip';});
+      c.classList.add('on');
+      if(gid==='bsp-fil')BS.fil=c.dataset.v;
+      else if(gid==='bsp-fil2')BS.fil2=c.dataset.v;
+      else if(gid==='bsp-mat'){BS.mat=c.dataset.v;if(BS.mat!=='ACC')c.classList.add('on-inox');}
+      calcBSP();
+    });
+  });
+  document.querySelectorAll('#jic-diam .chip,#jic-fil .chip,#jic-mat .chip').forEach(function(c){
+    c.addEventListener('click',function(){
+      var gid=c.parentElement.id;
+      c.parentElement.querySelectorAll('.chip').forEach(function(x){x.className='chip';});
+      c.classList.add('on');
+      if(gid==='jic-diam')JS.diam=c.dataset.v;
+      else if(gid==='jic-fil')JS.fil=c.dataset.v;
+      else if(gid==='jic-mat'){JS.mat=c.dataset.v;if(JS.mat!=='ACC')c.classList.add('on-inox');}
+      calcJIC();
+    });
+  });
+});
+function calcBSP(){
+  if(!BS.forma)return;
+  var f=FORME_BSP.find(function(x){return x.id===BS.forma;});if(!f)return;
+  var matSuf=BS.mat==='INOX'?'/VA':BS.mat==='OTT'?'/BR':'';
+  var parkerMatSuf=BS.mat==='INOX'?'SS':BS.mat==='OTT'?'BR':'';
+  var fil=BS.fil;var fil2=BS.fil2;
+  var rastCod=f.rastelli+'-'+fil+(f.haRid?'x'+fil2:'')+matSuf;
+  var parkerCod=f.parker+'-'+fil+(f.haRid?'X'+fil2:'')+parkerMatSuf;
+  var desc=f.nome+' '+BSP_FIL_DISP[fil]+(f.haRid?' x '+BSP_FIL_DISP[fil2]:'');
+  if(BS.mat!=='ACC')desc+=' '+(BS.mat==='INOX'?'Inox 316L':'Ottone');
+  var pBase=BSP_PREZZI[BS.forma]||2.0;
+  var pMat=BS.mat==='INOX'?2.9:BS.mat==='OTT'?1.4:1.0;
+  var pAcc=pBase,pInox=pBase*2.9;
+  var html='<div class="cod-row"><span class="cod-src">Rastelli</span><span class="cod-val">'+rastCod+'</span></div>'+
+    '<div class="cod-row"><span class="cod-src">Parker</span><span class="cod-val secondary">'+parkerCod+'</span></div>'+
+    '<div class="cod-desc">'+desc+'<br><span style="font-size:11px;color:var(--text3)">Tenuta cono 60° — filetto parallelo BSP (BSPP / Gas ISO 228)</span></div>'+
+    '<div class="price-row"><span class="pc pc-acc">Acc ~\u20ac'+pAcc.toFixed(2)+'/pz</span>'+
+    (BS.mat==='ACC'?'<span class="pc pc-inox">Inox ~\u20ac'+pInox.toFixed(2)+'/pz</span>':'')+
+    '</div>';
+  document.getElementById('bsp-result').innerHTML=html;
+  BS._cod=rastCod;BS._parker=parkerCod;BS._desc=desc;BS._prezzo=pBase*pMat;
+}
+function bspQd(d){BS.qty=Math.max(1,BS.qty+d);document.getElementById('bsp-qty-n').textContent=BS.qty;}
+function bspAddL(){
+  if(!BS._cod)return;
+  var ex=BSPLista.find(function(i){return i.cod===BS._cod;});
+  if(ex)ex.qty+=BS.qty;else BSPLista.push({cod:BS._cod,parker:BS._parker,desc:BS._desc,qty:BS.qty,prezzo:BS._prezzo});
+  bspRenderL();
+  var b=document.getElementById('bsp-btn-add');
+  b.textContent='\u2713 Aggiunto!';b.style.background='#16a34a';
+  setTimeout(function(){b.textContent='+ Aggiungi alla lista';b.style.background='';},1200);
+}
+function bspRenderL(){
+  var el=document.getElementById('bsp-lista-el'),ea=document.getElementById('bsp-exp'),lc=document.getElementById('bsp-lista-c');
+  if(!BSPLista.length){el.innerHTML='<div class="empty">Nessun adattatore</div>';ea.style.display='none';lc.textContent='vuota';return;}
+  lc.textContent=BSPLista.reduce(function(s,i){return s+i.qty;},0)+' pz';
+  el.innerHTML=BSPLista.map(function(item,i){
+    return'<div class="li-item"><div class="li-cod">'+item.cod+'</div><div class="li-desc">'+item.desc+'</div>'+
+    '<div class="li-row"><span class="ip">\u20ac'+(item.prezzo*item.qty).toFixed(2)+'</span>'+
+    '<button class="ib" data-i="'+i+'" onclick="BSPLista[parseInt(this.dataset.i)].qty=Math.max(1,BSPLista[parseInt(this.dataset.i)].qty-1);bspRenderL()">\u2212</button>'+
+    '<span class="in">'+item.qty+'</span>'+
+    '<button class="ib" data-i="'+i+'" onclick="BSPLista[parseInt(this.dataset.i)].qty++;bspRenderL()">+</button>'+
+    '<button class="btn btn-danger btn-sm" data-i="'+i+'" onclick="BSPLista.splice(parseInt(this.dataset.i),1);bspRenderL()" style="margin-left:auto">\u2715</button>'+
+    '</div></div>';
+  }).join('');
+  var lines=['LISTA ADATTATORI BSP \u2014 '+new Date().toLocaleDateString('it-IT'),''];
+  BSPLista.forEach(function(item){lines.push(item.qty+'x  '+item.cod+' (Parker: '+item.parker+')  \u2014  '+item.desc);});
+  document.getElementById('bsp-exp-pre').textContent=lines.join('\n');
+  ea.style.display='';
+}
+
+// ══ JIC 37° ══════════════════════════════════════════════════════════════════
+var IMG_B='https://rastelliraccordi.com/wp-content/uploads/2017/06/';
+var FORME_JIC=[
+  {id:'JIC-D',  nome:'Dritto maschio JIC',    short:'Terminale diretto JIC 37°',
+   img:'TN-92-1.bmp', parker:'GE',rastelli:'TN 92 JIC',
+   desc:'Raccordo terminale diretto JIC 37° \u2014 svasatura tubo 37\u00b0 lato DIN, filetto UNF maschio lato impianto. Standard SAE J514 (Triple-Lok\u00ae Parker).'},
+  {id:'JIC-90', nome:'Gomito 90° JIC',         short:'Gomito 90\u00b0 JIC 37\u00b0',
+   img:'TN-95-1.bmp', parker:'WE',rastelli:'TN 95 JIC',
+   desc:'Raccordo gomito 90\u00b0 JIC 37\u00b0. Richiede svasatura tubo a 37\u00b0.'},
+  {id:'JIC-45', nome:'Gomito 45° JIC',         short:'Gomito 45\u00b0 JIC 37\u00b0',
+   img:'TN-95-1.bmp', parker:'WE45',rastelli:'TN 94/45 JIC',
+   desc:'Raccordo gomito 45\u00b0 JIC 37\u00b0.'},
+  {id:'JIC-T',  nome:'T maschio JIC',          short:'Derivazione a T JIC 37\u00b0',
+   img:'TN-97.bmp',   parker:'TE',rastelli:'TN 97 JIC',
+   desc:'Raccordo a T JIC 37\u00b0 \u2014 tre uscite per svasatura.'},
+  {id:'JIC-FG', nome:'Femmina girevole JIC',   short:'Dado girevole JIC 37\u00b0',
+   img:'TN-147.bmp',  parker:'GEI',rastelli:'TN 147 JIC',
+   desc:'Raccordo femmina girevole JIC 37\u00b0. Il dado scorre libero facilitando il montaggio.'},
+  {id:'JIC-NP', nome:'Nipple M/M JIC',         short:'Nipplo maschio-maschio JIC',
+   img:'TN-98-1.bmp', parker:'NP',rastelli:'JIC-NP',
+   desc:'Nipple maschio-maschio JIC 37\u00b0 per giunzioni tubo-tubo.'},
+];
+var JIC_DIAM_F={'6':0.62,'8':0.75,'10':0.9,'12':1.0,'14':1.1,'16':1.2,'18':1.35,'20':1.5,'22':1.7,'25':2.0};
+var JIC_FIL_DISP={'7/16-20':'7/16"-20 UNF','1/2-20':'1/2"-20 UNF','9/16-18':'9/16"-18 UNF','3/4-16':'3/4"-16 UNF','7/8-14':'7/8"-14 UNF','1-1/16-12':'1 1/16"-12 UNF'};
+var JS={forma:null,diam:'10',fil:'1/2-20',mat:'ACC',qty:1,_cod:'',_desc:'',_prezzo:0};
+var JICLista=[];
+
+function buildSidebarJIC(){
+  var el=document.getElementById('forme-jic');if(!el)return;
+  el.innerHTML=FORME_JIC.map(function(f){
+    return'<div class="forma-item'+(JS.forma===f.id?' on':'')+'" onclick="jicSelForma(\''+f.id+'\')">'+
+      '<div><div class="fi-nome">'+f.nome+'</div><div class="fi-cod">'+f.short+'</div></div></div>';
+  }).join('');
+}
+function jicSelForma(id){
+  JS.forma=id;buildSidebarJIC();
+  var f=FORME_JIC.find(function(x){return x.id===id;});if(!f)return;
+  document.getElementById('jic-title').textContent=f.nome;
+  document.getElementById('jic-desc').textContent=f.desc;
+  calcJIC();
+}
+function calcJIC(){
+  if(!JS.forma)return;
+  var f=FORME_JIC.find(function(x){return x.id===JS.forma;});if(!f)return;
+  var matSuf=JS.mat==='INOX'?'SS':'';
+  var rastSuf=JS.mat==='INOX'?'/VA':'';
+  var parkerCod=f.parker+JS.diam+matSuf;
+  var rastCod=f.rastelli+'-'+JS.diam+rastSuf;
+  var filDisp=JIC_FIL_DISP[JS.fil]||JS.fil;
+  var desc=f.nome+' \u00d8'+JS.diam+'mm \u00d7 UNF '+filDisp+' \u2014 svasatura 37\u00b0';
+  if(JS.mat!=='ACC')desc+=' Inox 316L';
+  var pBase=3.2,pd=JIC_DIAM_F[JS.diam]||1.0,pMat=JS.mat==='INOX'?2.9:1.0;
+  var html='<div class="cod-row"><span class="cod-src">Parker</span><span class="cod-val">'+parkerCod+'</span></div>'+
+    '<div class="cod-row"><span class="cod-src">Rastelli</span><span class="cod-val secondary">'+rastCod+'</span></div>'+
+    '<div class="cod-desc">'+desc+
+    '<br><span style="font-size:11px;color:var(--amber)">&#9888; Richiede svasatura tubo 37\u00b0 (SAE J514) \u2014 non intercambiabile con DIN 24\u00b0</span></div>'+
+    '<div class="price-row"><span class="pc pc-acc">Acc ~\u20ac'+(pBase*pd).toFixed(2)+'/pz</span>'+
+    (JS.mat==='ACC'?'<span class="pc pc-inox">Inox ~\u20ac'+(pBase*pd*2.9).toFixed(2)+'/pz</span>':'')+
+    '</div>';
+  document.getElementById('jic-result').innerHTML=html;
+  JS._cod=parkerCod;JS._rastelli=rastCod;JS._desc=desc;JS._prezzo=pBase*pd*pMat;
+}
+function jicQd(d){JS.qty=Math.max(1,JS.qty+d);document.getElementById('jic-qty-n').textContent=JS.qty;}
+function jicAddL(){
+  if(!JS._cod)return;
+  var ex=JICLista.find(function(i){return i.cod===JS._cod;});
+  if(ex)ex.qty+=JS.qty;else JICLista.push({cod:JS._cod,rastelli:JS._rastelli,desc:JS._desc,qty:JS.qty,prezzo:JS._prezzo});
+  jicRenderL();
+  var b=document.getElementById('jic-btn-add');
+  b.textContent='\u2713 Aggiunto!';b.style.background='#16a34a';
+  setTimeout(function(){b.textContent='+ Aggiungi alla lista';b.style.background='';},1200);
+}
+function jicRenderL(){
+  var el=document.getElementById('jic-lista-el'),ea=document.getElementById('jic-exp'),lc=document.getElementById('jic-lista-c');
+  if(!JICLista.length){el.innerHTML='<div class="empty">Nessun raccordo</div>';ea.style.display='none';lc.textContent='vuota';return;}
+  lc.textContent=JICLista.reduce(function(s,i){return s+i.qty;},0)+' pz';
+  el.innerHTML=JICLista.map(function(item,i){
+    return'<div class="li-item"><div class="li-cod">'+item.cod+'</div><div class="li-desc">'+item.desc+'</div>'+
+    '<div class="li-row"><span class="ip">\u20ac'+(item.prezzo*item.qty).toFixed(2)+'</span>'+
+    '<button class="ib" data-i="'+i+'" onclick="JICLista[parseInt(this.dataset.i)].qty=Math.max(1,JICLista[parseInt(this.dataset.i)].qty-1);jicRenderL()">\u2212</button>'+
+    '<span class="in">'+item.qty+'</span>'+
+    '<button class="ib" data-i="'+i+'" onclick="JICLista[parseInt(this.dataset.i)].qty++;jicRenderL()">+</button>'+
+    '<button class="btn btn-danger btn-sm" data-i="'+i+'" onclick="JICLista.splice(parseInt(this.dataset.i),1);jicRenderL()" style="margin-left:auto">\u2715</button>'+
+    '</div></div>';
+  }).join('');
+  var lines=['LISTA RACCORDI JIC 37\u00b0 \u2014 '+new Date().toLocaleDateString('it-IT'),''];
+  JICLista.forEach(function(item){lines.push(item.qty+'x  '+item.cod+' (Rastelli: '+item.rastelli+')  \u2014  '+item.desc);});
+  document.getElementById('jic-exp-pre').textContent=lines.join('\n');
+  ea.style.display='';
+}
+// Init BSP e JIC
+buildSidebarBSP();
+buildSidebarJIC();
+bspSelForma('BSP-MM');
+jicSelForma('JIC-D');
+
+// ── INIT ──────────────────────────────────────────────────────
+// Legge numero commessa dall'URL se aperto dalla commessa
+var _commessaNum=(new URLSearchParams(window.location.search)).get('num')||'';
+if(_commessaNum){
+  document.querySelector('.topbar-sub').textContent='Commessa: '+_commessaNum+' — seleziona raccordi e premi "→ Aggiungi a commessa"';
+  // Rinomina il bottone invia per chiarezza
+  document.querySelectorAll('[onclick="dinInvia()"]').forEach(function(b){b.textContent='→ Aggiungi a '+_commessaNum;});
+}
+buildSidebarDin();
+dinSelForma('TN92');
+</script>
+</body>
+</html>
