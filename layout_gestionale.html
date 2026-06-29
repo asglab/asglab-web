@@ -1,0 +1,32 @@
+{{- /*
+  layouts/gestionale/list.html  (e single.html)
+  Layout AUTONOMO — bypassa completamente baseof.html di Blowfish.
+  Non usa {{ define "main" }} — scrive l'intera pagina HTML.
+*/ -}}
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth" data-default-appearance="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Gestionale — ASG LAB</title>
+  <meta name="theme-color" content="#f0f2f5">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  {{/* CSS dashboard — processato e fingerprinted da Hugo */}}
+  {{ $css := resources.Get "gestionale/dashboard.css" | resources.Fingerprint }}
+  <link rel="stylesheet" href="{{ $css.RelPermalink }}">
+</head>
+<body>
+
+{{/* HTML dashboard */}}
+{{ $body := resources.Get "gestionale/dashboard.css" }}
+{{ readFile "assets/gestionale/dashboard-body.html" | safeHTML }}
+
+{{/* JS dashboard */}}
+{{ $js := resources.Get "gestionale/dashboard.js" | resources.Fingerprint }}
+<script src="{{ $js.RelPermalink }}" defer></script>
+
+</body>
+</html>

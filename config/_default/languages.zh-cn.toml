@@ -1,0 +1,34 @@
+disabled = false
+languageCode = "zh-cn"
+languageName = "简体中文"
+weight = 9
+title = "ASG LAB"
+
+[params]
+  displayName = "简体中文"
+  isoCode = "zh-cn"
+  rtl = false
+  dateFormat = "2006-01-02"
+  logo = "img/icon-light.png"
+  # secondaryLogo = "img/icon-dark.png"
+  # description = "流体动力，绝对控制。"
+  # copyright = "Copy, _right?_ :thinking_face:"
+
+ [params.author]
+   name = "ASG LAB"
+   email = "info@asglab.it"
+   image = "img/icon-light.png"
+   imageQuality = 96
+   headline = "流体动力，绝对控制。"
+   bio = "我们专注于液压系统及其组件的设计、制造和维护。我们为工业领域提供量身定制的解决方案，融合经验、创新与可靠性。"
+   links = [
+     { email = "mailto:hello@your_domain.com" },
+#     { link = "https://link-to-some-website.com/" },
+#     { facebook = "https://facebook.com/username" },
+#     { github = "https://github.com/username" },
+#     { instagram = "https://instagram.com/username" },
+#     { linkedin = "https://linkedin.com/in/username" },
+     { telegram = "https://t.me/+393755707492" },
+#     { x-twitter = "https://twitter.com/username" },
+     { whatsapp = "https://wa.me/+393755707492" },
+   ]

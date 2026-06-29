@@ -1,0 +1,10 @@
+{{ define "main" }}
+<div id="gestionale-root"></div>
+<script>
+fetch('/gestionale/dashboard-body.html')
+  .then(r=>r.text())
+  .then(html=>{
+    document.getElementById('gestionale-root').innerHTML=html;
+  });
+</script>
+{{ end }}

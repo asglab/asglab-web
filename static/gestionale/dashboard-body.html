@@ -1,0 +1,1009 @@
+<!-- ══ SIDEBAR ══ -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-name">ASG LAB</div>
+    <div class="sidebar-logo-sub">Oleodinamica SRL</div>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item active" data-view="home" title="Home" href="#" onclick="navTo('home');event.preventDefault()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="8" width="6" height="7" rx="1" fill="currentColor" opacity=".5"/><rect x="9" y="4" width="6" height="11" rx="1" fill="currentColor" opacity=".8"/><rect x="3" y="1" width="10" height="4" rx="1" fill="currentColor"/></svg>
+      <span>Home</span>
+    </a>
+    <a class="nav-item" data-view="commesse" title="Commesse" href="#" onclick="navTo('commesse');event.preventDefault()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="3" rx="1" fill="currentColor" opacity=".5"/><rect x="2" y="7" width="8" height="2" rx="1" fill="currentColor" opacity=".8"/><rect x="2" y="11" width="10" height="2" rx="1" fill="currentColor" opacity=".6"/></svg>
+      <span>Commesse</span>
+      <span class="nav-badge" id="nb-commesse" style="display:none">0</span>
+    </a>
+    <a class="nav-item" data-view="approv" title="Approvvigionamenti" href="#" onclick="navTo('approv');event.preventDefault()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3" opacity=".6"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".9"/></svg>
+      <span>Approvvigionamenti</span>
+      <span class="nav-badge amber" id="nb-approv" style="display:none">0</span>
+    </a>
+    <div class="nav-section">Contabilità</div>
+    <a class="nav-item" data-view="contabilita" title="Contabilità" href="#" onclick="navTo('contabilita');event.preventDefault()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2" opacity=".7"/><path d="M1 7h14" stroke="currentColor" stroke-width="1" opacity=".5"/><rect x="4" y="9" width="2" height="2" rx=".5" fill="currentColor" opacity=".8"/><rect x="7" y="9" width="2" height="2" rx=".5" fill="currentColor" opacity=".5"/></svg>
+      <span>Contabilità</span>
+    </a>
+    <div class="nav-section">Operativo</div>
+    <a class="nav-item" data-view="magazzino" title="Magazzino" href="#" onclick="navTo('magazzino');event.preventDefault()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="9" width="12" height="5" rx="1" fill="currentColor" opacity=".4"/><rect x="4" y="5" width="8" height="5" rx="1" fill="currentColor" opacity=".6"/><rect x="6" y="2" width="4" height="4" rx="1" fill="currentColor" opacity=".9"/></svg>
+      <span>Magazzino</span>
+      <span class="nav-badge amber" id="nb-mag" style="display:none">0</span>
+    </a>
+    <a class="nav-item" data-view="fornitori" title="Fornitori" href="#" onclick="navTo('fornitori');event.preventDefault()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="3" stroke="currentColor" stroke-width="1.2" opacity=".7"/><circle cx="11" cy="8" r="2.5" stroke="currentColor" stroke-width="1.2" opacity=".5"/><path d="M2 14c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="currentColor" stroke-width="1.2" opacity=".7"/></svg>
+      <span>Fornitori</span>
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <button onclick="syncNow()" title="Sync Nextcloud" style="background:none;border:none;cursor:pointer;color:inherit;font-family:inherit;font-size:inherit;padding:0;width:100%;text-align:inherit;display:block;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:1px"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg><span> Sync Nextcloud</span></button>
+    <button onclick="openModal('config')" title="Configurazione" style="background:none;border:none;cursor:pointer;color:inherit;font-family:inherit;font-size:inherit;padding:0;width:100%;text-align:inherit;display:block;">⚙<span> Configurazione</span></button>
+    <button onclick="exportAll()" title="Backup JSON" style="background:none;border:none;cursor:pointer;color:inherit;font-family:inherit;font-size:inherit;padding:0;width:100%;text-align:inherit;display:block;">↓<span> Backup JSON</span></button>
+    <span style="font-size:9px;color:var(--text4);padding:0 14px;text-align:center">v15 · <span id="build-ts">15/04 07:23</span></span>
+    <span id="footer-ts" class="text-sm text-muted" style="font-size:10px;padding:0 14px"></span>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div id="main">
+  <div id="cfg-banner" class="show">
+    Nextcloud non configurato — <button onclick="openModal('config')" style="font-weight:700;text-decoration:underline;color:var(--amber);background:none;border:none;cursor:pointer;font-size:inherit;padding:0;font-family:inherit;">configura ora</button> per abilitare sync e backup dati.
+  </div>
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <span class="topbar-title" id="topbar-title">Home</span>
+    <div class="topbar-actions" id="topbar-actions"></div>
+    <button class="btn-icon" onclick="syncNow()" title="Sync Nextcloud" style="margin-left:8px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    </button>
+    <div id="sync-pill" style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);padding:4px 8px;border-radius:20px;background:var(--bg2);border:1px solid var(--border);">
+      <div class="sync-dot" id="sync-dot"></div>
+      <span id="sync-label">—</span>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- ══ VIEW: HOME ══ -->
+    <div class="view active" id="view-home">
+      <div class="metrics-row">
+        <div class="metric-card green">
+          <div class="metric-label">Liquidità totale</div>
+          <div class="metric-val" id="h-liquidita">€—</div>
+          <div class="metric-sub" id="h-liquidita-sub">aggiorna saldi banca</div>
+        </div>
+        <div class="metric-card green">
+          <div class="metric-label">Da incassare (clienti)</div>
+          <div class="metric-val" id="h-incassare">€—</div>
+          <div class="metric-sub" id="h-incassare-sub">fatture emesse aperte</div>
+        </div>
+        <div class="metric-card red">
+          <div class="metric-label">Da pagare</div>
+          <div class="metric-val" id="h-pagare">€—</div>
+          <div class="metric-sub" id="h-pagare-sub">fornitori + fisco 30gg</div>
+        </div>
+      </div>
+      <div class="home-grid">
+        <!-- Commesse in corso -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Commesse in corso</span>
+            <span class="panel-badge" id="h-comm-count">—</span>
+            <a class="panel-link" onclick="navTo('commesse')">tutte →</a>
+          </div>
+          <div class="panel-body" id="h-comm-list">
+            <div class="empty">Nessuna commessa in corso</div>
+          </div>
+        </div>
+        <!-- Scadenze urgenti -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Scadenze urgenti</span>
+            <span class="panel-badge" id="h-scad-count">—</span>
+            <a class="panel-link" onclick="navTo('contabilita');setTimeout(()=>contTab('scadenze'),50)">tutte →</a>
+          </div>
+          <div class="panel-body" id="h-scad-list">
+            <div class="empty">Nessuna scadenza urgente</div>
+          </div>
+        </div>
+        <!-- Approvvigionamenti -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Da ordinare</span>
+            <span class="panel-badge" id="h-approv-count">—</span>
+            <a class="panel-link" onclick="navTo('approv')">gestisci →</a>
+          </div>
+          <div class="panel-body" id="h-approv-list">
+            <div class="empty">Nessun componente da ordinare</div>
+          </div>
+        </div>
+        <!-- Magazzino alert + azioni -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Magazzino &amp; azioni</span>
+          </div>
+          <div class="panel-body" id="h-mag-actions">
+            <div class="empty">Caricamento…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ VIEW: COMMESSE ══ -->
+    <div class="view" id="view-commesse">
+      <div class="filter-bar">
+        <input type="text" class="search-input" id="comm-search" placeholder="🔍 Cerca numero, oggetto…" oninput="renderCommesse()">
+        <div class="filter-chip active" data-f-stato="" onclick="setFiltroComm(this,'stato','')">Tutte</div>
+        <div class="filter-chip green" data-f-stato="in-corso" onclick="setFiltroComm(this,'stato','in-corso')">In lavorazione</div>
+        <div class="filter-chip green" data-f-stato="confermata" onclick="setFiltroComm(this,'stato','confermata')">Confermate</div>
+        <div class="filter-chip" data-f-stato="inviata" onclick="setFiltroComm(this,'stato','inviata')">Inviate</div>
+        <div class="filter-chip amber" data-f-stato="offerta" onclick="setFiltroComm(this,'stato','offerta')">Offerta</div>
+        <div class="filter-chip" data-f-stato="bozza" onclick="setFiltroComm(this,'stato','bozza')">Bozza</div>
+        <div class="filter-chip" data-f-stato="chiusa" onclick="setFiltroComm(this,'stato','chiusa')">Chiuse</div>
+        <span style="width:1px;height:20px;background:var(--border);flex-shrink:0"></span>
+        <select class="filter-chip" id="comm-anno" onchange="renderCommesse()" style="padding:4px 8px;border-radius:20px">
+          <option value="">Tutti gli anni</option>
+        </select>
+        <select class="filter-chip" id="comm-cliente" onchange="renderCommesse()" style="padding:4px 8px;border-radius:20px">
+          <option value="">Tutti i clienti</option>
+        </select>
+        <span style="flex:1"></span>
+        <button class="btn btn-primary btn-sm" onclick="openModal('commessa')">+ Nuova</button>
+        <button class="btn-ghost btn-sm" onclick="exportReportCommesse()">📊 Report</button>
+      </div>
+      <div class="panel" id="comm-table-panel">
+        <div class="panel-body" id="comm-list">
+          <div class="empty">Nessuna commessa trovata</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ VIEW: DETTAGLIO COMMESSA ══ -->
+    <div class="view" id="view-detail">
+      <div class="det-header" id="det-header" style="background:var(--bg1);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">
+            <span class="det-num" id="det-num" style="font-size:18px;font-weight:700;color:var(--text)">—</span>
+            <a id="det-folder-link" href="#" target="_blank" style="font-size:13px;opacity:.6;text-decoration:none;display:none">📁</a>
+            <button class="btn btn-ghost btn-sm" onclick="openModal('edit-commessa',CC?.numero)" style="margin-left:4px">✎ Modifica</button>
+          </div>
+          <div id="det-title" style="font-size:14px;color:var(--text2);margin-bottom:6px">—</div>
+          <div id="det-meta" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"></div>
+        </div>
+        <!-- Margine commessa -->
+        <div id="det-margine" style="background:var(--bg2);border-radius:var(--r);padding:10px 14px;min-width:160px;"></div>
+      </div>
+      <div class="det-tabs" id="det-tabs" style="display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--bg1);overflow-x:auto;flex-shrink:0;"></div>
+      <div id="det-tab-contents" style="padding:0"></div>
+    </div>
+
+    <!-- ══ VIEW: APPROVVIGIONAMENTI ══ -->
+    <div class="view" id="view-approv">
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+        <div class="filter-chip active" data-appf="" onclick="setFiltroApprov(this,'')">Da ordinare</div>
+        <div class="filter-chip" data-appf="ordinato" onclick="setFiltroApprov(this,'ordinato')">Ordinati</div>
+        <div class="filter-chip" data-appf="ricevuto" onclick="setFiltroApprov(this,'ricevuto')">Ricevuti</div>
+        <div class="filter-chip" data-appf="tutti" onclick="setFiltroApprov(this,'tutti')">Tutti</div>
+        <span style="flex:1"></span>
+        <input type="text" class="search-input" id="approv-search" placeholder="Cerca componente…" oninput="renderApprov()">
+      </div>
+      <div id="approv-content">
+        <div class="empty">Nessun componente da approvvigionare</div>
+      </div>
+    </div>
+
+    <!-- ══ VIEW: CONTABILITÀ ══ -->
+    <div class="view" id="view-contabilita">
+      <div class="cont-tabs">
+        <div class="cont-tab active" onclick="contTab('fatture')">Fatture</div>
+        <div class="cont-tab" onclick="contTab('scadenze')">Scadenze</div>
+        <div class="cont-tab" onclick="contTab('cassa')">Cassa &amp; Movimenti</div>
+        <div class="cont-tab" onclick="contTab('primanota')">📒 Prima Nota</div>
+      </div>
+
+      <!-- FATTURE -->
+      <div class="cont-panel active" id="cont-fatture">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+          <div class="filter-chip active" data-ft="" onclick="setFiltroFatt(this,'')">Tutte</div>
+          <div class="filter-chip" data-ft="FE" onclick="setFiltroFatt(this,'FE')">Emesse (FE)</div>
+          <div class="filter-chip" data-ft="FA" onclick="setFiltroFatt(this,'FA')">Passive (FA)</div>
+          <div class="filter-chip amber" data-ft="nonpagata" onclick="setFiltroFatt(this,'nonpagata')">Aperte</div>
+          <span style="flex:1"></span>
+<button class="btn btn-primary btn-sm" onclick="navTo('import-fatture')">📥 Import F24</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="overflow-x:auto;">
+            <table style="width:100%;min-width:700px;border-collapse:collapse;font-size:13px;">
+              <thead><tr style="background:var(--bg2);font-size:11px;color:var(--text3);font-weight:600;">
+                <th style="padding:7px 10px;text-align:left;width:60px">Tipo</th>
+                <th style="padding:7px 8px;text-align:left;min-width:80px">N°</th>
+                <th style="padding:7px 8px;text-align:left">Cliente/Fornitore</th>
+                <th style="padding:7px 8px;text-align:right;width:80px">Importo</th>
+                <th style="padding:7px 8px;text-align:left;width:80px">Data</th>
+                <th style="padding:7px 8px;text-align:left;width:80px">Scadenza</th>
+                <th style="padding:7px 8px;text-align:left;width:70px">Stato</th>
+                <th style="padding:7px 8px;text-align:left;max-width:100px">Conto</th>
+                <th style="padding:7px 8px;text-align:center;width:30px">📄</th>
+              </tr></thead>
+              <tbody id="fatt-tbody">
+                <tr><td colspan="8" class="empty">Nessuna fattura — importa da Fattura24</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCADENZE -->
+      <div class="cont-panel" id="cont-scadenze">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap;">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <div class="filter-chip active" data-sf="tutti" onclick="setFiltroScad(this,'tutti')">Tutte</div>
+            <div class="filter-chip" data-sf="urgente" onclick="setFiltroScad(this,'urgente')">⚠ Urgenti 7gg</div>
+            <div class="filter-chip" data-sf="incasso" onclick="setFiltroScad(this,'incasso')">↑ Da incassare</div>
+            <div class="filter-chip" data-sf="pagamento" onclick="setFiltroScad(this,'pagamento')">↓ Da pagare</div>
+            <div class="filter-chip" data-sf="fiscale" onclick="setFiltroScad(this,'fiscale')">📋 Fiscali</div>
+            <div class="filter-chip" data-sf="prossimi30" onclick="setFiltroScad(this,'prossimi30')">📅 30 giorni</div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-ghost btn-sm" onclick="toggleFlussoCassa()" id="btn-flusso">📊 Flusso cassa</button>
+            <button class="btn btn-ghost btn-sm" onclick="rigeneraScadenzeFatture()" title="Rigenera da fatture">🔄 Rigenera</button>
+            <button class="btn btn-ghost btn-sm" onclick="openModal('scadenza')">+ Nuova</button>
+          </div>
+        </div>
+        <div id="scad-flusso-cont" style="display:none;margin-bottom:14px;"></div>
+        <div id="scad-summary-cont"></div>
+        <div id="scad-list-cont"></div>
+      </div>
+
+      <!-- CASSA -->
+      <div class="cont-panel" id="cont-cassa">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="openModal('conto')">+ Aggiorna saldo</button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('import-movimenti')">📥 Import movimenti</button>
+        </div>
+        <div class="conti-grid" id="cassa-grid"></div>
+        <div id="cassa-proiezione"></div>
+      </div>
+
+      <!-- PRIMA NOTA -->
+      <div class="cont-panel" id="cont-primanota">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+          <div style="font-size:12px;color:var(--text3);flex:1">
+            Movimenti da Prima Nota Fattura24 — filtra per conto e periodo
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openModal('import-primanota')">📥 Import Prima Nota</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportPrimaNotaPDF()">📄 Export PDF</button>
+        </div>
+        <!-- Filtri -->
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;">
+          <select id="pn-filtro-conto" class="keep-native" onchange="renderPrimaNota()" style="border:1.5px solid var(--border);border-radius:var(--r-sm);padding:5px 10px;font-size:12px;background:#fff;color:#0d1117;">
+            <option value="">Tutti i conti</option>
+          </select>
+          <input type="month" id="pn-filtro-da" onchange="renderPrimaNota()"
+            style="border:1.5px solid var(--border);border-radius:var(--r-sm);padding:5px 8px;font-size:12px;background:#fff;color:#0d1117;">
+          <input type="month" id="pn-filtro-a" onchange="renderPrimaNota()"
+            style="border:1.5px solid var(--border);border-radius:var(--r-sm);padding:5px 8px;font-size:12px;background:#fff;color:#0d1117;">
+          <button class="btn-ghost btn-sm" onclick="document.getElementById('pn-filtro-da').value='';document.getElementById('pn-filtro-a').value='';document.getElementById('pn-filtro-conto').value='';renderPrimaNota()">✕ Reset</button>
+        </div>
+        <!-- Saldo conti -->
+        <div id="pn-saldi" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;"></div>
+        <!-- Tabella movimenti -->
+        <div class="panel">
+          <div class="panel-body" style="padding:0;">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <thead><tr style="background:var(--bg2);font-size:11px;color:var(--text3);font-weight:600;">
+                <th style="padding:7px 10px;text-align:left">Data pag.</th>
+                <th style="padding:7px 8px;text-align:left">Tipo</th>
+                <th style="padding:7px 8px;text-align:left">N° Doc.</th>
+                <th style="padding:7px 8px;text-align:left">Data doc.</th>
+                <th style="padding:7px 8px;text-align:left">Cliente/Fornitore</th>
+                <th style="padding:7px 8px;text-align:left">Nota</th>
+                <th style="padding:7px 8px;text-align:left">Conto</th>
+                <th style="padding:7px 8px;text-align:right;color:var(--green)">Entrata</th>
+                <th style="padding:7px 8px;text-align:right;color:var(--red)">Uscita</th>
+                <th style="padding:7px 8px;text-align:right">Saldo prog.</th>
+              </tr></thead>
+              <tbody id="pn-tbody">
+                <tr><td colspan="10" class="empty">Nessun movimento — importa da Prima Nota Fattura24</td></tr>
+              </tbody>
+              <tfoot id="pn-tfoot"></tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    </div>
+
+    <!-- ══ VIEW: IMPORT FATTURE ══ -->
+    <div class="view" id="view-import-fatture">
+      <div class="panel">
+        <div class="panel-head"><span class="panel-title">Import fatture da Fattura24</span></div>
+        <div style="padding:16px">
+          <div class="drop-zone" id="drop-zone" ondrop="handleDrop(event)" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" onclick="document.getElementById('file-input').click()">
+            <div class="drop-zone-icon">📁</div>
+            <div>Trascina qui il file XLS esportato da Fattura24</div>
+            <div style="font-size:12px;color:var(--text4);margin-top:4px">oppure clicca per selezionare — FE (emesse) e FA (passive/ricevute)</div>
+          </div>
+          <input type="file" id="file-input" accept=".xls,.xlsx,.csv" multiple style="display:none" onchange="handleFileSelect(event)">
+          <div id="imp-preview-area" style="margin-top:12px"></div>
+          <div id="imp-actions" style="display:none;margin-top:12px;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button class="btn btn-primary" id="btn-confirm-import" onclick="confirmImport()">✓ Conferma importazione</button>
+            <button class="btn btn-ghost" onclick="resetImport()">✕ Annulla</button>
+            <span id="imp-nc-status" style="font-size:12px;color:var(--text3)"></span>
+          </div>
+          <div id="imp-progress" style="display:none;font-size:12px;color:var(--text3);margin-top:8px">
+            <span id="imp-progress-text">Elaborazione…</span>
+          </div>
+          <div id="imp-status-body" style="margin-top:16px"></div>
+        </div>
+      </div>
+
+
+
+    <!-- ══ VIEW: MAGAZZINO ══ -->
+    <div class="view" id="view-magazzino">
+      <div class="mag-metrics">
+        <div class="metric-card"><div class="metric-label">Voci totali</div><div class="metric-val" id="mag-tot">—</div></div>
+        <div class="metric-card amber"><div class="metric-label">Sotto scorta</div><div class="metric-val" id="mag-low">—</div></div>
+        <div class="metric-card"><div class="metric-label">Valore stimato</div><div class="metric-val" id="mag-val">—</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+        <input type="text" class="search-input" id="mag-search" placeholder="Cerca componente…" oninput="magFilter()">
+        <select class="filter-chip" id="mag-cat" onchange="magFilter()" style="padding:4px 8px">
+          <option value="">Tutte le categorie</option>
+        </select>
+        <span style="flex:1"></span>
+        <button class="btn btn-primary btn-sm" onclick="openModal('add-mag')">+ Aggiungi</button>
+      </div>
+      <div class="panel">
+        <div class="panel-body">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead><tr style="background:var(--bg2);font-size:11px;color:var(--text3);font-weight:600;">
+              <th style="padding:7px 14px;text-align:left">Componente</th>
+              <th style="padding:7px 8px;text-align:left">Categoria</th>
+              <th style="padding:7px 8px;text-align:left">Fornitore</th>
+              <th style="padding:7px 8px;text-align:center">Qta</th>
+              <th style="padding:7px 8px;text-align:right">Costo/cad</th>
+              <th style="padding:7px 8px;text-align:right">Valore</th>
+              <th style="padding:7px 8px;text-align:center">Azioni</th>
+            </tr></thead>
+            <tbody id="mag-tbody">
+              <tr><td colspan="7" class="empty">Magazzino vuoto</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ VIEW: FORNITORI ══ -->
+    <div class="view" id="view-fornitori">
+      <div id="forn-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;"></div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ══ MODAL ══ -->
+<div id="modal-overlay" onclick="if(event.target===this)closeM()">
+  <div id="modal-box">
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+
+// ═══════════════════════════════════════════════
+// MAPPE
+// ═══════════════════════════════════════════════
+// Mappa codice → nome esatto cartella su Nextcloud /Clienti/
+const CMAP={
+  ERS:'Mavent (ERS-RSF)',RSF:'Mavent (ERS-RSF)',
+  KFG:'KF Group (KFG)',
+  TRM:'Trime (TRM)',
+  ZMN:'Zeminian (ZMN)',
+  NTM:'NTM Automazione',
+  STP:'STP Scale (STP)',
+  FIZ:'Tecnical-FIZ',TCN:'Tecnical-FIZ',
+  MBE:'Mabe (MBE)',
+  NVL:'Navigazione Laghi (NVL-NAV)',NAV:'Navigazione Laghi (NVL-NAV)',
+  CSN:'Cason (CSN)',
+  DNT:'Denitel (DNT)',
+  FDC:'Fedco (FDC)',
+  LGL:'LGL Engineering',
+  MRM:'MRM',
+  NVT:'Nuova Tecninox (NVT)',
+  OAS:'OASI',OASI:'OASI',
+  OTT:'Ottino (OTT)',
+  CLG:'Icil Group (CLG)',
+  CSC:'Condominio Santa Chiara (CSC)',
+  RLN:'Orlandi (RLN)',
+  TCF:'Tecfluid (TCF)',
+  TBU:'Tabu (TBU)',
+  TCC:'Tecnocamini (TCC)',
+  TFC:'Trasp. F.Corretta (TFC)',
+  UMA:'UMAC (UMA)',
+  LMD:'La Maddalena (LMD)',
+};
+const CNAMES={ERS:'Mavent',RSF:'Mavent',KFG:'KF Group',TRM:'Trime',ZMN:'Zeminian',NTM:'NTM Autom.',STP:'STP Scale',FIZ:'Tecnical-FIZ',TCN:'Tecnical-FIZ',MBE:'Mabe',NVL:'Nav.Laghi',NAV:'Nav.Laghi',CSN:'Cason',DNT:'Denitel',FDC:'Fedco',LGL:'LGL Eng.',MRM:'MRM',NVT:'Nuova Tecninox',OASI:'OASI',OAS:'OASI',OTT:'Ottino',CLG:'Icil Group',CSC:'Cond.S.Chiara',RLN:'Orlandi',TCF:'Tecfluid',TBU:'Tabu',TCC:'Tecnocamini',TFC:'F.Corretta',UMA:'UMAC',LMD:'La Maddalena'};
+const TIPI={ricerca:'Ricerca componenti',realizzazione:'Realizzazione centralina',prestazione:'Prestazione ore',configuratore:'Configuratore PU',misto:'Misto'};
+const SL={bozza:'Bozza',offerta:'Offerta prep.',inviata:'Inviata',confermata:'Confermata','in-corso':'In lavorazione',chiusa:'Chiusa'};
+const SLC=SL; // alias
+const SAP={daordinare:'Da ordinare',ordinato:'Ordinato',arrivato:'Arrivato',problema:'Problema'};
+const TIPO_C={ricerca:'tipo-ricerca',realizzazione:'tipo-realizzazione',prestazione:'tipo-prestazione',configuratore:'tipo-configuratore',misto:'tipo-misto'};
+
+// ═══════════════════════════════════════════════
+// LISTINO ARES — estratto da xlsx (prezzi 2022)
+// ═══════════════════════════════════════════════
+const ARES=[
+  // ── Collettori PU05 (Gr.05 — minicentraline compatte) ──
+  // Codice M1A = collettore monopompa con valvola VMC1, attacchi P-T G1/4"
+  {s:'M1A-W',d:'PU05 Collettore M1A + VMC1-W 10-60 bar — G1/4" P-T Ø96',p:88.0,t:'PU05-collettore',serie:'PU05'},
+  {s:'M1A-X',d:'PU05 Collettore M1A + VMC1-X 30-150 bar — G1/4" P-T Ø96',p:88.0,t:'PU05-collettore',serie:'PU05'},
+  {s:'M1A-Y',d:'PU05 Collettore M1A + VMC1-Y 50-250 bar — G1/4" P-T Ø96',p:88.0,t:'PU05-collettore',serie:'PU05'},
+  {s:'M1A-Z',d:'PU05 Collettore M1A + VMC1-Z 80-360 bar — G1/4" P-T Ø96',p:92.0,t:'PU05-collettore',serie:'PU05'},
+  // Codice M2A = collettore M1A con doppio P (NOTA: non compatibile blocchi modulari)
+  {s:'M2A-W',d:'PU05 Collettore M2A doppio P + VMC1-W 10-60 bar (NO blocchi modulari)',p:92.0,t:'PU05-collettore',serie:'PU05'},
+  {s:'M2A-Y',d:'PU05 Collettore M2A doppio P + VMC1-Y 50-250 bar (NO blocchi modulari)',p:92.0,t:'PU05-collettore',serie:'PU05'},
+  // Codice M1R = collettore reversibile con due ingressi P1-P2 G3/8"
+  {s:'M1R-W',d:'PU05 Collettore reversibile M1R + VMC1-W 10-60 bar — P1-P2 G3/8"',p:145.0,t:'PU05-collettore',serie:'PU05'},
+  {s:'M1R-Y',d:'PU05 Collettore reversibile M1R + VMC1-Y 50-250 bar — P1-P2 G3/8"',p:148.0,t:'PU05-collettore',serie:'PU05'},
+  // ── Valvole screw-in PU05 (stesse cavità PU10 cav.13) ──
+  {s:'NC-PU05',d:'PU05 Valvola NC pilotata VE6-NC — 350 bar 25 l/min cav.13',p:42.6,t:'valvola',serie:'PU05'},
+  {s:'NCE-PU05',d:'PU05 Valvola NC pilotata + emergenza VE6-NC-EM — 350 bar 25 l/min',p:51.5,t:'valvola',serie:'PU05'},
+  {s:'NAE-PU05',d:'PU05 Valvola NA pilotata + emergenza VE2-NA-EM — 250 bar 12 l/min',p:49.3,t:'valvola',serie:'PU05'},
+  {s:'CDE-PU05',d:'PU05 Valvola NC diretta doppia tenuta VE2-NC-DT-EM — 210 bar 12 l/min',p:57.3,t:'valvola',serie:'PU05'},
+  {s:'CPE-PU05',d:'PU05 Valvola proporzionale VE9-NC-EM — 300 bar 30 l/min (NH16)',p:136.9,t:'valvola',serie:'PU05'},
+  {s:'PCD-PU05',d:'PU05 Valvola pneumatica doppia tenuta VP1-NC-DT — 300 bar 15 l/min',p:82.4,t:'valvola',serie:'PU05'},
+  {s:'CM1A',d:'PU05 Valvola manuale 2 vie a cartuccia senza microswitch',p:28.5,t:'valvola',serie:'PU05'},
+  {s:'CM1B',d:'PU05 Valvola manuale 2 vie a cartuccia con microswitch',p:34.0,t:'valvola',serie:'PU05'},
+  {s:'TC1-PU05',d:'PU05 Tappo cavità cav.11/13',p:4.2,t:'valvola',serie:'PU05'},
+  {s:'TC2-PU05',d:'PU05 Tappo cavità cav.13',p:4.2,t:'valvola',serie:'PU05'},
+  {s:'TS1',d:'PU05 Scarico ausiliario 1/4" BSPP cav.13',p:8.5,t:'valvola',serie:'PU05'},
+  {s:'TM1',d:'PU05 Mandata ausiliaria 1/4" BSPP cav.13',p:8.5,t:'valvola',serie:'PU05'},
+  {s:'VMC1-W',d:'PU05 Valvola massima VMC1-W 10-60 bar cav.11',p:16.8,t:'valvola',serie:'PU05'},
+  {s:'VMC1-X',d:'PU05 Valvola massima VMC1-X 30-150 bar cav.11',p:16.8,t:'valvola',serie:'PU05'},
+  {s:'VMC1-Y',d:'PU05 Valvola massima VMC1-Y 50-250 bar cav.11',p:16.8,t:'valvola',serie:'PU05'},
+  {s:'VMC1-Z',d:'PU05 Valvola massima VMC1-Z 80-360 bar cav.11',p:18.0,t:'valvola',serie:'PU05'},
+  {s:'VRF1R-PU05',d:'PU05 Regolatrice flusso compensata regolabile 2-20 l/min 350 bar',p:68.5,t:'valvola',serie:'PU05'},
+  {s:'RFR1',d:'PU05 Valvola bidirezionale controllo flusso 300 bar 30 l/min',p:52.0,t:'valvola',serie:'PU05'},
+  {s:'VR14',d:'PU05 Ritegno 1/4" BSPP cav.17',p:9.5,t:'valvola',serie:'PU05'},
+  {s:'VR38',d:'PU05 Ritegno 3/8" BSPP cav.18',p:11.2,t:'valvola',serie:'PU05'},
+  {s:'VRP38',d:'PU05 Ritegno pilotato 3/8" BSPP — rapporto 1:4 cav.19',p:42.0,t:'valvola',serie:'PU05'},
+  // ── Bobine per PU05 (N-H13, N-H13R, N-H16) ──
+  {s:'OA-PU05',d:'PU05 Bobina NH13 12 Vdc — 18W 100% IP65 DIN43650',p:12.0,t:'bobina',serie:'PU05'},
+  {s:'OB-PU05',d:'PU05 Bobina NH13 24 Vdc — 18W 100% IP65 DIN43650',p:12.0,t:'bobina',serie:'PU05'},
+  {s:'OC-PU05',d:'PU05 Bobina NH13 48 Vdc',p:14.8,t:'bobina',serie:'PU05'},
+  {s:'OL-PU05',d:'PU05 Bobina NH13 24 Vac 50Hz',p:12.0,t:'bobina',serie:'PU05'},
+  {s:'ON-PU05',d:'PU05 Bobina NH13 220 Vac 50Hz',p:12.5,t:'bobina',serie:'PU05'},
+  // ── Serbatoi PU05 (SPM serie — plastica HDPE+PP) ──
+  {s:'SPM01D',d:'PU05 Serbatoio plastica 1L orizzontale 135×158×134 Ø96',p:12.0,t:'serbatoio',serie:'PU05'},
+  {s:'SPM02D',d:'PU05 Serbatoio plastica 1.8L orizzontale 180×158×134 Ø96',p:13.5,t:'serbatoio',serie:'PU05'},
+  {s:'SPM03D',d:'PU05 Serbatoio plastica 2.5L orizzontale 240×158×134 Ø96',p:14.5,t:'serbatoio',serie:'PU05'},
+  {s:'SPM04D',d:'PU05 Serbatoio plastica 3.5L orizzontale 280×158×134 Ø96',p:15.5,t:'serbatoio',serie:'PU05'},
+  {s:'SPM05D',d:'PU05 Serbatoio plastica 4L orizzontale 330×158×134 Ø96',p:16.5,t:'serbatoio',serie:'PU05'},
+  {s:'SPM01V',d:'PU05 Serbatoio plastica 1L verticale 135×174×134 Ø96',p:12.0,t:'serbatoio',serie:'PU05'},
+  {s:'SPM03V',d:'PU05 Serbatoio plastica 2.5L verticale 240×174×134 Ø96',p:14.5,t:'serbatoio',serie:'PU05'},
+  {s:'SPM05V',d:'PU05 Serbatoio plastica 4L verticale 330×174×134 Ø96',p:16.5,t:'serbatoio',serie:'PU05'},
+  {s:'SPM03H',d:'PU05 Serbatoio plastica 1.3L orizzontale compact 218×115×103 Ø96',p:11.0,t:'serbatoio',serie:'PU05'},
+  {s:'SPM11H',d:'PU05 Serbatoio plastica 2L orizzontale compact 336×115×103 Ø96',p:13.5,t:'serbatoio',serie:'PU05'},
+  // ── Accessori PU05 ──
+  {s:'KS3',d:'PU05 Kit fissaggio serbatoio SPM (tutte le serie) — vite M6',p:5.0,t:'accessorio',serie:'PU05'},
+  {s:'FS0',d:'PU05 Adattatore per serbatoi in lamiera Ø123 su collettore PU05',p:18.0,t:'accessorio',serie:'PU05'},
+  {s:'FC11',d:'PU05 Giunto flangia motori DC C102-C203 Ø71 L=15.8',p:18.5,t:'giunto',serie:'PU05'},
+  {s:'FC12',d:'PU05 Giunto flangia motori DC C104-C205-C211-C401 Ø71 L=23.5',p:20.5,t:'giunto',serie:'PU05'},
+  {s:'FAM56',d:'PU05 Flangia motori AC MEC56 (M298/M498)',p:28.0,t:'giunto',serie:'PU05'},
+  {s:'FAM63',d:'PU05 Flangia motori AC MEC63 (M299/M200/M499/M400)',p:32.0,t:'giunto',serie:'PU05'},
+  {s:'FAM71',d:'PU05 Flangia motori AC MEC71 (M201/M202/M401/M402)',p:35.0,t:'giunto',serie:'PU05'},
+  // ── Motori DC PU05 (da catalogo sezione 5.1) ──
+  {s:'C102',d:'PU05 Motore DC 12V 500W S2=5min S3=17% IP44',p:68.0,t:'motore',serie:'PU05'},
+  {s:'C103',d:'PU05 Motore DC 12V 800W S2=4min S3=9% IP44',p:76.0,t:'motore',serie:'PU05'},
+  {s:'C108',d:'PU05 Motore DC 12V 500W S2=4min S3=15% IP44',p:70.0,t:'motore',serie:'PU05'},
+  {s:'C113',d:'PU05 Motore DC 12V 800W IP44 con termica',p:80.0,t:'motore',serie:'PU05'},
+  {s:'C202',d:'PU05 Motore DC 24V 500W S2=5min S3=17% IP44',p:68.0,t:'motore',serie:'PU05'},
+  {s:'C203',d:'PU05 Motore DC 24V 800W S2=2.5min S3=8% IP44',p:76.0,t:'motore',serie:'PU05'},
+  {s:'C208',d:'PU05 Motore DC 24V 500W S2=4min S3=15% IP44',p:70.0,t:'motore',serie:'PU05'},
+  {s:'C213',d:'PU05 Motore DC 24V 800W IP44 con termica',p:80.0,t:'motore',serie:'PU05'},
+  {s:'C104',d:'PU05 Motore DC 12V 1600W S2=2min S3=10% IP54',p:138.0,t:'motore',serie:'PU05'},
+  {s:'C105',d:'PU05 Motore DC 12V 1600W IP54 con termica',p:144.0,t:'motore',serie:'PU05'},
+  {s:'C204',d:'PU05 Motore DC 24V 2200W S2=2min S3=5% IP54',p:155.0,t:'motore',serie:'PU05'},
+  {s:'C205',d:'PU05 Motore DC 24V 2200W IP54 con termica',p:162.0,t:'motore',serie:'PU05'},
+  {s:'C111',d:'PU05 Motore DC 12V 1500W IP54 con termica Ø114',p:142.0,t:'motore',serie:'PU05'},
+  {s:'C211',d:'PU05 Motore DC 24V 2000W IP54 con termica Ø114',p:158.0,t:'motore',serie:'PU05'},
+  {s:'C401',d:'PU05 Motore DC 48V 2000W S2=2min IP54',p:158.0,t:'motore',serie:'PU05'},
+  {s:'C402',d:'PU05 Motore DC 48V 2000W S2=3min S3=12% IP54 con termica',p:164.0,t:'motore',serie:'PU05'},
+  {s:'C130',d:'PU05 Motore DC 12V 1500W ventilato S2=4min IP20',p:148.0,t:'motore',serie:'PU05'},
+  {s:'C230',d:'PU05 Motore DC 24V 2000W ventilato S2=5min IP20',p:158.0,t:'motore',serie:'PU05'},
+  // ── Motori AC PU05 ──
+  {s:'M298',d:'PU05 Motore AC 1-fase 0.12kW 2900rpm MEC56 B14',p:95.0,t:'motore',serie:'PU05'},
+  {s:'M299',d:'PU05 Motore AC 1-fase 0.18kW 2900rpm MEC63 B14',p:102.0,t:'motore',serie:'PU05'},
+  {s:'M200',d:'PU05 Motore AC 1-fase 0.25kW 2900rpm MEC63 B14',p:108.0,t:'motore',serie:'PU05'},
+  {s:'M201',d:'PU05 Motore AC 1-fase 0.37kW 2900rpm MEC71 B14',p:115.0,t:'motore',serie:'PU05'},
+  {s:'M202',d:'PU05 Motore AC 1-fase 0.55kW 2900rpm MEC71 B14',p:124.0,t:'motore',serie:'PU05'},
+  {s:'T297',d:'PU05 Motore AC 3-fase 0.09kW 2900rpm MEC56 B14',p:82.0,t:'motore',serie:'PU05'},
+  {s:'T298',d:'PU05 Motore AC 3-fase 0.12kW 2900rpm MEC56 B14',p:88.0,t:'motore',serie:'PU05'},
+  {s:'T299',d:'PU05 Motore AC 3-fase 0.18kW 2900rpm MEC63 B14',p:95.0,t:'motore',serie:'PU05'},
+  {s:'T200',d:'PU05 Motore AC 3-fase 0.25kW 2900rpm MEC63 B14',p:102.0,t:'motore',serie:'PU05'},
+  {s:'T201',d:'PU05 Motore AC 3-fase 0.37kW 2900rpm MEC71 B14',p:108.0,t:'motore',serie:'PU05'},
+  {s:'T202',d:'PU05 Motore AC 3-fase 0.55kW 2900rpm MEC71 B14',p:115.0,t:'motore',serie:'PU05'},
+  // ── Relay avviamento e coperchio protezione PU05 ──
+  {s:'FC-B',d:'PU05 Relay avviamento 12V 200A/350A max',p:28.0,t:'accessorio',serie:'PU05'},
+  {s:'FC-D',d:'PU05 Relay avviamento 24V 200A/350A max',p:28.0,t:'accessorio',serie:'PU05'},
+  {s:'G00',d:'PU05/PU10 Senza supporto montaggio',p:0.0,t:'accessorio',serie:'PU05'},
+  {s:'G01',d:'PU05/PU10 Supporto montaggio standard L=150 H=87',p:18.5,t:'accessorio',serie:'PU05'},
+  // Posizioni montaggio
+  {s:'1H',d:'PU05 Posizione montaggio 1H (serbatoio sotto, motore lato)',p:0.0,t:'accessorio',serie:'PU05'},
+  {s:'1V',d:'PU05 Posizione montaggio 1V (verticale)',p:0.0,t:'accessorio',serie:'PU05'},
+  // ── Blocchi modulari PU05 (stessa interfaccia PU10) ──
+  {s:'B09-PU05',d:'PU05 Distanziale H=18 pass-through P-T',p:19.1,t:'blocco',serie:'PU05'},
+  {s:'B01-PU05',d:'PU05 Distanziale H=39',p:25.6,t:'blocco',serie:'PU05'},
+  {s:'B92-PU05',d:'PU05 Distanziale H=25',p:23.6,t:'blocco',serie:'PU05'},
+  {s:'B15-PU05',d:'PU05 Adattatore rotaz. lato motore H=90 (M 1/4" BSPP)',p:102.5,t:'blocco',serie:'PU05'},
+  {s:'B03-PU05',d:'PU05 Blocco CETOP3-NG6 parallelo/serie 1/4"',p:39.2,t:'blocco',serie:'PU05'},
+  {s:'B11-PU05',d:'PU05 Blocco CETOP3-NG6 parallelo/serie 3/8"',p:39.2,t:'blocco',serie:'PU05'},
+  {s:'B73-PU05',d:'PU05 Blocco riduttrice di pressione 350 bar',p:297.0,t:'blocco',serie:'PU05'},
+  {s:'B259A-PU05',d:'PU05 Blocco valvola scarico automatica tipo A',p:134.8,t:'blocco',serie:'PU05'},
+  {s:'B38-PU05',d:'PU05 Blocco filtro sullo scarico 15 micron max 20 l/min',p:78.5,t:'blocco',serie:'PU05'},
+  // ── Collettori PU10 (Gr.1) ──
+  {s:'P002',d:'PU05 Pompa Gr.05 cil. 0.25 cc/giro — 200 bar 0.36 l/min @1500',p:58.0,t:'pompa',serie:'PU05'},
+  {s:'P004',d:'PU05 Pompa Gr.05 cil. 0.50 cc/giro — 200 bar 0.72 l/min @1500',p:60.0,t:'pompa',serie:'PU05'},
+  {s:'P006',d:'PU05 Pompa Gr.05 cil. 0.75 cc/giro — 200 bar 1.08 l/min @1500',p:62.0,t:'pompa',serie:'PU05'},
+  {s:'P008',d:'PU05 Pompa Gr.05 cil. 1.00 cc/giro — 200 bar 1.45 l/min @1500',p:64.0,t:'pompa',serie:'PU05'},
+  {s:'P009',d:'PU05 Pompa Gr.05 cil. 1.25 cc/giro — 200 bar 1.80 l/min @1500',p:66.0,t:'pompa',serie:'PU05'},
+  {s:'P010',d:'PU05 Pompa Gr.05 cil. 1.50 cc/giro — 175 bar 2.18 l/min @1500',p:68.0,t:'pompa',serie:'PU05'},
+  {s:'P012',d:'PU05 Pompa Gr.05 cil. 2.00 cc/giro — 160 bar 2.88 l/min @1500',p:72.0,t:'pompa',serie:'PU05'},
+  {s:'KP1',d:'PU05 Adattatore montaggio pompa Gr.05 su collettore Gr.1',p:18.5,t:'accessorio',serie:'PU05'},
+  // Motori DC per PU05 (stessa gamma PU10 ma versioni più piccole)
+  {s:'C102',d:'PU05 Motore DC 12V 500W 2500rpm IP44 reversibile',p:72.0,t:'motore',serie:'PU05'},
+  {s:'C202',d:'PU05 Motore DC 24V 500W 2800rpm IP44 reversibile',p:72.0,t:'motore',serie:'PU05'},
+  {s:'C103',d:'PU05 Motore DC 12V 800W 3500rpm IP44 reversibile',p:82.0,t:'motore',serie:'PU05'},
+  {s:'C203',d:'PU05 Motore DC 24V 800W 4000rpm IP44 reversibile',p:82.0,t:'motore',serie:'PU05'},
+  {s:'C114',d:'PU05 Motore DC 12V 500W IP44 reversibile con termica',p:76.0,t:'motore',serie:'PU05'},
+  {s:'C214',d:'PU05 Motore DC 24V 500W IP44 reversibile con termica',p:76.0,t:'motore',serie:'PU05'},
+  // Motori AC per PU05
+  {s:'M204',d:'PU05 Motore AC 1-fase 0.37kW 2900rpm MEC71 B14',p:115.0,t:'motore',serie:'PU05'},
+  {s:'M205',d:'PU05 Motore AC 1-fase 0.55kW 2900rpm MEC71 B14',p:122.0,t:'motore',serie:'PU05'},
+  {s:'T204',d:'PU05 Motore AC 3-fase 0.37kW 2900rpm MEC71 B14',p:108.0,t:'motore',serie:'PU05'},
+  {s:'T205',d:'PU05 Motore AC 3-fase 0.55kW 2900rpm MEC71 B14',p:115.0,t:'motore',serie:'PU05'},
+  // Giunti/flange PU05
+  {s:'FC05',d:'PU05 Giunto per motori DC C102/C103/C202/C203 Gr.05',p:20.0,t:'giunto',serie:'PU05'},
+  {s:'FC06',d:'PU05 Giunto per motori DC C104/C204/C205 Gr.05',p:22.0,t:'giunto',serie:'PU05'},
+  {s:'FA72',d:'PU05 Flangia per motori AC MEC71 Gr.05',p:28.0,t:'giunto',serie:'PU05'},
+  {s:'FA82',d:'PU05 Flangia per motori AC MEC80 Gr.05',p:32.0,t:'giunto',serie:'PU05'},
+  // Serbatoi PU05 (stessi del PU10 piccoli)
+  {s:'SL01H',d:'PU05 Serbatoio lamiera 1L orizzontale Ø123',p:18.5,t:'serbatoio',serie:'PU05'},
+  {s:'SL03H',d:'PU05 Serbatoio lamiera 2L orizzontale Ø123',p:22.0,t:'serbatoio',serie:'PU05'},
+  {s:'SL04H',d:'PU05 Serbatoio lamiera 3L orizzontale Ø123',p:25.0,t:'serbatoio',serie:'PU05'},
+  {s:'SP01D',d:'PU05 Serbatoio plastica 1L orizzontale Ø123 trasparente',p:12.0,t:'serbatoio',serie:'PU05'},
+  {s:'SP03D',d:'PU05 Serbatoio plastica 2.5L orizzontale Ø123 trasparente',p:14.5,t:'serbatoio',serie:'PU05'},
+  {s:'SP05D',d:'PU05 Serbatoio plastica 4L orizzontale Ø123 trasparente',p:16.5,t:'serbatoio',serie:'PU05'},
+  // ── Collettori PU10 (Gr.1) ──
+  {s:'A1A',d:'PU10 Collettore monopompa VMC1 — attacchi P-T G1/4"',p:263.8,t:'PU10-collettore',serie:'PU10'},
+  {s:'A1B',d:'PU10 Collettore + valvola NC pilotata integrata',p:278.5,t:'PU10-collettore',serie:'PU10'},
+  {s:'A1C',d:'PU10 Collettore con ritegno su A',p:266.4,t:'PU10-collettore',serie:'PU10'},
+  {s:'A1D',d:'PU10 Collettore doppio effetto — attacchi A-T G1/4"',p:269.7,t:'PU10-collettore',serie:'PU10'},
+  {s:'B2A',d:'PU10 Collettore VML1 semplice effetto (P+2 utenze)',p:278.5,t:'PU10-collettore',serie:'PU10'},
+  {s:'B3B',d:'PU10 Collettore VML1 doppio effetto A-B',p:278.5,t:'PU10-collettore',serie:'PU10'},
+  {s:'B4A',d:'PU10 Collettore VML1 4 vie A-B con check',p:286.0,t:'PU10-collettore',serie:'PU10'},
+  {s:'R1A',d:'PU10 Collettore pompa reversibile (P1-P2 G3/8")',p:537.2,t:'PU10-collettore',serie:'PU10'},
+  {s:'D1A',d:'PU10 Collettore doppia pompa 2×VMC1',p:978.1,t:'PU10-collettore',serie:'PU10'},
+  {s:'D2A',d:'PU10 Collettore doppia pompa 2×VMC1 alternativo',p:992.0,t:'PU10-collettore',serie:'PU10'},
+  // ── Collettori PU20 (Gr.2) ──
+  {s:'Z1A',d:'PU20 Collettore monopompa VMZ1 — attacchi P G3/8" T G1/2"',p:574.6,t:'PU20-collettore',serie:'PU20'},
+  {s:'Z2A',d:'PU20 Collettore doppia pompa VMZ1',p:988.6,t:'PU20-collettore',serie:'PU20'},
+  // ── Valvole screw-in PU10 ──
+  {s:'NC',d:'Valvola NC pilotata VE6-NC — 350 bar 25 l/min (NH13)',p:42.6,t:'valvola',serie:'PU10'},
+  {s:'NCE',d:'Valvola NC pilotata + emergenza VE6-NC-EM',p:51.5,t:'valvola',serie:'PU10'},
+  {s:'NAE',d:'Valvola NA pilotata + emergenza VE2-NA-EM — 250 bar 12 l/min',p:49.3,t:'valvola',serie:'PU10'},
+  {s:'CDE',d:'Valvola NC diretta doppia tenuta + emergenza VE2-NC-DT-EM',p:57.3,t:'valvola',serie:'PU10'},
+  {s:'CPE',d:'Valvola proporzionale NC pilotata VE9-NC-EM — 300 bar 30 l/min (NH16)',p:136.9,t:'valvola',serie:'PU10'},
+  {s:'PCD',d:'Valvola pneumatica doppia tenuta VP1-NC-DT — 300 bar 15 l/min',p:82.4,t:'valvola',serie:'PU10'},
+  {s:'E43A',d:'Valvola 4 vie 3 posizioni a cursore V43S13A',p:98.5,t:'valvola',serie:'PU10'},
+  {s:'E43B',d:'Valvola 4 vie 3 posizioni a cursore V43S13B',p:98.5,t:'valvola',serie:'PU10'},
+  {s:'E42B',d:'Valvola 4 vie 3 posizioni a cursore V42S13B',p:98.5,t:'valvola',serie:'PU10'},
+  // ── Bobine ──
+  {s:'OA',d:'Bobina NH13 12 Vdc — 18W IP65',p:12.0,t:'bobina',serie:'PU10'},
+  {s:'OB',d:'Bobina NH13 24 Vdc — 18W IP65',p:12.0,t:'bobina',serie:'PU10'},
+  {s:'OC',d:'Bobina NH13 48 Vdc',p:14.8,t:'bobina',serie:'PU10'},
+  {s:'OL',d:'Bobina NH13 24 Vac 50Hz',p:12.0,t:'bobina',serie:'PU10'},
+  {s:'ON',d:'Bobina NH13 220 Vac 50Hz',p:12.5,t:'bobina',serie:'PU10'},
+  // ── Pompe Gr.1 (PU10) ──
+  {s:'PG07',d:'Pompa Gr.1 cilindrata 3.15 cc/giro — 250 bar 4.44 l/min @1500',p:98.0,t:'pompa',serie:'PU10'},
+  {s:'PG05',d:'Pompa Gr.1 cilindrata 2.50 cc/giro — 250 bar 3.53 l/min @1500',p:92.0,t:'pompa',serie:'PU10'},
+  {s:'PG04',d:'Pompa Gr.1 cilindrata 2.00 cc/giro — 250 bar 2.82 l/min @1500',p:88.0,t:'pompa',serie:'PU10'},
+  {s:'PG09',d:'Pompa Gr.1 cilindrata 4.20 cc/giro — 250 bar 5.92 l/min @1500',p:104.0,t:'pompa',serie:'PU10'},
+  {s:'PG11',d:'Pompa Gr.1 cilindrata 5.00 cc/giro — 250 bar 7.05 l/min @1500',p:110.0,t:'pompa',serie:'PU10'},
+  {s:'PG12',d:'Pompa Gr.1 cilindrata 5.70 cc/giro — 200 bar 8.12 l/min @1500',p:115.0,t:'pompa',serie:'PU10'},
+  // ── Pompe Gr.2 (PU20) ──
+  {s:'P204',d:'Pompa Gr.2 cilindrata 8.2 cc/giro — 250 bar 11.32 l/min @1500',p:145.0,t:'pompa',serie:'PU20'},
+  {s:'P208',d:'Pompa Gr.2 cilindrata 14 cc/giro — 250 bar 19.95 l/min @1500',p:162.0,t:'pompa',serie:'PU20'},
+  {s:'P212',d:'Pompa Gr.2 cilindrata 19 cc/giro — 200 bar 27.36 l/min @1500',p:178.0,t:'pompa',serie:'PU20'},
+  {s:'P214',d:'Pompa Gr.2 cilindrata 22 cc/giro — 180 bar 31.68 l/min @1500',p:185.0,t:'pompa',serie:'PU20'},
+  // ── Serbatoi (PU10) ──
+  {s:'SL47H',d:'Serbatoio lamiera 7L orizzontale Ø123 — H/V',p:38.5,t:'serbatoio',serie:'PU10'},
+  {s:'SL44H',d:'Serbatoio lamiera 4L orizzontale Ø123',p:31.2,t:'serbatoio',serie:'PU10'},
+  {s:'SL48H',d:'Serbatoio lamiera 8L orizzontale Ø123',p:42.0,t:'serbatoio',serie:'PU10'},
+  {s:'SP07H',d:'Serbatoio plastica 3L orizzontale Ø123',p:22.4,t:'serbatoio',serie:'PU10'},
+  {s:'SP08H',d:'Serbatoio plastica 5L orizzontale Ø123',p:26.8,t:'serbatoio',serie:'PU10'},
+  // ── Serbatoi (PU20) ──
+  {s:'SZ23V',d:'Serbatoio PU20 lamiera 30L verticale Ø175',p:88.0,t:'serbatoio',serie:'PU20'},
+  {s:'SZ24V',d:'Serbatoio PU20 lamiera 45L verticale Ø175',p:102.0,t:'serbatoio',serie:'PU20'},
+  {s:'SZ22H',d:'Serbatoio PU20 lamiera 30L orizzontale Ø175',p:88.0,t:'serbatoio',serie:'PU20'},
+  // ── Motori DC (PU10) ──
+  {s:'C204',d:'Motore DC 24V 2200W 2600rpm IP54 — non reversibile',p:162.0,t:'motore',serie:'PU10'},
+  {s:'C205',d:'Motore DC 24V 2200W 2600rpm IP54 con termica',p:168.0,t:'motore',serie:'PU10'},
+  {s:'C104',d:'Motore DC 12V 1600W 2600rpm IP54',p:148.0,t:'motore',serie:'PU10'},
+  {s:'C202',d:'Motore DC 24V 500W 2800rpm IP44 reversibile',p:88.0,t:'motore',serie:'PU10'},
+  // ── Motori AC (PU10) ──
+  {s:'T206',d:'Motore AC 3-fase 0.75kW 2900rpm MEC80 B14',p:145.0,t:'motore',serie:'PU10'},
+  {s:'T207',d:'Motore AC 3-fase 1.1kW 2900rpm MEC80 B14',p:158.0,t:'motore',serie:'PU10'},
+  {s:'T208',d:'Motore AC 3-fase 1.5kW 2900rpm MEC90 B14',p:175.0,t:'motore',serie:'PU10'},
+  {s:'M206',d:'Motore AC 1-fase 0.75kW 2900rpm MEC80 B14',p:155.0,t:'motore',serie:'PU10'},
+  {s:'M207',d:'Motore AC 1-fase 1.1kW 2900rpm MEC80 B14',p:168.0,t:'motore',serie:'PU10'},
+  // ── Motori AC (PU20) ──
+  {s:'T258',d:'Motore AC 3-fase 7.5kW 3000rpm MEC132 B5',p:385.0,t:'motore',serie:'PU20'},
+  {s:'T255',d:'Motore AC 3-fase 3.0kW 3000rpm MEC100 B5',p:265.0,t:'motore',serie:'PU20'},
+  {s:'T256',d:'Motore AC 3-fase 4.0kW 3000rpm MEC112 B5',p:298.0,t:'motore',serie:'PU20'},
+  // ── Giunti/Flange (PU10) ──
+  {s:'FC02',d:'Giunto per motori DC C104-C204-C205-C215 Gr.1',p:28.5,t:'giunto',serie:'PU10'},
+  {s:'FC01',d:'Giunto per motori DC C102-C103-C202 Gr.1',p:22.4,t:'giunto',serie:'PU10'},
+  {s:'FA80',d:'Flangia per motori AC MEC80 Gr.1',p:35.2,t:'giunto',serie:'PU10'},
+  {s:'FA90',d:'Flangia per motori AC MEC90 Gr.1',p:38.8,t:'giunto',serie:'PU10'},
+  // ── Giunti/Flange (PU20) ──
+  {s:'FZ132',d:'Flangia+giunto PU20 per motori MEC132 B5',p:128.0,t:'giunto',serie:'PU20'},
+  {s:'FZ100',d:'Flangia+giunto PU20 per motori MEC110/112 B5',p:115.0,t:'giunto',serie:'PU20'},
+  // ── Blocchi modulari (comuni) ──
+  {s:'B09',d:'Distanziale H=18 — pass-through P-T',p:19.1,t:'blocco',serie:'PU10'},
+  {s:'B01',d:'Distanziale H=39',p:25.6,t:'blocco',serie:'PU10'},
+  {s:'B92',d:'Distanziale H=25',p:23.6,t:'blocco',serie:'PU10'},
+  {s:'B02',d:'Distanziale H=69',p:32.0,t:'blocco',serie:'PU10'},
+  {s:'B15',d:'Adattatore rotazione lato motore H=90 (M 1/4" BSPP)',p:102.5,t:'blocco',serie:'PU10'},
+  {s:'B51',d:'Adattatore rotazione lato motore H=60',p:48.3,t:'blocco',serie:'PU10'},
+  {s:'B26',d:'Adattatore rotazione lato serbatoio H=60',p:48.3,t:'blocco',serie:'PU10'},
+  {s:'B76',d:'Adattatore rotazione lato serbatoio H=90',p:55.0,t:'blocco',serie:'PU10'},
+  {s:'B33',d:'Adattatore rotazione 90°',p:48.3,t:'blocco',serie:'PU10'},
+  {s:'B128',d:'Blocco 4 attacchi P supplementari M 1/4"',p:38.3,t:'blocco',serie:'PU10'},
+  {s:'B96',d:'Blocco attacchi P-T 3/8" + M 1/4" BSPP',p:40.5,t:'blocco',serie:'PU10'},
+  {s:'B163',d:'Blocco attacchi P-T 1/2" + M 1/4" BSPP',p:45.3,t:'blocco',serie:'PU10'},
+  {s:'B03',d:'Blocco CETOP3-NG6 parallelo/serie — attacchi 1/4"',p:39.2,t:'blocco',serie:'PU10'},
+  {s:'B11',d:'Blocco CETOP3-NG6 parallelo/serie — attacchi 3/8"',p:39.2,t:'blocco',serie:'PU10'},
+  {s:'B85',d:'Blocco CETOP3-NG6 parallelo con uscite 1/4" BSPP',p:45.0,t:'blocco',serie:'PU10'},
+  {s:'B37',d:'Blocco CETOP5 parallelo (PU20)',p:68.0,t:'blocco',serie:'PU20'},
+  {s:'B30_06',d:'Divisore flusso 50/50 — 1-6 l/min',p:251.1,t:'blocco',serie:'PU10'},
+  {s:'B30_10',d:'Divisore flusso 50/50 — 5-10 l/min',p:251.1,t:'blocco',serie:'PU10'},
+  {s:'B30_20',d:'Divisore flusso 50/50 — 10-20 l/min',p:251.1,t:'blocco',serie:'PU10'},
+  {s:'B30_40',d:'Divisore flusso 50/50 — 20-40 l/min',p:268.0,t:'blocco',serie:'PU10'},
+  {s:'B41',d:'Blocco valvola prioritaria compensata — 350 bar 50 l/min',p:206.6,t:'blocco',serie:'PU10'},
+  {s:'B73',d:'Blocco riduttrice di pressione — 350 bar 30 l/min',p:297.0,t:'blocco',serie:'PU10'},
+  {s:'B259A',d:'Blocco valvola scarico automatica tipo A',p:134.8,t:'blocco',serie:'PU10'},
+  {s:'B259B',d:'Blocco valvola scarico automatica tipo B',p:134.8,t:'blocco',serie:'PU10'},
+  {s:'B38',d:'Blocco filtro sullo scarico 20 micron — max 20 l/min',p:78.5,t:'blocco',serie:'PU10'},
+  {s:'B39_25',d:'Blocco filtro sulla mandata 25 micron — max 10 l/min',p:82.0,t:'blocco',serie:'PU10'},
+  {s:'B20',d:'Pompa a mano modulare 6.5cc — max 350 bar',p:112.0,t:'blocco',serie:'PU10'},
+  // ── Valvole varie / accessori ──
+  {s:'VRF1R',d:'Regolatrice flusso compensata regolabile 2-20 l/min 350 bar',p:68.5,t:'valvola',serie:'PU10'},
+  {s:'VU1',d:'Ritegno a cartuccia — 3/4" 16 UNF cav.12',p:18.2,t:'valvola',serie:'PU10'},
+  {s:'VMC1-Y',d:'Valvola di massima VMC1 taratura 50-250 bar cav.11',p:24.8,t:'valvola',serie:'PU10'},
+  {s:'VMZ1-Y',d:'Valvola di massima VMZ1 taratura 50-220 bar (PU20)',p:38.5,t:'valvola',serie:'PU20'},
+  {s:'TC1',d:'Tappo cavità cav.05/11/13',p:4.2,t:'valvola',serie:'PU10'},
+  {s:'TC2',d:'Tappo cavità cav.04/05/10/12',p:4.2,t:'valvola',serie:'PU10'},
+  {s:'G01',d:'Supporto di montaggio standard',p:18.5,t:'accessorio',serie:'PU10'},
+];
+
+function aresSearch(q,serie=''){
+  if(!q||q.length<2)return[];
+  const r=q.toLowerCase();
+  return ARES.filter(a=>{
+    const match=a.s.toLowerCase().includes(r)||a.d.toLowerCase().includes(r);
+    const matchSerie=!serie||a.serie===serie||a.t==='bobina'||a.t==='accessorio';
+    return match&&matchSerie;
+  }).slice(0,8);
+}
+const TIPO_BADGE={
+  'PU05-collettore':'background:#fef3c7;color:#92400e;border:1px solid #f59e0b',
+  'PU10-collettore':'background:#dcfce7;color:#166534;border:1px solid #6ee7a0',
+  'PU20-collettore':'background:#dbeafe;color:#1e40af;border:1px solid #7fb3f5',
+  'valvola':'background:#ede9fe;color:#5b21b6;border:1px solid #a78bfa',
+  'bobina':'background:#fef3c7;color:#78350f;border:1px solid #f59e0b',
+  'pompa':'background:#ccfbf1;color:#115e59;border:1px solid #2dd4bf',
+  'serbatoio':'background:#f3f4f6;color:#374151;border:1px solid #d1d5db',
+  'motore':'background:#fee2e2;color:#991b1b;border:1px solid #f87171',
+  'giunto':'background:#fef3c7;color:#92400e;border:1px solid #fbbf24',
+  'blocco':'background:#f0f9ff;color:#0369a1;border:1px solid #7dd3fc',
+  'accessorio':'background:#f9fafb;color:#6b7280;border:1px solid #d1d5db',
+};
+
+// ═══════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════
+const CK='asg_config';
+function lCfg(){try{return JSON.parse(localStorage.getItem(CK)||'{}');}catch{return{};}}
+function sCfg(c){localStorage.setItem(CK,JSON.stringify(c));}
+// Legge valore da select nativo O da custom dropdown
+function getElVal(id){
+  const el=document.getElementById(id);
+  if(!el)return'';
+  if(el.classList&&el.classList.contains('csel'))return window._cselData?.[id]?.val||el.dataset.value||'';
+  return el.value||'';
+}
+
+function getCfg(){const c=lCfg();return{nc_url:c.nc_url||'',nc_user:c.nc_user||'',nc_pass:c.nc_pass||'',ok:!!(c.nc_url&&c.nc_user&&c.nc_pass)};}
+const K={comm:'asg_commesse',conti:'asg_conti',scad:'asg_scadenze',todo:'asg_todos',det:'asg_det',fatt:'asg_fatture',movimenti_fineco:'asg_mov_fineco',movimenti_sella:'asg_mov_sella'};
+
+// ═══════════════════════════════════════════════
+// NAVIGAZIONE SIDEBAR v13
+// ═══════════════════════════════════════════════
+const VIEW_TITLES={
+  home:'Home',commesse:'Commesse',approv:'Approvvigionamenti',
+  contabilita:'Contabilità','import-fatture':'Import Fatture',
+  magazzino:'Magazzino',fornitori:'Fornitori & Componenti',detail:'Commessa'
+};
+let _currentView='home';
+
+function navTo(viewId){
+  // Nascondi tutte le view
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  // Mostra quella richiesta
+  const el=document.getElementById('view-'+viewId);
+  if(el)el.classList.add('active');
+  _currentView=viewId;
+  // Aggiorna sidebar
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    n.classList.toggle('active',n.dataset.view===viewId);
+  });
+  // Aggiorna topbar
+  const tt=document.getElementById('topbar-title');
+  if(tt)tt.textContent=VIEW_TITLES[viewId]||viewId;
+  // Azioni topbar per vista
+  const ta=document.getElementById('topbar-actions');
+  if(ta){
+    if(viewId==='home')ta.innerHTML='<span id="clk" style="font-size:12px;color:var(--text3)">'+new Date().toLocaleDateString('it-IT',{weekday:'long',day:'2-digit',month:'long'})+'</span>';
+    else if(viewId==='commesse')ta.innerHTML='';
+    else if(viewId==='approv')ta.innerHTML='<button class="btn btn-ghost btn-sm" onclick="apriRDOTutti()">✉ Genera tutti RDO</button>';
+    else ta.innerHTML='';
+  }
+  // Render specifico
+  if(viewId==='home')renderHome();
+  else if(viewId==='commesse')renderCommesse();
+  else if(viewId==='approv')renderApprov();
+  else if(viewId==='contabilita')renderContabilita();
+  else if(viewId==='magazzino'){renderMag();renderMagMetrics();}
+  else if(viewId==='fornitori')renderFornCards(FORNITORI);
+  else if(viewId==='import-fatture')updateImpStatus();
+}
+
+function contTab(tab){
+  document.querySelectorAll('.cont-tab').forEach((t,i)=>{
+    const tabs=['fatture','scadenze','cassa'];
+    t.classList.toggle('active',tabs[i]===tab);
+  
+  if(tab==='primanota'){renderPrimaNota();}
+});
+  document.querySelectorAll('.cont-panel').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('cont-'+tab);
+  if(el)el.classList.add('active');
+  if(tab==='scadenze'){renderScadContabilita();if(!_flussoCassaVisible){toggleFlussoCassa();}}
+  else if(tab==='cassa')renderCassa();
+  else if(tab==='fatture')renderFatt();
+}
+
+
+// ═══════════════════════════════════════════════
+// PRIMA NOTA — Import, Storage, Render
+// ═══════════════════════════════════════════════
+let _pnImportRows = [];
+
+function lPN(){ try{return JSON.parse(localStorage.getItem('asg_primanota')||'[]');}catch{return[];} }
+function sPN(d){ localStorage.setItem('asg_primanota', JSON.stringify(d)); }
+
+// Aggiorna filtro conti disponibili
+function updatePNContoFilter(){
+  const data = lPN();
+  const conti = [...new Set(data.map(r=>r.conto).filter(Boolean))].sort();
+  const sel = document.getElementById('pn-filtro-conto');
+  if(!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Tutti i conti</option>' +
+    conti.map(c=>('<option value="'+(c)+'"'+(c===cur?' selected':'')+'>'+(c)+'</option>').join('');
+}
+
+// Render tabella Prima Nota
+function renderPrimaNota(){
+  updatePNContoFilter();
+  const data = lPN();
+  const filtConto = document.getElementById('pn-filtro-conto')?.value||'';
+  const filtDa   = document.getElementById('pn-filtro-da')?.value||'';
+  const filtA    = document.getElementById('pn-filtro-a')?.value||'';
+
+  let rows = data;
+  if(filtConto) rows = rows.filter(r=>r.conto===filtConto);
+  if(filtDa)   rows = rows.filter(r=>r.data_pag>=filtDa+'-01');
+  if(filtA)    rows = rows.filter(r=>r.data_pag<=filtA+'-31');
+
+  // Ordina per data pagamento
+  rows = [...rows].sort((a,b)=>a.data_pag.localeCompare(b.data_pag));
+
+  // Saldi per conto
+  const saldiEl = document.getElementById('pn-saldi');
+  if(saldiEl){
+    const conti = [...new Set(data.map(r=>r.conto).filter(Boolean))];
+    saldiEl.innerHTML = conti.map(c=>{
+      const mov = filtConto ? rows : data.filter(r=>r.conto===c);
+      const ent = mov.reduce((s,r)=>s+r.entrata,0);
+      const usc = mov.reduce((s,r)=>s+r.uscita,0);
+      const sal = ent - usc;
+      return ('<div style="background:var(--bg1);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;">\n        <div style="font-weight:700;color:var(--text2);margin-bottom:2px">'+(c)+'</div>\n        <div style="display:flex;gap:10px;">\n          <span style="color:var(--green)">↑ €'+(fmt(ent))+'</span>\n          <span style="color:var(--red)">↓ €'+(fmt(usc))+'</span>\n          <span style="font-weight:700;color:'+(sal>=0?'var(--blue)':'var(--red)')+'">= €'+(fmt(sal))+'</span>\n        </div>\n      </div>';
+    }).join('');
+  }
+
+  const tbody = document.getElementById('pn-tbody');
+  const tfoot = document.getElementById('pn-tfoot');
+  if(!tbody) return;
+
+  if(!rows.length){
+    tbody.innerHTML='<tr><td colspan="10" class="empty">Nessun movimento per questo filtro</td></tr>';
+    if(tfoot) tfoot.innerHTML='';
+    return;
+  }
+
+  let saldoRun = 0;
+  const totEnt = rows.reduce((s,r)=>s+r.entrata,0);
+  const totUsc = rows.reduce((s,r)=>s+r.uscita,0);
+
+  tbody.innerHTML = rows.map(r=>{
+    saldoRun += r.entrata - r.uscita;
+    return ('<tr style="border-bottom:1px solid var(--border);">\n      <td style="padding:6px 10px;font-family:monospace;font-size:11px">'+(fmtD(r.data_pag))+'</td>\n      <td style="padding:6px 8px;font-size:11px"><span class="bdg" style="font-size:10px">'+(r.tipo||'—')+'</span></td>\n      <td style="padding:6px 8px;font-size:11px;font-family:monospace">'+(r.num_doc||'—')+'</td>\n      <td style="padding:6px 8px;font-size:11px;font-family:monospace">'+(fmtD(r.data_doc))+'</td>\n      <td style="padding:6px 8px;font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+((r.cliente||r.fornitore||'').replace(/"/g,'')}">${r.cliente||r.fornitore||'—'}</td>
+      <td style="padding:6px 8px;font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.nota||'').replace(/"/g,''))+'">'+(r.nota||'')+'</td>\n      <td style="padding:6px 8px;font-size:11px"><span style="background:var(--blue-lt);color:var(--blue);padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600">'+(r.conto||'—')+'</span></td>\n      <td style="padding:6px 8px;text-align:right;font-weight:600;color:var(--green)">'+(r.entrata>0?'€'+fmt2(r.entrata):'')+'</td>\n      <td style="padding:6px 8px;text-align:right;font-weight:600;color:var(--red)">'+(r.uscita>0?'€'+fmt2(r.uscita):'')+'</td>\n      <td style="padding:6px 8px;text-align:right;font-family:monospace;font-size:11px;color:'+(saldoRun>=0?'var(--text2)':'var(--red)')+'">€'+(fmt2(saldoRun))+'</td>\n    </tr>';
+  }).join('');
+
+  if(tfoot) tfoot.innerHTML = ('<tr style="background:var(--bg2);font-weight:700;border-top:2px solid var(--border);">\n    <td colspan="7" style="padding:7px 10px;font-size:12px;color:var(--text3)">TOTALE — '+(rows.length)+' movimenti</td>\n    <td style="padding:7px 8px;text-align:right;color:var(--green)">€'+(fmt2(totEnt))+'</td>\n    <td style="padding:7px 8px;text-align:right;color:var(--red)">€'+(fmt2(totUsc))+'</td>\n    <td style="padding:7px 8px;text-align:right;font-weight:800">€'+(fmt2(totEnt-totUsc))+'</td>\n  </tr>';
+}
+
+// Handler drag & drop
+function handlePNDrop(e){
+  e.preventDefault();
+  handlePNFiles(e.dataTransfer.files);
+}
+
+// Parser XLS Prima Nota Fattura24
+async function handlePNFiles(files){
+  _pnImportRows = [];
+  const preview = document.getElementById('pn-import-preview');
+  const btn = document.getElementById('pn-import-btn');
+  if(preview) preview.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px">Lettura file…</div>';
+
+  for(const file of files){
+    try{
+      const rows = await parsePrimaNotaFile(file);
+      _pnImportRows.push(...rows);
+    } catch(err){
+      if(preview) preview.innerHTML += ('<div style="color:var(--red);font-size:12px;padding:4px">✗ '+(file.name)+': '+(err.message)+'</div>';
+    }
+  }
+
+  if(_pnImportRows.length){
+    if(preview) preview.innerHTML = ('<div style="background:var(--green-lt);border:1px solid var(--green-bd);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--green)">\n      ✓ Trovati <strong>'+(_pnImportRows.length)+'</strong> movimenti da importare<br>\n      Conti: '+([...new Set(_pnImportRows.map(r=>r.conto))].filter(Boolean).join(', '))+'\n    </div>';
+    if(btn) btn.style.display='';
+  }
+}
+
+async function parsePrimaNotaFile(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = e => {
+      try{
+        const wb = XLSX.read(e.target.result, {type:'array', cellDates:true, dateNF:'dd/mm/yyyy'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const raw = XLSX.utils.sheet_to_json(ws, {header:1, defval:'', raw:false, dateNF:'dd/mm/yyyy'});
+
+        // Trova riga header (contiene "DATA PAG." o "TIPO DOC.")
+        let hdrIdx = -1;
+        for(let i=0;i<raw.length;i++){
+          const r = raw[i].map(c=>String(c).toUpperCase().trim());
+          if(r.includes('DATA PAG.') || r.includes('TIPO DOC.')){
+            hdrIdx = i; break;
+          }
+        }
+        if(hdrIdx<0) throw new Error('Header non trovato. Usa export "Prima Nota" da Fattura24.');
+
+        const headers = raw[hdrIdx].map(c=>String(c).trim());
+        const rows = [];
+
+        for(let i=hdrIdx+1; i<raw.length; i++){
+          const row = {};
+          headers.forEach((h,j)=>{ row[h]=String(raw[i][j]??'').trim(); });
+
+          // Converti serial Excel in data se necessario
+          const excelDateToStr = v => {
+            if(!v)return'';
+            if(typeof v==='number'&&v>40000&&v<60000){
+              // Serial number Excel: giorni dal 1/1/1900
+              const d=new Date(Math.round((v-25569)*86400*1000));
+              return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');
+            }
+            return normDate(String(v));
+          };
+          const dataPag = excelDateToStr(row['DATA PAG.']||row['Data pagamento']||'');
+          if(!dataPag) continue; // salta righe vuote
+
+          const toNum = v => {
+            if(v===null||v===undefined||v===''||v==='-')return 0;
+            // SheetJS raw:true restituisce numeri JS nativi
+            if(typeof v==='number') return isFinite(v)?v:0;
+            const s=String(v).trim();
+            if(!s||s==='-')return 0;
+            // Rimuovi simbolo €  e spazi
+            const clean=s.replace(/[€\s]/g,'');
+            // Formato italiano: punto migliaia, virgola decimale → "1.234,56"
+            if(/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(clean))
+              return parseFloat(clean.replace(/\./g,'').replace(',','.'))||0;
+            // Formato con solo virgola decimale → "54,89"
+            if(/^\d+,\d+$/.test(clean))
+              return parseFloat(clean.replace(',','.'))||0;
+            // Già formato decimale con punto → "54.89"
+            return parseFloat(clean.replace(/,/g,''))||0;
+          };
+
+          rows.push({
+            id: 'pn_'+(row['ID']||row['Cod.']||Math.random().toString(36).slice(2)),
+            data_pag: dataPag,
+            tipo: row['TIPO DOC.']||row['Tipo']||'',
+            num_doc: row['NUM. DOC.']||row['Numero']||'',
+            data_doc: excelDateToStr(row['DATA DOC.']||row['Data doc.']||''),
+            nota: row['NOTA']||row['Descrizione']||'',
+            conto: row['CONTO']||row['Conto']||'',
+            cliente: row['CLIENTE']||row['Cliente']||'',
+            fornitore: row['FORNITORE']||row['Fornitore']||'',
+            entrata: toNum(row['ENTRATA']||row['Entrata']||0),
+            uscita: toNum(row['USCITA']||row['Uscita']||0),
+          });
+        }
+
+        if(!rows.length) throw new Error('Nessun movimento trovato nel file.');
+        resolve(rows);
+      } catch(err){ reject(err); }
+    };
+    reader.onerror = ()=>reject(new Error('Errore lettura file'));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function confirmImportPN(){
+  if(!_pnImportRows.length) return;
+  const existing = lPN();
+  // Deduplica per id
+  const existingIds = new Set(existing.map(r=>r.id));
+  const nuovi = _pnImportRows.filter(r=>!existingIds.has(r.id));
+  const merged = [...existing, ...nuovi];
+  sPN(merged);
+  closeM();
+  showToast(('✓ Importati '+(nuovi.length)+' movimenti ('+(_pnImportRows.length-nuovi.length)+' duplicati saltati)');
+  // Sincronizza su Nextcloud
+  wPutJSON('primanota.json', merged).catch(()=>{});
+  contTab('primanota');
+}
+
+// Export PDF Prima Nota
+function exportPrimaNotaPDF(){
+  const data = lPN();
+  const filtConto = document.getElementById('pn-filtro-conto')?.value||'';
+  const filtDa    = document.getElementById('pn-filtro-da')?.value||'';
+  const filtA     = document.getElementById('pn-filtro-a')?.value||'';
+  let rows = data;
+  if(filtConto) rows = rows.filter(r=>r.conto===filtConto);
+  if(filtDa)    rows = rows.filter(r=>r.data_pag>=filtDa+'-01');
+  if(filtA)     rows = rows.filter(r=>r.data_pag<=filtA+'-31');
+  rows = [...rows].sort((a,b)=>a.data_pag.localeCompare(b.data_pag));
+
+  const totEnt = rows.reduce((s,r)=>s+r.entrata,0);
+  const totUsc = rows.reduce((s,r)=>s+r.uscita,0);
+  const periodo = filtDa||filtA ? (''+(filtDa||'…')+' / '+(filtA||'…')+'' : 'Tutto il periodo';
+  const contoLbl = filtConto||'Tutti i conti';
+
+  const win = window.open('','_blank');
+  win.document.write(('<!DOCTYPE html><html><head><meta charset="utf-8">\n  <title>Prima Nota — ASG LAB</title>\n  <style>\n    body{font-family:sans-serif;font-size:11px;color:#111;margin:20px;}\n    h1{font-size:16px;margin-bottom:4px}\n    .sub{color:#666;font-size:11px;margin-bottom:16px}\n    table{width:100%;border-collapse:collapse;font-size:10px;}\n    th{background:#f0f0f0;padding:5px 6px;text-align:left;border-bottom:2px solid #ccc;font-size:10px;}\n    td{padding:4px 6px;border-bottom:1px solid #eee;}\n    .num{text-align:right;}\n    .green{color:#166534;font-weight:600}\n    .red{color:#991b1b;font-weight:600}\n    tfoot td{font-weight:700;background:#f7f7f7;border-top:2px solid #ccc;}\n    @media print{body{margin:0}button{display:none}}\n  </style></head><body>\n  <button onclick="window.print()" style="margin-bottom:12px;padding:6px 16px;background:#1a56db;color:#fff;border:none;border-radius:5px;cursor:pointer">🖨 Stampa / Salva PDF</button>\n  <h1>Prima Nota — ASG LAB</h1>\n  <div class="sub">Conto: <strong>'+(contoLbl)+'</strong> · Periodo: <strong>'+(periodo)+'</strong> · '+(rows.length)+' movimenti</div>\n  <table>\n    <thead><tr>\n      <th>Data pag.</th><th>Tipo</th><th>N° Doc.</th><th>Data doc.</th>\n      <th>Cliente/Fornitore</th><th>Nota</th><th>Conto</th>\n      <th class="num" style="color:green">Entrata</th>\n      <th class="num" style="color:red">Uscita</th>\n    </tr></thead>\n    <tbody>\n    '+(rows.map(r=>'+('<tr>\n      <td>'+(fmtD(r.data_pag))+'</td>\n      <td>'+(r.tipo||'—')+'</td>\n      <td>'+(r.num_doc||'—')+'</td>\n      <td>'+(fmtD(r.data_doc))+'</td>\n      <td>'+(r.cliente||r.fornitore||'—')+'</td>\n      <td style="color:#666">'+(r.nota||'')+'</td>\n      <td>'+(r.conto||'—')+'</td>\n      <td class="num green">'+(r.entrata>0?'€'+fmt2(r.entrata):'')+'</td>\n      <td class="num red">'+(r.uscita>0?'€'+fmt2(r.uscita):'')+'</td>\n    </tr>').join(''))+'\n    </tbody>\n    <tfoot><tr>\n      <td colspan="7">TOTALE</td>\n      <td class="num" style="color:green">€'+(fmt2(totEnt))+'</td>\n      <td class="num" style="color:red">€'+(fmt2(totUsc))+'</td>\n    </tr></tfoot>\n  </table>\n  <div style="margin-top:12px;font-size:10px;color:#666">\n    Saldo periodo: <strong style="color:'+(totEnt-totUsc>=0?'#166534':'#991b1b')+'">€'+(fmt2(totEnt-totUsc))+'</strong>\n    · Estratto il '+(new Date().toLocaleDateString('it-IT'))+'\n  </div>\n

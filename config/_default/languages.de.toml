@@ -1,0 +1,34 @@
+disabled = false
+languageCode = "en"
+languageName = "Deutsch"
+weight = 1
+title = "ASG LAB"
+
+[params]
+  displayName = "Deutsch"
+  isoCode = "en"
+  rtl = false
+  dateFormat = "2 January 2006"
+  logo = "img/icon-light.png"
+  # secondaryLogo = "img/icon-dark.png"
+  # description = "Fluid power, absolute control."
+  # copyright = "Copy, _right?_ :thinking_face:"
+
+ [params.author]
+   name = "ASG LAB"
+   email = "info@asglab.it"
+   image = "img/icon-light.png"
+   imageQuality = 96
+   headline = "Fluid power, absolute control."
+   bio = "We specialize in the design, construction, and maintenance of hydraulic systems and components. We offer tailor-made solutions for the industrial sector, combining experience, innovation, and reliability."
+   links = [
+     { email = "mailto:hello@your_domain.com" },
+#     { link = "https://link-to-some-website.com/" },
+#     { facebook = "https://facebook.com/username" },
+#     { github = "https://github.com/username" },
+#     { instagram = "https://instagram.com/username" },
+#     { linkedin = "https://linkedin.com/in/username" },
+     { telegram = "https://t.me/+393755707492" },
+#     { x-twitter = "https://twitter.com/username" },
+     { whatsapp = "https://wa.me/+393755707492" },
+   ]

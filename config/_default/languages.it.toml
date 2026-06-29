@@ -1,0 +1,34 @@
+disabled = false
+languageCode = "it"
+languageName = "Italiano"
+weight = 1
+title = "ASG LAB"
+
+[params]
+  displayName = "Italiano"
+  isoCode = "it"
+  rtl = false
+  dateFormat = "2 January 2006"
+  logo = "img/icon-light.png"
+  # secondaryLogo = "img/icon-dark.png"
+  # description = "Potenza fluida, controllo assoluto."
+  # copyright = "Copy, _right?_ :thinking_face:"
+
+[params.author]
+   name = "ASG LAB"
+   email = "info@asglab.it"
+   image = "img/icon-light.png"
+   imageQuality = 96
+   headline = "Potenza fluida, controllo assoluto."
+   bio = "Siamo specializzati nella progettazione, realizzazione e manutenzione di impianti e componenti oleodinamici. Offriamo soluzioni su misura per il settore industriale, unendo esperienza, innovazione e affidabilità."
+   links = [
+     { email = "mailto:hello@your_domain.com" },
+#     { link = "https://link-to-some-website.com/" },
+#     { facebook = "https://facebook.com/username" },
+#     { github = "https://github.com/username" },
+#     { instagram = "https://instagram.com/username" },
+#     { linkedin = "https://linkedin.com/in/username" },
+     { telegram = "https://t.me/+393755707492" },
+#     { x-twitter = "https://twitter.com/username" },
+     { whatsapp = "https://wa.me/+393755707492" },
+   ]

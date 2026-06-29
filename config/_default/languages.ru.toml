@@ -1,0 +1,34 @@
+disabled = false
+languageCode = "ru"
+languageName = "Русский"
+weight = 7
+title = "ASG LAB"
+
+[params]
+  displayName = "Русский"
+  isoCode = "ru"
+  rtl = false
+  dateFormat = "2 January 2006"
+  logo = "img/icon-light.png"
+  # secondaryLogo = "img/icon-dark.png"
+  # description = "Гидравлическая мощность, абсолютный контроль."
+  # copyright = "Copy, _right?_ :thinking_face:"
+
+ [params.author]
+   name = "ASG LAB"
+   email = "info@asglab.it"
+   image = "img/icon-light.png"
+   imageQuality = 96
+   headline = "Гидравлическая мощность, абсолютный контроль."
+   bio = "Мы специализируемся на проектировании, строительстве и обслуживании гидравлических систем и компонентов. Предлагаем индивидуальные решения для промышленного сектора, сочетая опыт, инновации и надежность."
+   links = [
+     { email = "mailto:hello@your_domain.com" },
+#     { link = "https://link-to-some-website.com/" },
+#     { facebook = "https://facebook.com/username" },
+#     { github = "https://github.com/username" },
+#     { instagram = "https://instagram.com/username" },
+#     { linkedin = "https://linkedin.com/in/username" },
+     { telegram = "https://t.me/+393755707492" },
+#     { x-twitter = "https://twitter.com/username" },
+     { whatsapp = "https://wa.me/+393755707492" },
+   ]

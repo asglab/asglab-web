@@ -1,0 +1,34 @@
+disabled = false
+languageCode = "hi"
+languageName = "हिन्दी"
+weight = 10
+title = "ASG LAB"
+
+[params]
+  displayName = "हिन्दी"
+  isoCode = "hi"
+  rtl = false
+  dateFormat = "2 January 2006"
+  logo = "img/icon-light.png"
+  # secondaryLogo = "img/icon-dark.png"
+  # description = "तरल शक्ति, पूर्ण नियंत्रण।"
+  # copyright = "Copy, _right?_ :thinking_face:"
+
+ [params.author]
+   name = "ASG LAB"
+   email = "info@asglab.it"
+   image = "img/icon-light.png"
+   imageQuality = 96
+   headline = "तरल शक्ति, पूर्ण नियंत्रण।"
+   bio = "हम हाइड्रोलिक सिस्टम और घटकों के डिजाइन, निर्माण और रखरखाव में विशेषज्ञ हैं। हम औद्योगिक क्षेत्र के लिए अनुभव, नवाचार और विश्वसनीयता को मिलाकर अनुकूलित समाधान प्रदान करते हैं।"
+   links = [
+     { email = "mailto:hello@your_domain.com" },
+#     { link = "https://link-to-some-website.com/" },
+#     { facebook = "https://facebook.com/username" },
+#     { github = "https://github.com/username" },
+#     { instagram = "https://instagram.com/username" },
+#     { linkedin = "https://linkedin.com/in/username" },
+     { telegram = "https://t.me/+393755707492" },
+#     { x-twitter = "https://twitter.com/username" },
+     { whatsapp = "https://wa.me/+393755707492" },
+   ]

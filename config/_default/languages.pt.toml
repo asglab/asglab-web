@@ -1,0 +1,34 @@
+disabled = false
+languageCode = "pt"
+languageName = "Português"
+weight = 6
+title = "ASG LAB"
+
+[params]
+  displayName = "Português"
+  isoCode = "pt"
+  rtl = false
+  dateFormat = "2 January 2006"
+  logo = "img/icon-light.png"
+  # secondaryLogo = "img/icon-dark.png"
+  # description = " Potência hidráulica, controle absoluto."
+  # copyright = "Copy, _right?_ :thinking_face:"
+
+ [params.author]
+   name = "ASG LAB"
+   email = "info@asglab.it"
+   image = "img/icon-light.png"
+   imageQuality = 96
+   headline = " Potência hidráulica, controle absoluto."
+   bio = " Somos especializados no projeto, construção e manutenção de sistemas e componentes hidráulicos. Oferecemos soluções sob medida para o setor industrial, combinando experiência, inovação e confiabilidade."
+   links = [
+     { email = "mailto:hello@your_domain.com" },
+#     { link = "https://link-to-some-website.com/" },
+#     { facebook = "https://facebook.com/username" },
+#     { github = "https://github.com/username" },
+#     { instagram = "https://instagram.com/username" },
+#     { linkedin = "https://linkedin.com/in/username" },
+     { telegram = "https://t.me/+393755707492" },
+#     { x-twitter = "https://twitter.com/username" },
+     { whatsapp = "https://wa.me/+393755707492" },
+   ]
