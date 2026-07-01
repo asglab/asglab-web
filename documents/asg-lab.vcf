@@ -1,0 +1,10 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:ASG LAB S.r.l.
+ORG:ASG LAB S.r.l.
+ADR;TYPE=WORK:;;Via Vitruvio 3;Milano;MI;20124;Italia
+TEL;TYPE=WORK,VOICE:+39 375 5707492
+EMAIL;TYPE=WORK:info@asglab.it
+URL:https://asglab.it
+NOTE:P.IVA 10122150963 - Sistemi e impianti oleoidraulici
+END:VCARD
