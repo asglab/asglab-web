@@ -1,0 +1,169 @@
+<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pressione Max Tubo/Cilindro — ASG LAB</title>
+<style>
+:root{--bg:#0f1117;--surface:#181c27;--card:#1e2333;--border:#2a3047;--accent:#e8b84b;--accent2:#4b8de8;--text:#d4d8e8;--muted:#6b7494;--danger:#e85b4b;--ok:#4be88a;--font-display:'Georgia',serif;--font-body:system-ui,sans-serif;--font-mono:'Courier New',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:20}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}.logo-mark{width:32px;height:32px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:bold;font-size:13px;color:#000}
+.logo-text{font-family:var(--font-display);font-size:1.05rem;color:var(--text)}.logo-text span{color:var(--accent)}
+nav{display:flex;gap:1.5rem}nav a{color:var(--muted);text-decoration:none;font-size:.85rem;letter-spacing:.04em;text-transform:uppercase}nav a.active{color:var(--text)}
+.demo-banner{background:repeating-linear-gradient(-45deg,#2a1f00 0,#2a1f00 10px,#1f1700 10px,#1f1700 20px);border-bottom:1px solid var(--accent);padding:.4rem 2rem;font-size:.75rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;text-align:center}
+.hero{padding:3rem 2rem 1.5rem;max-width:860px;margin:0 auto}.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem}
+h1{font-family:var(--font-display);font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:normal;color:#fff;margin-bottom:.6rem}.hero p{color:var(--muted);font-size:.9rem;max-width:560px}
+.page{max-width:860px;margin:0 auto;padding:0 2rem 4rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.6rem;margin-bottom:1.5rem}
+.card-title{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}@media(max-width:520px){.grid-2{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:.35rem}label{font-size:.8rem;color:var(--muted)}
+.input-wrap{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:5px;overflow:hidden;transition:border-color .15s}
+.input-wrap:focus-within{border-color:var(--accent)}
+input[type=number],select{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--font-mono);font-size:.95rem;padding:.5rem .7rem}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7494'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .5rem center;padding-right:1.8rem}
+.unit-badge{background:var(--surface);border-left:1px solid var(--border);padding:0 .6rem;font-size:.75rem;color:var(--muted);display:flex;align-items:center}
+.field-hint{font-size:.72rem;color:var(--muted);opacity:.7}
+.result-main{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:1.2rem 1.4rem;display:flex;align-items:flex-end;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.result-value{font-family:var(--font-mono);font-size:2.8rem;font-weight:bold;color:var(--accent);line-height:1;transition:color .2s}
+.result-value.danger{color:var(--danger)}.result-value.ok{color:var(--ok)}
+.result-unit{font-size:1rem;color:var(--muted);margin-bottom:.4rem}
+.result-label{flex-basis:100%;font-size:.75rem;color:var(--muted);margin-top:.3rem}
+.sub-results{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-top:.8rem}
+.sub-block{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:.7rem;text-align:center}
+.sub-val{font-family:var(--font-mono);font-size:1.1rem;font-weight:bold;color:var(--text)}
+.sub-unit{font-size:.7rem;color:var(--muted)}.sub-key{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:.2rem}
+.formula{background:var(--bg);border-left:3px solid var(--accent2);border-radius:0 4px 4px 0;padding:.8rem 1.1rem;font-family:var(--font-mono);font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:2}.formula b{color:var(--text)}
+.mat-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.mat-table th{color:var(--muted);text-align:left;font-weight:normal;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;padding:.3rem .5rem;border-bottom:1px solid var(--border)}
+.mat-table td{padding:.35rem .5rem;border-bottom:1px solid var(--border);font-family:var(--font-mono)}
+.mat-table tr:last-child td{border-bottom:none}.mat-table .hl{background:rgba(232,184,75,.06)}
+footer{border-top:1px solid var(--border);padding:1.2rem 2rem;max-width:860px;margin:0 auto;display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);flex-wrap:wrap;gap:.5rem}
+</style></head><body>
+<header>
+  <a href="index.html" class="logo"><div class="logo-mark">ASG</div><span class="logo-text">ASG <span>LAB</span></span></a>
+  <nav><a href="index.html">← Strumenti</a><a href="#" class="active">Pressione Max Tubo</a></nav>
+</header>
+<div class="demo-banner">⚠ Pagina demo — contenuto non pubblicato su asglab.it</div>
+<div class="hero">
+  <div class="eyebrow">Strumenti tecnici › Calcolatori</div>
+  <h1>Pressione Massima — Tubi Acciaio e Cilindri</h1>
+  <p>Calcola la pressione massima ammissibile per tubi in acciaio senza saldatura (EN 10305) e camicie per cilindri idraulici, con fattore di sicurezza configurabile.</p>
+</div>
+<div class="page">
+  <div class="card">
+    <div class="card-title">Parametri tubo / camicia cilindro</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Diametro esterno (D<sub>e</sub>)</label>
+        <div class="input-wrap"><input type="number" id="De" value="40" min="5" max="400" step="1" oninput="calc()"><span class="unit-badge">mm</span></div>
+      </div>
+      <div class="field">
+        <label>Spessore parete (s)</label>
+        <div class="input-wrap"><input type="number" id="s" value="4" min="0.5" max="50" step="0.5" oninput="calc()"><span class="unit-badge">mm</span></div>
+      </div>
+      <div class="field">
+        <label>Materiale</label>
+        <div class="input-wrap">
+          <select id="mat" onchange="calc()">
+            <option value="235">E235 (St35) — σ<sub>s</sub>=235 MPa — EN 10305</option>
+            <option value="355" selected>E355 (St52) — σ<sub>s</sub>=355 MPa — EN 10305</option>
+            <option value="500">C45 — σ<sub>s</sub>=500 MPa — cilindri rettificati</option>
+            <option value="600">42CrMo4 — σ<sub>s</sub>=600 MPa — alta resistenza</option>
+            <option value="custom">Personalizzato…</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" id="customField" style="display:none">
+        <label>Tensione di snervamento σ<sub>s</sub> personalizzata</label>
+        <div class="input-wrap"><input type="number" id="sigmaCustom" value="350" min="100" max="1200" step="10" oninput="calc()"><span class="unit-badge">MPa</span></div>
+      </div>
+      <div class="field">
+        <label>Fattore di sicurezza (SF)</label>
+        <div class="input-wrap">
+          <select id="sf" onchange="calc()">
+            <option value="2.5">2.5 — Applicazione mobile standard</option>
+            <option value="3" selected>3.0 — Installazione industriale</option>
+            <option value="4">4.0 — Macchine con persone nelle vicinanze</option>
+            <option value="5">5.0 — Applicazioni critiche / safety</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Giunzione / saldatura</label>
+        <div class="input-wrap">
+          <select id="weld" onchange="calc()">
+            <option value="1" selected>Tubo senza saldatura — coeff. 1.0</option>
+            <option value="0.85">Saldato longitudinalmente — coeff. 0.85</option>
+            <option value="0.7">Saldato a spirale / qualità ridotta — coeff. 0.7</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Risultati</div>
+    <div class="result-main">
+      <div class="result-value" id="rPmax">—</div>
+      <div class="result-unit">bar</div>
+      <div class="result-label" id="rLabel">Pressione massima ammissibile</div>
+    </div>
+    <div class="sub-results">
+      <div class="sub-block"><div class="sub-val" id="rPburst">—</div><div class="sub-unit">bar</div><div class="sub-key">P rottura teorica</div></div>
+      <div class="sub-block"><div class="sub-val" id="rDi">—</div><div class="sub-unit">mm</div><div class="sub-key">Ø interno</div></div>
+      <div class="sub-block"><div class="sub-val" id="rRatio">—</div><div class="sub-unit">D/s</div><div class="sub-key">Rapporto D/s</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Formula (Lamé thin-wall / Barlow)</div>
+    <div class="formula">
+      <b>P<sub>burst</sub></b> = 2 · σ<sub>s</sub> · s · w / D<sub>e</sub> &nbsp;&nbsp;[MPa → bar ×10]<br>
+      <b>P<sub>max</sub></b> = P<sub>burst</sub> / SF<br><br>
+      <b>σ<sub>s</sub></b> = tensione snervamento [MPa] &nbsp;|&nbsp; <b>s</b> = spessore [mm]<br>
+      <b>D<sub>e</sub></b> = diametro esterno [mm] &nbsp;|&nbsp; <b>w</b> = coeff. giunzione &nbsp;|&nbsp; <b>SF</b> = fattore sicurezza
+    </div>
+    <div class="card-title" style="margin-top:1rem">Tensioni di snervamento di riferimento</div>
+    <table class="mat-table">
+      <tr><th>Materiale</th><th>Norma</th><th>σ<sub>s</sub> (MPa)</th><th>Uso tipico</th></tr>
+      <tr><td>E235 (St35.8)</td><td>EN 10305-1</td><td>235</td><td>Bassa pressione, tubi luce</td></tr>
+      <tr class="hl"><td>E355 (St52)</td><td>EN 10305-1</td><td>355</td><td>Oleodinamica industriale</td></tr>
+      <tr><td>C45 normalizzato</td><td>EN 10083</td><td>430–500</td><td>Camicie cilindri rettificati</td></tr>
+      <tr><td>42CrMo4 bonificato</td><td>EN 10083</td><td>600–900</td><td>Alta pressione, cilindri premium</td></tr>
+    </table>
+    <p style="font-size:.75rem;color:var(--muted);margin-top:.8rem">⚠ Verifica sempre con le tabelle del costruttore e la normativa applicabile (EN 10305, ISO 10763, UNI 8863). Per cilindri idraulici fare riferimento a ISO 6020/6022. Il calcolatore non sostituisce una verifica strutturale professionale.</p>
+  </div>
+</div>
+<footer><div>© 2025 ASG LAB S.r.l. — Via Vitruvio 3, 20124 Milano</div><div>info@asglab.it</div></footer>
+<script>
+document.getElementById('mat').addEventListener('change',function(){
+  document.getElementById('customField').style.display=this.value==='custom'?'flex':'none';calc();
+});
+function calc(){
+  const De=+document.getElementById('De').value||0;
+  const s=+document.getElementById('s').value||0;
+  const matVal=document.getElementById('mat').value;
+  const sigma=matVal==='custom'?(+document.getElementById('sigmaCustom').value||350):+matVal;
+  const sf=+document.getElementById('sf').value||3;
+  const w=+document.getElementById('weld').value||1;
+  if(De<=0||s<=0||s>=De/2){
+    ['rPmax','rPburst','rDi','rRatio'].forEach(id=>document.getElementById(id).textContent='—');
+    document.getElementById('rLabel').textContent='Valori non validi';
+    document.getElementById('rPmax').className='result-value';return;
+  }
+  const Pburst_bar=(2*sigma*s*w/De)*10;
+  const Pmax_bar=Pburst_bar/sf;
+  const Di=De-2*s;
+  const ratio=De/s;
+  document.getElementById('rPburst').textContent=Pburst_bar.toFixed(0);
+  document.getElementById('rDi').textContent=Di.toFixed(1);
+  document.getElementById('rRatio').textContent=ratio.toFixed(1);
+  const el=document.getElementById('rPmax');
+  el.textContent=Pmax_bar.toFixed(0);
+  el.className='result-value'+(Pmax_bar<50?' danger':Pmax_bar>250?' ok':'');
+  let msg='Pressione massima ammissibile';
+  if(ratio>20)msg+=' — ⚠ parete sottile (D/s>20): verifica flambaggio';
+  if(Pmax_bar<50)msg+=' — pressione molto bassa per questa geometria';
+  document.getElementById('rLabel').textContent=msg;
+}
+calc();
+</script>
+</body></html>

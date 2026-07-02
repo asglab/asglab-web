@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flange SAE J518 — ASG LAB</title>
+<style>
+:root{--bg:#0f1117;--surface:#181c27;--card:#1e2333;--border:#2a3047;--accent:#e8b84b;--accent2:#4b8de8;--text:#d4d8e8;--muted:#6b7494;--danger:#e85b4b;--ok:#4be88a;--font-display:'Georgia',serif;--font-body:system-ui,sans-serif;--font-mono:'Courier New',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:20}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}.logo-mark{width:32px;height:32px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:bold;font-size:13px;color:#000}
+.logo-text{font-family:var(--font-display);font-size:1.05rem;color:var(--text)}.logo-text span{color:var(--accent)}
+nav{display:flex;gap:1.5rem}nav a{color:var(--muted);text-decoration:none;font-size:.85rem;letter-spacing:.04em;text-transform:uppercase}nav a.active{color:var(--text)}
+.demo-banner{background:repeating-linear-gradient(-45deg,#2a1f00 0,#2a1f00 10px,#1f1700 10px,#1f1700 20px);border-bottom:1px solid var(--accent);padding:.4rem 2rem;font-size:.75rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;text-align:center}
+.hero{padding:3rem 2rem 1.5rem;max-width:980px;margin:0 auto}.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem}
+h1{font-family:var(--font-display);font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:normal;color:#fff;margin-bottom:.6rem}.hero p{color:var(--muted);font-size:.9rem;max-width:580px}
+.page{max-width:980px;margin:0 auto;padding:0 2rem 4rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.6rem;margin-bottom:1.5rem}
+.card-title{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
+.toolbar{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1.2rem;align-items:center}
+.tab-group{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:5px;overflow:hidden}
+.tab{padding:.4rem .9rem;font-size:.8rem;cursor:pointer;color:var(--muted);border:none;background:transparent;transition:background .15s,color .15s}
+.tab.active{background:var(--accent);color:#000;font-weight:bold}
+input[type=text]{background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--font-mono);font-size:.85rem;padding:.4rem .7rem;outline:none;transition:border-color .15s;width:200px}
+input[type=text]:focus{border-color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead th{color:var(--muted);font-weight:normal;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;padding:.4rem .5rem;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:rgba(255,255,255,.03)}
+tbody tr:last-child{border-bottom:none}
+td{padding:.4rem .5rem;font-family:var(--font-mono);color:var(--text);font-size:.8rem}
+td.label{font-family:var(--font-body);color:var(--text);font-size:.78rem}
+.series-3000{color:var(--accent)}
+.series-6000{color:var(--accent2)}
+.oring-dim{color:var(--muted);font-size:.72rem}
+footer{border-top:1px solid var(--border);padding:1.2rem 2rem;max-width:980px;margin:0 auto;display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);flex-wrap:wrap;gap:.5rem}
+</style></head><body>
+<header>
+  <a href="index.html" class="logo"><div class="logo-mark">ASG</div><span class="logo-text">ASG <span>LAB</span></span></a>
+  <nav><a href="index.html">← Strumenti</a><a href="#" class="active">Flange SAE J518</a></nav>
+</header>
+<div class="demo-banner">⚠ Pagina demo — contenuto non pubblicato su asglab.it</div>
+<div class="hero">
+  <div class="eyebrow">Strumenti tecnici › Riferimento</div>
+  <h1>Flange SAE J518 / ISO 6162</h1>
+  <p>Tabella dimensionale completa delle flange SAE per oleodinamica — Serie 3000 PSI e 6000 PSI. Dimensioni fori bulloni, passo, O-ring, codici ISO 6162-1 e -2.</p>
+</div>
+<div class="page">
+  <div class="card">
+    <div class="toolbar">
+      <div class="tab-group">
+        <button class="tab active" onclick="setView('all')">Tutte</button>
+        <button class="tab" onclick="setView('3000')">Serie 3000 PSI</button>
+        <button class="tab" onclick="setView('6000')">Serie 6000 PSI</button>
+      </div>
+      <input type="text" id="search" placeholder="Cerca DN / pollici / vite…" oninput="render()">
+    </div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>Codice SAE</th><th>DN nominale</th><th>Pollici</th><th>Serie</th>
+        <th>Ø foro flangia (mm)</th><th>Ø fori bulloni (mm)</th><th>Interasse bulloni (mm)</th>
+        <th>Bullone UNC</th><th>Coppia (N·m)</th><th>O-ring AS568</th><th>P max (bar)</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Note di utilizzo</div>
+    <p style="font-size:.82rem;color:var(--muted);line-height:1.7">
+      Le flange SAE J518 (equivalente ISO 6162) si dividono in due serie: <strong style="color:var(--accent)">3000 PSI (~210 bar)</strong> per applicazioni standard e <strong style="color:var(--accent2)">6000 PSI (~420 bar)</strong> per alta pressione. La tenuta è affidata a un O-ring in sede piatta sulla faccia della flangia — mai applicare sigillanti su questa superficie. Le viti devono essere in classe 10.9 o SAE Grade 8. Serrare a croce in più passaggi fino alla coppia specificata. L'O-ring per le flange SAE è normalmente un AS 568A in NBR 70 Shore; per applicazioni con olio sintetico o alte temperature usare FKM.
+    </p>
+  </div>
+</div>
+<footer><div>© 2025 ASG LAB S.r.l. — Via Vitruvio 3, 20124 Milano</div><div>info@asglab.it</div></footer>
+<script>
+// SAE J518 / ISO 6162 data
+// code, dn_mm, inch, series, d_bore, d_bolt_holes, bolt_pcd, bolt_unc, torque_nm, oring_as568, pmax_bar
+const DATA=[
+  ['SAE-08-3000',12.7,'1/2"','3000',28.6,11.1,38.1,'3/8-16 UNC',34,'-116',210],
+  ['SAE-08-6000',12.7,'1/2"','6000',28.6,12.7,38.1,'1/2-13 UNC',81,'-116',420],
+  ['SAE-12-3000',19.1,'3/4"','3000',35.7,11.1,47.6,'3/8-16 UNC',34,'-118',210],
+  ['SAE-12-6000',19.1,'3/4"','6000',35.7,12.7,47.6,'1/2-13 UNC',81,'-118',420],
+  ['SAE-16-3000',25.4,'1"','3000',44.4,11.1,57.2,'3/8-16 UNC',34,'-120',210],
+  ['SAE-16-6000',25.4,'1"','6000',44.4,14.3,57.2,'9/16-12 UNC',136,'-120',420],
+  ['SAE-20-3000',31.8,'1¼"','3000',52.4,14.3,69.9,'9/16-12 UNC',136,'-122',210],
+  ['SAE-20-6000',31.8,'1¼"','6000',52.4,14.3,69.9,'9/16-12 UNC',136,'-122',420],
+  ['SAE-24-3000',38.1,'1½"','3000',60.3,14.3,79.4,'9/16-12 UNC',136,'-125',210],
+  ['SAE-24-6000',38.1,'1½"','6000',60.3,17.5,79.4,'5/8-11 UNC',190,'-125',420],
+  ['SAE-32-3000',50.8,'2"','3000',79.4,14.3,98.4,'9/16-12 UNC',136,'-128',210],
+  ['SAE-32-6000',50.8,'2"','6000',79.4,17.5,98.4,'3/4-10 UNC',325,'-128',420],
+  ['SAE-40-3000',63.5,'2½"','3000',93.7,17.5,120.7,'3/4-10 UNC',325,'-132',210],
+  ['SAE-40-6000',63.5,'2½"','6000',93.7,20.6,120.7,'7/8-9 UNC',540,'-132',420],
+  ['SAE-48-3000',76.2,'3"','3000',111.1,20.6,139.7,'7/8-9 UNC',540,'-136',210],
+  ['SAE-48-6000',76.2,'3"','6000',111.1,23.8,139.7,'1-8 UNC',780,'-136',420],
+  ['SAE-64-3000',101.6,'4"','3000',146.1,23.8,180.0,'1-8 UNC',780,'-144',210],
+  ['SAE-64-6000',101.6,'4"','6000',146.1,23.8,180.0,'1-8 UNC',780,'-144',350],
+];
+let view='all';
+function setView(v){view=v;document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['all','3000','6000'][i]===v));render();}
+function render(){
+  const q=document.getElementById('search').value.toLowerCase();
+  let rows=DATA.filter(r=>{
+    if(view!=='all'&&r[3]!==view)return false;
+    return !q||r[0].toLowerCase().includes(q)||r[2].includes(q)||r[7].toLowerCase().includes(q)||String(r[1]).includes(q);
+  });
+  document.getElementById('tbody').innerHTML=rows.map(r=>`<tr>
+    <td class="label ${r[3]==='3000'?'series-3000':'series-6000'}">${r[0]}</td>
+    <td>${r[1]}</td><td>${r[2]}</td>
+    <td><span style="color:${r[3]==='3000'?'var(--accent)':'var(--accent2)'};font-weight:bold">${r[3]}</span></td>
+    <td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td>
+    <td>${r[7]}</td><td>${r[8]}</td>
+    <td class="oring-dim">${r[9]}</td>
+    <td>${r[10]}</td>
+  </tr>`).join('');
+}
+render();
+</script>
+</body></html>

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cerca Bobina Solenoide — ASG LAB</title>
+<style>
+  :root {
+    --bg:       #0f1117;
+    --surface:  #181c27;
+    --card:     #1e2333;
+    --border:   #2a3047;
+    --accent:   #e8b84b;
+    --accent2:  #4b8de8;
+    --text:     #d4d8e8;
+    --muted:    #6b7494;
+    --danger:   #e85b4b;
+    --ok:       #4be88a;
+    --font-display: 'Georgia', serif;
+    --font-body:    system-ui, -apple-system, sans-serif;
+    --font-mono:    'Courier New', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+
+  /* Header */
+  header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px;
+    position: sticky; top: 0; z-index: 20;
+  }
+  .logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+  .logo-mark {
+    width: 32px; height: 32px; background: var(--accent); border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: bold; font-size: 13px; color: #000;
+  }
+  .logo-text { font-family: var(--font-display); font-size: 1.05rem; color: var(--text); }
+  .logo-text span { color: var(--accent); }
+  nav { display: flex; gap: 1.5rem; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; }
+  nav a.active { color: var(--text); }
+
+  .demo-banner {
+    background: repeating-linear-gradient(-45deg,#2a1f00 0,#2a1f00 10px,#1f1700 10px,#1f1700 20px);
+    border-bottom: 1px solid var(--accent); padding: 0.4rem 2rem;
+    font-size: 0.75rem; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; text-align: center;
+  }
+
+  .hero { padding: 3rem 2rem 1.5rem; max-width: 980px; margin: 0 auto; }
+  .eyebrow { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+  h1 { font-family: var(--font-display); font-size: clamp(1.5rem,3.5vw,2.2rem); font-weight: normal; color: #fff; margin-bottom: 0.6rem; }
+  .hero p { color: var(--muted); font-size: 0.9rem; max-width: 580px; }
+
+  .page { max-width: 980px; margin: 0 auto; padding: 0 2rem 4rem; }
+
+  /* Layout a due colonne */
+  .layout { display: grid; grid-template-columns: 280px 1fr; gap: 1.2rem; align-items: start; }
+  @media (max-width: 700px) { .layout { grid-template-columns: 1fr; } }
+
+  /* Pannello filtri */
+  .filters { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; position: sticky; top: 72px; }
+  .filters-title { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  .filter-group { margin-bottom: 1rem; }
+  .filter-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.3rem; display: block; }
+  select, input[type=text], input[type=number] {
+    width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text); font-family: var(--font-mono); font-size: 0.85rem; padding: 0.45rem 0.6rem; outline: none;
+    transition: border-color 0.15s;
+  }
+  select:focus, input:focus { border-color: var(--accent); }
+  select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7494'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; padding-right: 1.8rem; }
+  .range-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+  .range-sep { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.75rem; }
+
+  .btn-primary {
+    width: 100%; background: var(--accent); color: #000; border: none; border-radius: 5px;
+    padding: 0.6rem; font-size: 0.85rem; font-weight: bold; cursor: pointer; letter-spacing: 0.04em;
+    transition: opacity 0.15s; margin-top: 0.5rem;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-ghost {
+    width: 100%; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 5px;
+    padding: 0.5rem; font-size: 0.8rem; cursor: pointer; margin-top: 0.4rem; transition: border-color 0.15s;
+  }
+  .btn-ghost:hover { border-color: var(--text); color: var(--text); }
+
+  /* AI search box */
+  .ai-box {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 1rem 1.2rem; margin-bottom: 1.2rem;
+  }
+  .ai-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; }
+  .ai-badge {
+    background: var(--accent2); color: #fff; font-size: 0.65rem; font-weight: bold;
+    letter-spacing: 0.08em; text-transform: uppercase; padding: 0.15rem 0.45rem; border-radius: 3px;
+  }
+  .ai-header span { font-size: 0.8rem; color: var(--muted); }
+  .ai-input-row { display: flex; gap: 0.5rem; }
+  #aiQuery {
+    flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 5px;
+    color: var(--text); font-family: var(--font-body); font-size: 0.9rem; padding: 0.5rem 0.7rem;
+    outline: none; transition: border-color 0.15s;
+  }
+  #aiQuery:focus { border-color: var(--accent2); }
+  .btn-ai {
+    background: var(--accent2); color: #fff; border: none; border-radius: 5px;
+    padding: 0.5rem 1rem; font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: opacity 0.15s;
+  }
+  .btn-ai:hover { opacity: 0.85; }
+  .btn-ai:disabled { opacity: 0.5; cursor: not-allowed; }
+  #aiResult {
+    margin-top: 0.8rem; font-size: 0.85rem; color: var(--text); line-height: 1.6;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 5px;
+    padding: 0.7rem 0.9rem; display: none;
+  }
+  .ai-thinking { color: var(--muted); font-style: italic; }
+
+  /* Risultati */
+  .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; }
+  .results-count { font-size: 0.8rem; color: var(--muted); }
+  .sort-select { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-size: 0.8rem; padding: 0.3rem 0.5rem; outline: none; cursor: pointer; }
+
+  /* Card bobina */
+  .coil-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 1rem 1.2rem; margin-bottom: 0.8rem;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 0.4rem 1rem; align-items: start;
+    transition: border-color 0.15s; cursor: default;
+  }
+  .coil-card:hover { border-color: var(--accent); }
+  .coil-pn { font-family: var(--font-mono); font-size: 0.95rem; color: var(--accent); font-weight: bold; }
+  .coil-desc { font-size: 0.82rem; color: var(--muted); margin-top: 0.1rem; }
+  .coil-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
+  .tag {
+    font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.15rem 0.5rem; border-radius: 3px; border: 1px solid var(--border); color: var(--muted);
+  }
+  .tag.marca { border-color: #3a4060; color: #8899cc; }
+  .tag.tensione { border-color: #3a4a30; color: #7ab870; }
+  .tag.connettore { border-color: #3a3040; color: #9988bb; }
+  .tag.ip { border-color: #403020; color: #b8924b; }
+  .coil-specs {
+    display: grid; grid-template-columns: repeat(3, auto); gap: 0.2rem 1rem;
+    text-align: right;
+  }
+  .spec-item { display: flex; flex-direction: column; align-items: flex-end; }
+  .spec-val { font-family: var(--font-mono); font-size: 0.9rem; color: var(--text); }
+  .spec-key { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .coil-badge-ac { color: var(--danger); font-size: 0.7rem; font-weight: bold; }
+  .coil-badge-dc { color: var(--ok); font-size: 0.7rem; font-weight: bold; }
+
+  .no-results { text-align: center; color: var(--muted); padding: 2rem; font-size: 0.9rem; }
+
+  footer { border-top: 1px solid var(--border); padding: 1.2rem 2rem; max-width: 980px; margin: 0 auto; display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); flex-wrap: wrap; gap: 0.5rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="#" class="logo">
+    <div class="logo-mark">ASG</div>
+    <span class="logo-text">ASG <span>LAB</span></span>
+  </a>
+  <nav>
+    <a href="#">Prodotti</a>
+    <a href="#" class="active">Strumenti</a>
+    <a href="#">Tecnica</a>
+    <a href="#">Contatti</a>
+  </nav>
+</header>
+<div class="demo-banner">⚠ Pagina demo — contenuto non pubblicato su asglab.it</div>
+
+<div class="hero">
+  <div class="eyebrow">Strumenti tecnici › Database</div>
+  <h1>Cerca Bobina Solenoide</h1>
+  <p>Database di bobine per valvole oleodinamiche. Cerca per marca, tensione, connettore, dimensioni o usa la ricerca assistita AI per descrivere cosa ti serve a parole libere.</p>
+</div>
+
+<div class="page">
+  <div class="layout">
+
+    <!-- Filtri -->
+    <aside class="filters">
+      <div class="filters-title">Filtri</div>
+
+      <div class="filter-group">
+        <label class="filter-label">Marca / Serie</label>
+        <select id="fMarca">
+          <option value="">Tutte</option>
+          <option>Duplomatic</option>
+          <option>ATOS</option>
+          <option>Rexroth</option>
+          <option>Sun Hydraulics</option>
+          <option>Wandfluh</option>
+          <option>Parker</option>
+          <option>Ponar</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Tensione nominale</label>
+        <select id="fTensione">
+          <option value="">Tutte</option>
+          <option>12 VDC</option>
+          <option>24 VDC</option>
+          <option>110 VAC</option>
+          <option>230 VAC</option>
+          <option>24 VAC/RAC</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Tipo corrente</label>
+        <select id="fCorrente">
+          <option value="">Tutti</option>
+          <option>DC</option>
+          <option>AC</option>
+          <option>RAC (AC+rettificatore)</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Connettore</label>
+        <select id="fConnettore">
+          <option value="">Tutti</option>
+          <option>DIN 43650-A</option>
+          <option>DIN 43650-B</option>
+          <option>AMP Junior Timer</option>
+          <option>Deutsch DT</option>
+          <option>Hirschmann</option>
+          <option>Senza connettore (cavi)</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Grado di protezione IP</label>
+        <select id="fIP">
+          <option value="">Tutti</option>
+          <option>IP65</option>
+          <option>IP67</option>
+          <option>IP69K</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Resistenza bobina (Ω)</label>
+        <div class="range-row">
+          <input type="number" id="fROhm1" placeholder="Min" min="0" step="1">
+          <div class="range-sep">—</div>
+          <input type="number" id="fROhm2" placeholder="Max" min="0" step="1">
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Ricerca part number / testo</label>
+        <input type="text" id="fTesto" placeholder="es. EVS10 / M22 / 24V...">
+      </div>
+
+      <button class="btn-primary" onclick="doFilter()">🔍 Cerca</button>
+      <button class="btn-ghost" onclick="resetFilter()">✕ Azzera filtri</button>
+    </aside>
+
+    <!-- Contenuto principale -->
+    <main>
+
+      <!-- AI search -->
+      <div class="ai-box">
+        <div class="ai-header">
+          <span class="ai-badge">AI</span>
+          <span>Descrivi cosa ti serve — il motore AI trova la bobina giusta</span>
+        </div>
+        <div class="ai-input-row">
+          <input type="text" id="aiQuery" placeholder="es. «bobina 24V DIN per valvola Duplomatic senza diodo»  o  «equivalente a Rexroth R900019832»">
+          <button class="btn-ai" id="aiBtn" onclick="doAiSearch()">Chiedi</button>
+        </div>
+        <div id="aiResult"></div>
+      </div>
+
+      <!-- Header risultati -->
+      <div class="results-header">
+        <span class="results-count" id="resultsCount">— bobine trovate</span>
+        <select class="sort-select" id="sortBy" onchange="doFilter()">
+          <option value="marca">Ordina: Marca</option>
+          <option value="tensione">Ordina: Tensione</option>
+          <option value="res">Ordina: Resistenza</option>
+        </select>
+      </div>
+
+      <!-- Lista risultati -->
+      <div id="resultsList"></div>
+
+    </main>
+  </div>
+</div>
+
+<footer>
+  <div>© 2025 ASG LAB S.r.l. — Via Vitruvio 3, 20124 Milano — P.IVA 10122150963</div>
+  <div><a href="mailto:info@asglab.it" style="color:var(--muted)">info@asglab.it</a> — +39 375 5707492</div>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────
+// Dataset bobine (originale ASG LAB - non estratto da IH)
+// ─────────────────────────────────────────────
+const COILS = [
+  // DUPLOMATIC
+  { pn:"EVS10-24VDC/ST", marca:"Duplomatic", serie:"EVS10", tensione:"24 VDC", tipo:"DC",
+    connettore:"DIN 43650-A", ip:"IP65", resistenza_ohm:29, potenza_w:20, diodo:false,
+    desc:"Bobina standard per distributori Serie DS3/DS4 CETOP 3 e 5. Senza diodo flyback.", peso_g:180,
+    diam_int_mm:12.5, diam_est_mm:28, h_mm:40 },
+  { pn:"EVS10-24VDC/ST/D", marca:"Duplomatic", serie:"EVS10", tensione:"24 VDC", tipo:"DC",
+    connettore:"DIN 43650-A", ip:"IP65", resistenza_ohm:29, potenza_w:20, diodo:true,
+    desc:"Come EVS10-24VDC/ST ma con diodo flyback integrato — attenzione alla polarità.", peso_g:185,
+    diam_int_mm:12.5, diam_est_mm:28, h_mm:40 },
+  { pn:"EVS10-12VDC/ST", marca:"Duplomatic", serie:"EVS10", tensione:"12 VDC", tipo:"DC",
+    connettore:"DIN 43650-A", ip:"IP65", resistenza_ohm:7.5, potenza_w:19, diodo:false,
+    desc:"Variante 12V per applicazioni mobili. Resistenza a freddo ~6.8Ω.", peso_g:180,
+    diam_int_mm:12.5, diam_est_mm:28, h_mm:40 },
+  { pn:"EVS10-230VAC/50Hz", marca:"Duplomatic", serie:"EVS10", tensione:"230 VAC", tipo:"AC",
+    connettore:"DIN 43650-A", ip:"IP65", resistenza_ohm:1600, potenza_w:30, diodo:false,
+    desc:"Bobina AC 230V/50Hz con anello di smorzamento (shading ring). Solo installazioni fisse.", peso_g:195,
+    diam_int_mm:12.5, diam_est_mm:28, h_mm:40 },
+
+  // ATOS
+  { pn:"SP-CAL-210-24VDC", marca:"ATOS", serie:"SP-CAL", tensione:"24 VDC", tipo:"DC",
+    connettore:"DIN 43650-A", ip:"IP65", resistenza_ohm:26, potenza_w:22, diodo:true,
+    desc:"Bobina per valvole serie NG6 ATOS. Diodo flyback integrato. Morsetto DIN standard.", peso_g:165,
+    diam_int_mm:13, diam_est_mm:27, h_mm:38 },
+  { pn:"SP-CAL-215-24VDC-IP67", marca:"ATOS", serie:"SP-CAL", tensione:"24 VDC", tipo:"DC",
+    connettore:"DIN 43650-B", ip:"IP67", resistenza_ohm:26, potenza_w:22, diodo:true,
+    desc:"Versione IP67 con connettore DIN B (M18). Adatta per ambienti umidi e wash-down.", peso_g:175,
+    diam_int_mm:13, diam_est_mm:27, h_mm:38 },
+  { pn:"SP-CAL-220-12VDC", marca:"ATOS", serie:"SP-CAL", tensione:"12 VDC", tipo:"DC",
+    connettore:"DIN 43650-A", ip:"IP65", resistenza_ohm:6.8, potenza_w:21, diodo:false,
+    desc:"12VDC senza diodo. Per sistemi mobili con batteria a piombo 12V.", peso_g:165,
+    diam_int_mm:13, diam_est_mm:27, h_mm:38 },
+
+  // REXROTH
+  { pn:"R900019832", marca:"Rexroth", serie:"M-3SED", tensione:"24 VDC", tipo:"DC",
+    connettore:"DIN 43650-A", ip:"IP65", resistenza_ohm:32, potenza_w:18, diodo:true,
+    desc:"Bobina originale Rexroth per valvole M-3SED, 4WE6, 4WE10. Diodo varistivo integrato.", peso_g:200,
+    diam_int_mm:11.5, diam_est_mm:26, h_mm:42 },
+  { pn:"R900207788", marca:"Rexroth", serie:"4WE10", tensione:"24 VDC", tipo:"DC",
+    connettore:"DIN 43650-A", ip:"IP65", resistenza_ohm:32, potenza_w:18, diodo:true,
+    desc:"Bobina per distributori 4WE10 NG10. Intercambiabile R900019832 solo con verifica dimensionale.", peso_g:205,
+    diam_int_mm:11.5, diam_est_mm:26, h_mm:44 },
+  { pn:"R900560244", marca:"Rexroth", serie:"4WE6", tensione:"24 VAC/RAC", tipo:"RAC (AC+rettificatore)",
+    connettore:"DIN 43650-A", ip:"IP65", resistenza_ohm:18, potenza_w:20, diodo:false,
+    desc:"Bobina RAC: alimentazione 24VAC con rettificatore interno. Consente pilotaggio da PLC AC senza convertitore.", peso_g:210,
+    diam_int_mm:11.5, diam_est_mm:26, h_mm:42 },
+
+  // SUN HYDRAULICS
+  { pn:"923-0002", marca:"Sun Hydraulics", serie:"T-8A", tensione:"12 VDC", tipo:"DC",
+    connettore:"AMP Junior Timer", ip:"IP65", resistenza_ohm:4.4, potenza_w:33, diodo:false,
+    desc:"Bobina per cartucce Sun T-8A, T-8S. Connettore AMP 2 pin. Tutti i solenoidi Sun sono avvolti DC, anche quelli AC (rettificatore interno).", peso_g:145,
+    diam_int_mm:10, diam_est_mm:22, h_mm:35 },
+  { pn:"923-0003", marca:"Sun Hydraulics", serie:"T-8A", tensione:"24 VDC", tipo:"DC",
+    connettore:"AMP Junior Timer", ip:"IP65", resistenza_ohm:18, potenza_w:32, diodo:false,
+    desc:"Versione 24VDC per cartucce T-8A. Non ha polarità — nessun diodo flyback integrato.", peso_g:145,
+    diam_int_mm:10, diam_est_mm:22, h_mm:35 },
+  { pn:"923-0015-IP69K", marca:"Sun Hydraulics", serie:"T-8A", tensione:"24 VDC", tipo:"DC",
+    connettore:"Deutsch DT", ip:"IP69K", resistenza_ohm:18, potenza_w:32, diodo:true,
+    desc:"Versione Weatherized IP69K con connettore Deutsch DT. TVS surge suppressor integrato. Per applicazioni marine e wash-down.", peso_g:165,
+    diam_int_mm:10, diam_est_mm:22, h_mm:37 },
+
+  // WANDFLUH
+  { pn:"MA2301-24VDC", marca:"Wandfluh", serie:"MA23", tensione:"24 VDC", tipo:"DC",
+    connettore:"DIN 43650-A", ip:"IP65", resistenza_ohm:28, potenza_w:21, diodo:true,
+    desc:"Bobina Wandfluh per valvole NG6. Qualità svizzera, lunga vita in ciclo continuo.", peso_g:190,
+    diam_int_mm:12, diam_est_mm:27, h_mm:41 },
+
+  // PARKER
+  { pn:"S1-205000", marca:"Parker", serie:"S1", tensione:"230 VAC", tipo:"AC",
+    connettore:"DIN 43650-A", ip:"IP65", resistenza_ohm:1450, potenza_w:28, diodo:false,
+    desc:"Bobina AC 230V/50Hz Parker. True-AC con anello di smorzamento. VA apparente ~60VA, PF≈0.5.", peso_g:195,
+    diam_int_mm:12, diam_est_mm:27, h_mm:42 },
+  { pn:"S1-205100", marca:"Parker", serie:"S1", tensione:"24 VDC", tipo:"DC",
+    connettore:"DIN 43650-A", ip:"IP65", resistenza_ohm:31, potenza_w:19, diodo:false,
+    desc:"Versione DC della serie S1 Parker. Compatibile con distributori D1VW, D3W.", peso_g:185,
+    diam_int_mm:12, diam_est_mm:27, h_mm:42 },
+
+  // PONAR
+  { pn:"EM/SO24-M22", marca:"Ponar", serie:"EM/SO", tensione:"24 VDC", tipo:"DC",
+    connettore:"Hirschmann", ip:"IP65", resistenza_ohm:30, potenza_w:19, diodo:false,
+    desc:"Bobina economica per valvole Ponar/WEH. Connettore Hirschmann. Diffusa su macchinari est-europei.", peso_g:170,
+    diam_int_mm:12.5, diam_est_mm:27, h_mm:39 },
+];
+
+// ─────────────────────────────────────────────
+// Filtro + render
+// ─────────────────────────────────────────────
+function doFilter() {
+  const marca      = document.getElementById('fMarca').value;
+  const tensione   = document.getElementById('fTensione').value;
+  const corrente   = document.getElementById('fCorrente').value;
+  const connettore = document.getElementById('fConnettore').value;
+  const ip         = document.getElementById('fIP').value;
+  const rMin       = parseFloat(document.getElementById('fROhm1').value) || 0;
+  const rMax       = parseFloat(document.getElementById('fROhm2').value) || Infinity;
+  const testo      = document.getElementById('fTesto').value.toLowerCase();
+  const sort       = document.getElementById('sortBy').value;
+
+  let res = COILS.filter(c => {
+    if (marca      && c.marca !== marca)           return false;
+    if (tensione   && c.tensione !== tensione)     return false;
+    if (corrente   && c.tipo !== corrente)         return false;
+    if (connettore && c.connettore !== connettore) return false;
+    if (ip         && c.ip !== ip)                 return false;
+    if (c.resistenza_ohm < rMin || c.resistenza_ohm > rMax) return false;
+    if (testo && !(c.pn.toLowerCase().includes(testo) ||
+                   c.desc.toLowerCase().includes(testo) ||
+                   c.marca.toLowerCase().includes(testo) ||
+                   c.serie.toLowerCase().includes(testo))) return false;
+    return true;
+  });
+
+  if (sort === 'tensione') res.sort((a,b) => a.tensione.localeCompare(b.tensione));
+  else if (sort === 'res') res.sort((a,b) => a.resistenza_ohm - b.resistenza_ohm);
+  else res.sort((a,b) => a.marca.localeCompare(b.marca));
+
+  renderResults(res);
+}
+
+function resetFilter() {
+  ['fMarca','fTensione','fCorrente','fConnettore','fIP','sortBy'].forEach(id => document.getElementById(id).value = '');
+  ['fROhm1','fROhm2','fTesto'].forEach(id => document.getElementById(id).value = '');
+  doFilter();
+}
+
+function renderResults(list) {
+  const el = document.getElementById('resultsList');
+  document.getElementById('resultsCount').textContent = `${list.length} bobina${list.length !== 1 ? 'e' : ''} trovata${list.length !== 1 ? '' : ''}`;
+
+  if (!list.length) {
+    el.innerHTML = '<div class="no-results">Nessuna bobina corrisponde ai criteri selezionati.<br>Prova ad allargare i filtri o usa la ricerca AI.</div>';
+    return;
+  }
+
+  el.innerHTML = list.map(c => `
+    <div class="coil-card">
+      <div>
+        <div class="coil-pn">${c.pn}
+          <span class="coil-badge-${c.tipo === 'DC' ? 'dc' : 'ac'}" style="margin-left:0.5rem;font-size:0.72rem">
+            ${c.tipo}${c.diodo ? ' ⚡diodo' : ''}
+          </span>
+        </div>
+        <div class="coil-desc">${c.desc}</div>
+        <div class="coil-tags">
+          <span class="tag marca">${c.marca}</span>
+          <span class="tag tensione">${c.tensione}</span>
+          <span class="tag connettore">${c.connettore}</span>
+          <span class="tag ip">${c.ip}</span>
+        </div>
+      </div>
+      <div class="coil-specs">
+        <div class="spec-item"><span class="spec-val">${c.resistenza_ohm} Ω</span><span class="spec-key">Resistenza</span></div>
+        <div class="spec-item"><span class="spec-val">${c.potenza_w} W</span><span class="spec-key">Potenza</span></div>
+        <div class="spec-item"><span class="spec-val">ø${c.diam_est_mm}×${c.h_mm}</span><span class="spec-key">mm (est×H)</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─────────────────────────────────────────────
+// AI search via Anthropic API
+// ─────────────────────────────────────────────
+async function doAiSearch() {
+  const q = document.getElementById('aiQuery').value.trim();
+  if (!q) return;
+  const btn = document.getElementById('aiBtn');
+  const res = document.getElementById('aiResult');
+  btn.disabled = true; btn.textContent = '…';
+  res.style.display = 'block';
+  res.innerHTML = '<span class="ai-thinking">Analisi in corso…</span>';
+
+  const context = JSON.stringify(COILS.map(c => ({
+    pn: c.pn, marca: c.marca, tensione: c.tensione, tipo: c.tipo,
+    connettore: c.connettore, ip: c.ip, resistenza_ohm: c.resistenza_ohm,
+    potenza_w: c.potenza_w, diodo: c.diodo,
+    dim: `ø int ${c.diam_int_mm}mm, ø est ${c.diam_est_mm}mm, H ${c.h_mm}mm`,
+    desc: c.desc
+  })));
+
+  const systemPrompt = `Sei un assistente tecnico specializzato in oleodinamica industriale per ASG LAB S.r.l. (Milano). 
+Hai accesso al database bobine ASG LAB. Rispondi in italiano, in modo conciso e tecnico. 
+Quando suggerisci una bobina, cita il part number e spiega brevemente perché è adatta. 
+Se la richiesta contiene un part number concorrente, suggerisci il più simile nel database. 
+Se nessuna bobina è adatta, dillo chiaramente e suggerisci come affinare la ricerca.
+Database bobine disponibile: ${context}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: q }]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content?.map(b => b.text || '').join('') || 'Nessuna risposta.';
+    res.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  } catch(e) {
+    res.innerHTML = '<span style="color:var(--danger)">Errore di connessione all\'AI. Riprova.</span>';
+  }
+
+  btn.disabled = false; btn.textContent = 'Chiedi';
+}
+
+document.getElementById('aiQuery').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doAiSearch();
+});
+
+// Init
+doFilter();
+</script>
+</body>
+</html>

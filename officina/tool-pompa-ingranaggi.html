@@ -1,0 +1,132 @@
+<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cilindrata Pompa Ingranaggi — ASG LAB</title>
+<style>
+:root{--bg:#0f1117;--surface:#181c27;--card:#1e2333;--border:#2a3047;--accent:#e8b84b;--accent2:#4b8de8;--text:#d4d8e8;--muted:#6b7494;--danger:#e85b4b;--ok:#4be88a;--font-display:'Georgia',serif;--font-body:system-ui,sans-serif;--font-mono:'Courier New',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:20}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}
+.logo-mark{width:32px;height:32px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:bold;font-size:13px;color:#000}
+.logo-text{font-family:var(--font-display);font-size:1.05rem;color:var(--text)}.logo-text span{color:var(--accent)}
+nav{display:flex;gap:1.5rem}nav a{color:var(--muted);text-decoration:none;font-size:.85rem;letter-spacing:.04em;text-transform:uppercase}nav a.active{color:var(--text)}
+.demo-banner{background:repeating-linear-gradient(-45deg,#2a1f00 0,#2a1f00 10px,#1f1700 10px,#1f1700 20px);border-bottom:1px solid var(--accent);padding:.4rem 2rem;font-size:.75rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;text-align:center}
+.hero{padding:3rem 2rem 1.5rem;max-width:860px;margin:0 auto}
+.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem}
+h1{font-family:var(--font-display);font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:normal;color:#fff;margin-bottom:.6rem}
+.hero p{color:var(--muted);font-size:.9rem;max-width:560px}
+.page{max-width:860px;margin:0 auto;padding:0 2rem 4rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.6rem;margin-bottom:1.5rem}
+.card-title{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:520px){.grid-2{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:.35rem}
+label{font-size:.8rem;color:var(--muted)}
+.input-wrap{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:5px;overflow:hidden;transition:border-color .15s}
+.input-wrap:focus-within{border-color:var(--accent)}
+input[type=number]{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--font-mono);font-size:.95rem;padding:.5rem .7rem}
+.unit-badge{background:var(--surface);border-left:1px solid var(--border);padding:0 .6rem;font-size:.75rem;color:var(--muted);display:flex;align-items:center}
+.field-hint{font-size:.72rem;color:var(--muted);opacity:.7}
+.results-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem}
+@media(max-width:520px){.results-grid{grid-template-columns:1fr 1fr}}
+.res-block{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:1rem;text-align:center}
+.res-val{font-family:var(--font-mono);font-size:1.6rem;font-weight:bold;color:var(--accent);line-height:1.1}
+.res-unit{font-size:.75rem;color:var(--muted);margin-top:.15rem}
+.res-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.4rem}
+.formula{background:var(--bg);border-left:3px solid var(--accent2);border-radius:0 4px 4px 0;padding:.8rem 1.1rem;font-family:var(--font-mono);font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:2}
+.formula b{color:var(--text)}
+.note{font-size:.82rem;color:var(--muted);line-height:1.6;margin-top:.8rem}
+footer{border-top:1px solid var(--border);padding:1.2rem 2rem;max-width:860px;margin:0 auto;display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);flex-wrap:wrap;gap:.5rem}
+.back-link{font-size:.8rem;color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;gap:.3rem;margin-bottom:1.2rem}
+.back-link:hover{color:var(--accent)}
+</style></head><body>
+<header>
+  <a href="index.html" class="logo"><div class="logo-mark">ASG</div><span class="logo-text">ASG <span>LAB</span></span></a>
+  <nav><a href="index.html">← Strumenti</a><a href="#" class="active">Pompa Ingranaggi</a></nav>
+</header>
+<div class="demo-banner">⚠ Pagina demo — contenuto non pubblicato su asglab.it</div>
+<div class="hero">
+  <div class="eyebrow">Strumenti tecnici › Calcolatori</div>
+  <h1>Cilindrata Pompa a Ingranaggi Esterni</h1>
+  <p>Calcola la cilindrata teorica, la portata e la coppia assorbita di una pompa a ingranaggi esterni a partire dalle dimensioni geometriche degli ingranaggi.</p>
+</div>
+<div class="page">
+  <div class="card">
+    <div class="card-title">Geometria ingranaggi</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Numero di denti (z)</label>
+        <div class="input-wrap"><input type="number" id="z" value="11" min="6" max="30" step="1" oninput="calc()"></div>
+        <span class="field-hint">Denti per ciascuna ruota dentata</span>
+      </div>
+      <div class="field">
+        <label>Modulo (m)</label>
+        <div class="input-wrap"><input type="number" id="m" value="3" min="0.5" max="10" step="0.5" oninput="calc()"><span class="unit-badge">mm</span></div>
+        <span class="field-hint">Modulo secondo DIN 780 (es. 2, 2.5, 3, 4…)</span>
+      </div>
+      <div class="field">
+        <label>Larghezza dente (b)</label>
+        <div class="input-wrap"><input type="number" id="b" value="25" min="5" max="100" step="1" oninput="calc()"><span class="unit-badge">mm</span></div>
+        <span class="field-hint">Larghezza faccia ingranaggio</span>
+      </div>
+      <div class="field">
+        <label>Velocità di rotazione (n)</label>
+        <div class="input-wrap"><input type="number" id="n" value="1450" min="100" max="4000" step="50" oninput="calc()"><span class="unit-badge">rpm</span></div>
+        <span class="field-hint">Tipico: 1450 rpm (motore 4 poli 50Hz)</span>
+      </div>
+      <div class="field">
+        <label>Pressione di lavoro (Δp)</label>
+        <div class="input-wrap"><input type="number" id="dp" value="200" min="10" max="400" step="10" oninput="calc()"><span class="unit-badge">bar</span></div>
+      </div>
+      <div class="field">
+        <label>Efficienza volumetrica (η<sub>vol</sub>)</label>
+        <div class="input-wrap"><input type="number" id="etavol" value="0.92" min="0.7" max="0.99" step="0.01" oninput="calc()"></div>
+        <span class="field-hint">Tipico: 0.90–0.95 per pompe nuove</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Risultati</div>
+    <div class="results-grid">
+      <div class="res-block"><div class="res-val" id="rDisp">—</div><div class="res-unit">cc/giro</div><div class="res-label">Cilindrata teorica</div></div>
+      <div class="res-block"><div class="res-val" id="rFlow">—</div><div class="res-unit">l/min</div><div class="res-label">Portata reale</div></div>
+      <div class="res-block"><div class="res-val" id="rPower">—</div><div class="res-unit">kW</div><div class="res-label">Potenza assorbita</div></div>
+      <div class="res-block"><div class="res-val" id="rTorque">—</div><div class="res-unit">N·m</div><div class="res-label">Coppia all'albero</div></div>
+      <div class="res-block"><div class="res-val" id="rDp">—</div><div class="res-unit">mm</div><div class="res-label">Diametro primitivo</div></div>
+      <div class="res-block"><div class="res-val" id="rDe">—</div><div class="res-unit">mm</div><div class="res-label">Diametro esterno</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Formula</div>
+    <div class="formula">
+      <b>V</b> = 2π · z · m² · b &nbsp;&nbsp;[mm³/giro → cc/giro ÷ 1000]<br>
+      <b>Q</b> = V · n · η<sub>vol</sub> / 1000 &nbsp;&nbsp;[l/min]<br>
+      <b>P</b> = Q · Δp / 600 &nbsp;&nbsp;[kW]<br>
+      <b>T</b> = V · Δp / (20π) &nbsp;&nbsp;[N·m]<br>
+      <b>d</b> = m · z &nbsp;(diametro primitivo) &nbsp;|&nbsp; <b>D</b> = m · (z+2) &nbsp;(diametro esterno)
+    </div>
+    <p class="note">La formula V = 2π·z·m²·b è la cilindrata teorica per ingranaggi a denti diritti con profilo standard (angolo di pressione 20°, addendum = 1·m, dedendum = 1.25·m). Il fattore reale dipende dalla geometria esatta del profilo evolvente e dalla larghezza della camera. Per confronto con dati di catalogo usare sempre il dato misurato del costruttore.</p>
+  </div>
+</div>
+<footer><div>© 2025 ASG LAB S.r.l. — Via Vitruvio 3, 20124 Milano</div><div>info@asglab.it</div></footer>
+<script>
+function calc(){
+  const z=+document.getElementById('z').value||0;
+  const m=+document.getElementById('m').value||0;
+  const b=+document.getElementById('b').value||0;
+  const n=+document.getElementById('n').value||0;
+  const dp=+document.getElementById('dp').value||0;
+  const ev=+document.getElementById('etavol').value||0.92;
+  const V=2*Math.PI*z*m*m*b/1000; // cc/giro
+  const Q=V*n*ev/1000;             // l/min
+  const P=Q*dp/600;                // kW
+  const T=V*1000*dp/(20*Math.PI); // N·m  (V in cc→mm³ * dp bar / (20π) ≈ N·m)
+  const dp_mm=m*z;
+  const de_mm=m*(z+2);
+  set('rDisp',V,'1');set('rFlow',Q,'1');set('rPower',P,'2');
+  set('rTorque',T,'1');set('rDp',dp_mm,'1');set('rDe',de_mm,'1');
+}
+function set(id,v,dec){document.getElementById(id).textContent=isFinite(v)&&v>0?v.toFixed(dec):'—'}
+calc();
+</script>
+</body></html>

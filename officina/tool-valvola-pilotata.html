@@ -1,0 +1,137 @@
+<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Valvola Pilotata — ASG LAB</title>
+<style>
+:root{--bg:#0f1117;--surface:#181c27;--card:#1e2333;--border:#2a3047;--accent:#e8b84b;--accent2:#4b8de8;--text:#d4d8e8;--muted:#6b7494;--danger:#e85b4b;--ok:#4be88a;--font-display:'Georgia',serif;--font-body:system-ui,sans-serif;--font-mono:'Courier New',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:20}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}.logo-mark{width:32px;height:32px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:bold;font-size:13px;color:#000}
+.logo-text{font-family:var(--font-display);font-size:1.05rem;color:var(--text)}.logo-text span{color:var(--accent)}
+nav{display:flex;gap:1.5rem}nav a{color:var(--muted);text-decoration:none;font-size:.85rem;letter-spacing:.04em;text-transform:uppercase}nav a.active{color:var(--text)}
+.demo-banner{background:repeating-linear-gradient(-45deg,#2a1f00 0,#2a1f00 10px,#1f1700 10px,#1f1700 20px);border-bottom:1px solid var(--accent);padding:.4rem 2rem;font-size:.75rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;text-align:center}
+.hero{padding:3rem 2rem 1.5rem;max-width:860px;margin:0 auto}.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem}
+h1{font-family:var(--font-display);font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:normal;color:#fff;margin-bottom:.6rem}.hero p{color:var(--muted);font-size:.9rem;max-width:560px}
+.page{max-width:860px;margin:0 auto;padding:0 2rem 4rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.6rem;margin-bottom:1.5rem}
+.card-title{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}@media(max-width:520px){.grid-2{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:.35rem}label{font-size:.8rem;color:var(--muted)}
+.input-wrap{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:5px;overflow:hidden;transition:border-color .15s}.input-wrap:focus-within{border-color:var(--accent)}
+input[type=number],select{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--font-mono);font-size:.95rem;padding:.5rem .7rem}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7494'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .5rem center;padding-right:1.8rem}
+.unit-badge{background:var(--surface);border-left:1px solid var(--border);padding:0 .6rem;font-size:.75rem;color:var(--muted);display:flex;align-items:center}
+.field-hint{font-size:.72rem;color:var(--muted);opacity:.7}
+canvas{width:100%;display:block}
+.result-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin-top:.8rem}
+.rb{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:.7rem;text-align:center}
+.rv{font-family:var(--font-mono);font-size:1.1rem;font-weight:bold;color:var(--accent)}
+.ru{font-size:.7rem;color:var(--muted)}.rk{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:.2rem}
+.note{font-size:.82rem;color:var(--muted);line-height:1.6}
+footer{border-top:1px solid var(--border);padding:1.2rem 2rem;max-width:860px;margin:0 auto;display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);flex-wrap:wrap;gap:.5rem}
+</style></head><body>
+<header>
+  <a href="index.html" class="logo"><div class="logo-mark">ASG</div><span class="logo-text">ASG <span>LAB</span></span></a>
+  <nav><a href="index.html">← Strumenti</a><a href="#" class="active">Valvola Pilotata</a></nav>
+</header>
+<div class="demo-banner">⚠ Pagina demo — contenuto non pubblicato su asglab.it</div>
+<div class="hero">
+  <div class="eyebrow">Strumenti tecnici › Calcolatori</div>
+  <h1>Valvola di Non Ritorno Pilotata</h1>
+  <p>Grafico interattivo della pressione di pilotaggio necessaria per aprire una valvola di non ritorno pilotata (VNRP) montata sul cilindro, in funzione del carico, della contropressione e del rapporto di pilotaggio.</p>
+</div>
+<div class="page">
+  <div class="card">
+    <div class="card-title">Parametri</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Diametro pistone (D)</label>
+        <div class="input-wrap"><input type="number" id="D" value="80" min="20" max="400" step="5" oninput="calc()"><span class="unit-badge">mm</span></div>
+      </div>
+      <div class="field">
+        <label>Diametro stelo (d)</label>
+        <div class="input-wrap"><input type="number" id="d" value="50" min="0" max="300" step="5" oninput="calc()"><span class="unit-badge">mm</span></div>
+      </div>
+      <div class="field">
+        <label>Carico di compressione sul cilindro (F)</label>
+        <div class="input-wrap"><input type="number" id="F" value="40000" min="0" max="5000000" step="1000" oninput="calc()"><span class="unit-badge">N</span></div>
+        <span class="field-hint">Forza esterna che tende a far rientrare lo stelo</span>
+      </div>
+      <div class="field">
+        <label>Contropressione lato stelo (P<sub>b</sub>)</label>
+        <div class="input-wrap"><input type="number" id="Pb" value="5" min="0" max="50" step="1" oninput="calc()"><span class="unit-badge">bar</span></div>
+        <span class="field-hint">Contropressione nel circuito di ritorno</span>
+      </div>
+      <div class="field">
+        <label>Rapporto pilotaggio valvola (r)</label>
+        <div class="input-wrap">
+          <select id="r" onchange="calc()">
+            <option value="3">3:1</option>
+            <option value="4" selected>4:1 — standard</option>
+            <option value="4.5">4.5:1</option>
+            <option value="5">5:1</option>
+            <option value="6">6:1</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Grafico P<sub>pilota</sub> necessario vs carico F</div>
+    <canvas id="chart" height="220"></canvas>
+    <div class="result-row">
+      <div class="rb"><div class="rv" id="rPcilindr">—</div><div class="ru">bar</div><div class="rk">P lato pistone</div></div>
+      <div class="rb"><div class="rv" id="rPpilot">—</div><div class="ru">bar</div><div class="rk">P pilotaggio min</div></div>
+      <div class="rb"><div class="rv" id="rAeff">—</div><div class="ru">cm²</div><div class="rk">Area pistone</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Note tecniche</div>
+    <p class="note">La valvola di non ritorno pilotata (VNRP) blocca il flusso in una direzione finché non viene applicata una pressione di pilotaggio sul porto X. È comunemente usata come valvola di blocco su cilindri verticali e come valvola di bilanciamento in applicazioni di sollevamento. La pressione di pilotaggio minima necessaria per aprire la valvola contro un carico si calcola come: <code style="background:var(--bg);padding:0 .3rem;border-radius:3px">P_pilot = (P_carico − P_backpressure × A_stelo/A_pistone) / r</code>. A differenza della valvola overcenter, la VNRP non ha taratura interna — si apre appena il pilotaggio supera la soglia.</p>
+  </div>
+</div>
+<footer><div>© 2025 ASG LAB S.r.l. — Via Vitruvio 3, 20124 Milano</div><div>info@asglab.it</div></footer>
+<script>
+function calc(){
+  const D=+document.getElementById('D').value||80;
+  const d=+document.getElementById('d').value||50;
+  const F=+document.getElementById('F').value||0;
+  const Pb=+document.getElementById('Pb').value||0;
+  const r=+document.getElementById('r').value||4;
+  const Ap=Math.PI*D*D/4; // mm²
+  const Ar=Math.PI*(D*D-d*d)/4;
+  const Pc=F/Ap/10; // bar
+  const Pp=Math.max(0,(Pc-Pb*Ar/Ap)/r);
+  document.getElementById('rPcilindr').textContent=Pc.toFixed(1);
+  document.getElementById('rPpilot').textContent=Pp.toFixed(1);
+  document.getElementById('rAeff').textContent=(Ap/100).toFixed(2);
+  drawChart(D,d,Pb,r,F);
+}
+function drawChart(D,d,Pb,r,Fcur){
+  const canvas=document.getElementById('chart');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width=canvas.offsetWidth;const H=canvas.height=220;
+  ctx.clearRect(0,0,W,H);
+  const PAD={top:16,right:24,bottom:36,left:52};
+  const cW=W-PAD.left-PAD.right;const cH=H-PAD.top-PAD.bottom;
+  const Ap=Math.PI*D*D/4;const Ar=Math.PI*(D*D-d*d)/4;
+  const Fmax=Math.max(Fcur*2,100000);
+  const ppMax=((Fmax/Ap/10)-Pb*Ar/Ap)/r;
+  const yMax=Math.max(ppMax*1.1,10);
+  // grid
+  ctx.strokeStyle='#2a3047';ctx.lineWidth=1;
+  for(let g=0;g<=5;g++){const y=PAD.top+cH-(g/5)*cH;ctx.beginPath();ctx.moveTo(PAD.left,y);ctx.lineTo(PAD.left+cW,y);ctx.stroke();ctx.fillStyle='#6b7494';ctx.font='10px Courier New';ctx.textAlign='right';ctx.fillText((yMax*g/5).toFixed(0),PAD.left-5,y+4);}
+  for(let t=0;t<=5;t++){const x=PAD.left+(t/5)*cW;ctx.fillStyle='#6b7494';ctx.font='10px Courier New';ctx.textAlign='center';ctx.fillText(((Fmax*t/5)/1000).toFixed(0)+'kN',x,PAD.top+cH+18);}
+  ctx.fillStyle='#6b7494';ctx.font='10px system-ui';ctx.textAlign='center';
+  ctx.fillText('P pilot [bar]',14,PAD.top+cH/2);ctx.fillText('Forza carico F [kN]',PAD.left+cW/2,H-4);
+  // curve
+  ctx.beginPath();let first=true;const steps=80;
+  for(let i=0;i<=steps;i++){const f=(i/steps)*Fmax;const Pc=f/Ap/10;const pp=Math.max(0,(Pc-Pb*Ar/Ap)/r);const x=PAD.left+(f/Fmax)*cW;const y=PAD.top+cH-(Math.min(pp,yMax)/yMax)*cH;first?ctx.moveTo(x,y):ctx.lineTo(x,y);first=false;}
+  ctx.strokeStyle='#4b8de8';ctx.lineWidth=2;ctx.stroke();
+  // current point
+  const Ppc=(Fcur/Ap/10-Pb*Ar/Ap)/r;
+  if(Ppc>=0&&Fcur<=Fmax){const cx=PAD.left+(Fcur/Fmax)*cW;const cy=PAD.top+cH-(Math.min(Ppc,yMax)/yMax)*cH;ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);ctx.fillStyle='#4b8de8';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(75,141,232,.3)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(PAD.left,cy);ctx.lineTo(cx,cy);ctx.stroke();ctx.beginPath();ctx.moveTo(cx,PAD.top+cH);ctx.lineTo(cx,cy);ctx.stroke();ctx.setLineDash([]);}
+}
+window.addEventListener('resize',calc);calc();
+</script>
+</body></html>

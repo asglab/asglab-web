@@ -1,0 +1,152 @@
+<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Strumenti Tecnici — ASG LAB</title>
+<style>
+:root{--bg:#0f1117;--surface:#181c27;--card:#1e2333;--border:#2a3047;--accent:#e8b84b;--accent2:#4b8de8;--text:#d4d8e8;--muted:#6b7494;--danger:#e85b4b;--ok:#4be88a;--font-display:'Georgia',serif;--font-body:system-ui,sans-serif;--font-mono:'Courier New',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:20}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}.logo-mark{width:32px;height:32px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:bold;font-size:13px;color:#000}
+.logo-text{font-family:var(--font-display);font-size:1.05rem;color:var(--text)}.logo-text span{color:var(--accent)}
+nav{display:flex;gap:1.5rem}nav a{color:var(--muted);text-decoration:none;font-size:.85rem;letter-spacing:.04em;text-transform:uppercase;transition:color .15s}nav a:hover{color:var(--text)}nav a.active{color:var(--text)}
+.demo-banner{background:repeating-linear-gradient(-45deg,#2a1f00 0,#2a1f00 10px,#1f1700 10px,#1f1700 20px);border-bottom:1px solid var(--accent);padding:.4rem 2rem;font-size:.75rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;text-align:center}
+.hero{padding:3.5rem 2rem 2.5rem;max-width:980px;margin:0 auto}
+.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.8rem}
+h1{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,3rem);font-weight:normal;color:#fff;line-height:1.15;margin-bottom:1rem}
+h1 em{color:var(--accent);font-style:normal}
+.hero p{color:var(--muted);font-size:.95rem;max-width:560px;line-height:1.7}
+.page{max-width:980px;margin:0 auto;padding:0 2rem 5rem}
+/* categoria label */
+.cat-label{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:2rem 0 .8rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+/* griglia tool */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.9rem;margin-bottom:.5rem}
+/* card tool */
+.tool-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.3rem 1.4rem;text-decoration:none;display:flex;flex-direction:column;gap:.4rem;transition:border-color .15s,transform .15s,background .15s;cursor:pointer}
+.tool-card:hover{border-color:var(--accent);background:#222840;transform:translateY(-2px)}
+.tool-card:active{transform:translateY(0)}
+.tool-icon{font-size:1.4rem;line-height:1;margin-bottom:.2rem}
+.tool-name{font-size:.95rem;color:#fff;font-family:var(--font-display);font-weight:normal}
+.tool-desc{font-size:.78rem;color:var(--muted);line-height:1.5}
+.tool-tags{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.4rem}
+.tag{font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;padding:.1rem .4rem;border-radius:3px;border:1px solid var(--border);color:var(--muted)}
+.tag.ai{border-color:#2a3d6b;color:var(--accent2)}
+.tag.new{border-color:#3a2a00;color:var(--accent)}
+.tag.db{border-color:#2a3a2a;color:var(--ok)}
+.tag.calc{border-color:#3a2a2a;color:var(--danger)}
+/* stats bar */
+.stats-bar{display:flex;gap:2rem;margin-bottom:2.5rem;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column}
+.stat-val{font-family:var(--font-mono);font-size:2rem;font-weight:bold;color:var(--accent);line-height:1}
+.stat-key{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.2rem}
+/* divider */
+hr{border:none;border-top:1px solid var(--border);margin:2.5rem 0}
+footer{border-top:1px solid var(--border);padding:1.4rem 2rem;max-width:980px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;font-size:.75rem;color:var(--muted);flex-wrap:wrap;gap:.5rem}
+footer a{color:var(--muted);text-decoration:none}
+.footer-brand{display:flex;align-items:center;gap:.5rem}
+</style></head><body>
+
+<header>
+  <a href="#" class="logo"><div class="logo-mark">ASG</div><span class="logo-text">ASG <span>LAB</span></span></a>
+  <nav><a href="#">Prodotti</a><a href="#" class="active">Strumenti</a><a href="#">Tecnica</a><a href="#">Contatti</a></nav>
+</header>
+<div class="demo-banner">⚠ Suite demo — non ancora pubblicata su asglab.it</div>
+
+<div class="hero">
+  <div class="eyebrow">ASG LAB › Strumenti Tecnici</div>
+  <h1>Calcolatori e database<br>per l'<em>oleodinamica industriale</em></h1>
+  <p>Strumenti tecnici sviluppati internamente da ASG LAB per il dimensionamento, la diagnosi e la selezione di componenti idraulici. Gratuiti, senza registrazione, disponibili anche offline.</p>
+</div>
+
+<div class="page">
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-val">10</span><span class="stat-key">Tool disponibili</span></div>
+    <div class="stat"><span class="stat-val">2</span><span class="stat-key">Con AI integrata</span></div>
+    <div class="stat"><span class="stat-val">3</span><span class="stat-key">Database interattivi</span></div>
+    <div class="stat"><span class="stat-val">5</span><span class="stat-key">Calcolatori</span></div>
+  </div>
+
+  <div class="cat-label">Calcolatori idraulici</div>
+  <div class="tools-grid">
+
+    <a class="tool-card" href="tool-orifizio.html">
+      <div class="tool-icon">🔵</div>
+      <div class="tool-name">Perdita di Pressione su Orifizio</div>
+      <div class="tool-desc">Stima la caduta di pressione attraverso un orifizio calibrato. Grafico ΔP vs portata in tempo reale. Formula derivata da Bernoulli, coefficiente Cd configurabile.</div>
+      <div class="tool-tags"><span class="tag calc">Calcolatore</span><span class="tag new">Nuovo</span></div>
+    </a>
+
+    <a class="tool-card" href="tool-pompa-ingranaggi.html">
+      <div class="tool-icon">⚙️</div>
+      <div class="tool-name">Cilindrata Pompa a Ingranaggi</div>
+      <div class="tool-desc">Calcola cilindrata teorica, portata reale, potenza assorbita e coppia di una pompa a ingranaggi esterni dai parametri geometrici (modulo, denti, larghezza).</div>
+      <div class="tool-tags"><span class="tag calc">Calcolatore</span></div>
+    </a>
+
+    <a class="tool-card" href="tool-pressione-tubo.html">
+      <div class="tool-icon">🔴</div>
+      <div class="tool-name">Pressione Max Tubi e Cilindri</div>
+      <div class="tool-desc">Pressione massima ammissibile per tubi in acciaio (EN 10305) e camicie cilindri. Materiali E235, E355, C45, 42CrMo4. Fattore di sicurezza configurabile.</div>
+      <div class="tool-tags"><span class="tag calc">Calcolatore</span></div>
+    </a>
+
+    <a class="tool-card" href="tool-nomogramma-tubi.html">
+      <div class="tool-icon">📐</div>
+      <div class="tool-name">Dimensionamento Tubi e Flessibili</div>
+      <div class="tool-desc">Determina il diametro interno minimo in funzione di portata e velocità raccomandata. Confronto automatico con tutti i DN standard disponibili. Velocità per linee aspirazione, ritorno e pressione.</div>
+      <div class="tool-tags"><span class="tag calc">Calcolatore</span></div>
+    </a>
+
+    <a class="tool-card" href="tool-overcenter.html">
+      <div class="tool-icon">🔒</div>
+      <div class="tool-name">Valvola di Blocco / Overcenter</div>
+      <div class="tool-desc">Calcola la pressione minima di pilotaggio per aprire una valvola overcenter (counterbalance) a pilotaggio esterno. Grafico interattivo P<sub>pilot</sub> vs rapporto r.</div>
+      <div class="tool-tags"><span class="tag calc">Calcolatore</span></div>
+    </a>
+
+    <a class="tool-card" href="tool-valvola-pilotata.html">
+      <div class="tool-icon">⬆️</div>
+      <div class="tool-name">Valvola di Non Ritorno Pilotata</div>
+      <div class="tool-desc">Grafico della pressione di pilotaggio necessaria per aprire una VNRP su cilindro, in funzione del carico, contropressione e rapporto di pilotaggio.</div>
+      <div class="tool-tags"><span class="tag calc">Calcolatore</span></div>
+    </a>
+
+  </div>
+
+  <div class="cat-label">Database e tabelle</div>
+  <div class="tools-grid">
+
+    <a class="tool-card" href="tool-bobine.html">
+      <div class="tool-icon">🧲</div>
+      <div class="tool-name">Cerca Bobina Solenoide</div>
+      <div class="tool-desc">Database bobine per valvole oleodinamiche (Duplomatic, ATOS, Rexroth, Sun, Parker…). Filtri per tensione, connettore, IP, resistenza. Ricerca AI in linguaggio naturale.</div>
+      <div class="tool-tags"><span class="tag db">Database</span><span class="tag ai">AI</span><span class="tag new">Nuovo</span></div>
+    </a>
+
+    <a class="tool-card" href="tool-oring.html">
+      <div class="tool-icon">⭕</div>
+      <div class="tool-name">Tabella O-Ring Standard</div>
+      <div class="tool-desc">O-ring secondo ISO 3601 (metrici), BS 1806 (BSP) e AS 568 (SAE/pollici). Dimensioni, diametri derivati, materiali NBR / FKM / EPDM / PU e temperatura di esercizio.</div>
+      <div class="tool-tags"><span class="tag db">Database</span></div>
+    </a>
+
+    <a class="tool-card" href="tool-flange-sae.html">
+      <div class="tool-icon">🔩</div>
+      <div class="tool-name">Flange SAE J518 / ISO 6162</div>
+      <div class="tool-desc">Tabella dimensionale completa flange SAE — Serie 3000 PSI e 6000 PSI. Diametri, fori, passo bulloni, coppie di serraggio, O-ring AS 568, pressione massima.</div>
+      <div class="tool-tags"><span class="tag db">Database</span></div>
+    </a>
+
+  </div>
+
+  <hr>
+  <p style="font-size:.82rem;color:var(--muted);line-height:1.7;max-width:600px">
+    Hai trovato un errore o vorresti un tool specifico? Scrivi a <a href="mailto:info@asglab.it" style="color:var(--accent)">info@asglab.it</a> — il nostro ufficio tecnico risponde a tutte le richieste. Tutti i calcolatori sono forniti a scopo indicativo: per progettazioni definitive fare sempre riferimento alle norme applicabili e ai dati dei costruttori.
+  </p>
+</div>
+
+<footer>
+  <div class="footer-brand">
+    <div style="width:24px;height:24px;background:var(--accent);border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:bold;font-size:10px;color:#000">ASG</div>
+    <span>© 2025 ASG LAB S.r.l. — Via Vitruvio 3, 20124 Milano — P.IVA 10122150963</span>
+  </div>
+  <div><a href="mailto:info@asglab.it">info@asglab.it</a> · +39 375 5707492</div>
+</footer>
+</body></html>

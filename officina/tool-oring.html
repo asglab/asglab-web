@@ -1,0 +1,258 @@
+<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tabella O-Ring — ASG LAB</title>
+<style>
+:root{--bg:#0f1117;--surface:#181c27;--card:#1e2333;--border:#2a3047;--accent:#e8b84b;--accent2:#4b8de8;--text:#d4d8e8;--muted:#6b7494;--danger:#e85b4b;--ok:#4be88a;--font-display:'Georgia',serif;--font-body:system-ui,sans-serif;--font-mono:'Courier New',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:20}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}.logo-mark{width:32px;height:32px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:bold;font-size:13px;color:#000}
+.logo-text{font-family:var(--font-display);font-size:1.05rem;color:var(--text)}.logo-text span{color:var(--accent)}
+nav{display:flex;gap:1.5rem}nav a{color:var(--muted);text-decoration:none;font-size:.85rem;letter-spacing:.04em;text-transform:uppercase}nav a.active{color:var(--text)}
+.demo-banner{background:repeating-linear-gradient(-45deg,#2a1f00 0,#2a1f00 10px,#1f1700 10px,#1f1700 20px);border-bottom:1px solid var(--accent);padding:.4rem 2rem;font-size:.75rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;text-align:center}
+.hero{padding:3rem 2rem 1.5rem;max-width:980px;margin:0 auto}.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem}
+h1{font-family:var(--font-display);font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:normal;color:#fff;margin-bottom:.6rem}.hero p{color:var(--muted);font-size:.9rem;max-width:580px}
+.page{max-width:980px;margin:0 auto;padding:0 2rem 4rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.6rem;margin-bottom:1.5rem}
+.card-title{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
+.toolbar{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1.2rem;align-items:center}
+.tab-group{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:5px;overflow:hidden}
+.tab{padding:.4rem .9rem;font-size:.8rem;cursor:pointer;color:var(--muted);border:none;background:transparent;transition:background .15s,color .15s}
+.tab.active{background:var(--accent);color:#000;font-weight:bold}
+input[type=text]{background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--font-mono);font-size:.85rem;padding:.4rem .7rem;outline:none;transition:border-color .15s;width:220px}
+input[type=text]:focus{border-color:var(--accent)}
+.count{font-size:.78rem;color:var(--muted);margin-left:auto}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+thead th{color:var(--muted);font-weight:normal;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;padding:.4rem .6rem;border-bottom:1px solid var(--border);text-align:left;cursor:pointer;user-select:none;white-space:nowrap}
+thead th:hover{color:var(--text)}
+thead th.sorted{color:var(--accent)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:rgba(255,255,255,.03)}
+tbody tr:last-child{border-bottom:none}
+td{padding:.4rem .6rem;font-family:var(--font-mono);color:var(--text)}
+td.label{font-family:var(--font-body);color:var(--muted);font-size:.78rem}
+.badge{display:inline-block;font-size:.65rem;padding:.1rem .4rem;border-radius:3px;font-family:var(--font-body);font-weight:bold;letter-spacing:.04em}
+.badge-nbr{background:#1a2a1a;color:var(--ok)}
+.badge-fkm{background:#1a1a2a;color:var(--accent2)}
+.badge-epdm{background:#2a1a1a;color:var(--danger)}
+.badge-pu{background:#2a2a10;color:var(--accent)}
+footer{border-top:1px solid var(--border);padding:1.2rem 2rem;max-width:980px;margin:0 auto;display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);flex-wrap:wrap;gap:.5rem}
+</style></head><body>
+<header>
+  <a href="index.html" class="logo"><div class="logo-mark">ASG</div><span class="logo-text">ASG <span>LAB</span></span></a>
+  <nav><a href="index.html">← Strumenti</a><a href="#" class="active">Tabella O-Ring</a></nav>
+</header>
+<div class="demo-banner">⚠ Pagina demo — contenuto non pubblicato su asglab.it</div>
+<div class="hero">
+  <div class="eyebrow">Strumenti tecnici › Database</div>
+  <h1>Tabella O-Ring Standard</h1>
+  <p>Dimensioni di O-ring secondo ISO 3601 (metrici), BS 1806 (BSP) e AS 568 (SAE/pollici). Cerca per diametro interno, sezione o codice. Materiali: NBR, FKM, EPDM, PU.</p>
+</div>
+<div class="page">
+  <div class="card">
+    <div class="card-title">Cerca O-Ring</div>
+    <div class="toolbar">
+      <div class="tab-group">
+        <button class="tab active" onclick="setStd('ISO')">ISO 3601 (metrici)</button>
+        <button class="tab" onclick="setStd('BS')">BS 1806 (BSP)</button>
+        <button class="tab" onclick="setStd('AS')">AS 568 (SAE)</button>
+      </div>
+      <input type="text" id="search" placeholder="Cerca codice / dimensione…" oninput="render()">
+      <span class="count" id="count"></span>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('code')">Codice</th>
+            <th onclick="sortBy('di')">Ø int (mm)</th>
+            <th onclick="sortBy('cs')">Sezione (mm)</th>
+            <th onclick="sortBy('de')">Ø est (mm)</th>
+            <th>Materiali</th>
+            <th class="label">Note</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Guida materiali</div>
+    <table style="font-size:.82rem">
+      <thead><tr><th>Materiale</th><th>T° min</th><th>T° max</th><th>Fluidi compatibili</th><th>Non idoneo per</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-nbr">NBR</span> Nitrile</td><td>−40°C</td><td>+120°C</td><td>Oli minerali, gasolio, LHM, LP</td><td>Glicole, chetoni, freni DOT</td></tr>
+        <tr><td><span class="badge badge-fkm">FKM</span> Viton</td><td>−20°C</td><td>+200°C</td><td>Oli sintetici, Skydrol, acidi</td><td>Acetone, MEK, ammine</td></tr>
+        <tr><td><span class="badge badge-epdm">EPDM</span></td><td>−50°C</td><td>+150°C</td><td>Acqua, vapore, HFC, freni DOT</td><td>Oli minerali (incompatibile)</td></tr>
+        <tr><td><span class="badge badge-pu">PU</span> Poliuretano</td><td>−30°C</td><td>+100°C</td><td>Oli minerali, HFA, HFB</td><td>Acidi, acqua calda > 60°C</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<footer><div>© 2025 ASG LAB S.r.l. — Via Vitruvio 3, 20124 Milano</div><div>info@asglab.it</div></footer>
+<script>
+// Dataset O-ring (campione rappresentativo - dataset completo da ISO 3601 / BS 1806 / AS 568)
+const DATA = {
+  ISO:[
+    // ISO 3601 — formato: code, di(mm), cs(mm), note
+    {code:'01-3.0×1.0',di:3.0,cs:1.0,note:'Serie 1'},
+    {code:'02-4.0×1.0',di:4.0,cs:1.0,note:'Serie 1'},
+    {code:'03-5.0×1.0',di:5.0,cs:1.0,note:''},
+    {code:'04-6.0×1.0',di:6.0,cs:1.0,note:''},
+    {code:'05-7.0×1.5',di:7.0,cs:1.5,note:''},
+    {code:'06-8.0×1.5',di:8.0,cs:1.5,note:'Comune valvole cartuccia'},
+    {code:'07-9.0×1.5',di:9.0,cs:1.5,note:''},
+    {code:'08-10.0×1.5',di:10.0,cs:1.5,note:''},
+    {code:'09-11.0×1.5',di:11.0,cs:1.5,note:''},
+    {code:'10-12.0×1.5',di:12.0,cs:1.5,note:''},
+    {code:'11-13.0×1.5',di:13.0,cs:1.5,note:''},
+    {code:'12-14.0×1.5',di:14.0,cs:1.5,note:'Porte BSP 1/4"'},
+    {code:'13-15.0×1.5',di:15.0,cs:1.5,note:''},
+    {code:'14-16.0×2.0',di:16.0,cs:2.0,note:''},
+    {code:'15-17.0×2.0',di:17.0,cs:2.0,note:'Porte BSP 3/8"'},
+    {code:'16-18.0×2.0',di:18.0,cs:2.0,note:''},
+    {code:'17-19.0×2.0',di:19.0,cs:2.0,note:''},
+    {code:'18-20.0×2.0',di:20.0,cs:2.0,note:''},
+    {code:'19-21.0×2.5',di:21.0,cs:2.5,note:''},
+    {code:'20-22.0×2.5',di:22.0,cs:2.5,note:'Porte BSP 1/2"'},
+    {code:'21-23.0×2.5',di:23.0,cs:2.5,note:''},
+    {code:'22-24.0×2.5',di:24.0,cs:2.5,note:''},
+    {code:'23-25.0×2.5',di:25.0,cs:2.5,note:''},
+    {code:'24-26.0×2.5',di:26.0,cs:2.5,note:''},
+    {code:'25-27.0×2.5',di:27.0,cs:2.5,note:''},
+    {code:'26-28.0×2.5',di:28.0,cs:2.5,note:''},
+    {code:'27-29.0×2.5',di:29.0,cs:2.5,note:'Porte BSP 3/4"'},
+    {code:'28-30.0×3.0',di:30.0,cs:3.0,note:''},
+    {code:'29-32.0×3.0',di:32.0,cs:3.0,note:''},
+    {code:'30-34.0×3.0',di:34.0,cs:3.0,note:''},
+    {code:'31-36.0×3.0',di:36.0,cs:3.0,note:'Porte BSP 1"'},
+    {code:'32-38.0×3.0',di:38.0,cs:3.0,note:''},
+    {code:'33-40.0×3.0',di:40.0,cs:3.0,note:''},
+    {code:'34-42.0×3.0',di:42.0,cs:3.0,note:''},
+    {code:'35-45.0×3.0',di:45.0,cs:3.0,note:'Porte BSP 1¼"'},
+    {code:'36-48.0×3.5',di:48.0,cs:3.5,note:''},
+    {code:'37-50.0×3.5',di:50.0,cs:3.5,note:''},
+    {code:'38-52.0×3.5',di:52.0,cs:3.5,note:''},
+    {code:'39-54.0×3.5',di:54.0,cs:3.5,note:'Porte BSP 1½"'},
+    {code:'40-56.0×3.5',di:56.0,cs:3.5,note:''},
+    {code:'41-60.0×4.0',di:60.0,cs:4.0,note:''},
+    {code:'42-63.0×4.0',di:63.0,cs:4.0,note:'Porte BSP 2"'},
+    {code:'43-67.0×4.0',di:67.0,cs:4.0,note:''},
+    {code:'44-70.0×4.0',di:70.0,cs:4.0,note:''},
+    {code:'45-75.0×4.0',di:75.0,cs:4.0,note:''},
+    {code:'46-80.0×4.0',di:80.0,cs:4.0,note:''},
+    {code:'47-85.0×4.0',di:85.0,cs:4.0,note:''},
+    {code:'48-90.0×5.0',di:90.0,cs:5.0,note:''},
+    {code:'49-95.0×5.0',di:95.0,cs:5.0,note:''},
+    {code:'50-100.0×5.0',di:100.0,cs:5.0,note:''},
+    {code:'51-106.0×5.0',di:106.0,cs:5.0,note:''},
+    {code:'52-112.0×5.0',di:112.0,cs:5.0,note:''},
+    {code:'53-118.0×5.0',di:118.0,cs:5.0,note:''},
+    {code:'54-125.0×6.0',di:125.0,cs:6.0,note:''},
+    {code:'55-132.0×6.0',di:132.0,cs:6.0,note:''},
+    {code:'56-140.0×6.0',di:140.0,cs:6.0,note:''},
+    {code:'57-150.0×6.0',di:150.0,cs:6.0,note:''},
+  ],
+  BS:[
+    // BS 1806 (BSP) — codici e dimensioni approssimati
+    {code:'BS001A',di:1.02,cs:1.02,note:'1/16" BSP'},
+    {code:'BS002A',di:2.57,cs:1.02,note:''},
+    {code:'BS003A',di:3.69,cs:1.02,note:'1/8" BSP'},
+    {code:'BS004A',di:5.28,cs:1.78,note:'1/4" BSP'},
+    {code:'BS005A',di:7.66,cs:1.78,note:'3/8" BSP'},
+    {code:'BS006A',di:10.82,cs:2.62,note:'1/2" BSP'},
+    {code:'BS007A',di:13.95,cs:2.62,note:''},
+    {code:'BS008A',di:17.17,cs:2.62,note:'3/4" BSP'},
+    {code:'BS009A',di:21.89,cs:2.62,note:'1" BSP'},
+    {code:'BS010A',di:26.57,cs:2.62,note:'1¼" BSP'},
+    {code:'BS011A',di:33.74,cs:3.53,note:'1½" BSP'},
+    {code:'BS012A',di:42.52,cs:3.53,note:'2" BSP'},
+    {code:'BS013A',di:54.50,cs:3.53,note:'2½" BSP'},
+    {code:'BS014A',di:67.57,cs:3.53,note:'3" BSP'},
+    {code:'BS015A',di:80.70,cs:5.33,note:'3½" BSP'},
+    {code:'BS016A',di:93.25,cs:5.33,note:'4" BSP'},
+  ],
+  AS:[
+    // AS 568A (SAE) — dash sizes principali
+    {code:'-003',di:1.78,cs:1.02,note:''},
+    {code:'-004',di:2.57,cs:1.02,note:''},
+    {code:'-005',di:3.69,cs:1.02,note:''},
+    {code:'-006',di:4.47,cs:1.02,note:''},
+    {code:'-008',di:6.07,cs:1.02,note:''},
+    {code:'-010',di:7.65,cs:1.02,note:''},
+    {code:'-012',di:9.25,cs:1.02,note:''},
+    {code:'-014',di:10.82,cs:1.78,note:''},
+    {code:'-016',di:12.42,cs:1.78,note:''},
+    {code:'-018',di:14.00,cs:1.78,note:''},
+    {code:'-020',di:15.60,cs:1.78,note:''},
+    {code:'-022',di:17.17,cs:1.78,note:''},
+    {code:'-024',di:18.77,cs:1.78,note:''},
+    {code:'-025',di:20.35,cs:1.78,note:''},
+    {code:'-026',di:21.95,cs:1.78,note:''},
+    {code:'-028',di:23.52,cs:1.78,note:''},
+    {code:'-030',di:25.12,cs:1.78,note:''},
+    {code:'-032',di:26.70,cs:1.78,note:''},
+    {code:'-034',di:28.30,cs:1.78,note:''},
+    {code:'-036',di:29.87,cs:1.78,note:''},
+    {code:'-110',di:8.43,cs:2.62,note:''},
+    {code:'-112',di:11.63,cs:2.62,note:''},
+    {code:'-114',di:14.82,cs:2.62,note:''},
+    {code:'-116',di:17.44,cs:2.62,note:''},
+    {code:'-118',di:19.99,cs:2.62,note:''},
+    {code:'-120',di:22.61,cs:2.62,note:''},
+    {code:'-125',di:30.40,cs:2.62,note:''},
+    {code:'-130',di:38.20,cs:2.62,note:''},
+    {code:'-135',di:44.45,cs:2.62,note:''},
+    {code:'-140',di:50.70,cs:2.62,note:''},
+    {code:'-210',di:11.91,cs:3.53,note:''},
+    {code:'-214',di:18.64,cs:3.53,note:''},
+    {code:'-218',di:25.35,cs:3.53,note:''},
+    {code:'-222',di:31.42,cs:3.53,note:''},
+    {code:'-226',di:38.10,cs:3.53,note:''},
+    {code:'-232',di:47.63,cs:3.53,note:''},
+    {code:'-238',di:57.15,cs:3.53,note:''},
+    {code:'-244',di:69.85,cs:3.53,note:''},
+    {code:'-250',di:82.55,cs:3.53,note:''},
+    {code:'-312',di:20.24,cs:5.33,note:''},
+    {code:'-320',di:44.45,cs:5.33,note:''},
+    {code:'-328',di:63.50,cs:5.33,note:''},
+    {code:'-336',di:82.55,cs:5.33,note:''},
+    {code:'-344',di:101.60,cs:5.33,note:''},
+    {code:'-352',di:126.97,cs:5.33,note:''},
+  ]
+};
+const MATS=['<span class="badge badge-nbr">NBR</span>','<span class="badge badge-fkm">FKM</span>','<span class="badge badge-epdm">EPDM</span>','<span class="badge badge-pu">PU</span>'];
+let currentStd='ISO',sortCol='di',sortDir=1;
+
+function setStd(s){
+  currentStd=s;
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['ISO','BS','AS'][i]===s));
+  render();
+}
+function sortBy(col){
+  if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}
+  document.querySelectorAll('thead th').forEach(th=>th.classList.remove('sorted'));
+  render();
+}
+function render(){
+  const q=document.getElementById('search').value.toLowerCase();
+  let rows=DATA[currentStd].filter(r=>
+    !q||r.code.toLowerCase().includes(q)||
+    r.di.toString().includes(q)||r.cs.toString().includes(q)||
+    (r.note||'').toLowerCase().includes(q)
+  );
+  rows.sort((a,b)=>(a[sortCol]>b[sortCol]?1:-1)*sortDir);
+  document.getElementById('count').textContent=rows.length+' O-ring';
+  document.getElementById('tbody').innerHTML=rows.map(r=>{
+    const de=(r.di+2*r.cs).toFixed(2);
+    return`<tr>
+      <td>${r.code}</td>
+      <td>${r.di.toFixed(2)}</td>
+      <td>${r.cs.toFixed(2)}</td>
+      <td>${de}</td>
+      <td>${MATS.join(' ')}</td>
+      <td class="label">${r.note||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+render();
+</script>
+</body></html>

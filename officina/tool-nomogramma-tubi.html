@@ -1,0 +1,173 @@
+<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dimensionamento Tubi — ASG LAB</title>
+<style>
+:root{--bg:#0f1117;--surface:#181c27;--card:#1e2333;--border:#2a3047;--accent:#e8b84b;--accent2:#4b8de8;--text:#d4d8e8;--muted:#6b7494;--danger:#e85b4b;--ok:#4be88a;--font-display:'Georgia',serif;--font-body:system-ui,sans-serif;--font-mono:'Courier New',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:20}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}.logo-mark{width:32px;height:32px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:bold;font-size:13px;color:#000}
+.logo-text{font-family:var(--font-display);font-size:1.05rem;color:var(--text)}.logo-text span{color:var(--accent)}
+nav{display:flex;gap:1.5rem}nav a{color:var(--muted);text-decoration:none;font-size:.85rem;letter-spacing:.04em;text-transform:uppercase}nav a.active{color:var(--text)}
+.demo-banner{background:repeating-linear-gradient(-45deg,#2a1f00 0,#2a1f00 10px,#1f1700 10px,#1f1700 20px);border-bottom:1px solid var(--accent);padding:.4rem 2rem;font-size:.75rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;text-align:center}
+.hero{padding:3rem 2rem 1.5rem;max-width:980px;margin:0 auto}.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem}
+h1{font-family:var(--font-display);font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:normal;color:#fff;margin-bottom:.6rem}.hero p{color:var(--muted);font-size:.9rem;max-width:580px}
+.page{max-width:980px;margin:0 auto;padding:0 2rem 4rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.6rem;margin-bottom:1.5rem}
+.card-title{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
+.layout{display:grid;grid-template-columns:260px 1fr;gap:1.2rem}
+@media(max-width:700px){.layout{grid-template-columns:1fr}}
+.sidebar{display:flex;flex-direction:column;gap:1rem}
+.field{display:flex;flex-direction:column;gap:.35rem}
+label{font-size:.8rem;color:var(--muted)}
+.input-wrap{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:5px;overflow:hidden;transition:border-color .15s}.input-wrap:focus-within{border-color:var(--accent)}
+input[type=number],select{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--font-mono);font-size:.95rem;padding:.5rem .7rem}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7494'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .5rem center;padding-right:1.8rem}
+.unit-badge{background:var(--surface);border-left:1px solid var(--border);padding:0 .6rem;font-size:.75rem;color:var(--muted);display:flex;align-items:center}
+.field-hint{font-size:.72rem;color:var(--muted);opacity:.7}
+/* velocity zone selector */
+.zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.zone-btn{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:.5rem .6rem;cursor:pointer;text-align:left;transition:border-color .15s,background .15s}
+.zone-btn.active{border-color:var(--accent);background:rgba(232,184,75,.08)}
+.zone-btn .zname{font-size:.78rem;color:var(--text)}
+.zone-btn .zrange{font-size:.68rem;color:var(--muted);font-family:var(--font-mono)}
+/* result panel */
+.result-panel{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:1.2rem;margin-bottom:.8rem}
+.vel-indicator{margin-bottom:1rem}
+.vel-bar-bg{background:var(--border);border-radius:3px;height:8px;position:relative;margin:.4rem 0}
+.vel-bar-fill{height:8px;border-radius:3px;transition:width .3s,background .3s;position:absolute;left:0;top:0}
+.vel-val{font-family:var(--font-mono);font-size:1.8rem;font-weight:bold;line-height:1;color:var(--accent)}
+.vel-unit{font-size:.8rem;color:var(--muted)}
+.dn-table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:.8rem}
+.dn-table th{color:var(--muted);font-weight:normal;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;padding:.3rem .5rem;border-bottom:1px solid var(--border);text-align:left}
+.dn-table td{padding:.35rem .5rem;border-bottom:1px solid var(--border);font-family:var(--font-mono)}
+.dn-table tr:last-child td{border-bottom:none}
+.ok-row{background:rgba(75,232,138,.06);border-left:3px solid var(--ok)}
+.warn-row{background:rgba(232,184,75,.06)}
+.bad-row{opacity:.4}
+.tag-ok{color:var(--ok);font-size:.7rem;font-weight:bold}
+.tag-warn{color:var(--accent);font-size:.7rem}
+.tag-bad{color:var(--danger);font-size:.7rem}
+footer{border-top:1px solid var(--border);padding:1.2rem 2rem;max-width:980px;margin:0 auto;display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);flex-wrap:wrap;gap:.5rem}
+</style></head><body>
+<header>
+  <a href="index.html" class="logo"><div class="logo-mark">ASG</div><span class="logo-text">ASG <span>LAB</span></span></a>
+  <nav><a href="index.html">← Strumenti</a><a href="#" class="active">Dimensionamento Tubi</a></nav>
+</header>
+<div class="demo-banner">⚠ Pagina demo — contenuto non pubblicato su asglab.it</div>
+<div class="hero">
+  <div class="eyebrow">Strumenti tecnici › Calcolatori</div>
+  <h1>Dimensionamento Tubi e Tubi Flessibili</h1>
+  <p>Determina il diametro interno minimo di un tubo o tubo flessibile in funzione di portata e velocità di scorrimento raccomandata. Confronto immediato con i DN standard disponibili.</p>
+</div>
+<div class="page">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="card" style="margin-bottom:0">
+        <div class="card-title">Parametri</div>
+        <div style="display:flex;flex-direction:column;gap:.9rem">
+          <div class="field">
+            <label>Portata</label>
+            <div class="input-wrap"><input type="number" id="Q" value="30" min="0.1" max="2000" step="1" oninput="calc()"><span class="unit-badge">l/min</span></div>
+          </div>
+          <div class="field">
+            <label>Tipo linea — velocità raccomandata</label>
+            <div class="zone-grid">
+              <div class="zone-btn active" onclick="setZone(this,2,4)" data-vmin="2" data-vmax="4"><div class="zname">🔵 Aspirazione</div><div class="zrange">0.5 – 2 m/s</div></div>
+              <div class="zone-btn" onclick="setZone(this,2,4)" data-vmin="2" data-vmax="4"><div class="zname">🟡 Ritorno</div><div class="zrange">2 – 4 m/s</div></div>
+              <div class="zone-btn" onclick="setZone(this,4,6)" data-vmin="4" data-vmax="6"><div class="zname">🟠 Pressione bassa</div><div class="zrange">3 – 6 m/s</div></div>
+              <div class="zone-btn" onclick="setZone(this,4,6)" data-vmin="4" data-vmax="6"><div class="zname">🔴 Pressione alta</div><div class="zrange">4 – 8 m/s</div></div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Velocità target</label>
+            <div class="input-wrap"><input type="number" id="v" value="3" min="0.2" max="15" step="0.1" oninput="calc()"><span class="unit-badge">m/s</span></div>
+            <span class="field-hint">Modifica manuale se necessario</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-title">Diametro interno minimo calcolato</div>
+        <div class="result-panel">
+          <div class="vel-val" id="rDi">—</div>
+          <div class="vel-unit">mm — Ø interno minimo</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:.3rem" id="rFormula">Q = v · A</div>
+        </div>
+        <div class="card-title" style="margin-top:1rem">DN standard consigliati — tubo acciaio EN 10305 e tubo flessibile</div>
+        <table class="dn-table" id="dnTable">
+          <thead><tr><th>DN</th><th>Ø int. reale (mm)</th><th>Velocità effettiva</th><th>Valutazione</th></tr></thead>
+          <tbody id="dnBody"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Velocità raccomandate ISO/industria</div>
+        <table style="font-size:.82rem;width:100%;border-collapse:collapse">
+          <thead><tr>
+            <th style="color:var(--muted);font-weight:normal;font-size:.72rem;text-transform:uppercase;padding:.3rem .5rem;border-bottom:1px solid var(--border);text-align:left">Tipo linea</th>
+            <th style="color:var(--muted);font-weight:normal;font-size:.72rem;text-transform:uppercase;padding:.3rem .5rem;border-bottom:1px solid var(--border)">v min (m/s)</th>
+            <th style="color:var(--muted);font-weight:normal;font-size:.72rem;text-transform:uppercase;padding:.3rem .5rem;border-bottom:1px solid var(--border)">v max (m/s)</th>
+            <th style="color:var(--muted);font-weight:normal;font-size:.72rem;text-transform:uppercase;padding:.3rem .5rem;border-bottom:1px solid var(--border);text-align:left">Note</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:.35rem .5rem">Aspirazione pompa</td><td style="padding:.35rem .5rem;text-align:center;font-family:var(--font-mono)">0.5</td><td style="padding:.35rem .5rem;text-align:center;font-family:var(--font-mono)">1.5</td><td style="padding:.35rem .5rem;font-size:.78rem;color:var(--muted)">Cavitazione se >1.5 m/s</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:.35rem .5rem">Linea di ritorno</td><td style="padding:.35rem .5rem;text-align:center;font-family:var(--font-mono)">2</td><td style="padding:.35rem .5rem;text-align:center;font-family:var(--font-mono)">4</td><td style="padding:.35rem .5rem;font-size:.78rem;color:var(--muted)">Filtro ritorno: ridurre</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:.35rem .5rem">Linea pressione &lt;150 bar</td><td style="padding:.35rem .5rem;text-align:center;font-family:var(--font-mono)">3</td><td style="padding:.35rem .5rem;text-align:center;font-family:var(--font-mono)">6</td><td style="padding:.35rem .5rem;font-size:.78rem;color:var(--muted)">Tubi flessibili: max 5 m/s</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:.35rem .5rem">Linea pressione &gt;150 bar</td><td style="padding:.35rem .5rem;text-align:center;font-family:var(--font-mono)">4</td><td style="padding:.35rem .5rem;text-align:center;font-family:var(--font-mono)">8</td><td style="padding:.35rem .5rem;font-size:.78rem;color:var(--muted)">Rumore e usura a velocità elevate</td></tr>
+            <tr><td style="padding:.35rem .5rem">Scarico solenoidi / drenaggi</td><td style="padding:.35rem .5rem;text-align:center;font-family:var(--font-mono)">—</td><td style="padding:.35rem .5rem;text-align:center;font-family:var(--font-mono)">1</td><td style="padding:.35rem .5rem;font-size:.78rem;color:var(--muted)">Contropressione scarico: &lt;3 bar</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<footer><div>© 2025 ASG LAB S.r.l. — Via Vitruvio 3, 20124 Milano</div><div>info@asglab.it</div></footer>
+<script>
+// DN standard: [nome, Di_mm]
+const DNS=[
+  ['DN4 (1/8")',4],['DN5',5],['DN6 (1/4")',6],['DN7',7],['DN8 (5/16")',8],
+  ['DN10 (3/8")',10],['DN12 (1/2")',12],['DN13',13],['DN16 (5/8")',16],
+  ['DN18',18],['DN19 (3/4")',19],['DN20',20],['DN22',22],['DN25 (1")',25],
+  ['DN28',28],['DN32 (1¼")',32],['DN38 (1½")',38],['DN40',40],
+  ['DN50 (2")',50],['DN51',51],['DN63 (2½")',63],['DN76 (3")',76]
+];
+let vMin=0.5,vMax=2;
+
+function setZone(el,min,max){
+  document.querySelectorAll('.zone-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  vMin=+el.dataset.vmin; vMax=+el.dataset.vmax;
+  const vTarget=(vMin+vMax)/2;
+  document.getElementById('v').value=vTarget.toFixed(1);
+  calc();
+}
+function calc(){
+  const Q=+document.getElementById('Q').value||0;
+  const v=+document.getElementById('v').value||1;
+  // Di = sqrt(4Q / (π·v·60000)) in m → mm
+  const Q_m3s=Q/60000;
+  const A=Q_m3s/v; // m²
+  const Di_m=Math.sqrt(4*A/Math.PI);
+  const Di_mm=Di_m*1000;
+  document.getElementById('rDi').textContent=Di_mm.toFixed(1);
+  document.getElementById('rFormula').textContent=`D = √(4·Q / π·v) = √(4·${Q}/(π·${v}·60000)) · 1000 = ${Di_mm.toFixed(1)} mm`;
+  // confronto DN
+  const rows=DNS.map(([name,di])=>{
+    const A_dn=Math.PI*(di/1000)*(di/1000)/4;
+    const v_eff=(Q/60000)/A_dn;
+    const ok=v_eff>=vMin&&v_eff<=vMax;
+    const low=v_eff<vMin;
+    const over=v_eff>vMax*1.5;
+    let cls=over?'bad-row':low?'':'ok-row';
+    if(!ok&&!over&&!low)cls='warn-row';
+    const tag=over?`<span class="tag-bad">⚠ troppo veloce</span>`:ok?`<span class="tag-ok">✓ ottimale</span>`:`<span class="tag-warn">～ accettabile</span>`;
+    return`<tr class="${cls}"><td>${name}</td><td>${di}</td><td>${v_eff.toFixed(2)} m/s</td><td>${tag}</td></tr>`;
+  });
+  document.getElementById('dnBody').innerHTML=rows.join('');
+}
+// init
+document.querySelector('.zone-btn').dispatchEvent(new Event('click'));
+calc();
+</script>
+</body></html>

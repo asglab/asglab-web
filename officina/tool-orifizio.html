@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calcolatore Perdita di Pressione su Orifizio — ASG LAB</title>
+<style>
+  /* ── Tokens ── */
+  :root {
+    --bg:        #0f1117;
+    --surface:   #181c27;
+    --card:      #1e2333;
+    --border:    #2a3047;
+    --accent:    #e8b84b;       /* oro industriale */
+    --accent2:   #4b8de8;       /* blu tecnico */
+    --text:      #d4d8e8;
+    --muted:     #6b7494;
+    --danger:    #e85b4b;
+    --ok:        #4be88a;
+
+    --font-display: 'Georgia', 'Times New Roman', serif;
+    --font-body:    system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono:    'Courier New', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+  }
+
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-weight: bold;
+    font-size: 13px;
+    color: #000;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-text {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+
+  .logo-text span { color: var(--accent); }
+
+  nav { display: flex; gap: 1.5rem; }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: color 0.15s;
+  }
+  nav a:hover { color: var(--accent); }
+  nav a.active { color: var(--text); }
+
+  /* ── Demo badge ── */
+  .demo-banner {
+    background: repeating-linear-gradient(
+      -45deg, #2a1f00 0px, #2a1f00 10px, #1f1700 10px, #1f1700 20px
+    );
+    border-bottom: 1px solid var(--accent);
+    padding: 0.4rem 2rem;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 3.5rem 2rem 2rem;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: normal;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .hero p {
+    color: var(--muted);
+    max-width: 600px;
+    font-size: 0.95rem;
+  }
+
+  /* ── Layout ── */
+  .page { max-width: 860px; margin: 0 auto; padding: 0 2rem 4rem; }
+
+  /* ── Card ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.6rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Form grid ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 520px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 0.35rem; }
+
+  label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+  }
+
+  .input-wrap {
+    display: flex;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .input-wrap:focus-within { border-color: var(--accent); }
+
+  input[type=number], select {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    padding: 0.5rem 0.7rem;
+  }
+
+  .unit-badge {
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    padding: 0 0.6rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    display: flex; align-items: center;
+    white-space: nowrap;
+  }
+
+  select {
+    cursor: pointer;
+    padding: 0.5rem 0.7rem;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7494'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
+    padding-right: 2rem;
+  }
+
+  .field-hint {
+    font-size: 0.72rem;
+    color: var(--muted);
+    opacity: 0.7;
+  }
+
+  /* ── Slider ── */
+  .slider-wrap { margin-top: 0.4rem; }
+  input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  .slider-labels {
+    display: flex; justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    margin-top: 0.2rem;
+  }
+
+  /* ── Result box ── */
+  .result-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.2rem 1.4rem;
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .result-value {
+    font-family: var(--font-mono);
+    font-size: 2.8rem;
+    font-weight: bold;
+    color: var(--accent);
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .result-value.danger { color: var(--danger); }
+  .result-value.ok     { color: var(--ok); }
+
+  .result-unit {
+    font-size: 1rem;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+
+  .result-label {
+    flex-basis: 100%;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+  }
+
+  /* ── Chart ── */
+  #chart {
+    width: 100%;
+    height: 200px;
+    display: block;
+  }
+
+  /* ── Formula box ── */
+  .formula {
+    background: var(--bg);
+    border-left: 3px solid var(--accent2);
+    border-radius: 0 4px 4px 0;
+    padding: 0.8rem 1.1rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    line-height: 2;
+  }
+
+  .formula b { color: var(--text); }
+
+  /* ── Legenda Cd ── */
+  .cd-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+  .cd-table th {
+    color: var(--muted);
+    text-align: left;
+    font-weight: normal;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.3rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .cd-table td {
+    padding: 0.35rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+  }
+  .cd-table tr:last-child td { border-bottom: none; }
+  .cd-table .highlight { background: rgba(232,184,75,0.06); }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1.2rem 2rem;
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    color: var(--muted);
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  footer a { color: var(--muted); }
+  .disclaimer {
+    font-size: 0.72rem;
+    color: var(--muted);
+    opacity: 0.6;
+    margin-top: 0.5rem;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <a href="#" class="logo">
+    <div class="logo-mark">ASG</div>
+    <span class="logo-text">ASG <span>LAB</span></span>
+  </a>
+  <nav>
+    <a href="#">Prodotti</a>
+    <a href="#" class="active">Strumenti</a>
+    <a href="#">Tecnica</a>
+    <a href="#">Contatti</a>
+  </nav>
+</header>
+
+<!-- Demo banner -->
+<div class="demo-banner">⚠ Pagina demo — contenuto non pubblicato su asglab.it</div>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="eyebrow">Strumenti tecnici › Calcolatori</div>
+  <h1>Perdita di pressione<br>su orifizio idraulico</h1>
+  <p>Stima la caduta di pressione attraverso un orifizio calibrato in funzione della portata, del diametro e della viscosità dell'olio. Utile per il dimensionamento di orifizi di smorzamento, valvole a cartuccia e restrizioni di flusso.</p>
+</div>
+
+<!-- Pagina -->
+<div class="page">
+
+  <!-- Card parametri -->
+  <div class="card">
+    <div class="card-title">Parametri di ingresso</div>
+    <div class="grid-2">
+
+      <div class="field">
+        <label>Diametro orifizio</label>
+        <div class="input-wrap">
+          <input type="number" id="diam" value="1.5" min="0.1" max="20" step="0.1" oninput="calc()">
+          <span class="unit-badge">mm</span>
+        </div>
+        <span class="field-hint">Diametro del foro calibrato</span>
+      </div>
+
+      <div class="field">
+        <label>Portata</label>
+        <div class="input-wrap">
+          <input type="number" id="flow" value="10" min="0.1" max="500" step="0.5" oninput="calc()">
+          <span class="unit-badge">l/min</span>
+        </div>
+        <div class="slider-wrap">
+          <input type="range" id="flowSlider" min="0.1" max="100" step="0.5" value="10"
+                 oninput="document.getElementById('flow').value=this.value; calc()">
+          <div class="slider-labels"><span>0</span><span>50</span><span>100 l/min</span></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Densità olio</label>
+        <div class="input-wrap">
+          <select id="density" onchange="calc()">
+            <option value="870">Minerale ISO VG 46 — 870 kg/m³</option>
+            <option value="875" selected>Minerale ISO VG 68 — 875 kg/m³</option>
+            <option value="880">Minerale ISO VG 100 — 880 kg/m³</option>
+            <option value="920">HFA/HFB (sintesi) — 920 kg/m³</option>
+            <option value="1000">HFC (acqua-glicole) — 1000 kg/m³</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Coefficiente di efflusso Cd</label>
+        <div class="input-wrap">
+          <input type="number" id="cd" value="0.70" min="0.4" max="0.95" step="0.01" oninput="calc()">
+        </div>
+        <span class="field-hint">Tipico: 0.62–0.78 (vedi tabella)</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Card risultato -->
+  <div class="card">
+    <div class="card-title">Risultato</div>
+    <div class="result-box">
+      <div class="result-value" id="result">—</div>
+      <div class="result-unit">bar</div>
+      <div class="result-label" id="result-label">Caduta di pressione stimata all'orifizio</div>
+    </div>
+    <div style="margin-top:1rem;">
+      <div class="card-title" style="margin-bottom:0.8rem;">Curva ΔP vs portata (0 → portata impostata × 2)</div>
+      <canvas id="chart"></canvas>
+    </div>
+  </div>
+
+  <!-- Card formula -->
+  <div class="card">
+    <div class="card-title">Formula e note</div>
+    <div class="formula">
+      <b>Q</b> = Cd · A · √(2·ΔP / ρ)<br>
+      →&nbsp;&nbsp;<b>ΔP</b> = ρ · Q² / (2 · Cd² · A²)<br><br>
+      <b>Q</b> = portata [m³/s] &nbsp;|&nbsp; <b>A</b> = π·d²/4 [m²]<br>
+      <b>ρ</b> = densità olio [kg/m³] &nbsp;|&nbsp; <b>Cd</b> = coeff. efflusso [-]<br>
+      <b>ΔP</b> = perdita di pressione [Pa → convertita in bar]
+    </div>
+    <p style="font-size:0.82rem; color:var(--muted); margin-bottom:1rem;">
+      La formula deriva dall'equazione di Bernoulli per fluido incomprimibile in regime turbolento. 
+      Il coefficiente Cd compensa la contrazione della vena fluida (<em>vena contracta</em>) e le perdite per attrito sul bordo dell'orifizio. 
+      Per orifizi a spigolo vivo con regime turbolento sviluppato (Re > 5000) il valore canonico è <strong style="color:var(--text)">Cd ≈ 0.62 – 0.65</strong>.
+    </p>
+
+    <div class="card-title" style="margin-top:1.2rem;">Valori di riferimento Cd</div>
+    <table class="cd-table">
+      <tr>
+        <th>Geometria orifizio</th>
+        <th>Cd tipico</th>
+        <th>Note</th>
+      </tr>
+      <tr>
+        <td>Spigolo vivo, Re > 5000</td>
+        <td>0.61 – 0.64</td>
+        <td>Riferimento Danfoss</td>
+      </tr>
+      <tr class="highlight">
+        <td>Spigolo vivo con raccordo</td>
+        <td>0.68 – 0.72</td>
+        <td>Orifizi calibrati standard</td>
+      </tr>
+      <tr>
+        <td>Bocchello corto (l/d ≈ 1)</td>
+        <td>0.75 – 0.82</td>
+        <td>Riferimento Hawe Hydraulik</td>
+      </tr>
+      <tr>
+        <td>Profilo arrotondato</td>
+        <td>0.90 – 0.98</td>
+        <td>Bassa perdita, raro in oleodinamica</td>
+      </tr>
+    </table>
+    <p class="disclaimer" style="margin-top:0.8rem;">
+      ⚠ Questo calcolatore fornisce stime teoriche per fluido newtoniano in regime stazionario. 
+      Per progettazione definitiva fare riferimento ai dati sperimentali del costruttore. 
+      La viscosità non è inclusa nel modello semplificato (Torricelli); per bassi numeri di Reynolds (Re &lt; 2000) il Cd dipende dal numero di Reynolds e i risultati possono discostarsi significativamente.
+    </p>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="page" style="padding-top:0;">
+  <footer>
+    <div>© 2025 ASG LAB S.r.l. — Via Vitruvio 3, 20124 Milano</div>
+    <div>P.IVA 10122150963 — <a href="mailto:info@asglab.it">info@asglab.it</a></div>
+  </footer>
+</div>
+
+<script>
+// ── Calc engine ──
+function calc() {
+  const d_mm  = parseFloat(document.getElementById('diam').value)  || 0;
+  const Q_lpm = parseFloat(document.getElementById('flow').value)  || 0;
+  const rho   = parseFloat(document.getElementById('density').value) || 875;
+  const Cd    = parseFloat(document.getElementById('cd').value)    || 0.70;
+
+  // sync slider
+  document.getElementById('flowSlider').value = Math.min(Q_lpm, 100);
+
+  const dP = computeDP(Q_lpm, d_mm, rho, Cd);
+
+  const el = document.getElementById('result');
+  if (!isFinite(dP) || d_mm <= 0 || Q_lpm <= 0) {
+    el.textContent = '—';
+    el.className = 'result-value';
+    document.getElementById('result-label').textContent = 'Inserire valori validi';
+    drawChart(Q_lpm, d_mm, rho, Cd);
+    return;
+  }
+
+  el.textContent = dP.toFixed(1);
+  el.className   = 'result-value' + (dP > 350 ? ' danger' : dP < 5 ? ' ok' : '');
+
+  let warn = '';
+  if (dP > 350) warn = '⚠ Perdita molto elevata — verificare il dimensionamento';
+  else if (dP > 100) warn = 'Perdita significativa — valutare se accettabile per il circuito';
+  else warn = 'Caduta di pressione stimata all\'orifizio';
+  document.getElementById('result-label').textContent = warn;
+
+  drawChart(Q_lpm, d_mm, rho, Cd);
+}
+
+function computeDP(Q_lpm, d_mm, rho, Cd) {
+  const Q  = Q_lpm / 60000;          // m³/s
+  const d  = d_mm  / 1000;           // m
+  const A  = Math.PI * d * d / 4;    // m²
+  const dP_Pa = rho * Q * Q / (2 * Cd * Cd * A * A);
+  return dP_Pa / 100000;             // bar
+}
+
+// ── Chart ──
+function drawChart(Q_max_lpm, d_mm, rho, Cd) {
+  const canvas = document.getElementById('chart');
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.width  = canvas.offsetWidth;
+  const H = canvas.height = 200;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const PAD = { top: 16, right: 16, bottom: 36, left: 52 };
+  const cW = W - PAD.left - PAD.right;
+  const cH = H - PAD.top  - PAD.bottom;
+
+  const maxQ  = Math.max(Q_max_lpm * 2, 5);
+  const steps = 120;
+
+  // compute max ΔP for scale
+  let maxDP = 0;
+  for (let i = 1; i <= steps; i++) {
+    const q = (i / steps) * maxQ;
+    const dp = computeDP(q, d_mm, rho, Cd);
+    if (isFinite(dp)) maxDP = Math.max(maxDP, dp);
+  }
+  if (maxDP === 0) return;
+  const scaleDP = niceMax(maxDP);
+
+  // grid
+  const gridColor = '#2a3047';
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth   = 1;
+  const gridLines = 5;
+  for (let g = 0; g <= gridLines; g++) {
+    const y = PAD.top + cH - (g / gridLines) * cH;
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + cW, y);
+    ctx.stroke();
+    // label
+    ctx.fillStyle = '#6b7494';
+    ctx.font = '10px Courier New';
+    ctx.textAlign = 'right';
+    ctx.fillText((scaleDP * g / gridLines).toFixed(0), PAD.left - 6, y + 4);
+  }
+
+  // axis labels
+  ctx.fillStyle = '#6b7494';
+  ctx.font = '10px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('ΔP [bar]', 14, PAD.top + cH / 2);
+  ctx.fillText('Portata [l/min]', PAD.left + cW / 2, H - 4);
+
+  // Q axis ticks
+  const qTicks = 5;
+  for (let t = 0; t <= qTicks; t++) {
+    const x = PAD.left + (t / qTicks) * cW;
+    const q = (t / qTicks) * maxQ;
+    ctx.fillStyle = '#6b7494';
+    ctx.font = '10px Courier New';
+    ctx.textAlign = 'center';
+    ctx.fillText(q.toFixed(0), x, PAD.top + cH + 18);
+    ctx.beginPath(); ctx.moveTo(x, PAD.top + cH); ctx.lineTo(x, PAD.top + cH + 4);
+    ctx.strokeStyle = gridColor; ctx.lineWidth = 1; ctx.stroke();
+  }
+
+  // curve
+  ctx.beginPath();
+  let firstPoint = true;
+  for (let i = 1; i <= steps; i++) {
+    const q  = (i / steps) * maxQ;
+    const dp = computeDP(q, d_mm, rho, Cd);
+    if (!isFinite(dp)) continue;
+    const x = PAD.left + (q  / maxQ)   * cW;
+    const y = PAD.top  + cH - (dp / scaleDP) * cH;
+    firstPoint ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    firstPoint = false;
+  }
+  ctx.strokeStyle = '#e8b84b';
+  ctx.lineWidth   = 2;
+  ctx.stroke();
+
+  // current point dot
+  if (Q_max_lpm > 0 && d_mm > 0) {
+    const dpCur = computeDP(Q_max_lpm, d_mm, rho, Cd);
+    if (isFinite(dpCur) && dpCur <= scaleDP) {
+      const cx = PAD.left + (Q_max_lpm / maxQ) * cW;
+      const cy = PAD.top  + cH - (dpCur / scaleDP) * cH;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+      ctx.fillStyle   = dpCur > 350 ? '#e85b4b' : '#e8b84b';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth   = 1.5;
+      ctx.stroke();
+
+      // dashed reference lines
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = 'rgba(232,184,75,0.3)';
+      ctx.lineWidth   = 1;
+      ctx.beginPath(); ctx.moveTo(PAD.left, cy); ctx.lineTo(cx, cy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, PAD.top + cH); ctx.lineTo(cx, cy); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+}
+
+function niceMax(v) {
+  const mag   = Math.pow(10, Math.floor(Math.log10(v)));
+  const steps = [1, 2, 5, 10];
+  for (const s of steps) if (s * mag >= v) return s * mag;
+  return v;
+}
+
+// Init
+window.addEventListener('load', calc);
+window.addEventListener('resize', () => calc());
+</script>
+</body>
+</html>
