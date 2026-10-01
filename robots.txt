@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://asglab.it/sitemap.xml
